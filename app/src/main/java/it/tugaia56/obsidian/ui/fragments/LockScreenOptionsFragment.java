@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import it.tugaia56.obsidian.R;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
@@ -55,9 +56,6 @@ public class LockScreenOptionsFragment extends Fragment {
     private static final String KEY_MEDIA_BLUR       = "lockscreen_media_blur";       // 0-100
 
     private RecyclerView mRv;
-    private ListWidgetAdapter mCarrierAdapter;
-    private ListWidgetAdapter mFilterAdapter;
-    private SliderWidgetAdapter mBlurAdapter;
     // Stato SOLO visivo (non persistito): lo switch attiva soltanto, il tocco sul nome
     // apre/chiude le opzioni sottostanti — stesso pattern di QsTilesCustomizeFragment.
     private boolean mLockBlurExpanded = ObsidianPrefs.getBoolean(PREF_BLUR_ON, false);
@@ -96,11 +94,13 @@ public class LockScreenOptionsFragment extends Fragment {
             rebuild();
         };
         lockBlurSwitch.onRowClick = () -> { mLockBlurExpanded = !mLockBlurExpanded; rebuild(); };
-        chain.add(new SwitchWidgetAdapter(List.of(lockBlurSwitch)));
+        List<Object> blurRows = new java.util.ArrayList<>();
+        blurRows.add(lockBlurSwitch);
         if (mLockBlurExpanded) {
-            chain.add(sliderRow(getString(R.string.qs_blur_intentisy), PREF_BLUR_RADIUS, 0, 100, 40, "%"));
-            chain.add(sliderRow(getString(R.string.qs_blur_max_amount), PREF_BLUR_MAX, 0, 100, 100, "%"));
+            blurRows.add(sliderItem(getString(R.string.qs_blur_intentisy), PREF_BLUR_RADIUS, 0, 100, 40, "%"));
+            blurRows.add(sliderItem(getString(R.string.qs_blur_max_amount), PREF_BLUR_MAX, 0, 100, 100, "%"));
         }
+        GroupUtils.addGroup(chain, blurRows);
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.nav_lock_misc))));
         SwitchWidgetAdapter.SwitchItem lockIconItem = prefSwitch(
@@ -109,26 +109,21 @@ public class LockScreenOptionsFragment extends Fragment {
                 getString(R.string.lockscreen_affordance_remove_left), null, "lockscreen_affordance_remove_left");
         SwitchWidgetAdapter.SwitchItem rightItem = prefSwitch(
                 getString(R.string.lockscreen_affordance_remove_right), null, "lockscreen_affordance_remove_right");
-        chain.add(new SwitchWidgetAdapter(List.of(lockIconItem, leftItem, rightItem)));
-
         SwitchWidgetAdapter.SwitchItem sosItem = prefSwitch(
                 getString(R.string.lockscreen_hide_sos), getString(R.string.lockscreen_hide_sos_summary),
                 "lockscreen_hide_sos");
         SwitchWidgetAdapter.SwitchItem carrierItem = prefSwitch(
                 getString(R.string.lockscreen_hide_carrier), getString(R.string.lockscreen_hide_carrier_summary),
                 "lockscreen_hide_carrier");
-        chain.add(new SwitchWidgetAdapter(List.of(sosItem, carrierItem)));
-
-        mCarrierAdapter = carrierReplacementRow();
-        chain.add(mCarrierAdapter);
-
         SwitchWidgetAdapter.SwitchItem statusbarItem = prefSwitch(
                 getString(R.string.lockscreen_hide_statusbar), getString(R.string.lockscreen_hide_statusbar_summary),
                 "lockscreen_hide_statusbar");
         SwitchWidgetAdapter.SwitchItem powerMenuItem = prefSwitch(
                 getString(R.string.lockscreen_hide_power_menu), getString(R.string.lockscreen_hide_power_menu_summary),
                 "lockscreen_hide_power_menu");
-        chain.add(new SwitchWidgetAdapter(List.of(statusbarItem, powerMenuItem)));
+        GroupUtils.addGroup(chain, List.of(
+                lockIconItem, leftItem, rightItem, sosItem, carrierItem,
+                carrierReplacementItem(), statusbarItem, powerMenuItem));
 
         // ── Sfondo con Effetto Profondità: apre l'editor nativo di OxygenOS, non un
         // hook nostro — vedi il commento in testa alla classe. ──
@@ -149,13 +144,13 @@ public class LockScreenOptionsFragment extends Fragment {
             rebuild();
         };
         albumArtItem.onRowClick = () -> { mAlbumArtExpanded = !mAlbumArtExpanded; rebuild(); };
-        chain.add(new SwitchWidgetAdapter(List.of(albumArtItem)));
+        List<Object> albumRows = new java.util.ArrayList<>();
+        albumRows.add(albumArtItem);
         if (mAlbumArtExpanded) {
-            mFilterAdapter = filterRow();
-            chain.add(mFilterAdapter);
-            mBlurAdapter = blurRow();
-            chain.add(mBlurAdapter);
+            albumRows.add(filterItem());
+            albumRows.add(blurItem());
         }
+        GroupUtils.addGroup(chain, albumRows);
 
         android.os.Parcelable scrollState = mRv.getLayoutManager() != null
                 ? mRv.getLayoutManager().onSaveInstanceState() : null;
@@ -186,21 +181,20 @@ public class LockScreenOptionsFragment extends Fragment {
         return item;
     }
 
-    private SliderWidgetAdapter sliderRow(String title, String key, int min, int max, int def, String unit) {
+    private SliderWidgetAdapter.SliderItem sliderItem(String title, String key, int min, int max, int def, String unit) {
         int current = ObsidianPrefs.getInt(key, def);
-        SliderWidgetAdapter.SliderItem item = new SliderWidgetAdapter.SliderItem(
+        return new SliderWidgetAdapter.SliderItem(
                 title, current, min, max, unit, def,
                 value -> ObsidianPrefs.putInt(key, value));
-        return new SliderWidgetAdapter(List.of(item));
     }
 
-    private ListWidgetAdapter carrierReplacementRow() {
+    private ListWidgetAdapter.ListItem carrierReplacementItem() {
         String current = ObsidianPrefs.getString(PREF_CARRIER_REPLACEMENT, "");
         ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
                 getString(R.string.lockscreen_carrier_replacement), textOrSummary(current),
                 this::showCarrierReplacementDialog);
         item.useAccentColor = false;
-        return new ListWidgetAdapter(List.of(item));
+        return item;
     }
 
     private void showCarrierReplacementDialog() {
@@ -222,8 +216,7 @@ public class LockScreenOptionsFragment extends Fragment {
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     String text = et.getText().toString().trim();
                     ObsidianPrefs.putString(PREF_CARRIER_REPLACEMENT, text);
-                    mCarrierAdapter.getItems().get(0).valueSummary = textOrSummary(text);
-                    mCarrierAdapter.notifyItemChanged(0);
+                    rebuild();
                     AppUtils.showRestartReminder(requireContext());
                 })
                 .setNegativeButton(R.string.cancel, null)
@@ -238,10 +231,9 @@ public class LockScreenOptionsFragment extends Fragment {
     // No restart reminder here: AlbumArtLockscreenMod re-renders live on every
     // pref change via XPrefs' cross-process listener (updatePrefs()).
 
-    private ListWidgetAdapter filterRow() {
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
+    private ListWidgetAdapter.ListItem filterItem() {
+        return new ListWidgetAdapter.ListItem(
                 getString(R.string.lockscreen_album_art_filter), filterLabel(), this::showFilterDialog);
-        return new ListWidgetAdapter(List.of(item));
     }
 
     private String filterLabel() {
@@ -268,19 +260,17 @@ public class LockScreenOptionsFragment extends Fragment {
                 .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putString(KEY_ALBUM_ART_FILTER, String.valueOf(selected[0]));
-                    mFilterAdapter.getItems().get(0).valueSummary = filterLabel();
-                    mFilterAdapter.notifyItemChanged(0);
+                    rebuild();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());
     }
 
-    private SliderWidgetAdapter blurRow() {
+    private SliderWidgetAdapter.SliderItem blurItem() {
         int current = ObsidianPrefs.getInt(KEY_MEDIA_BLUR, 30);
-        SliderWidgetAdapter.SliderItem item = new SliderWidgetAdapter.SliderItem(
+        return new SliderWidgetAdapter.SliderItem(
                 getString(R.string.lockscreen_media_blur), current, 0, 100, "%", 30,
                 value -> ObsidianPrefs.putInt(KEY_MEDIA_BLUR, value));
-        return new SliderWidgetAdapter(List.of(item));
     }
 
     private int dp(int v) {

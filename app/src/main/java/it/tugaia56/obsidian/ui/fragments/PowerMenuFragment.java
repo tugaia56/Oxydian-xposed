@@ -22,6 +22,7 @@ import java.util.List;
 
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.activity.MainActivity;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
@@ -150,8 +151,6 @@ public class PowerMenuFragment extends Fragment {
             rebuild();
         };
 
-        SwitchWidgetAdapter toggles = new SwitchWidgetAdapter(List.of(authItem, hideSosItem, advancedRebootItem));
-
         SliderWidgetAdapter.SliderItem yOffsetItem = new SliderWidgetAdapter.SliderItem(
                 getString(R.string.advanced_reboot_y_offset_title),
                 ObsidianPrefs.getInt("advanced_reboot_y_offset", 0),
@@ -187,30 +186,26 @@ public class PowerMenuFragment extends Fragment {
         };
 
         List<RecyclerView.Adapter<?>> sections = new java.util.ArrayList<>();
-        sections.add(toggles);
+        GroupUtils.addGroup(sections, List.of(authItem, hideSosItem, advancedRebootItem));
         if (mAdvancedRebootExpanded) {
-            ListWidgetAdapter.ListItem colorItem = colorModeItem();
-            colorItem.nested = true;
-            sections.add(new ListWidgetAdapter(List.of(colorItem)));
+            GroupUtils.addGroup(sections, List.of(colorModeItem()), true);
         }
         sections.add(yOffsetAdapter);
         sections.add(new ListWidgetAdapter(List.of(gradientColorItem())));
-        sections.add(new SwitchWidgetAdapter(List.of(bgItem)));
+        GroupUtils.addGroup(sections, List.of(bgItem));
         if (mBgExpanded) {
             ListWidgetAdapter.ListItem bgPickItem = new ListWidgetAdapter.ListItem(
                     getString(R.string.power_menu_bg_color_title),
                     triColorLabel(PREF_BG_MODE, PREF_BG_CUSTOM, "stock"),
                     this::openBgColorPicker);
-            bgPickItem.nested = true;
-            sections.add(new ListWidgetAdapter(List.of(bgPickItem)));
+            GroupUtils.addGroup(sections, List.of(bgPickItem), true);
         }
-        sections.add(new SwitchWidgetAdapter(List.of(borderItem)));
+        GroupUtils.addGroup(sections, List.of(borderItem));
         if (mBorderExpanded) {
             ListWidgetAdapter.ListItem borderColorItem = accentCustomColorItem(
                     PREF_BORDER_USE_ACCENT, PREF_BORDER_CUSTOM_COLOR,
                     DIALOG_BORDER_CUSTOM_COLOR, R.string.power_menu_border_color_title);
-            borderColorItem.nested = true;
-            sections.add(new ListWidgetAdapter(List.of(borderColorItem)));
+            GroupUtils.addGroup(sections, List.of(borderColorItem), true);
         }
 
         mRv.setAdapter(new ConcatAdapter(sections));

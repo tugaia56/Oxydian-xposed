@@ -18,7 +18,9 @@ public final class GroupUtils {
      * Adds each item in {@code rows} to {@code chain} as its own single-item adapter,
      * assigning TOP/MIDDLE/BOTTOM/SINGLE group positions so the whole list renders as
      * one seamless card. Accepts {@link SwitchWidgetAdapter.SwitchItem},
-     * {@link SliderWidgetAdapter.SliderItem} and {@link ListWidgetAdapter.ListItem}.
+     * {@link SliderWidgetAdapter.SliderItem}, {@link ListWidgetAdapter.ListItem} and
+     * {@link DualSliderWidgetAdapter.DualSliderItem} (no "nested" field on that last one,
+     * so the {@code nested} flag is a no-op for it).
      */
     public static void addGroup(List<RecyclerView.Adapter<?>> chain, List<?> rows) {
         addGroup(chain, rows, false);
@@ -47,6 +49,9 @@ public final class GroupUtils {
                 s.groupPos = pos;
                 s.nested = nested;
                 chain.add(new ListWidgetAdapter(List.of(s)));
+            } else if (row instanceof DualSliderWidgetAdapter.DualSliderItem s) {
+                s.groupPos = pos;
+                chain.add(new DualSliderWidgetAdapter(List.of(s)));
             }
         }
     }

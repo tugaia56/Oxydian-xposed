@@ -37,6 +37,7 @@ import java.util.List;
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.activity.MainActivity;
 import it.tugaia56.obsidian.ui.adapters.DarkShadowColorListener;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
@@ -140,30 +141,34 @@ public class AodWeatherFragment extends Fragment {
             rebuild();
         };
         weatherSwitch.onRowClick = () -> { mWeatherExpanded = !mWeatherExpanded; rebuild(); };
-        chain.add(new SwitchWidgetAdapter(List.of(weatherSwitch)));
+        List<Object> topRows = new ArrayList<>();
+        topRows.add(weatherSwitch);
 
         if (mWeatherExpanded) {
-            chain.add(singleChoiceRow(getString(R.string.weather_update_interval_title),
+            topRows.add(singleChoiceItem(getString(R.string.weather_update_interval_title),
                     KEY_UPDATE_INTERVAL, R.array.weather_update_interval_entries));
-            chain.add(lastUpdateRow());
-            chain.add(providerChoiceRow());
+            topRows.add(lastUpdateItem());
+            topRows.add(providerChoiceItem());
             String provider = ObsidianPrefs.getString(KEY_PROVIDER, "2");
             if ("0".equals(provider)) {
-                chain.add(editTextRow(getString(R.string.weather_owm_key), getString(R.string.weather_owm_key), KEY_OWM_KEY));
+                topRows.add(editTextItem(getString(R.string.weather_owm_key), getString(R.string.weather_owm_key), KEY_OWM_KEY));
             } else if ("3".equals(provider)) {
-                chain.add(editTextRow(getString(R.string.weather_yandex_key), getString(R.string.weather_yandex_key), KEY_YANDEX_KEY));
+                topRows.add(editTextItem(getString(R.string.weather_yandex_key), getString(R.string.weather_yandex_key), KEY_YANDEX_KEY));
             }
-            chain.add(singleChoiceRow(getString(R.string.weather_units_title),
+            topRows.add(singleChoiceItem(getString(R.string.weather_units_title),
                     KEY_UNITS, R.array.weather_units_entries));
+        }
+        GroupUtils.addGroup(chain, topRows);
 
+        if (mWeatherExpanded) {
             chain.add(new SectionTitleAdapter(List.of(getString(R.string.aod_clock_prefs))));
-            chain.add(new SwitchWidgetAdapter(List.of(
+            GroupUtils.addGroup(chain, List.of(
                     prefSwitch(getString(R.string.weather_show_location), null, KEY_SHOW_LOCATION),
                     prefSwitch(getString(R.string.weather_show_condition), null, KEY_SHOW_CONDITION),
                     prefSwitch(getString(R.string.weather_show_humidity), null, KEY_SHOW_HUMIDITY),
-                    prefSwitch(getString(R.string.weather_show_wind), null, KEY_SHOW_WIND))));
-            chain.add(sliderRow(getString(R.string.weather_text_size), KEY_TEXT_SIZE, 13, 24, 16, "dp"));
-            chain.add(sliderRow(getString(R.string.weather_image_size), KEY_IMAGE_SIZE, 13, 24, 18, "dp"));
+                    prefSwitch(getString(R.string.weather_show_wind), null, KEY_SHOW_WIND),
+                    sliderItem(getString(R.string.weather_text_size), KEY_TEXT_SIZE, 13, 24, 16, "dp"),
+                    sliderItem(getString(R.string.weather_image_size), KEY_IMAGE_SIZE, 13, 24, 18, "dp")));
         }
 
         chain.add(colorRow());
@@ -178,19 +183,19 @@ public class AodWeatherFragment extends Fragment {
                 rebuild();
             };
             locSwitch.onRowClick = () -> { mLocExpanded = !mLocExpanded; rebuild(); };
-            chain.add(new SwitchWidgetAdapter(List.of(locSwitch)));
+            List<Object> locRows = new ArrayList<>();
+            locRows.add(locSwitch);
             if (mLocExpanded) {
                 if (manual) {
-                    chain.add(editTextRow(getString(R.string.weather_custom_location_picker_title),
+                    locRows.add(editTextItem(getString(R.string.weather_custom_location_picker_title),
                             getString(R.string.weather_location_hint), KEY_LOC_VALUE));
                 } else {
-                    chain.add(gpsRefreshRow());
+                    locRows.add(gpsRefreshItem());
                 }
             }
-
-            chain.add(iconPackChoiceRow());
-            chain.add(new SwitchWidgetAdapter(List.of(
-                    prefSwitch(getString(R.string.weather_centered), getString(R.string.weather_centered_summary), KEY_CENTERED))));
+            locRows.add(iconPackChoiceItem());
+            locRows.add(prefSwitch(getString(R.string.weather_centered), getString(R.string.weather_centered_summary), KEY_CENTERED));
+            GroupUtils.addGroup(chain, locRows);
         }
 
         SwitchWidgetAdapter.SwitchItem marginsSwitch = gatingSwitch(getString(R.string.weather_custom_margins), null, KEY_MARGINS_SWITCH);
@@ -200,11 +205,13 @@ public class AodWeatherFragment extends Fragment {
             rebuild();
         };
         marginsSwitch.onRowClick = () -> { mMarginsExpanded = !mMarginsExpanded; rebuild(); };
-        chain.add(new SwitchWidgetAdapter(List.of(marginsSwitch)));
+        List<Object> marginRows = new ArrayList<>();
+        marginRows.add(marginsSwitch);
         if (mMarginsExpanded) {
-            chain.add(sliderRow(getString(R.string.weather_margin_top), KEY_MARGIN_TOP, -400, 400, 0, "dp", 10));
-            chain.add(sliderRow(getString(R.string.weather_margin_left), KEY_MARGIN_LEFT, 0, 100, 0, "dp"));
+            marginRows.add(sliderItem(getString(R.string.weather_margin_top), KEY_MARGIN_TOP, -400, 400, 0, "dp", 10));
+            marginRows.add(sliderItem(getString(R.string.weather_margin_left), KEY_MARGIN_LEFT, 0, 100, 0, "dp"));
         }
+        GroupUtils.addGroup(chain, marginRows);
 
         SwitchWidgetAdapter.SwitchItem fontSwitch = gatingSwitch(getString(R.string.pick_font_title), null, KEY_FONT_SWITCH);
         fontSwitch.onChanged = () -> {
@@ -213,8 +220,10 @@ public class AodWeatherFragment extends Fragment {
             rebuild();
         };
         fontSwitch.onRowClick = () -> { mFontExpanded = !mFontExpanded; rebuild(); };
-        chain.add(new SwitchWidgetAdapter(List.of(fontSwitch)));
-        if (mFontExpanded) chain.add(stubRow(getString(R.string.pick_font_title), getString(R.string.pick_font_summary)));
+        List<Object> fontRows = new ArrayList<>();
+        fontRows.add(fontSwitch);
+        if (mFontExpanded) fontRows.add(stubItem(getString(R.string.pick_font_title), getString(R.string.pick_font_summary)));
+        GroupUtils.addGroup(chain, fontRows);
 
         android.os.Parcelable scrollState = mRv.getLayoutManager() != null
                 ? mRv.getLayoutManager().onSaveInstanceState() : null;
@@ -313,26 +322,26 @@ public class AodWeatherFragment extends Fragment {
         return item;
     }
 
-    private ListWidgetAdapter stubRow(String title, String summary) {
+    private ListWidgetAdapter.ListItem stubItem(String title, String summary) {
         ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(title, summary,
                 () -> Toast.makeText(requireContext(), R.string.section_wip_summary, Toast.LENGTH_SHORT).show());
         item.useAccentColor = false;
-        return new ListWidgetAdapter(List.of(item));
+        return item;
     }
 
     /** Riga di sola lettura — scritta dall'hook (AodWeather/LockscreenWeather) a ogni fetch riuscito. */
-    private ListWidgetAdapter lastUpdateRow() {
+    private ListWidgetAdapter.ListItem lastUpdateItem() {
         String value = ObsidianPrefs.getString("weather_last_update", "—");
         ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
                 getString(R.string.weather_last_update), value, null);
         item.useAccentColor = false;
-        return new ListWidgetAdapter(List.of(item));
+        return item;
     }
 
     /** Riga "Posizione automatica" (switch spento) — tocco chiede il permesso se manca e poi
      *  un fix GPS/rete una tantum (GpsLocationHelper), il cui risultato viene letto
      *  direttamente dal Mod (AodWeather/LockscreenWeather) al posto della città digitata. */
-    private ListWidgetAdapter gpsRefreshRow() {
+    private ListWidgetAdapter.ListItem gpsRefreshItem() {
         String name = GpsLocationHelper.lastKnownName();
         String summary = name != null ? name : getString(R.string.weather_gps_never_updated);
         ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
@@ -344,21 +353,18 @@ public class AodWeatherFragment extends Fragment {
             }
         });
         item.useAccentColor = false;
-        return new ListWidgetAdapter(List.of(item));
+        return item;
     }
 
-    private ListWidgetAdapter editTextRow(String title, String summary, String key) {
-        final ListWidgetAdapter[] adapterRef = new ListWidgetAdapter[1];
+    private ListWidgetAdapter.ListItem editTextItem(String title, String summary, String key) {
         ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
                 title, textOrDefault(ObsidianPrefs.getString(key, ""), summary),
-                () -> showEditTextDialog(title, summary, key, adapterRef[0]));
+                () -> showEditTextDialog(title, summary, key));
         item.useAccentColor = false;
-        ListWidgetAdapter adapter = new ListWidgetAdapter(List.of(item));
-        adapterRef[0] = adapter;
-        return adapter;
+        return item;
     }
 
-    private void showEditTextDialog(String title, String summary, String key, ListWidgetAdapter adapter) {
+    private void showEditTextDialog(String title, String summary, String key) {
         EditText et = new EditText(requireContext());
         et.setInputType(InputType.TYPE_CLASS_TEXT);
         et.setText(ObsidianPrefs.getString(key, ""));
@@ -376,8 +382,7 @@ public class AodWeatherFragment extends Fragment {
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     String text = et.getText().toString().trim();
                     ObsidianPrefs.putString(key, text);
-                    adapter.getItems().get(0).valueSummary = textOrDefault(text, summary);
-                    adapter.notifyItemChanged(0);
+                    rebuild();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());
@@ -389,14 +394,14 @@ public class AodWeatherFragment extends Fragment {
 
     /** Come singleChoiceRow, ma ricostruisce la lista dopo la scelta — serve a mostrare/
      *  nascondere il campo chiave giusto in base al provider selezionato. */
-    private ListWidgetAdapter providerChoiceRow() {
+    private ListWidgetAdapter.ListItem providerChoiceItem() {
         String title = getString(R.string.weather_provider_title);
         String[] entries = getResources().getStringArray(R.array.weather_provider_entries);
         int currentValue = 2;
         try { currentValue = Integer.parseInt(ObsidianPrefs.getString(KEY_PROVIDER, "2")); } catch (NumberFormatException ignored) {}
         final int current = currentValue;
         final int[] selected = {current};
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
+        return new ListWidgetAdapter.ListItem(
                 title, choiceLabel(KEY_PROVIDER, R.array.weather_provider_entries),
                 () -> ObsidianTheme.themeDialog(new AlertDialog.Builder(requireContext())
                         .setTitle(title)
@@ -407,20 +412,15 @@ public class AodWeatherFragment extends Fragment {
                         })
                         .setNegativeButton(R.string.cancel, null)
                         .show()));
-        return new ListWidgetAdapter(List.of(item));
     }
 
     // ── Pacchetto icone condizioni (18 pacchetti, come OC) ──────────────────────
 
-    private ListWidgetAdapter iconPackChoiceRow() {
+    private ListWidgetAdapter.ListItem iconPackChoiceItem() {
         String title = getString(R.string.weather_icon_pack_title);
-        final ListWidgetAdapter[] adapterRef = new ListWidgetAdapter[1];
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
+        return new ListWidgetAdapter.ListItem(
                 title, iconPackLabel(),
-                () -> showIconPackDialog(title, adapterRef[0]));
-        ListWidgetAdapter adapter = new ListWidgetAdapter(List.of(item));
-        adapterRef[0] = adapter;
-        return adapter;
+                () -> showIconPackDialog(title));
     }
 
     private String iconPackLabel() {
@@ -429,7 +429,7 @@ public class AodWeatherFragment extends Fragment {
         return WeatherIconPacks.labels(requireContext())[idx];
     }
 
-    private void showIconPackDialog(String title, ListWidgetAdapter adapter) {
+    private void showIconPackDialog(String title) {
         String[] entries = WeatherIconPacks.labels(requireContext());
         int current = WeatherIconPacks.indexForPrefix(ObsidianPrefs.getString(KEY_ICON_PACK, WeatherIconPacks.DEFAULT));
         final int[] selected = {current};
@@ -479,21 +479,16 @@ public class AodWeatherFragment extends Fragment {
                 .setView(listView)
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putString(KEY_ICON_PACK, WeatherIconPacks.prefixForIndex(selected[0]));
-                    adapter.getItems().get(0).valueSummary = iconPackLabel();
-                    adapter.notifyItemChanged(0);
+                    rebuild();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());
     }
 
-    private ListWidgetAdapter singleChoiceRow(String title, String key, int entriesArrayRes) {
-        final ListWidgetAdapter[] adapterRef = new ListWidgetAdapter[1];
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
+    private ListWidgetAdapter.ListItem singleChoiceItem(String title, String key, int entriesArrayRes) {
+        return new ListWidgetAdapter.ListItem(
                 title, choiceLabel(key, entriesArrayRes),
-                () -> showSingleChoiceDialog(title, key, entriesArrayRes, adapterRef[0]));
-        ListWidgetAdapter adapter = new ListWidgetAdapter(List.of(item));
-        adapterRef[0] = adapter;
-        return adapter;
+                () -> showSingleChoiceDialog(title, key, entriesArrayRes));
     }
 
     private String choiceLabel(String key, int entriesArrayRes) {
@@ -503,7 +498,7 @@ public class AodWeatherFragment extends Fragment {
         return (idx >= 0 && idx < entries.length) ? entries[idx] : entries[0];
     }
 
-    private void showSingleChoiceDialog(String title, String key, int entriesArrayRes, ListWidgetAdapter adapter) {
+    private void showSingleChoiceDialog(String title, String key, int entriesArrayRes) {
         String[] entries = getResources().getStringArray(entriesArrayRes);
         int current = 0;
         try { current = Integer.parseInt(ObsidianPrefs.getString(key, "0")); } catch (NumberFormatException ignored) {}
@@ -513,24 +508,23 @@ public class AodWeatherFragment extends Fragment {
                 .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putString(key, String.valueOf(selected[0]));
-                    adapter.getItems().get(0).valueSummary = choiceLabel(key, entriesArrayRes);
-                    adapter.notifyItemChanged(0);
+                    rebuild();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());
     }
 
-    private SliderWidgetAdapter sliderRow(String title, String key, int min, int max, int def, String unit) {
-        return sliderRow(title, key, min, max, def, unit, 1);
+    private SliderWidgetAdapter.SliderItem sliderItem(String title, String key, int min, int max, int def, String unit) {
+        return sliderItem(title, key, min, max, def, unit, 1);
     }
 
-    private SliderWidgetAdapter sliderRow(String title, String key, int min, int max, int def, String unit, int step) {
+    private SliderWidgetAdapter.SliderItem sliderItem(String title, String key, int min, int max, int def, String unit, int step) {
         int current = ObsidianPrefs.getInt(key, def);
         SliderWidgetAdapter.SliderItem item = new SliderWidgetAdapter.SliderItem(
                 title, current, min, max, unit, def,
                 value -> ObsidianPrefs.putInt(key, value));
         item.step = step;
-        return new SliderWidgetAdapter(List.of(item));
+        return item;
     }
 
     private int dp(int v) {

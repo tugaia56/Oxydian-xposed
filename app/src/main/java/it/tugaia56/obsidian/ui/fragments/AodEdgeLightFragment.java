@@ -26,6 +26,7 @@ import java.util.List;
 
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.activity.MainActivity;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
@@ -92,24 +93,21 @@ public class AodEdgeLightFragment extends Fragment {
         chain.add(mPreviewAdapter);
         chain.add(new TextRowAdapter(getString(R.string.edge_light_advice)));
 
-        chain.add(new SwitchWidgetAdapter(List.of(
+        GroupUtils.addGroup(chain, List.of(
                 prefSwitch(getString(R.string.edge_light_enabled_title), getString(R.string.edge_light_summary), KEY_ENABLED),
                 prefSwitch(getString(R.string.edge_light_always_trigger_on_pulse_title),
                         getString(R.string.edge_light_always_trigger_on_pulse_summary), KEY_ALWAYS_PULSE),
-                prefSwitch(getString(R.string.edge_light_retick_title), getString(R.string.edge_light_retick_summary), KEY_RETICK))));
-        chain.add(singleChoiceRow(getString(R.string.edge_light_retick_time),
-                KEY_RETICK_DURATION, R.array.edge_light_retick_entries));
+                prefSwitch(getString(R.string.edge_light_retick_title), getString(R.string.edge_light_retick_summary), KEY_RETICK),
+                singleChoiceItem(getString(R.string.edge_light_retick_time), KEY_RETICK_DURATION, R.array.edge_light_retick_entries)));
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.edge_light_style_title))));
-        chain.add(singleChoiceRow(getString(R.string.edge_light_style_title), KEY_STYLE, R.array.edge_light_style_entries, true));
-        chain.add(new SwitchWidgetAdapter(List.of(
-                prefSwitch(getString(R.string.edge_light_show_blur), null, KEY_SHOW_BLUR))));
-        chain.add(singleChoiceRow(getString(R.string.edge_light_blur_mode_title), KEY_BLUR_MODE, R.array.edge_light_blur_mode_entries));
-        chain.add(singleChoiceRow(getString(R.string.edge_light_blur_type_title), KEY_BLUR_TYPE, R.array.edge_light_blur_type_entries));
-
-        chain.add(colorModeRow());
-
-        chain.add(sliderRow(getString(R.string.edge_light_stroke_width_title), KEY_WIDTH, 8, 20, 12, "dp"));
+        GroupUtils.addGroup(chain, List.of(
+                singleChoiceItem(getString(R.string.edge_light_style_title), KEY_STYLE, R.array.edge_light_style_entries, true),
+                prefSwitch(getString(R.string.edge_light_show_blur), null, KEY_SHOW_BLUR),
+                singleChoiceItem(getString(R.string.edge_light_blur_mode_title), KEY_BLUR_MODE, R.array.edge_light_blur_mode_entries),
+                singleChoiceItem(getString(R.string.edge_light_blur_type_title), KEY_BLUR_TYPE, R.array.edge_light_blur_type_entries),
+                colorModeItem(),
+                sliderItem(getString(R.string.edge_light_stroke_width_title), KEY_WIDTH, 8, 20, 12, "dp")));
 
         android.os.Parcelable scrollState = mRv.getLayoutManager() != null
                 ? mRv.getLayoutManager().onSaveInstanceState() : null;
@@ -119,11 +117,10 @@ public class AodEdgeLightFragment extends Fragment {
         }
     }
 
-    private ListWidgetAdapter colorModeRow() {
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
+    private ListWidgetAdapter.ListItem colorModeItem() {
+        return new ListWidgetAdapter.ListItem(
                 getString(R.string.edge_light_color_mode_title), choiceLabel(KEY_COLOR_MODE, R.array.edge_light_color_mode_entries),
                 this::showColorModeDialog);
-        return new ListWidgetAdapter(List.of(item));
     }
 
     private void showColorModeDialog() {
@@ -271,18 +268,14 @@ public class AodEdgeLightFragment extends Fragment {
         return item;
     }
 
-    private ListWidgetAdapter singleChoiceRow(String title, String key, int entriesArrayRes) {
-        return singleChoiceRow(title, key, entriesArrayRes, false);
+    private ListWidgetAdapter.ListItem singleChoiceItem(String title, String key, int entriesArrayRes) {
+        return singleChoiceItem(title, key, entriesArrayRes, false);
     }
 
-    private ListWidgetAdapter singleChoiceRow(String title, String key, int entriesArrayRes, boolean refreshPreviewOnApply) {
-        final ListWidgetAdapter[] adapterRef = new ListWidgetAdapter[1];
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
+    private ListWidgetAdapter.ListItem singleChoiceItem(String title, String key, int entriesArrayRes, boolean refreshPreviewOnApply) {
+        return new ListWidgetAdapter.ListItem(
                 title, choiceLabel(key, entriesArrayRes),
-                () -> showSingleChoiceDialog(title, key, entriesArrayRes, adapterRef[0], refreshPreviewOnApply));
-        ListWidgetAdapter adapter = new ListWidgetAdapter(List.of(item));
-        adapterRef[0] = adapter;
-        return adapter;
+                () -> showSingleChoiceDialog(title, key, entriesArrayRes, refreshPreviewOnApply));
     }
 
     private String choiceLabel(String key, int entriesArrayRes) {
@@ -292,7 +285,7 @@ public class AodEdgeLightFragment extends Fragment {
         return (idx >= 0 && idx < entries.length) ? entries[idx] : entries[0];
     }
 
-    private void showSingleChoiceDialog(String title, String key, int entriesArrayRes, ListWidgetAdapter adapter, boolean refreshPreviewOnApply) {
+    private void showSingleChoiceDialog(String title, String key, int entriesArrayRes, boolean refreshPreviewOnApply) {
         String[] entries = getResources().getStringArray(entriesArrayRes);
         int current = 0;
         try { current = Integer.parseInt(ObsidianPrefs.getString(key, "0")); } catch (NumberFormatException ignored) {}
@@ -302,23 +295,21 @@ public class AodEdgeLightFragment extends Fragment {
                 .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putString(key, String.valueOf(selected[0]));
-                    adapter.getItems().get(0).valueSummary = choiceLabel(key, entriesArrayRes);
-                    adapter.notifyItemChanged(0);
+                    rebuild();
                     if (refreshPreviewOnApply) refreshGlow();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());
     }
 
-    private SliderWidgetAdapter sliderRow(String title, String key, int min, int max, int def, String unit) {
+    private SliderWidgetAdapter.SliderItem sliderItem(String title, String key, int min, int max, int def, String unit) {
         int current = ObsidianPrefs.getInt(key, def);
-        SliderWidgetAdapter.SliderItem item = new SliderWidgetAdapter.SliderItem(
+        return new SliderWidgetAdapter.SliderItem(
                 title, current, min, max, unit, def,
                 value -> {
                     ObsidianPrefs.putInt(key, value);
                     refreshGlow();
                 });
-        return new SliderWidgetAdapter(List.of(item));
     }
 
     private int dp(int v) {

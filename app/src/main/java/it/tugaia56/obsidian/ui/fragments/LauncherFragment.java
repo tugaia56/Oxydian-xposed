@@ -23,6 +23,7 @@ import java.util.List;
 
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.activity.MainActivity;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
@@ -129,41 +130,39 @@ public class LauncherFragment extends Fragment {
 
         // ── Recents (first, per request) ────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.launcher_recents))));
-        chain.add(new SwitchWidgetAdapter(List.of(
+        List<Object> recentsRows = new ArrayList<>(List.of(
                 boolItem(R.string.launcher_app_details_title, R.string.launcher_app_details_summary, KEY_OPEN_APP_DETAILS),
                 boolItem(R.string.launcher_disable_recents_previous_page_title, R.string.launcher_disable_recents_previous_page_summary, KEY_DISABLE_PREV_RECENTS),
-                boolItem(R.string.launcher_replace_lock_title, R.string.launcher_replace_lock_summary, KEY_REPLACE_LOCK))));
-        chain.add(new SwitchWidgetAdapter(List.of(recentsButtonColorSwitch())));
+                boolItem(R.string.launcher_replace_lock_title, R.string.launcher_replace_lock_summary, KEY_REPLACE_LOCK),
+                recentsButtonColorSwitch()));
         if (ObsidianPrefs.getBoolean(KEY_RECENTS_BTN_COLOR + "_on", false)) {
-            chain.add(recentsButtonColorPickerRow());
+            recentsRows.add(recentsButtonColorPickerItem());
         }
+        GroupUtils.addGroup(chain, recentsRows);
 
         // ── Home Layout ──────────────────────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.launcher_layout))));
-        chain.add(new SwitchWidgetAdapter(List.of(
-                boolItem(R.string.launcher_edit_layout, R.string.launcher_edit_layout_summary, KEY_REARRANGE_HOME))));
-        chain.add(sliderRow(getString(R.string.launcher_columns), KEY_LAUNCHER_COLUMNS, 4, 8, 4));
-        chain.add(sliderRow(getString(R.string.launcher_rows), KEY_LAUNCHER_ROWS, 3, 10, 4));
-        chain.add(new SwitchWidgetAdapter(List.of(
-                boolItem(R.string.hide_app_labels, R.string.hide_app_labels_desktop, KEY_DESKTOP_HIDE_LABELS))));
+        GroupUtils.addGroup(chain, List.of(
+                boolItem(R.string.launcher_edit_layout, R.string.launcher_edit_layout_summary, KEY_REARRANGE_HOME),
+                sliderItem(getString(R.string.launcher_columns), KEY_LAUNCHER_COLUMNS, 4, 8, 4),
+                sliderItem(getString(R.string.launcher_rows), KEY_LAUNCHER_ROWS, 3, 10, 4),
+                boolItem(R.string.hide_app_labels, R.string.hide_app_labels_desktop, KEY_DESKTOP_HIDE_LABELS)));
 
         // ── Folder Layout ────────────────────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.launcher_folder_layout))));
-        chain.add(new SwitchWidgetAdapter(List.of(
-                boolItem(R.string.launcher_folder_edit_layout, null, KEY_REARRANGE_FOLDER))));
-        chain.add(sliderRow(getString(R.string.launcher_folder_columns), KEY_FOLDER_MAX_COLUMNS, 3, 7, 3));
-        chain.add(sliderRow(getString(R.string.launcher_folder_rows), KEY_FOLDER_MAX_ROWS, 3, 7, 3));
-        chain.add(new SwitchWidgetAdapter(List.of(
+        GroupUtils.addGroup(chain, List.of(
+                boolItem(R.string.launcher_folder_edit_layout, null, KEY_REARRANGE_FOLDER),
+                sliderItem(getString(R.string.launcher_folder_columns), KEY_FOLDER_MAX_COLUMNS, 3, 7, 3),
+                sliderItem(getString(R.string.launcher_folder_rows), KEY_FOLDER_MAX_ROWS, 3, 7, 3),
                 boolItem(R.string.launcher_folder_update_preview, null, KEY_REARRANGE_PREVIEW),
-                boolItem(R.string.remove_folder_pagination_title, null, KEY_REMOVE_FOLDER_PAGE))));
+                boolItem(R.string.remove_folder_pagination_title, null, KEY_REMOVE_FOLDER_PAGE)));
 
         // ── Drawer ───────────────────────────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.drawer))));
-        chain.add(new SwitchWidgetAdapter(List.of(
-                boolItem(R.string.launcher_drawer_edit_columns, null, KEY_REARRANGE_DRAWER))));
-        chain.add(sliderRow(getString(R.string.drawer_columns), KEY_DRAWER_COLUMNS, 3, 7, 4));
-        chain.add(new SwitchWidgetAdapter(List.of(
-                boolItem(R.string.hide_app_labels, R.string.hide_app_labels_drawer, KEY_DRAWER_HIDE_LABELS))));
+        GroupUtils.addGroup(chain, List.of(
+                boolItem(R.string.launcher_drawer_edit_columns, null, KEY_REARRANGE_DRAWER),
+                sliderItem(getString(R.string.drawer_columns), KEY_DRAWER_COLUMNS, 3, 7, 4),
+                boolItem(R.string.hide_app_labels, R.string.hide_app_labels_drawer, KEY_DRAWER_HIDE_LABELS)));
 
         // ── Dock background (sub-screen) ────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.dock_section_title))));
@@ -173,10 +172,10 @@ public class LauncherFragment extends Fragment {
 
         // ── Miscellaneous ────────────────────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.misc_category))));
-        chain.add(new SwitchWidgetAdapter(List.of(
+        GroupUtils.addGroup(chain, List.of(
                 boolItem(R.string.remove_home_pagination, null, KEY_REMOVE_HOME_PAGE),
-                boolItem(R.string.hide_scroller, R.string.hide_scroller_summary, KEY_HIDE_SCROLLER))));
-        chain.add(swipeRightRow());
+                boolItem(R.string.hide_scroller, R.string.hide_scroller_summary, KEY_HIDE_SCROLLER),
+                swipeRightItem()));
 
         android.os.Parcelable scrollState = mRv.getLayoutManager() != null
                 ? mRv.getLayoutManager().onSaveInstanceState() : null;
@@ -210,11 +209,10 @@ public class LauncherFragment extends Fragment {
         return item;
     }
 
-    private ListWidgetAdapter recentsButtonColorPickerRow() {
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
+    private ListWidgetAdapter.ListItem recentsButtonColorPickerItem() {
+        return new ListWidgetAdapter.ListItem(
                 getString(R.string.launcher_recents_button_color_title), recentsColorLabel(),
                 this::showRecentsColorModeDialog);
-        return new ListWidgetAdapter(List.of(item));
     }
 
     private String recentsColorLabel() {
@@ -302,28 +300,26 @@ public class LauncherFragment extends Fragment {
     }
 
     /** A row with an inline slider for an integer pref (mirrors OC's slider prefs). */
-    private SliderWidgetAdapter sliderRow(String title, String key, int min, int max, int def) {
-        return sliderRow(title, key, min, max, def, true);
+    private SliderWidgetAdapter.SliderItem sliderItem(String title, String key, int min, int max, int def) {
+        return sliderItem(title, key, min, max, def, true);
     }
 
-    private SliderWidgetAdapter sliderRow(String title, String key, int min, int max, int def, boolean implemented) {
+    private SliderWidgetAdapter.SliderItem sliderItem(String title, String key, int min, int max, int def, boolean implemented) {
         if (!implemented) title = title + getString(R.string.wip_inline_suffix);
         int current = ObsidianPrefs.getInt(key, def);
-        SliderWidgetAdapter.SliderItem item = new SliderWidgetAdapter.SliderItem(
+        return new SliderWidgetAdapter.SliderItem(
                 title, current, min, max, "", def,
                 value -> ObsidianPrefs.putInt(key, value));
-        return new SliderWidgetAdapter(List.of(item));
     }
 
     /** Collapses OC's separate enable-switch + 3-way radio group into a single single-choice
      *  dialog — any explicit pick sets [[KEY_SWIPE_RIGHT_ENABLED]]=true, matching what "Discover
      *  (default)" already behaves like when the switch is off, so there's no separate off state. */
-    private ListWidgetAdapter swipeRightRow() {
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
+    private ListWidgetAdapter.ListItem swipeRightItem() {
+        return new ListWidgetAdapter.ListItem(
                 getString(R.string.custom_swipe_right_behavior_title),
                 swipeRightSummary(),
                 this::showSwipeRightDialog);
-        return new ListWidgetAdapter(List.of(item));
     }
 
     private String swipeRightSummary() {

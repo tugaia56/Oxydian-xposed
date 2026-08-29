@@ -29,6 +29,7 @@ import java.util.List;
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.activity.MainActivity;
 import it.tugaia56.obsidian.ui.adapters.DarkShadowColorListener;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
@@ -102,9 +103,9 @@ public class AodClockFragment extends Fragment {
         mColorItems.clear();
         List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
 
-        chain.add(new SwitchWidgetAdapter(List.of(
-                gatingSwitch(getString(R.string.aod_clock_switch_title), null, KEY_SWITCH))));
-        chain.add(clockStylePickerRow());
+        GroupUtils.addGroup(chain, List.of(
+                gatingSwitch(getString(R.string.aod_clock_switch_title), null, KEY_SWITCH),
+                clockStylePickerItem()));
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.aod_clock_prefs))));
         SwitchWidgetAdapter.SwitchItem colorSwitch = gatingSwitch(getString(R.string.aod_clock_custom_color_title), null, KEY_COLOR_SWITCH);
@@ -114,10 +115,12 @@ public class AodClockFragment extends Fragment {
             rebuild();
         };
         colorSwitch.onRowClick = () -> { mColorExpanded = !mColorExpanded; rebuild(); };
-        chain.add(new SwitchWidgetAdapter(List.of(colorSwitch)));
+        GroupUtils.addGroup(chain, List.of(colorSwitch));
         if (mColorExpanded) chain.add(clockColorsRow());
-        chain.add(sliderRow(getString(R.string.aod_font_line_height_title), KEY_LINE_HEIGHT, -120, 120, 0, "dp", true));
-        chain.add(sliderRow(getString(R.string.aod_clock_text_scaling), KEY_TEXT_SCALING, 50, 150, 100, "%", true));
+
+        List<Object> restRows = new ArrayList<>();
+        restRows.add(sliderItem(getString(R.string.aod_font_line_height_title), KEY_LINE_HEIGHT, -120, 120, 0, "dp", true));
+        restRows.add(sliderItem(getString(R.string.aod_clock_text_scaling), KEY_TEXT_SCALING, 50, 150, 100, "%", true));
 
         SwitchWidgetAdapter.SwitchItem fontSwitch = gatingSwitch(getString(R.string.lockscreen_clock_font_custom_enabled), null, KEY_CUSTOM_FONT);
         fontSwitch.onChanged = () -> {
@@ -126,11 +129,12 @@ public class AodClockFragment extends Fragment {
             rebuild();
         };
         fontSwitch.onRowClick = () -> { mFontExpanded = !mFontExpanded; rebuild(); };
-        chain.add(new SwitchWidgetAdapter(List.of(fontSwitch)));
-        if (mFontExpanded) chain.add(stubRow(getString(R.string.pick_font_title), getString(R.string.pick_font_summary)));
+        restRows.add(fontSwitch);
+        if (mFontExpanded) restRows.add(stubItem(getString(R.string.pick_font_title), getString(R.string.pick_font_summary)));
 
-        chain.add(editTextRow(getString(R.string.lockscreen_clock_custom_format_title),
+        restRows.add(editTextItem(getString(R.string.lockscreen_clock_custom_format_title),
                 getString(R.string.lockscreen_clock_custom_format_summary), KEY_FORMAT));
+        GroupUtils.addGroup(chain, restRows);
 
         android.os.Parcelable scrollState = mRv.getLayoutManager() != null
                 ? mRv.getLayoutManager().onSaveInstanceState() : null;
@@ -237,8 +241,8 @@ public class AodClockFragment extends Fragment {
 
     /** Riga "Stile orologio" — apre la griglia con anteprima live di tutti i 61 stili invece
      *  di un elenco testuale, così si vede subito quale si sta scegliendo. */
-    private ListWidgetAdapter clockStylePickerRow() {
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
+    private ListWidgetAdapter.ListItem clockStylePickerItem() {
+        return new ListWidgetAdapter.ListItem(
                 getString(R.string.lockscreen_clock_style_title),
                 choiceLabel(KEY_STYLE, R.array.lockscreen_clock_style_entries),
                 () -> {
@@ -249,7 +253,6 @@ public class AodClockFragment extends Fragment {
                                 getString(R.string.lockscreen_clock_style_title));
                     }
                 });
-        return new ListWidgetAdapter(List.of(item));
     }
 
     private ListWidgetAdapter singleChoiceRow(String title, String key, int entriesArrayRes, boolean affectsPreview) {
@@ -290,25 +293,22 @@ public class AodClockFragment extends Fragment {
                 .show());
     }
 
-    private ListWidgetAdapter stubRow(String title, String summary) {
+    private ListWidgetAdapter.ListItem stubItem(String title, String summary) {
         ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(title, summary,
                 () -> Toast.makeText(requireContext(), R.string.section_wip_summary, Toast.LENGTH_SHORT).show());
         item.useAccentColor = false;
-        return new ListWidgetAdapter(List.of(item));
+        return item;
     }
 
-    private ListWidgetAdapter editTextRow(String title, String summary, String key) {
-        final ListWidgetAdapter[] adapterRef = new ListWidgetAdapter[1];
+    private ListWidgetAdapter.ListItem editTextItem(String title, String summary, String key) {
         ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
                 title, textOrDefault(ObsidianPrefs.getString(key, ""), summary),
-                () -> showEditTextDialog(title, summary, key, adapterRef[0]));
+                () -> showEditTextDialog(title, summary, key));
         item.useAccentColor = false;
-        ListWidgetAdapter adapter = new ListWidgetAdapter(List.of(item));
-        adapterRef[0] = adapter;
-        return adapter;
+        return item;
     }
 
-    private void showEditTextDialog(String title, String summary, String key, ListWidgetAdapter adapter) {
+    private void showEditTextDialog(String title, String summary, String key) {
         EditText et = new EditText(requireContext());
         et.setInputType(InputType.TYPE_CLASS_TEXT);
         et.setText(ObsidianPrefs.getString(key, ""));
@@ -326,8 +326,7 @@ public class AodClockFragment extends Fragment {
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     String text = et.getText().toString().trim();
                     ObsidianPrefs.putString(key, text);
-                    adapter.getItems().get(0).valueSummary = textOrDefault(text, summary);
-                    adapter.notifyItemChanged(0);
+                    rebuild();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());
@@ -337,19 +336,18 @@ public class AodClockFragment extends Fragment {
         return text.isEmpty() ? fallback : text;
     }
 
-    private SliderWidgetAdapter sliderRow(String title, String key, int min, int max, int def, String unit) {
-        return sliderRow(title, key, min, max, def, unit, false);
+    private SliderWidgetAdapter.SliderItem sliderItem(String title, String key, int min, int max, int def, String unit) {
+        return sliderItem(title, key, min, max, def, unit, false);
     }
 
-    private SliderWidgetAdapter sliderRow(String title, String key, int min, int max, int def, String unit, boolean affectsPreview) {
+    private SliderWidgetAdapter.SliderItem sliderItem(String title, String key, int min, int max, int def, String unit, boolean affectsPreview) {
         int current = ObsidianPrefs.getInt(key, def);
-        SliderWidgetAdapter.SliderItem item = new SliderWidgetAdapter.SliderItem(
+        return new SliderWidgetAdapter.SliderItem(
                 title, current, min, max, unit, def,
                 value -> {
                     ObsidianPrefs.putInt(key, value);
                     if (affectsPreview) rebuild();
                 });
-        return new SliderWidgetAdapter(List.of(item));
     }
 
     private int dp(int v) {

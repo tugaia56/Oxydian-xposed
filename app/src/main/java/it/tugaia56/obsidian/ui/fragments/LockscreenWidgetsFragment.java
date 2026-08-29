@@ -38,6 +38,7 @@ import java.util.function.IntConsumer;
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.activity.MainActivity;
 import it.tugaia56.obsidian.ui.adapters.DarkShadowColorListener;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.NavAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
@@ -154,21 +155,28 @@ public class LockscreenWidgetsFragment extends Fragment {
             rebuild();
         };
         deviceWidgetSwitch.onRowClick = () -> { mDeviceWidgetExpanded = !mDeviceWidgetExpanded; rebuild(); };
-        chain.add(new SwitchWidgetAdapter(List.of(deviceWidgetSwitch)));
-        if (mDeviceWidgetExpanded) chain.add(new ListWidgetAdapter(List.of(new ListWidgetAdapter.ListItem(
-                getString(R.string.lockscreen_device_widget_settings), null,
-                () -> navigate(new DeviceWidgetSettingsFragment(), getString(R.string.lockscreen_device_widget_settings))))));
+        List<Object> deviceWidgetRows = new ArrayList<>();
+        deviceWidgetRows.add(deviceWidgetSwitch);
+        if (mDeviceWidgetExpanded) {
+            ListWidgetAdapter.ListItem deviceSettingsItem = new ListWidgetAdapter.ListItem(
+                    getString(R.string.lockscreen_device_widget_settings), null,
+                    () -> navigate(new DeviceWidgetSettingsFragment(), getString(R.string.lockscreen_device_widget_settings)));
+            deviceWidgetRows.add(deviceSettingsItem);
+        }
+        GroupUtils.addGroup(chain, deviceWidgetRows);
 
         if (mWidgetsEnabledExpanded) {
             chain.add(new SectionTitleAdapter(List.of(getString(R.string.large_widgets_category_title))));
-            chain.add(singleChoiceRow(getString(R.string.main_custom_widgets1), KEY_MAIN_WIDGET1, R.array.lockscreen_widget_entries));
-            chain.add(singleChoiceRow(getString(R.string.main_custom_widgets2), KEY_MAIN_WIDGET2, R.array.lockscreen_widget_entries));
+            GroupUtils.addGroup(chain, List.of(
+                    singleChoiceItem(getString(R.string.main_custom_widgets1), KEY_MAIN_WIDGET1, R.array.lockscreen_widget_entries),
+                    singleChoiceItem(getString(R.string.main_custom_widgets2), KEY_MAIN_WIDGET2, R.array.lockscreen_widget_entries)));
 
             chain.add(new SectionTitleAdapter(List.of(getString(R.string.mini_widgets_category_title))));
-            chain.add(singleChoiceRow(getString(R.string.custom_widgets1), KEY_MINI_WIDGET1, R.array.lockscreen_widget_entries));
-            chain.add(singleChoiceRow(getString(R.string.custom_widgets2), KEY_MINI_WIDGET2, R.array.lockscreen_widget_entries));
-            chain.add(singleChoiceRow(getString(R.string.custom_widgets3), KEY_MINI_WIDGET3, R.array.lockscreen_widget_entries));
-            chain.add(singleChoiceRow(getString(R.string.custom_widgets4), KEY_MINI_WIDGET4, R.array.lockscreen_widget_entries));
+            GroupUtils.addGroup(chain, List.of(
+                    singleChoiceItem(getString(R.string.custom_widgets1), KEY_MINI_WIDGET1, R.array.lockscreen_widget_entries),
+                    singleChoiceItem(getString(R.string.custom_widgets2), KEY_MINI_WIDGET2, R.array.lockscreen_widget_entries),
+                    singleChoiceItem(getString(R.string.custom_widgets3), KEY_MINI_WIDGET3, R.array.lockscreen_widget_entries),
+                    singleChoiceItem(getString(R.string.custom_widgets4), KEY_MINI_WIDGET4, R.array.lockscreen_widget_entries)));
         }
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.widgets_custom_color))));
@@ -184,7 +192,7 @@ public class LockscreenWidgetsFragment extends Fragment {
             rebuild();
         };
         colorSwitch.onRowClick = () -> { mColorSwitchExpanded = !mColorSwitchExpanded; rebuild(); };
-        chain.add(new SwitchWidgetAdapter(List.of(colorSwitch)));
+        GroupUtils.addGroup(chain, List.of(colorSwitch));
         if (mColorSwitchExpanded) {
             chain.add(collapsibleHeader(getString(R.string.widgets_big_color_section),
                     () -> { mBigColorsExpanded = !mBigColorsExpanded; rebuild(); }));
@@ -209,13 +217,16 @@ public class LockscreenWidgetsFragment extends Fragment {
             rebuild();
         };
         bgSwitch.onRowClick = () -> { mBgSwitchExpanded = !mBgSwitchExpanded; rebuild(); };
-        chain.add(new SwitchWidgetAdapter(List.of(bgSwitch)));
-        if (mBgSwitchExpanded) chain.add(bgRow());
+        List<Object> bgRows = new ArrayList<>();
+        bgRows.add(bgSwitch);
+        if (mBgSwitchExpanded) bgRows.add(bgItem());
+        GroupUtils.addGroup(chain, bgRows);
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.misc_category))));
         if (mWidgetsEnabledExpanded) {
-            chain.add(sliderRow(getString(R.string.widgets_scale), KEY_SCALE, 50, 100, 100, "%"));
-            chain.add(sliderRow(getString(R.string.lockscreen_clock_top_margin_title), KEY_TOP_MARGIN, -50, 200, 0, "dp"));
+            GroupUtils.addGroup(chain, List.of(
+                    sliderItem(getString(R.string.widgets_scale), KEY_SCALE, 50, 100, 100, "%"),
+                    sliderItem(getString(R.string.lockscreen_clock_top_margin_title), KEY_TOP_MARGIN, -50, 200, 0, "dp")));
         }
 
         android.os.Parcelable scrollState = mRv.getLayoutManager() != null
@@ -342,12 +353,11 @@ public class LockscreenWidgetsFragment extends Fragment {
     // "weather_background". L'anteprima resta un CurrentWeatherView (identica a quella del
     // Meteo, come richiesto) anche se il risultato reale si applica ai widget grandi/mini. ──
 
-    private ListWidgetAdapter bgRow() {
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
+    private ListWidgetAdapter.ListItem bgItem() {
+        return new ListWidgetAdapter.ListItem(
                 getString(R.string.lockscreen_weather_selection_title),
                 choiceLabel(KEY_BG_SELECTION, R.array.lockscreen_weather_bg_entries),
                 this::showBgDialog);
-        return new ListWidgetAdapter(List.of(item));
     }
 
     private void showBgDialog() {
@@ -489,14 +499,10 @@ public class LockscreenWidgetsFragment extends Fragment {
         return item;
     }
 
-    private ListWidgetAdapter singleChoiceRow(String title, String key, int entriesArrayRes) {
-        final ListWidgetAdapter[] adapterRef = new ListWidgetAdapter[1];
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
+    private ListWidgetAdapter.ListItem singleChoiceItem(String title, String key, int entriesArrayRes) {
+        return new ListWidgetAdapter.ListItem(
                 title, choiceLabel(key, entriesArrayRes),
-                () -> showSingleChoiceDialog(title, key, entriesArrayRes, adapterRef[0]));
-        ListWidgetAdapter adapter = new ListWidgetAdapter(List.of(item));
-        adapterRef[0] = adapter;
-        return adapter;
+                () -> showSingleChoiceDialog(title, key, entriesArrayRes));
     }
 
     private String choiceLabel(String key, int entriesArrayRes) {
@@ -516,7 +522,7 @@ public class LockscreenWidgetsFragment extends Fragment {
         return (idx >= 0 && idx < entries.length) ? entries[idx] : entries[0];
     }
 
-    private void showSingleChoiceDialog(String title, String key, int entriesArrayRes, ListWidgetAdapter adapter) {
+    private void showSingleChoiceDialog(String title, String key, int entriesArrayRes) {
         String[] entries = getResources().getStringArray(entriesArrayRes);
         int current = 0;
         try { current = Integer.parseInt(ObsidianPrefs.getString(key, "0")); } catch (NumberFormatException ignored) {}
@@ -526,10 +532,10 @@ public class LockscreenWidgetsFragment extends Fragment {
                 .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putString(key, String.valueOf(selected[0]));
-                    adapter.getItems().get(0).valueSummary = choiceLabel(key, entriesArrayRes);
-                    adapter.notifyItemChanged(0);
                     if (entriesArrayRes == R.array.lockscreen_widget_entries && selected[0] == TYPE_CUSTOM_APP) {
-                        showAppPickerDialog(key, adapter, entriesArrayRes);
+                        showAppPickerDialog(key);
+                    } else {
+                        rebuild();
                     }
                 })
                 .setNegativeButton(R.string.cancel, null)
@@ -539,7 +545,7 @@ public class LockscreenWidgetsFragment extends Fragment {
 
     // ── Selettore "App Personalizzata" ───────────────────────────────────────────
 
-    private void showAppPickerDialog(String slotKey, ListWidgetAdapter adapter, int entriesArrayRes) {
+    private void showAppPickerDialog(String slotKey) {
         PackageManager pm = requireContext().getPackageManager();
         Intent launcherIntent = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER);
         List<ResolveInfo> apps = pm.queryIntentActivities(launcherIntent, 0);
@@ -577,8 +583,7 @@ public class LockscreenWidgetsFragment extends Fragment {
 
             row.setOnClickListener(v -> {
                 ObsidianPrefs.putString(slotKey + "_app_package", packageName);
-                adapter.getItems().get(0).valueSummary = choiceLabel(slotKey, entriesArrayRes);
-                adapter.notifyItemChanged(0);
+                rebuild();
                 if (dlgRef[0] != null) dlgRef[0].dismiss();
             });
             list.addView(row);
@@ -595,12 +600,11 @@ public class LockscreenWidgetsFragment extends Fragment {
         ObsidianTheme.themeDialog(dlgRef[0]);
     }
 
-    private SliderWidgetAdapter sliderRow(String title, String key, int min, int max, int def, String unit) {
+    private SliderWidgetAdapter.SliderItem sliderItem(String title, String key, int min, int max, int def, String unit) {
         int current = ObsidianPrefs.getInt(key, def);
-        SliderWidgetAdapter.SliderItem item = new SliderWidgetAdapter.SliderItem(
+        return new SliderWidgetAdapter.SliderItem(
                 title, current, min, max, unit, def,
                 value -> ObsidianPrefs.putInt(key, value));
-        return new SliderWidgetAdapter(List.of(item));
     }
 
     private void navigate(Fragment fragment, String title) {

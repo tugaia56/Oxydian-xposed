@@ -30,6 +30,7 @@ import java.util.List;
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.activity.MainActivity;
 import it.tugaia56.obsidian.ui.adapters.DarkShadowColorListener;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
@@ -100,9 +101,11 @@ public class DeviceWidgetSettingsFragment extends Fragment {
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.device_widget_preview_title))));
         chain.add(previewRow());
+        List<Object> typeRows = new ArrayList<>();
         for (int i = 0; i < KEY_TYPES.length; i++) {
-            chain.add(pickTypeRow("Widget " + (i + 1), KEY_TYPES[i], DEFAULT_TYPE[i]));
+            typeRows.add(pickTypeItem("Widget " + (i + 1), KEY_TYPES[i], DEFAULT_TYPE[i]));
         }
+        GroupUtils.addGroup(chain, typeRows);
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.lockscreen_widgets_style_section))));
         chain.add(styleRow());
@@ -209,13 +212,9 @@ public class DeviceWidgetSettingsFragment extends Fragment {
         };
     }
 
-    private ListWidgetAdapter pickTypeRow(String title, String key, int defaultType) {
-        final ListWidgetAdapter[] adapterRef = new ListWidgetAdapter[1];
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
-                title, typeLabel(key, defaultType), () -> showTypeDialog(title, key, defaultType, adapterRef[0]));
-        ListWidgetAdapter adapter = new ListWidgetAdapter(List.of(item));
-        adapterRef[0] = adapter;
-        return adapter;
+    private ListWidgetAdapter.ListItem pickTypeItem(String title, String key, int defaultType) {
+        return new ListWidgetAdapter.ListItem(
+                title, typeLabel(key, defaultType), () -> showTypeDialog(title, key, defaultType));
     }
 
     private int typeIndex(String key, int defaultType) {
@@ -227,7 +226,7 @@ public class DeviceWidgetSettingsFragment extends Fragment {
         return (idx >= 0 && idx < TYPE_LABELS.length) ? TYPE_LABELS[idx] : TYPE_LABELS[0];
     }
 
-    private void showTypeDialog(String title, String key, int defaultType, ListWidgetAdapter adapter) {
+    private void showTypeDialog(String title, String key, int defaultType) {
         int current = typeIndex(key, defaultType);
         final int[] selected = {current};
         ObsidianTheme.themeDialog(new AlertDialog.Builder(requireContext())
@@ -235,9 +234,7 @@ public class DeviceWidgetSettingsFragment extends Fragment {
                 .setSingleChoiceItems(TYPE_LABELS, current, (d, which) -> selected[0] = which)
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putString(key, String.valueOf(selected[0]));
-                    adapter.getItems().get(0).valueSummary = typeLabel(key, defaultType);
-                    adapter.notifyItemChanged(0);
-                    applyPreviewStyle();
+                    rebuild();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());

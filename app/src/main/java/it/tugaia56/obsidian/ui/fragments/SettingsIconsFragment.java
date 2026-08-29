@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.tugaia56.obsidian.R;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
 import it.tugaia56.obsidian.utils.AppUtils;
@@ -342,11 +343,10 @@ public class SettingsIconsFragment extends Fragment {
                     rebuild();
                 }));
 
-        List<RecyclerView.Adapter<?>> adapters = new ArrayList<>(List.of(
-                new ListWidgetAdapter(List.of(bgColorItem)),
-                new SwitchWidgetAdapter(List.of(solidItem)),
-                new ListWidgetAdapter(List.of(bgShapeItem))));
-        if (showIconColor) adapters.add(new ListWidgetAdapter(List.of(iconColorItem)));
+        List<Object> rows = new ArrayList<>(List.of(bgColorItem, solidItem, bgShapeItem));
+        if (showIconColor) rows.add(iconColorItem);
+        List<RecyclerView.Adapter<?>> adapters = new ArrayList<>();
+        GroupUtils.addGroup(adapters, rows);
         return adapters;
     }
 

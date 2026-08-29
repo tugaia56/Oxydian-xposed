@@ -14,9 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import it.tugaia56.obsidian.R;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
@@ -58,30 +60,27 @@ public class SettingsGeneralFragment extends Fragment {
     }
 
     private void rebuild() {
-        SectionTitleAdapter appearanceSection = new SectionTitleAdapter(
-                List.of(getString(R.string.settings_appearance_section)));
-        ListWidgetAdapter themeModeAdapter = new ListWidgetAdapter(List.of(
+        List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
+
+        chain.add(new SectionTitleAdapter(List.of(getString(R.string.settings_appearance_section))));
+        GroupUtils.addGroup(chain, List.of(
                 new ListWidgetAdapter.ListItem(
                         getString(R.string.settings_theme_title),
                         themeModeLabel(),
-                        this::showThemeModeDialog)));
-
-        ListWidgetAdapter languageAdapter = new ListWidgetAdapter(List.of(
+                        this::showThemeModeDialog),
                 new ListWidgetAdapter.ListItem(
                         getString(R.string.settings_language),
                         getString(R.string.settings_language_summary),
                         null)));
 
-        SectionTitleAdapter layoutSection = new SectionTitleAdapter(
-                List.of(getString(R.string.settings_layout_section)));
-        ListWidgetAdapter defaultTabAdapter = new ListWidgetAdapter(List.of(
+        chain.add(new SectionTitleAdapter(List.of(getString(R.string.settings_layout_section))));
+        chain.add(new ListWidgetAdapter(List.of(
                 new ListWidgetAdapter.ListItem(
                         getString(R.string.settings_default_tab_title),
                         defaultTabLabel(),
-                        this::showDefaultTabDialog)));
+                        this::showDefaultTabDialog))));
 
-        SectionTitleAdapter debugSection = new SectionTitleAdapter(
-                List.of(getString(R.string.settings_debug_section)));
+        chain.add(new SectionTitleAdapter(List.of(getString(R.string.settings_debug_section))));
         SwitchWidgetAdapter.SwitchItem moreLoggingItem = new SwitchWidgetAdapter.SwitchItem(
                 getString(R.string.more_logging_title),
                 getString(R.string.more_logging_summary),
@@ -89,10 +88,9 @@ public class SettingsGeneralFragment extends Fragment {
                 null);
         moreLoggingItem.onChanged = () ->
                 ObsidianPrefs.putBoolean(KEY_MORE_LOGGING, moreLoggingItem.checked);
-        SwitchWidgetAdapter moreLoggingAdapter = new SwitchWidgetAdapter(List.of(moreLoggingItem));
+        chain.add(new SwitchWidgetAdapter(List.of(moreLoggingItem)));
 
-        mRv.setAdapter(new ConcatAdapter(appearanceSection, themeModeAdapter, languageAdapter,
-                layoutSection, defaultTabAdapter, debugSection, moreLoggingAdapter));
+        mRv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
 
     private String themeModeLabel() {

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.tugaia56.obsidian.R;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
 import it.tugaia56.obsidian.utils.ObsidianPrefs;
@@ -55,15 +56,16 @@ public class LauncherDockBackgroundFragment extends Fragment {
     private void rebuild() {
         List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
 
-        chain.add(new SwitchWidgetAdapter(List.of(
+        List<Object> rows = new ArrayList<>(List.of(
                 boolItem(getString(R.string.dock_background), getString(R.string.dock_background_summary), KEY_DOCK_BG),
-                boolItem(getString(R.string.dock_background_material), getString(R.string.dock_background_material_summary), KEY_DOCK_BG_MATERIAL))));
+                boolItem(getString(R.string.dock_background_material), getString(R.string.dock_background_material_summary), KEY_DOCK_BG_MATERIAL)));
 
         // Quantità/Raggio angolo si applicano solo a "Materiale" — visibili solo con quella attiva.
         if (ObsidianPrefs.getBoolean(KEY_DOCK_BG_MATERIAL, false)) {
-            chain.add(sliderRow(getString(R.string.dock_background_amount), KEY_DOCK_BG_AMOUNT, 0, 4, 0));
-            chain.add(sliderRow(getString(R.string.dock_background_radius), KEY_DOCK_BG_RADIUS, 0, 100, 30));
+            rows.add(sliderItem(getString(R.string.dock_background_amount), KEY_DOCK_BG_AMOUNT, 0, 4, 0));
+            rows.add(sliderItem(getString(R.string.dock_background_radius), KEY_DOCK_BG_RADIUS, 0, 100, 30));
         }
+        GroupUtils.addGroup(chain, rows);
 
         mRv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
@@ -78,11 +80,10 @@ public class LauncherDockBackgroundFragment extends Fragment {
         return item;
     }
 
-    private SliderWidgetAdapter sliderRow(String title, String key, int min, int max, int def) {
+    private SliderWidgetAdapter.SliderItem sliderItem(String title, String key, int min, int max, int def) {
         int current = ObsidianPrefs.getInt(key, def);
-        SliderWidgetAdapter.SliderItem item = new SliderWidgetAdapter.SliderItem(
+        return new SliderWidgetAdapter.SliderItem(
                 title, current, min, max, "", def,
                 value -> ObsidianPrefs.putInt(key, value));
-        return new SliderWidgetAdapter(List.of(item));
     }
 }

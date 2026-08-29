@@ -26,6 +26,7 @@ import java.util.List;
 
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.adapters.DualSliderWidgetAdapter;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
@@ -83,16 +84,14 @@ public class GestureNavigationFragment extends Fragment {
 
         // ── Gesture Indietro ─────────────────────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.gesture_back_title))));
-        chain.add(new SwitchWidgetAdapter(List.of(prefSwitch(
-                getString(R.string.gesture_left_title), null, PREF_GESTURE_LEFT))));
-        chain.add(dualSliderRow(getString(R.string.gesture_height_title),
-                PREF_GESTURE_LEFT_HEIGHT_MIN, PREF_GESTURE_LEFT_HEIGHT_MAX, 0, 100, "%", true));
-        chain.add(new SwitchWidgetAdapter(List.of(prefSwitch(
-                getString(R.string.gesture_right_title), null, PREF_GESTURE_RIGHT))));
-        chain.add(dualSliderRow(getString(R.string.gesture_height_title),
-                PREF_GESTURE_RIGHT_HEIGHT_MIN, PREF_GESTURE_RIGHT_HEIGHT_MAX, 0, 100, "%", false));
-        chain.add(new SwitchWidgetAdapter(List.of(prefSwitch(
-                getString(R.string.gesture_back_on_rotate), null, PREF_GESTURE_ON_ROTATE))));
+        GroupUtils.addGroup(chain, List.of(
+                prefSwitch(getString(R.string.gesture_left_title), null, PREF_GESTURE_LEFT),
+                dualSliderItem(getString(R.string.gesture_height_title),
+                        PREF_GESTURE_LEFT_HEIGHT_MIN, PREF_GESTURE_LEFT_HEIGHT_MAX, 0, 100, "%", true),
+                prefSwitch(getString(R.string.gesture_right_title), null, PREF_GESTURE_RIGHT),
+                dualSliderItem(getString(R.string.gesture_height_title),
+                        PREF_GESTURE_RIGHT_HEIGHT_MIN, PREF_GESTURE_RIGHT_HEIGHT_MAX, 0, 100, "%", false),
+                prefSwitch(getString(R.string.gesture_back_on_rotate), null, PREF_GESTURE_ON_ROTATE)));
 
         // ── Override Hold Back ──────────────────────────────────────────────────
         SwitchWidgetAdapter.SwitchItem holdbackSwitch = gatingSwitch(
@@ -103,24 +102,26 @@ public class GestureNavigationFragment extends Fragment {
             rebuild();
         };
         holdbackSwitch.onRowClick = () -> { mHoldbackExpanded = !mHoldbackExpanded; rebuild(); };
-        chain.add(new SwitchWidgetAdapter(List.of(holdbackSwitch)));
+        List<Object> holdbackRows = new ArrayList<>();
+        holdbackRows.add(holdbackSwitch);
         if (mHoldbackExpanded) {
-            chain.add(singleChoiceRow(getString(R.string.gesture_override_back_hold_mode),
+            holdbackRows.add(singleChoiceItem(getString(R.string.gesture_override_back_hold_mode),
                     PREF_HOLDBACK_MODE, R.array.gesture_holdback_mode_entries));
-            chain.add(commandChoiceRow(getString(R.string.gesture_override_back_hold_common),
+            holdbackRows.add(commandChoiceItem(getString(R.string.gesture_override_back_hold_common),
                     PREF_HOLDBACK_LEFT));
             boolean perSide = "1".equals(ObsidianPrefs.getString(PREF_HOLDBACK_MODE, "0"));
             if (perSide) {
-                chain.add(commandChoiceRow(getString(R.string.gesture_override_back_hold_right),
+                holdbackRows.add(commandChoiceItem(getString(R.string.gesture_override_back_hold_right),
                         PREF_HOLDBACK_RIGHT));
             }
         }
+        GroupUtils.addGroup(chain, holdbackRows);
 
         // ── Pillola di Navigazione ───────────────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.gesture_nav_pill_cat))));
-        chain.add(new SwitchWidgetAdapter(List.of(prefSwitch(
-                getString(R.string.colorpill), null, PREF_PILL_ACCENT))));
-        chain.add(sliderRow(getString(R.string.gesture_nav_pill_width_title), PREF_PILL_WIDTH, 10, 100, 50, "%"));
+        GroupUtils.addGroup(chain, List.of(
+                prefSwitch(getString(R.string.colorpill), null, PREF_PILL_ACCENT),
+                sliderItem(getString(R.string.gesture_nav_pill_width_title), PREF_PILL_WIDTH, 10, 100, 50, "%")));
 
         android.os.Parcelable scrollState = mRv.getLayoutManager() != null
                 ? mRv.getLayoutManager().onSaveInstanceState() : null;
@@ -150,14 +151,10 @@ public class GestureNavigationFragment extends Fragment {
         return item;
     }
 
-    private ListWidgetAdapter singleChoiceRow(String title, String key, int entriesArrayRes) {
-        final ListWidgetAdapter[] adapterRef = new ListWidgetAdapter[1];
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
+    private ListWidgetAdapter.ListItem singleChoiceItem(String title, String key, int entriesArrayRes) {
+        return new ListWidgetAdapter.ListItem(
                 title, choiceLabel(key, entriesArrayRes),
-                () -> showSingleChoiceDialog(title, key, entriesArrayRes, adapterRef[0]));
-        ListWidgetAdapter adapter = new ListWidgetAdapter(List.of(item));
-        adapterRef[0] = adapter;
-        return adapter;
+                () -> showSingleChoiceDialog(title, key, entriesArrayRes));
     }
 
     private String choiceLabel(String key, int entriesArrayRes) {
@@ -167,7 +164,7 @@ public class GestureNavigationFragment extends Fragment {
         return (idx >= 0 && idx < entries.length) ? entries[idx] : entries[0];
     }
 
-    private void showSingleChoiceDialog(String title, String key, int entriesArrayRes, ListWidgetAdapter adapter) {
+    private void showSingleChoiceDialog(String title, String key, int entriesArrayRes) {
         String[] entries = getResources().getStringArray(entriesArrayRes);
         int current = 0;
         try { current = Integer.parseInt(ObsidianPrefs.getString(key, "0")); } catch (NumberFormatException ignored) {}
@@ -177,8 +174,7 @@ public class GestureNavigationFragment extends Fragment {
                 .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putString(key, String.valueOf(selected[0]));
-                    adapter.getItems().get(0).valueSummary = choiceLabel(key, entriesArrayRes);
-                    adapter.notifyItemChanged(0);
+                    rebuild();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
@@ -201,17 +197,13 @@ public class GestureNavigationFragment extends Fragment {
         R.drawable.ic_custom_app,
     };
 
-    private ListWidgetAdapter commandChoiceRow(String title, String key) {
-        final ListWidgetAdapter[] adapterRef = new ListWidgetAdapter[1];
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
+    private ListWidgetAdapter.ListItem commandChoiceItem(String title, String key) {
+        return new ListWidgetAdapter.ListItem(
                 title, choiceLabel(key, R.array.gesture_holdback_commands_entries),
-                () -> showCommandChoiceDialog(title, key, adapterRef[0]));
-        ListWidgetAdapter adapter = new ListWidgetAdapter(List.of(item));
-        adapterRef[0] = adapter;
-        return adapter;
+                () -> showCommandChoiceDialog(title, key));
     }
 
-    private void showCommandChoiceDialog(String title, String key, ListWidgetAdapter adapter) {
+    private void showCommandChoiceDialog(String title, String key) {
         String[] entries = getResources().getStringArray(R.array.gesture_holdback_commands_entries);
         int current = 0;
         try { current = Integer.parseInt(ObsidianPrefs.getString(key, "0")); } catch (NumberFormatException ignored) {}
@@ -263,9 +255,7 @@ public class GestureNavigationFragment extends Fragment {
                 .setView(listView)
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putString(key, String.valueOf(selected[0]));
-                    adapter.getItems().get(0).valueSummary =
-                            choiceLabel(key, R.array.gesture_holdback_commands_entries);
-                    adapter.notifyItemChanged(0);
+                    rebuild();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
@@ -276,17 +266,16 @@ public class GestureNavigationFragment extends Fragment {
         return Math.round(v * getResources().getDisplayMetrics().density);
     }
 
-    private SliderWidgetAdapter sliderRow(String title, String key, int min, int max, int def, String unit) {
+    private SliderWidgetAdapter.SliderItem sliderItem(String title, String key, int min, int max, int def, String unit) {
         int current = ObsidianPrefs.getInt(key, def);
-        SliderWidgetAdapter.SliderItem item = new SliderWidgetAdapter.SliderItem(
+        return new SliderWidgetAdapter.SliderItem(
                 title, current, min, max, unit, def,
                 value -> ObsidianPrefs.putInt(key, value));
-        return new SliderWidgetAdapter(List.of(item));
     }
 
     // ── Cursore doppio per la zona del gesto Indietro, con anteprima live ──────
 
-    private DualSliderWidgetAdapter dualSliderRow(String title, String minKey, String maxKey,
+    private DualSliderWidgetAdapter.DualSliderItem dualSliderItem(String title, String minKey, String maxKey,
                                                    int rangeMin, int rangeMax, String unit, boolean isLeft) {
         int curMin = ObsidianPrefs.getInt(minKey, rangeMin);
         int curMax = ObsidianPrefs.getInt(maxKey, rangeMax);
@@ -299,7 +288,7 @@ public class GestureNavigationFragment extends Fragment {
         item.onDragStart = () -> showZonePreview(isLeft);
         item.onDrag = (mn, mx) -> updateZonePreview(mn, mx);
         item.onDragEnd = this::hideZonePreview;
-        return new DualSliderWidgetAdapter(List.of(item));
+        return item;
     }
 
     private View mPreviewOverlay;

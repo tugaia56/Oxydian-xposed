@@ -21,6 +21,7 @@ import java.util.Locale;
 
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.activity.MainActivity;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
@@ -101,7 +102,7 @@ public class StatusbarNotifsFragment extends Fragment {
 
         // ── Rimozioni notifica (esistenti, invariate) ────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.section_statusbar_notifs))));
-        chain.add(new SwitchWidgetAdapter(buildRemovalSwitches()));
+        GroupUtils.addGroup(chain, buildRemovalSwitches());
 
         // ── Usa icone app / Espansione / pulsanti ─────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.notif_expansion_section))));
@@ -113,16 +114,16 @@ public class StatusbarNotifsFragment extends Fragment {
             rebuild();
         };
         appIconSwitch.onRowClick = () -> { mAppIconExpanded = !mAppIconExpanded; rebuild(); };
-        chain.add(new SwitchWidgetAdapter(List.of(appIconSwitch)));
+        List<Object> expansionRows = new ArrayList<>();
+        expansionRows.add(appIconSwitch);
         if (mAppIconExpanded) {
-            chain.add(sliderRow(getString(R.string.statusbar_app_icon_scale), PREF_APP_ICON_SCALE, 50, 200, 100, "%"));
+            expansionRows.add(sliderItem(getString(R.string.statusbar_app_icon_scale), PREF_APP_ICON_SCALE, 50, 200, 100, "%"));
         }
-
-        // ── Espansione / pulsanti ────────────────────────────────────────────────
-        chain.add(singleChoiceRow(getString(R.string.notif_default_expansion_title),
+        expansionRows.add(singleChoiceItem(getString(R.string.notif_default_expansion_title),
                 PREF_DEFAULT_EXPANSION, R.array.notif_default_expansion_entries));
-        chain.add(new SwitchWidgetAdapter(List.of(prefSwitch(
-                getString(R.string.notif_show_buttons), getString(R.string.notif_show_buttons_summary), PREF_SHOW_BUTTONS))));
+        expansionRows.add(prefSwitch(
+                getString(R.string.notif_show_buttons), getString(R.string.notif_show_buttons_summary), PREF_SHOW_BUTTONS));
+        GroupUtils.addGroup(chain, expansionRows);
 
         // ── Personalizza pulsante Cancella tutto ────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.customize_clear_all_button))));
@@ -134,13 +135,15 @@ public class StatusbarNotifsFragment extends Fragment {
             rebuild();
         };
         clearBtnSwitch.onRowClick = () -> { mClearBtnExpanded = !mClearBtnExpanded; rebuild(); };
-        chain.add(new SwitchWidgetAdapter(List.of(clearBtnSwitch)));
+        List<Object> clearBtnRows = new ArrayList<>();
+        clearBtnRows.add(clearBtnSwitch);
         if (mClearBtnExpanded) {
-            chain.add(colorModeRow(getString(R.string.clear_all_bg_color),
+            clearBtnRows.add(colorModeItem(getString(R.string.clear_all_bg_color),
                     PREF_LINK_BG_ACCENT, PREF_CLEAR_BG_COLOR, DEFAULT_CLEAR_BG_COLOR, CLEAR_BG_DIALOG_ID));
-            chain.add(colorModeRow(getString(R.string.clear_all_icon_color),
+            clearBtnRows.add(colorModeItem(getString(R.string.clear_all_icon_color),
                     PREF_LINK_ICON_ACCENT, PREF_CLEAR_ICON_COLOR, DEFAULT_CLEAR_ICON_COLOR, CLEAR_ICON_DIALOG_ID));
         }
+        GroupUtils.addGroup(chain, clearBtnRows);
 
         android.os.Parcelable scrollState = mRv.getLayoutManager() != null
                 ? mRv.getLayoutManager().onSaveInstanceState() : null;
@@ -178,12 +181,11 @@ public class StatusbarNotifsFragment extends Fragment {
     // ── Riga unica "Accento / Personalizzato" — tocco apre un dialog a scelta singola
     // invece di uno switch + riga separata, stesso pattern di ClockChipStyleFragment ──
 
-    private ListWidgetAdapter colorModeRow(String title, String accentKey, String colorKey, int colorDef, int dialogId) {
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(title,
+    private ListWidgetAdapter.ListItem colorModeItem(String title, String accentKey, String colorKey, int colorDef, int dialogId) {
+        return new ListWidgetAdapter.ListItem(title,
                 ObsidianPrefs.getBoolean(accentKey, false) ? getString(R.string.color_mode_accent)
                         : colorHex(ObsidianPrefs.getInt(colorKey, colorDef)),
                 () -> showColorModeDialog(title, accentKey, colorKey, colorDef, dialogId));
-        return new ListWidgetAdapter(List.of(item));
     }
 
     private void showColorModeDialog(String title, String accentKey, String colorKey, int colorDef, int dialogId) {
@@ -241,14 +243,10 @@ public class StatusbarNotifsFragment extends Fragment {
         return item;
     }
 
-    private ListWidgetAdapter singleChoiceRow(String title, String key, int entriesArrayRes) {
-        final ListWidgetAdapter[] adapterRef = new ListWidgetAdapter[1];
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
+    private ListWidgetAdapter.ListItem singleChoiceItem(String title, String key, int entriesArrayRes) {
+        return new ListWidgetAdapter.ListItem(
                 title, choiceLabel(key, entriesArrayRes),
-                () -> showSingleChoiceDialog(title, key, entriesArrayRes, adapterRef[0]));
-        ListWidgetAdapter adapter = new ListWidgetAdapter(List.of(item));
-        adapterRef[0] = adapter;
-        return adapter;
+                () -> showSingleChoiceDialog(title, key, entriesArrayRes));
     }
 
     private String choiceLabel(String key, int entriesArrayRes) {
@@ -258,7 +256,7 @@ public class StatusbarNotifsFragment extends Fragment {
         return (idx >= 0 && idx < entries.length) ? entries[idx] : entries[0];
     }
 
-    private void showSingleChoiceDialog(String title, String key, int entriesArrayRes, ListWidgetAdapter adapter) {
+    private void showSingleChoiceDialog(String title, String key, int entriesArrayRes) {
         String[] entries = getResources().getStringArray(entriesArrayRes);
         int current = 0;
         try { current = Integer.parseInt(ObsidianPrefs.getString(key, "0")); } catch (NumberFormatException ignored) {}
@@ -268,18 +266,16 @@ public class StatusbarNotifsFragment extends Fragment {
                 .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putString(key, String.valueOf(selected[0]));
-                    adapter.getItems().get(0).valueSummary = choiceLabel(key, entriesArrayRes);
-                    adapter.notifyItemChanged(0);
+                    rebuild();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());
     }
 
-    private SliderWidgetAdapter sliderRow(String title, String key, int min, int max, int def, String unit) {
+    private SliderWidgetAdapter.SliderItem sliderItem(String title, String key, int min, int max, int def, String unit) {
         int current = ObsidianPrefs.getInt(key, def);
-        SliderWidgetAdapter.SliderItem item = new SliderWidgetAdapter.SliderItem(
+        return new SliderWidgetAdapter.SliderItem(
                 title, current, min, max, unit, def,
                 value -> ObsidianPrefs.putInt(key, value));
-        return new SliderWidgetAdapter(List.of(item));
     }
 }

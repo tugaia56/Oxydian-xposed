@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import it.tugaia56.obsidian.R;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
@@ -61,10 +62,7 @@ public class QsHeaderImageFragment extends Fragment {
     };
 
     private ActivityResultLauncher<String> mPickImage;
-    private ListWidgetAdapter imgPickAdapter;
-    private ListWidgetAdapter.ListItem imgPickItem;
-    private ListWidgetAdapter scaleAdapter;
-    private ListWidgetAdapter.ListItem scaleItem;
+    private RecyclerView mRv;
 
     // ── Image preview ─────────────────────────────────────────────────────────
     private ImageView        mPreviewIv;
@@ -86,8 +84,8 @@ public class QsHeaderImageFragment extends Fragment {
                 uri -> {
                     if (uri == null) return;
                     if (copyImageToExternal(uri)) {
-                        updateImgLabel();
                         reloadPreviewBitmap();
+                        rebuild();
                         Toast.makeText(requireContext(), R.string.obs_restart_ui_hint, Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(requireContext(),
@@ -111,8 +109,11 @@ public class QsHeaderImageFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        RecyclerView rv = (RecyclerView) view;
+        mRv = (RecyclerView) view;
+        rebuild();
+    }
 
+    private void rebuild() {
         // ── Enable switch ─────────────────────────────────────────────────────
         SwitchWidgetAdapter.SwitchItem switchItem = new SwitchWidgetAdapter.SwitchItem(
                 getString(R.string.qs_header_enabled),
@@ -126,7 +127,7 @@ public class QsHeaderImageFragment extends Fragment {
         };
 
         // ── Image picker ──────────────────────────────────────────────────────
-        imgPickItem = new ListWidgetAdapter.ListItem(
+        ListWidgetAdapter.ListItem imgPickItem = new ListWidgetAdapter.ListItem(
                 getString(R.string.qs_header_pick),
                 imageLabel(),
                 () -> {
@@ -136,7 +137,6 @@ public class QsHeaderImageFragment extends Fragment {
                         mPickImage.launch("image/*");
                     }
                 });
-        imgPickAdapter = new ListWidgetAdapter(List.of(imgPickItem));
 
         // ── Height slider ─────────────────────────────────────────────────────
         SliderWidgetAdapter.SliderItem heightItem = new SliderWidgetAdapter.SliderItem(
@@ -161,11 +161,10 @@ public class QsHeaderImageFragment extends Fragment {
         // ── Scale type (list → dialog) ────────────────────────────────────────
         int currScale = ObsidianPrefs.getInt(PREF_HEADER_SCALE, 0);
         mPreviewScale = currScale;
-        scaleItem = new ListWidgetAdapter.ListItem(
+        ListWidgetAdapter.ListItem scaleItem = new ListWidgetAdapter.ListItem(
                 getString(R.string.qs_header_scale),
                 SCALE_NAMES[Math.min(currScale, SCALE_NAMES.length - 1)],
                 this::showScaleDialog);
-        scaleAdapter = new ListWidgetAdapter(List.of(scaleItem));
 
         // ── Vertical gravity slider (CENTER_CROP only: 0=top, 50=center, 100=bottom) ───
         SliderWidgetAdapter.SliderItem gravityItem = new SliderWidgetAdapter.SliderItem(
@@ -210,21 +209,21 @@ public class QsHeaderImageFragment extends Fragment {
                 });
 
         // ── Assemble ──────────────────────────────────────────────────────────
-        rv.setAdapter(new ConcatAdapter(
-                new SectionTitleAdapter(List.of(getString(R.string.qs_header_section))),
-                new SwitchWidgetAdapter(List.of(switchItem)),
-                new SectionTitleAdapter(List.of(getString(R.string.dst_qs_bg_customize))),
-                imgPickAdapter,
-                new SliderWidgetAdapter(List.of(heightItem)),
-                new SliderWidgetAdapter(List.of(alphaItem)),
-                new SectionTitleAdapter(List.of(getString(R.string.qs_header_adjust))),
-                scaleAdapter,
-                mPreviewAdapter = new ImagePreviewAdapter(),
-                new SliderWidgetAdapter(List.of(gravityItem)),
-                new SliderWidgetAdapter(List.of(fadeItem)),
-                new SliderWidgetAdapter(List.of(padHItem)),
-                new SliderWidgetAdapter(List.of(padTItem))
-        ));
+        List<RecyclerView.Adapter<?>> chain = new java.util.ArrayList<>();
+        chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_header_section))));
+        chain.add(new SwitchWidgetAdapter(List.of(switchItem)));
+
+        chain.add(new SectionTitleAdapter(List.of(getString(R.string.dst_qs_bg_customize))));
+        GroupUtils.addGroup(chain, List.of(imgPickItem, heightItem, alphaItem));
+
+        chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_header_adjust))));
+        // scaleItem is its own group — the live preview card right after it can't
+        // participate in GroupUtils (custom adapter type), so it breaks the run.
+        GroupUtils.addGroup(chain, List.of(scaleItem));
+        chain.add(mPreviewAdapter = new ImagePreviewAdapter());
+        GroupUtils.addGroup(chain, List.of(gravityItem, fadeItem, padHItem, padTItem));
+
+        mRv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
 
     // ── Image preview helpers ─────────────────────────────────────────────────
@@ -350,12 +349,6 @@ public class QsHeaderImageFragment extends Fragment {
                 : getString(R.string.qs_header_pick_none);
     }
 
-    private void updateImgLabel() {
-        if (imgPickItem == null || imgPickAdapter == null) return;
-        imgPickItem.valueSummary = imageLabel();
-        imgPickAdapter.notifyDataSetChanged();
-    }
-
     private void showScaleDialog() {
         int curr = ObsidianPrefs.getInt(PREF_HEADER_SCALE, 0);
         ObsidianTheme.themeDialog(new AlertDialog.Builder(requireContext())
@@ -363,17 +356,7 @@ public class QsHeaderImageFragment extends Fragment {
                 .setSingleChoiceItems(SCALE_NAMES, curr, (dialog, which) -> {
                     ObsidianPrefs.putInt(PREF_HEADER_SCALE, which);
                     mPreviewScale = which;
-                    if (scaleItem != null) {
-                        scaleItem.valueSummary = SCALE_NAMES[which];
-                        if (scaleAdapter != null) scaleAdapter.notifyDataSetChanged();
-                    }
-                    // Show/hide preview card based on scale mode
-                    if (mPreviewAdapter != null) mPreviewAdapter.notifyDataSetChanged();
-                    // Refresh preview with new scale mode
-                    if (mPreviewIv != null && mPreviewBmp != null) {
-                        mPreviewIv.post(() ->
-                                applyPreviewMatrix(ObsidianPrefs.getInt(PREF_HEADER_GRAVITY, 50)));
-                    }
+                    rebuild();
                     Toast.makeText(requireContext(), R.string.obs_restart_ui_hint, Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
                 })

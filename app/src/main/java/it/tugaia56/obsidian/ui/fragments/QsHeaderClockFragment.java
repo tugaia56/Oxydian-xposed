@@ -35,6 +35,7 @@ import java.util.List;
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.activity.MainActivity;
 import it.tugaia56.obsidian.ui.adapters.DarkShadowColorListener;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
@@ -159,9 +160,12 @@ public class QsHeaderClockFragment extends Fragment {
 
         if (!enabled) {
             // ── Preferenze Orologio Stock — reale OC: visibile SOLO quando l'orologio
-            // personalizzato è disattivato (stesso comportamento di OC). ──────────
+            // personalizzato è disattivato (stesso comportamento di OC). Tutte le righe
+            // (incluse quelle condizionali) restano nella STESSA sezione senza titoli
+            // intermedi — un unico gruppo/card. ──────────────────────────────────────
             chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_header_stock_section))));
-            chain.add(redOneModeRow());
+            List<Object> stockRows = new ArrayList<>();
+            stockRows.add(redOneModeItem());
 
             SwitchWidgetAdapter.SwitchItem stockColorSwitch = gatingSwitch(getString(R.string.qs_header_stock_time_color_title), null, PREF_STOCK_COLOR_ON);
             stockColorSwitch.onChanged = () -> {
@@ -170,15 +174,14 @@ public class QsHeaderClockFragment extends Fragment {
                 rebuild();
             };
             stockColorSwitch.onRowClick = () -> { mStockColorExpanded = !mStockColorExpanded; rebuild(); };
-            chain.add(new SwitchWidgetAdapter(List.of(stockColorSwitch)));
+            stockRows.add(stockColorSwitch);
             if (mStockColorExpanded) {
-                chain.add(colorTriggerRow(getString(R.string.qs_header_stock_color),
+                stockRows.add(colorTriggerItem(getString(R.string.qs_header_stock_color),
                         PREF_STOCK_COLOR, STOCK_COLOR_DIALOG_ID, Color.WHITE));
             }
 
             boolean hideDate = ObsidianPrefs.getBoolean(PREF_STOCK_HIDE_DATE, false);
-            chain.add(new SwitchWidgetAdapter(List.of(
-                    gatingSwitch(getString(R.string.qs_header_stock_hide_date), null, PREF_STOCK_HIDE_DATE))));
+            stockRows.add(gatingSwitch(getString(R.string.qs_header_stock_hide_date), null, PREF_STOCK_HIDE_DATE));
 
             if (!hideDate) {
                 SwitchWidgetAdapter.SwitchItem dateColorSwitch = gatingSwitch(getString(R.string.qs_header_stock_clock_date_custom_color_title), null, PREF_STOCK_DATE_COLOR_ON);
@@ -188,9 +191,9 @@ public class QsHeaderClockFragment extends Fragment {
                     rebuild();
                 };
                 dateColorSwitch.onRowClick = () -> { mDateColorExpanded = !mDateColorExpanded; rebuild(); };
-                chain.add(new SwitchWidgetAdapter(List.of(dateColorSwitch)));
+                stockRows.add(dateColorSwitch);
                 if (mDateColorExpanded) {
-                    chain.add(colorTriggerRow(getString(R.string.qs_header_stock_clock_date_custom_color),
+                    stockRows.add(colorTriggerItem(getString(R.string.qs_header_stock_clock_date_custom_color),
                             PREF_STOCK_DATE_COLOR, STOCK_DATE_COLOR_DIALOG_ID, Color.WHITE));
                 }
             }
@@ -202,8 +205,8 @@ public class QsHeaderClockFragment extends Fragment {
                 rebuild();
             };
             clockChipSwitch.onRowClick = () -> { mClockChipExpanded = !mClockChipExpanded; rebuild(); };
-            chain.add(new SwitchWidgetAdapter(List.of(clockChipSwitch)));
-            if (mClockChipExpanded) chain.add(chipStyleRow(CLOCK_CHIP_PREFIX,
+            stockRows.add(clockChipSwitch);
+            if (mClockChipExpanded) stockRows.add(chipStyleItem(CLOCK_CHIP_PREFIX,
                     getString(R.string.qs_header_stock_clock_background_chip_style)));
 
             if (!hideDate) {
@@ -214,13 +217,13 @@ public class QsHeaderClockFragment extends Fragment {
                     rebuild();
                 };
                 dateChipSwitch.onRowClick = () -> { mDateChipExpanded = !mDateChipExpanded; rebuild(); };
-                chain.add(new SwitchWidgetAdapter(List.of(dateChipSwitch)));
-                if (mDateChipExpanded) chain.add(chipStyleRow(DATE_CHIP_PREFIX,
+                stockRows.add(dateChipSwitch);
+                if (mDateChipExpanded) stockRows.add(chipStyleItem(DATE_CHIP_PREFIX,
                         getString(R.string.qs_header_stock_date_background_chip_style)));
             }
 
-            chain.add(new SwitchWidgetAdapter(List.of(
-                    prefSwitch(getString(R.string.qs_header_stock_clock_hide_carrier_label), null, PREF_STOCK_HIDE_CARRIER))));
+            stockRows.add(prefSwitch(getString(R.string.qs_header_stock_clock_hide_carrier_label), null, PREF_STOCK_HIDE_CARRIER));
+            GroupUtils.addGroup(chain, stockRows);
         } else {
             // ── Stile Orologio — griglia con anteprima reale, visibile SOLO quando
             // l'orologio personalizzato è attivo (stesso comportamento di OC). ─────
@@ -236,8 +239,10 @@ public class QsHeaderClockFragment extends Fragment {
                 rebuild();
             };
             fontSwitch.onRowClick = () -> { mFontExpanded = !mFontExpanded; rebuild(); };
-            chain.add(new SwitchWidgetAdapter(List.of(fontSwitch)));
-            if (mFontExpanded) chain.add(stubRow(getString(R.string.pick_font_title), getString(R.string.pick_font_summary)));
+            List<Object> fontRows = new ArrayList<>();
+            fontRows.add(fontSwitch);
+            if (mFontExpanded) fontRows.add(stubItem(getString(R.string.pick_font_title), getString(R.string.pick_font_summary)));
+            GroupUtils.addGroup(chain, fontRows);
 
             // ── Preferenze Orologio Personalizzato: colori/scala/formato/immagine ──
             chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_header_clock_custom_prefs_section))));
@@ -248,16 +253,18 @@ public class QsHeaderClockFragment extends Fragment {
                 rebuild();
             };
             colorAllSwitch.onRowClick = () -> { mColorAllExpanded = !mColorAllExpanded; rebuild(); };
-            chain.add(new SwitchWidgetAdapter(List.of(colorAllSwitch)));
+            GroupUtils.addGroup(chain, List.of(colorAllSwitch));
             if (mColorAllExpanded) chain.add(clockColorsRow());
-            chain.add(sliderRow(getString(R.string.qs_header_clock_scale), PREF_SCALE, 50, 200, 100, "%"));
-            chain.add(editTextRow(getString(R.string.lockscreen_clock_custom_format_title),
-                    getString(R.string.lockscreen_clock_custom_format_summary), PREF_FORMAT));
+            GroupUtils.addGroup(chain, List.of(
+                    sliderItem(getString(R.string.qs_header_clock_scale), PREF_SCALE, 50, 200, 100, "%"),
+                    editTextItem(getString(R.string.lockscreen_clock_custom_format_title),
+                            getString(R.string.lockscreen_clock_custom_format_summary), PREF_FORMAT)));
 
             // ── Margini Orologio ─────────────────────────────────────────────────
             chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_header_adjust))));
-            chain.add(sliderRow(getString(R.string.qs_header_clock_top_margin), PREF_TOP_MARGIN, 0, 100, 0, "dp"));
-            chain.add(sliderRow(getString(R.string.qs_header_clock_left_margin), PREF_LEFT_MARGIN, 0, 100, 8, "dp"));
+            GroupUtils.addGroup(chain, List.of(
+                    sliderItem(getString(R.string.qs_header_clock_top_margin), PREF_TOP_MARGIN, 0, 100, 0, "dp"),
+                    sliderItem(getString(R.string.qs_header_clock_left_margin), PREF_LEFT_MARGIN, 0, 100, 8, "dp")));
         }
 
         android.os.Parcelable scrollState = mRv.getLayoutManager() != null
@@ -465,17 +472,13 @@ public class QsHeaderClockFragment extends Fragment {
         return (mode >= 0 && mode < entries.length) ? entries[mode] : entries[0];
     }
 
-    private ListWidgetAdapter redOneModeRow() {
-        final ListWidgetAdapter[] adapterRef = new ListWidgetAdapter[1];
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
+    private ListWidgetAdapter.ListItem redOneModeItem() {
+        return new ListWidgetAdapter.ListItem(
                 getString(R.string.qs_header_stock_uno_rosso), redOneModeLabel(),
-                () -> showRedOneModeDialog(adapterRef[0]));
-        ListWidgetAdapter adapter = new ListWidgetAdapter(List.of(item));
-        adapterRef[0] = adapter;
-        return adapter;
+                this::showRedOneModeDialog);
     }
 
-    private void showRedOneModeDialog(ListWidgetAdapter adapter) {
+    private void showRedOneModeDialog() {
         String[] entries = getResources().getStringArray(R.array.qs_header_red_one_mode_entries);
         int current = 0;
         try { current = Integer.parseInt(ObsidianPrefs.getString(PREF_STOCK_RED_MODE, "0")); }
@@ -496,10 +499,7 @@ public class QsHeaderClockFragment extends Fragment {
                         return;
                     }
                     ObsidianPrefs.putString(PREF_STOCK_RED_MODE, String.valueOf(which));
-                    if (adapter != null) {
-                        adapter.getItems().get(0).valueSummary = redOneModeLabel();
-                        adapter.notifyItemChanged(0);
-                    }
+                    rebuild();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());
@@ -507,13 +507,13 @@ public class QsHeaderClockFragment extends Fragment {
 
     // ── Single-colour "trigger" row — no persistent swatch, tap opens the picker ────
 
-    private ListWidgetAdapter colorTriggerRow(String title, String key, int dialogId, int def) {
+    private ListWidgetAdapter.ListItem colorTriggerItem(String title, String key, int dialogId, int def) {
         String label = ObsidianPrefs.getBoolean(key + "_use_accent", false)
                 ? getString(R.string.color_mode_accent) : getString(R.string.pick_color);
         ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
                 title, label, () -> showTriggerColorAccentChoice(title, key, dialogId, def));
         item.useAccentColor = false;
-        return new ListWidgetAdapter(List.of(item));
+        return item;
     }
 
     /** Accento/Personalizzato inserted before the row opens the raw picker — Accento resolves
@@ -586,24 +586,23 @@ public class QsHeaderClockFragment extends Fragment {
         return item;
     }
 
-    private ListWidgetAdapter stubRow(String title, String summary) {
+    private ListWidgetAdapter.ListItem stubItem(String title, String summary) {
         ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(title, summary,
                 () -> Toast.makeText(requireContext(), R.string.section_wip_summary, Toast.LENGTH_SHORT).show());
         item.useAccentColor = false;
-        return new ListWidgetAdapter(List.of(item));
+        return item;
     }
 
     /** Naviga all'editor completo "Stile Chip di sfondo" (stessa schermata del chip Barra di
      *  stato, riusata via prefisso — vedi ClockChipStyleFragment/ChipStyleHelper). */
-    private ListWidgetAdapter chipStyleRow(String prefix, String title) {
-        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(title, chipStyleLabel(prefix),
+    private ListWidgetAdapter.ListItem chipStyleItem(String prefix, String title) {
+        return new ListWidgetAdapter.ListItem(title, chipStyleLabel(prefix),
                 () -> {
                     if (getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).navigateTo(
                                 ClockChipStyleFragment.newInstance(prefix), title);
                     }
                 });
-        return new ListWidgetAdapter(List.of(item));
     }
 
     private String chipStyleLabel(String prefix) {
@@ -613,18 +612,15 @@ public class QsHeaderClockFragment extends Fragment {
         return (idx >= 0 && idx < entries.length) ? entries[idx] : entries[0];
     }
 
-    private ListWidgetAdapter editTextRow(String title, String summary, String key) {
-        final ListWidgetAdapter[] adapterRef = new ListWidgetAdapter[1];
+    private ListWidgetAdapter.ListItem editTextItem(String title, String summary, String key) {
         ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
                 title, textOrDefault(ObsidianPrefs.getString(key, ""), summary),
-                () -> showEditTextDialog(title, summary, key, adapterRef[0]));
+                () -> showEditTextDialog(title, summary, key));
         item.useAccentColor = false;
-        ListWidgetAdapter adapter = new ListWidgetAdapter(List.of(item));
-        adapterRef[0] = adapter;
-        return adapter;
+        return item;
     }
 
-    private void showEditTextDialog(String title, String summary, String key, ListWidgetAdapter adapter) {
+    private void showEditTextDialog(String title, String summary, String key) {
         EditText et = new EditText(requireContext());
         et.setInputType(InputType.TYPE_CLASS_TEXT);
         et.setText(ObsidianPrefs.getString(key, ""));
@@ -642,8 +638,7 @@ public class QsHeaderClockFragment extends Fragment {
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     String text = et.getText().toString().trim();
                     ObsidianPrefs.putString(key, text);
-                    adapter.getItems().get(0).valueSummary = textOrDefault(text, summary);
-                    adapter.notifyItemChanged(0);
+                    rebuild();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());
@@ -653,12 +648,11 @@ public class QsHeaderClockFragment extends Fragment {
         return text.isEmpty() ? fallback : text;
     }
 
-    private SliderWidgetAdapter sliderRow(String title, String key, int min, int max, int def, String unit) {
+    private SliderWidgetAdapter.SliderItem sliderItem(String title, String key, int min, int max, int def, String unit) {
         int current = ObsidianPrefs.getInt(key, def);
-        SliderWidgetAdapter.SliderItem item = new SliderWidgetAdapter.SliderItem(
+        return new SliderWidgetAdapter.SliderItem(
                 title, current, min, max, unit, def,
                 value -> ObsidianPrefs.putInt(key, value));
-        return new SliderWidgetAdapter(List.of(item));
     }
 
     private int dp(int v) {

@@ -20,10 +20,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.activity.MainActivity;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.NavAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
@@ -83,7 +85,8 @@ public class FingerprintIconFragment extends Fragment {
             ObsidianPrefs.putBoolean("lockscreen_fp_custom_icon", customItem.checked);
             AppUtils.showRestartReminder(requireContext());
         };
-        SwitchWidgetAdapter toggles = new SwitchWidgetAdapter(List.of(removeItem, customItem));
+        List<RecyclerView.Adapter<?>> toggleChain = new ArrayList<>();
+        GroupUtils.addGroup(toggleChain, List.of(removeItem, customItem));
 
         List<NavAdapter.NavItem> navItems = List.of(
                 new NavAdapter.NavItem(
@@ -100,7 +103,10 @@ public class FingerprintIconFragment extends Fragment {
 
         SliderWidgetAdapter scaleAdapter = scaleRow();
 
-        rv.setAdapter(new ConcatAdapter(toggles, navAdapter, scaleAdapter));
+        List<RecyclerView.Adapter<?>> chain = new ArrayList<>(toggleChain);
+        chain.add(navAdapter);
+        chain.add(scaleAdapter);
+        rv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
 
     // ── Custom image picker ─────────────────────────────────────────────────

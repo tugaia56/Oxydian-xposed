@@ -19,6 +19,7 @@ import java.util.List;
 
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.activity.MainActivity;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
@@ -40,9 +41,6 @@ public class ClockStyleFragment extends Fragment {
     private static final String PREF_BG_CHIP_ON = PREF_CHIP_PREFIX + "_switch";
     private static final String PREF_CHIP_STYLE = PREF_CHIP_PREFIX + "_style";
 
-    private ListWidgetAdapter positionAdapter;
-    private ListWidgetAdapter sizeAdapter;
-    private ListWidgetAdapter paddingAdapter;
     private RecyclerView mRv;
     private boolean mChipExpanded = ObsidianPrefs.getBoolean(PREF_BG_CHIP_ON, false);
 
@@ -66,33 +64,21 @@ public class ClockStyleFragment extends Fragment {
     }
 
     private void rebuild() {
-        // ── Position ─────────────────────────────────────────────────────────
-        positionAdapter = new ListWidgetAdapter(List.of(
+        List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
+        chain.add(new SectionTitleAdapter(List.of(getString(R.string.nav_clock_style))));
+        GroupUtils.addGroup(chain, List.of(
                 new ListWidgetAdapter.ListItem(
                         getString(R.string.clock_position_title),
                         positionLabel(),
-                        this::showPositionDialog)));
-
-        // ── Font size ─────────────────────────────────────────────────────────
-        sizeAdapter = new ListWidgetAdapter(List.of(
+                        this::showPositionDialog),
                 new ListWidgetAdapter.ListItem(
                         getString(R.string.clock_size_title),
                         sizeLabel(),
-                        this::showSizeDialog)));
-
-        // ── Extra padding ─────────────────────────────────────────────────────
-        paddingAdapter = new ListWidgetAdapter(List.of(
+                        this::showSizeDialog),
                 new ListWidgetAdapter.ListItem(
                         getString(R.string.clock_padding_title),
                         paddingLabel(),
                         this::showPaddingDialog)));
-
-        List<RecyclerView.Adapter<?>> chain = new ArrayList<>(List.of(
-                new SectionTitleAdapter(List.of(getString(R.string.nav_clock_style))),
-                positionAdapter,
-                sizeAdapter,
-                paddingAdapter
-        ));
 
         // ── Chip di sfondo (reale OC status_bar_clock_background_chip) ──────────
         boolean chipOn = ObsidianPrefs.getBoolean(PREF_BG_CHIP_ON, false);
@@ -153,8 +139,7 @@ public class ClockStyleFragment extends Fragment {
                 .setSingleChoiceItems(entries, curIdx, (d, w) -> sel[0] = w)
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putString(PREF_POSITION, values[sel[0]]);
-                    positionAdapter.getItems().get(0).valueSummary = entries[sel[0]];
-                    positionAdapter.notifyItemChanged(0);
+                    rebuild();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());
@@ -174,8 +159,7 @@ public class ClockStyleFragment extends Fragment {
                 .setSingleChoiceItems(entries, curIdx, (d, w) -> sel[0] = w)
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putInt(PREF_SIZE, values[sel[0]]);
-                    sizeAdapter.getItems().get(0).valueSummary = entries[sel[0]];
-                    sizeAdapter.notifyItemChanged(0);
+                    rebuild();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());
@@ -195,8 +179,7 @@ public class ClockStyleFragment extends Fragment {
                 .setSingleChoiceItems(entries, curIdx, (d, w) -> sel[0] = w)
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putInt(PREF_PADDING, values[sel[0]]);
-                    paddingAdapter.getItems().get(0).valueSummary = entries[sel[0]];
-                    paddingAdapter.notifyItemChanged(0);
+                    rebuild();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());

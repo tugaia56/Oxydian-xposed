@@ -14,9 +14,11 @@ import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import it.tugaia56.obsidian.R;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 
@@ -52,23 +54,25 @@ public class CreditsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         RecyclerView rv = (RecyclerView) view;
 
-        rv.setAdapter(new ConcatAdapter(
-                new SectionTitleAdapter(List.of(getString(R.string.credits_thanks))),
-                new ListWidgetAdapter(List.of(
-                        link("Oxygen Customizer", getString(R.string.credits_oc_summary),
-                                "https://github.com/DHD2280/Oxygen-Customizer"),
-                        link("crDroid", getString(R.string.credits_crdroid_summary),
-                                "https://github.com/crdroidandroid"),
-                        link("LSPosed", getString(R.string.credits_lsposed_summary),
-                                "https://github.com/LSPosed/LSPosed"))),
+        List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
 
-                new SectionTitleAdapter(List.of(getString(R.string.credits_libraries))),
-                new ListWidgetAdapter(List.of(
-                        link("EventBus", "greenrobot", "https://github.com/greenrobot/EventBus"),
-                        link("ColorPicker", "Jared Rummler", "https://github.com/jaredrummler/ColorPicker"),
-                        link("libsu", "topjohnwu", "https://github.com/topjohnwu/libsu"),
-                        link("RemotePreferences", "crossbowffs", "https://github.com/crossbowffs/RemotePreferences"),
-                        link("Lottie", "Airbnb", "https://github.com/airbnb/lottie-android")))
-        ));
+        chain.add(new SectionTitleAdapter(List.of(getString(R.string.credits_thanks))));
+        GroupUtils.addGroup(chain, List.of(
+                link("Oxygen Customizer", getString(R.string.credits_oc_summary),
+                        "https://github.com/DHD2280/Oxygen-Customizer"),
+                link("crDroid", getString(R.string.credits_crdroid_summary),
+                        "https://github.com/crdroidandroid"),
+                link("LSPosed", getString(R.string.credits_lsposed_summary),
+                        "https://github.com/LSPosed/LSPosed")));
+
+        chain.add(new SectionTitleAdapter(List.of(getString(R.string.credits_libraries))));
+        GroupUtils.addGroup(chain, List.of(
+                link("EventBus", "greenrobot", "https://github.com/greenrobot/EventBus"),
+                link("ColorPicker", "Jared Rummler", "https://github.com/jaredrummler/ColorPicker"),
+                link("libsu", "topjohnwu", "https://github.com/topjohnwu/libsu"),
+                link("RemotePreferences", "crossbowffs", "https://github.com/crossbowffs/RemotePreferences"),
+                link("Lottie", "Airbnb", "https://github.com/airbnb/lottie-android")));
+
+        rv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
 }

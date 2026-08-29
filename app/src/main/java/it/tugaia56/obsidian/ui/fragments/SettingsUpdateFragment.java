@@ -28,10 +28,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import it.tugaia56.obsidian.BuildConfig;
 import it.tugaia56.obsidian.R;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
 import it.tugaia56.obsidian.utils.ObsidianPrefs;
@@ -111,9 +113,13 @@ public class SettingsUpdateFragment extends Fragment {
             UpdateScheduler.reschedule(requireContext());
         };
 
-        SwitchWidgetAdapter switchAdapter = new SwitchWidgetAdapter(List.of(autoUpdateItem, wifiOnlyItem));
+        List<RecyclerView.Adapter<?>> switchChain = new ArrayList<>();
+        GroupUtils.addGroup(switchChain, List.of(autoUpdateItem, wifiOnlyItem));
 
-        mRv.setAdapter(new ConcatAdapter(checkAdapter, switchAdapter));
+        List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
+        chain.add(checkAdapter);
+        chain.addAll(switchChain);
+        mRv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
 
     private void maybeRequestNotifPermission() {

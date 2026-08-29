@@ -21,6 +21,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.util.List;
 
 import it.tugaia56.obsidian.R;
+import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
@@ -49,14 +50,7 @@ public class ClockOraDataFragment extends Fragment {
     private static final String PREF_AFTER_TEXT         = "sbc_after_clock_format";
     private static final String PREF_AFTER_SMALL        = "sbc_after_small";
 
-    // ── List adapters (need reference to update summaries) ─────────────────────
-    private ListWidgetAdapter amPmAdapter;
-    private ListWidgetAdapter dateDisplayAdapter;
-    private ListWidgetAdapter datePosAdapter;
-    private ListWidgetAdapter dateFormatAdapter;
-    private ListWidgetAdapter beforeTextAdapter;
-    private ListWidgetAdapter afterTextAdapter;
-    private RecyclerView      rv;
+    private RecyclerView rv;
 
     // ── Lifecycle ──────────────────────────────────────────────────────────────
 
@@ -105,36 +99,23 @@ public class ClockOraDataFragment extends Fragment {
         secondsItem.onChanged = () ->
                 ObsidianPrefs.putBoolean(PREF_SHOW_SECONDS, secondsItem.checked);
 
-        amPmAdapter = new ListWidgetAdapter(List.of(
-                new ListWidgetAdapter.ListItem(
-                        getString(R.string.clock_ampm_title),
-                        amPmLabel(),
-                        this::showAmPmDialog)));
+        ListWidgetAdapter.ListItem amPmItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.clock_ampm_title), amPmLabel(), this::showAmPmDialog);
 
-        dateDisplayAdapter = new ListWidgetAdapter(List.of(
-                new ListWidgetAdapter.ListItem(
-                        getString(R.string.clock_date_title),
-                        dateDisplayLabel(),
-                        this::showDateDisplayDialog)));
+        ListWidgetAdapter.ListItem dateDisplayItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.clock_date_title), dateDisplayLabel(), this::showDateDisplayDialog);
 
-        datePosAdapter = new ListWidgetAdapter(List.of(
-                new ListWidgetAdapter.ListItem(
-                        getString(R.string.clock_date_position_title),
-                        datePosLabel(),
-                        this::showDatePosDialog)));
+        ListWidgetAdapter.ListItem datePosItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.clock_date_position_title), datePosLabel(), this::showDatePosDialog);
 
-        dateFormatAdapter = new ListWidgetAdapter(List.of(
-                new ListWidgetAdapter.ListItem(
-                        getString(R.string.clock_date_format_title),
-                        dateFormatLabel(),
-                        this::showDateFormatDialog)));
+        ListWidgetAdapter.ListItem dateFormatItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.clock_date_format_title), dateFormatLabel(), this::showDateFormatDialog);
 
         // ── Avanzate ─────────────────────────────────────────────────────────
-        beforeTextAdapter = new ListWidgetAdapter(List.of(
-                new ListWidgetAdapter.ListItem(
-                        getString(R.string.clock_before_text),
-                        textOrNone(ObsidianPrefs.getString(PREF_BEFORE_TEXT, "")),
-                        this::showBeforeTextDialog)));
+        ListWidgetAdapter.ListItem beforeTextItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.clock_before_text),
+                textOrNone(ObsidianPrefs.getString(PREF_BEFORE_TEXT, "")),
+                this::showBeforeTextDialog);
 
         SwitchItem beforeSmallItem = new SwitchItem(
                 getString(R.string.clock_text_small),
@@ -143,11 +124,10 @@ public class ClockOraDataFragment extends Fragment {
         beforeSmallItem.onChanged = () ->
                 ObsidianPrefs.putBoolean(PREF_BEFORE_SMALL, beforeSmallItem.checked);
 
-        afterTextAdapter = new ListWidgetAdapter(List.of(
-                new ListWidgetAdapter.ListItem(
-                        getString(R.string.clock_after_text),
-                        textOrNone(ObsidianPrefs.getString(PREF_AFTER_TEXT, "")),
-                        this::showAfterTextDialog)));
+        ListWidgetAdapter.ListItem afterTextItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.clock_after_text),
+                textOrNone(ObsidianPrefs.getString(PREF_AFTER_TEXT, "")),
+                this::showAfterTextDialog);
 
         SwitchItem afterSmallItem = new SwitchItem(
                 getString(R.string.clock_text_small),
@@ -159,23 +139,20 @@ public class ClockOraDataFragment extends Fragment {
         String dateVal    = ObsidianPrefs.getString(PREF_DATE_DISPLAY, "0");
         boolean dateActive = !"0".equals(dateVal);
 
-        List<RecyclerView.Adapter<?>> chain = new java.util.ArrayList<>(List.of(
-                new SectionTitleAdapter(List.of(getString(R.string.clock_section_hide))),
-                new SwitchWidgetAdapter(List.of(hideLauncherItem, hideAutoItem)),
-                new SectionTitleAdapter(List.of(getString(R.string.clock_section_format))),
-                new SwitchWidgetAdapter(List.of(secondsItem)),
-                amPmAdapter,
-                dateDisplayAdapter
-        ));
+        List<RecyclerView.Adapter<?>> chain = new java.util.ArrayList<>();
+        chain.add(new SectionTitleAdapter(List.of(getString(R.string.clock_section_hide))));
+        GroupUtils.addGroup(chain, List.of(hideLauncherItem, hideAutoItem));
+
+        chain.add(new SectionTitleAdapter(List.of(getString(R.string.clock_section_format))));
+        List<Object> formatRows = new java.util.ArrayList<>(List.of(secondsItem, amPmItem, dateDisplayItem));
         if (dateActive) {
-            chain.add(datePosAdapter);
-            chain.add(dateFormatAdapter);
+            formatRows.add(datePosItem);
+            formatRows.add(dateFormatItem);
         }
+        GroupUtils.addGroup(chain, formatRows);
+
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.clock_section_advanced))));
-        chain.add(beforeTextAdapter);
-        chain.add(new SwitchWidgetAdapter(List.of(beforeSmallItem)));
-        chain.add(afterTextAdapter);
-        chain.add(new SwitchWidgetAdapter(List.of(afterSmallItem)));
+        GroupUtils.addGroup(chain, List.of(beforeTextItem, beforeSmallItem, afterTextItem, afterSmallItem));
 
         rv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
@@ -192,8 +169,7 @@ public class ClockOraDataFragment extends Fragment {
                 .setSingleChoiceItems(entries, curIdx, (d, w) -> sel[0] = w)
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putString(PREF_AM_PM, values[sel[0]]);
-                    amPmAdapter.getItems().get(0).valueSummary = entries[sel[0]];
-                    amPmAdapter.notifyItemChanged(0);
+                    buildRecyclerView();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());
@@ -209,8 +185,6 @@ public class ClockOraDataFragment extends Fragment {
                 .setSingleChoiceItems(entries, curIdx, (d, w) -> sel[0] = w)
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putString(PREF_DATE_DISPLAY, values[sel[0]]);
-                    dateDisplayAdapter.getItems().get(0).valueSummary = entries[sel[0]];
-                    dateDisplayAdapter.notifyItemChanged(0);
                     buildRecyclerView(); // show/hide date position row
                 })
                 .setNegativeButton(R.string.cancel, null)
@@ -227,8 +201,7 @@ public class ClockOraDataFragment extends Fragment {
                 .setSingleChoiceItems(entries, curIdx, (d, w) -> sel[0] = w)
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putString(PREF_DATE_POS, values[sel[0]]);
-                    datePosAdapter.getItems().get(0).valueSummary = entries[sel[0]];
-                    datePosAdapter.notifyItemChanged(0);
+                    buildRecyclerView();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());
@@ -244,22 +217,21 @@ public class ClockOraDataFragment extends Fragment {
                 .setSingleChoiceItems(entries, curIdx, (d, w) -> sel[0] = w)
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putString(PREF_DATE_FORMAT, values[sel[0]]);
-                    dateFormatAdapter.getItems().get(0).valueSummary = entries[sel[0]];
-                    dateFormatAdapter.notifyItemChanged(0);
+                    buildRecyclerView();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());
     }
 
     private void showBeforeTextDialog() {
-        showTextInputDialog(R.string.clock_before_text, PREF_BEFORE_TEXT, beforeTextAdapter);
+        showTextInputDialog(R.string.clock_before_text, PREF_BEFORE_TEXT);
     }
 
     private void showAfterTextDialog() {
-        showTextInputDialog(R.string.clock_after_text, PREF_AFTER_TEXT, afterTextAdapter);
+        showTextInputDialog(R.string.clock_after_text, PREF_AFTER_TEXT);
     }
 
-    private void showTextInputDialog(int titleRes, String prefKey, ListWidgetAdapter adapter) {
+    private void showTextInputDialog(int titleRes, String prefKey) {
         EditText et = new EditText(requireContext());
         et.setInputType(InputType.TYPE_CLASS_TEXT);
         et.setText(ObsidianPrefs.getString(prefKey, ""));
@@ -277,14 +249,12 @@ public class ClockOraDataFragment extends Fragment {
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     String text = et.getText().toString().trim();
                     ObsidianPrefs.putString(prefKey, text);
-                    adapter.getItems().get(0).valueSummary = textOrNone(text);
-                    adapter.notifyItemChanged(0);
+                    buildRecyclerView();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .setNeutralButton(R.string.reset, (d, w) -> {
                     ObsidianPrefs.putString(prefKey, "");
-                    adapter.getItems().get(0).valueSummary = textOrNone("");
-                    adapter.notifyItemChanged(0);
+                    buildRecyclerView();
                 })
                 .show());
     }
