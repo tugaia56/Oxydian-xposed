@@ -1,10 +1,15 @@
 package it.tugaia56.obsidian.ui.fragments;
 
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -18,12 +23,16 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.List;
 
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.activity.MainActivity;
 import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
+import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
 import it.tugaia56.obsidian.ui.events.ColorSelectedEvent;
@@ -56,22 +65,92 @@ public class PowerMenuFragment extends Fragment {
     private static final String PREF_BG_MODE   = "power_menu_bg_mode";
     private static final String PREF_BG_CUSTOM = "power_menu_bg_custom_color";
     private static final int DIALOG_BG_CUSTOM_COLOR = PREF_BG_CUSTOM.hashCode();
+    private static final String BG_MODE_IMAGE = "image";
+    /** Same relative path MiscMods.java reads from — keep both sides in sync if this changes. */
+    private static final String BG_IMAGE_FILENAME = "power_menu_bg_image";
     private static final String PREF_BORDER = "power_menu_border_enabled";
     private static final String PREF_BORDER_USE_ACCENT   = "power_menu_border_use_accent";
     private static final String PREF_BORDER_CUSTOM_COLOR = "power_menu_border_custom_color";
     private static final int DIALOG_BORDER_CUSTOM_COLOR = PREF_BORDER_CUSTOM_COLOR.hashCode();
 
+    // Sfondo Menù Power — background of the WHOLE popup window, independent from the
+    // pillolone's own background above. Same 3-way shape, own pref keys/file.
+    private static final String PREF_MENU_BG_MODE   = "power_menu_menu_bg_mode";
+    private static final String PREF_MENU_BG_CUSTOM = "power_menu_menu_bg_custom_color";
+    private static final int DIALOG_MENU_BG_CUSTOM_COLOR = PREF_MENU_BG_CUSTOM.hashCode();
+    /** Same relative path MiscMods.java reads from — keep both sides in sync if this changes. */
+    private static final String MENU_BG_IMAGE_FILENAME = "power_menu_menu_bg_image";
+
     private RecyclerView mRv;
     /** Switch ON/OFF keeps this in sync (auto expand/collapse on activation); tapping the row
      *  NAME independently toggles it on top of that — same pattern as everywhere else in the app. */
     private boolean mAdvancedRebootExpanded = ObsidianPrefs.getBoolean("show_advanced_reboot", false);
-    private boolean mBorderExpanded = ObsidianPrefs.getBoolean(PREF_BORDER, false);
-    private boolean mBgExpanded = "custom".equals(ObsidianPrefs.getString(PREF_BG_MODE, "stock"));
+    /** Shared by both image pickers (pillolone bg + whole-menu bg) — only one can be open at a
+     *  time, so a single launcher + a "which target" flag avoids registering two. */
+    private ActivityResultLauncher<String> mPickImage;
+    private String mPendingImageTarget; // "pill" or "menu"
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
+        mPickImage = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri == null) return;
+                    boolean pill = "pill".equals(mPendingImageTarget);
+                    File dest = pill ? getBgImageFile() : getMenuBgImageFile();
+                    if (copyImageToExternal(uri, dest)) {
+                        ObsidianPrefs.putString(pill ? PREF_BG_MODE : PREF_MENU_BG_MODE, BG_MODE_IMAGE);
+                        rebuild();
+                        Toast.makeText(requireContext(), R.string.obs_restart_ui_hint, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(requireContext(), R.string.qs_header_pick_error, Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private File getBgImageFile() {
+        return new File(Environment.getExternalStorageDirectory(), ".obsidian/" + BG_IMAGE_FILENAME);
+    }
+
+    private File getMenuBgImageFile() {
+        return new File(Environment.getExternalStorageDirectory(), ".obsidian/" + MENU_BG_IMAGE_FILENAME);
+    }
+
+    private boolean copyImageToExternal(Uri uri, File dest) {
+        try {
+            File dir = new File(Environment.getExternalStorageDirectory(), ".obsidian");
+            if (!dir.exists() && !dir.mkdirs()) return false;
+            try (InputStream in = requireContext().getContentResolver().openInputStream(uri);
+                 FileOutputStream out = new FileOutputStream(dest)) {
+                if (in == null) return false;
+                byte[] buf = new byte[8192];
+                int n;
+                while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            }
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    private void pickBgImage() {
+        mPendingImageTarget = "pill";
+        launchImagePicker();
+    }
+
+    private void pickMenuBgImage() {
+        mPendingImageTarget = "menu";
+        launchImagePicker();
+    }
+
+    private void launchImagePicker() {
+        if (!AppUtils.hasStoragePermission()) {
+            AppUtils.requestStoragePermission(requireActivity());
+        } else {
+            mPickImage.launch("image/*");
+        }
     }
 
     @Override
@@ -91,6 +170,9 @@ public class PowerMenuFragment extends Fragment {
             ObsidianPrefs.putString(PREF_BG_MODE, "custom"); // picking a colour implies "on"
         } else if (event.dialogId() == DIALOG_BORDER_CUSTOM_COLOR) {
             ObsidianPrefs.putInt(PREF_BORDER_CUSTOM_COLOR, event.color());
+        } else if (event.dialogId() == DIALOG_MENU_BG_CUSTOM_COLOR) {
+            ObsidianPrefs.putInt(PREF_MENU_BG_CUSTOM, event.color());
+            ObsidianPrefs.putString(PREF_MENU_BG_MODE, "custom");
         } else {
             return;
         }
@@ -159,62 +241,101 @@ public class PowerMenuFragment extends Fragment {
                 ObsidianPrefs.getInt("advanced_reboot_y_offset", 0),
                 0, 100, "dp", 0,
                 value -> ObsidianPrefs.putInt("advanced_reboot_y_offset", value));
-        SliderWidgetAdapter yOffsetAdapter = new SliderWidgetAdapter(List.of(yOffsetItem));
 
-        // Switch enables only — tap the row NAME to expand/collapse the colour-picker row below it.
+        // ── Pillolone (Riavvia/Spegni): Colore / Sfondo / Bordo, own section. One row each —
+        // switch ON immediately pops the mode dialog (no separate "tap to open" row underneath,
+        // that read as a confusing duplicate of the switch's own label); switch OFF = stock.
+        // Tapping the row NAME while already on reopens the same dialog to change the choice. ──
+
+        SwitchWidgetAdapter.SwitchItem gradientSwitch = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.power_menu_gradient_color_title),
+                !"stock".equals(ObsidianPrefs.getString(PREF_GRADIENT_MODE, "accent"))
+                        ? modeAccentCustomLabel(PREF_GRADIENT_MODE, PREF_GRADIENT_CUSTOM) : null,
+                !"stock".equals(ObsidianPrefs.getString(PREF_GRADIENT_MODE, "accent")),
+                null);
+        gradientSwitch.onChanged = () -> {
+            ObsidianPrefs.putString(PREF_GRADIENT_MODE, gradientSwitch.checked ? "accent" : "stock");
+            rebuild();
+            if (gradientSwitch.checked) showModeAccentCustomDialog(PREF_GRADIENT_MODE, PREF_GRADIENT_CUSTOM,
+                    DIALOG_GRADIENT_CUSTOM_COLOR, R.string.power_menu_gradient_color_title);
+        };
+        gradientSwitch.onRowClick = () -> {
+            if (!"stock".equals(ObsidianPrefs.getString(PREF_GRADIENT_MODE, "accent"))) {
+                showModeAccentCustomDialog(PREF_GRADIENT_MODE, PREF_GRADIENT_CUSTOM,
+                        DIALOG_GRADIENT_CUSTOM_COLOR, R.string.power_menu_gradient_color_title);
+            }
+        };
+
         SwitchWidgetAdapter.SwitchItem bgItem = new SwitchWidgetAdapter.SwitchItem(
-                getString(R.string.power_menu_bg_color_title), null,
-                "custom".equals(ObsidianPrefs.getString(PREF_BG_MODE, "stock")),
+                getString(R.string.power_menu_bg_color_title),
+                !"stock".equals(ObsidianPrefs.getString(PREF_BG_MODE, "stock"))
+                        ? triColorLabel(PREF_BG_MODE, PREF_BG_CUSTOM, "accent") : null,
+                !"stock".equals(ObsidianPrefs.getString(PREF_BG_MODE, "stock")),
                 null);
         bgItem.onChanged = () -> {
-            ObsidianPrefs.putString(PREF_BG_MODE, bgItem.checked ? "custom" : "stock");
-            mBgExpanded = bgItem.checked;
+            ObsidianPrefs.putString(PREF_BG_MODE, bgItem.checked ? "accent" : "stock");
             rebuild();
+            if (bgItem.checked) showBgModeDialog();
         };
         bgItem.onRowClick = () -> {
-            mBgExpanded = !mBgExpanded;
-            rebuild();
+            if (!"stock".equals(ObsidianPrefs.getString(PREF_BG_MODE, "stock"))) showBgModeDialog();
         };
 
-        // Switch enables only — tap the row NAME to expand/collapse "Colore Bordo" below it.
         SwitchWidgetAdapter.SwitchItem borderItem = new SwitchWidgetAdapter.SwitchItem(
                 getString(R.string.power_menu_border_title),
-                getString(R.string.power_menu_border_summary),
+                ObsidianPrefs.getBoolean(PREF_BORDER, false)
+                        ? accentCustomColorLabel(PREF_BORDER_USE_ACCENT, PREF_BORDER_CUSTOM_COLOR)
+                        : getString(R.string.power_menu_border_summary),
                 ObsidianPrefs.getBoolean(PREF_BORDER, false),
                 null);
         borderItem.onChanged = () -> {
             ObsidianPrefs.putBoolean(PREF_BORDER, borderItem.checked);
-            mBorderExpanded = borderItem.checked;
             AppUtils.showRestartReminder(requireContext());
             rebuild();
+            if (borderItem.checked) showAccentCustomDialog(PREF_BORDER_USE_ACCENT, PREF_BORDER_CUSTOM_COLOR,
+                    DIALOG_BORDER_CUSTOM_COLOR, R.string.power_menu_border_color_title);
         };
         borderItem.onRowClick = () -> {
-            mBorderExpanded = !mBorderExpanded;
+            if (ObsidianPrefs.getBoolean(PREF_BORDER, false)) {
+                showAccentCustomDialog(PREF_BORDER_USE_ACCENT, PREF_BORDER_CUSTOM_COLOR,
+                        DIALOG_BORDER_CUSTOM_COLOR, R.string.power_menu_border_color_title);
+            }
+        };
+
+        // Sfondo Menù Power — background of the WHOLE popup window, same one-row/auto-open shape.
+        SwitchWidgetAdapter.SwitchItem menuBgItem = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.power_menu_bg_section),
+                !"stock".equals(ObsidianPrefs.getString(PREF_MENU_BG_MODE, "stock"))
+                        ? triColorLabel(PREF_MENU_BG_MODE, PREF_MENU_BG_CUSTOM, "accent") : null,
+                !"stock".equals(ObsidianPrefs.getString(PREF_MENU_BG_MODE, "stock")),
+                null);
+        menuBgItem.onChanged = () -> {
+            ObsidianPrefs.putString(PREF_MENU_BG_MODE, menuBgItem.checked ? "accent" : "stock");
             rebuild();
+            if (menuBgItem.checked) showMenuBgModeDialog();
+        };
+        menuBgItem.onRowClick = () -> {
+            if (!"stock".equals(ObsidianPrefs.getString(PREF_MENU_BG_MODE, "stock"))) showMenuBgModeDialog();
         };
 
         List<RecyclerView.Adapter<?>> sections = new java.util.ArrayList<>();
-        GroupUtils.addGroup(sections, List.of(authItem, hideSosItem, advancedRebootItem));
+
+        // ── Menù Power: autenticazione, SOS, Riavvio Avanzato (+ Colore Pulsante/Offset, solo
+        // se attivo) — tutto quello che NON riguarda il pillolone Riavvia/Spegni. ──────────
+        List<Object> menuRows = new java.util.ArrayList<>(List.of(authItem, hideSosItem, advancedRebootItem));
         if (mAdvancedRebootExpanded) {
-            GroupUtils.addGroup(sections, List.of(colorModeItem()), true);
+            menuRows.add(colorModeItem());
+            menuRows.add(yOffsetItem);
         }
-        sections.add(yOffsetAdapter);
-        sections.add(new ListWidgetAdapter(List.of(gradientColorItem())));
-        GroupUtils.addGroup(sections, List.of(bgItem));
-        if (mBgExpanded) {
-            ListWidgetAdapter.ListItem bgPickItem = new ListWidgetAdapter.ListItem(
-                    getString(R.string.power_menu_bg_color_title),
-                    triColorLabel(PREF_BG_MODE, PREF_BG_CUSTOM, "stock"),
-                    this::openBgColorPicker);
-            GroupUtils.addGroup(sections, List.of(bgPickItem), true);
-        }
-        GroupUtils.addGroup(sections, List.of(borderItem));
-        if (mBorderExpanded) {
-            ListWidgetAdapter.ListItem borderColorItem = accentCustomColorItem(
-                    PREF_BORDER_USE_ACCENT, PREF_BORDER_CUSTOM_COLOR,
-                    DIALOG_BORDER_CUSTOM_COLOR, R.string.power_menu_border_color_title);
-            GroupUtils.addGroup(sections, List.of(borderColorItem), true);
-        }
+        GroupUtils.addGroup(sections, menuRows);
+
+        // ── Sfondo Menù Power — sopra Pillolone, sua card a sé. ───────────────────────────
+        GroupUtils.addGroup(sections, List.of(menuBgItem));
+
+        // ── Pillolone: Colore Riavvia/Spegni → Sfondo Pillolone → Bordo Pillolone, un'unica
+        // card continua, una riga sola ciascuno. ─────────────────────────────────────────
+        sections.add(new SectionTitleAdapter(List.of(getString(R.string.power_menu_pill_section))));
+        GroupUtils.addGroup(sections, List.of(gradientSwitch, bgItem, borderItem));
 
         mRv.setAdapter(new ConcatAdapter(sections));
     }
@@ -260,12 +381,37 @@ public class PowerMenuFragment extends Fragment {
                 .show());
     }
 
-    private ListWidgetAdapter.ListItem gradientColorItem() {
-        return new ListWidgetAdapter.ListItem(
-                getString(R.string.power_menu_gradient_color_title),
-                triColorLabel(PREF_GRADIENT_MODE, PREF_GRADIENT_CUSTOM, "accent"),
-                () -> showTriColorDialog(PREF_GRADIENT_MODE, PREF_GRADIENT_CUSTOM,
-                        DIALOG_GRADIENT_CUSTOM_COLOR, R.string.power_menu_gradient_color_title, "accent"));
+    /** Same label logic as accentCustomColorLabel(), just reading a string-mode pref
+     *  ("accent"/"custom", "stock" only reachable via the row's own switch being off) instead
+     *  of a boolean — shared by "Colore Riavvia/Spegni" and "Sfondo Pillolone"'s colour sub-case. */
+    private String modeAccentCustomLabel(String modePrefKey, String customPrefKey) {
+        boolean useAccent = !"custom".equals(ObsidianPrefs.getString(modePrefKey, "accent"));
+        if (useAccent) return getString(R.string.color_mode_accent);
+        return String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(customPrefKey, ObsidianTheme.DEFAULT_ACCENT));
+    }
+
+    /** 2-way Accento/Personalizzato sub-dialog for a string-mode pref — same choices as
+     *  showAccentCustomDialog() but for "Colore Riavvia/Spegni", which stores "accent"/"custom"
+     *  (stock is the row's own switch being off, not a third dialog choice anymore). */
+    private void showModeAccentCustomDialog(String modePrefKey, String customPrefKey, int dialogId, int titleResId) {
+        String[] entries = { getString(R.string.color_mode_accent), getString(R.string.color_mode_custom) };
+        String currentMode = ObsidianPrefs.getString(modePrefKey, "accent");
+        int current = "custom".equals(currentMode) ? 1 : 0;
+        final int[] selected = {current};
+        ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(titleResId)
+                .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
+                .setPositiveButton(R.string.apply, (d, w) -> {
+                    boolean useAccent = selected[0] == 0;
+                    ObsidianPrefs.putString(modePrefKey, useAccent ? "accent" : "custom");
+                    rebuild();
+                    if (!useAccent && getActivity() instanceof MainActivity) {
+                        int currentColor = ObsidianPrefs.getInt(customPrefKey, ObsidianTheme.DEFAULT_ACCENT);
+                        ((MainActivity) getActivity()).showColorPickerDialog(dialogId, currentColor, true, true, true);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show());
     }
 
     // AOSP framework dark-surface greys (android:color/background_dark and friends) — kept dark
@@ -288,38 +434,70 @@ public class PowerMenuFragment extends Fragment {
         }
     }
 
+    /** "Sfondo Pillolone" row tap — 3-way Accento/Colore/Immagine chooser ("Stock" is the row's
+     *  own switch being off, not a dialog choice). Picking "Colore" opens the existing preset
+     *  colour picker unchanged; picking "Immagine" launches the system image picker (permission-
+     *  gated, same flow as QsHeaderImageFragment) — the mode pref only flips to "image" once a
+     *  file is actually copied successfully, so cancelling the picker leaves the mode untouched. */
+    private void showBgModeDialog() {
+        String[] entries = {
+                getString(R.string.color_mode_accent),
+                getString(R.string.power_menu_bg_mode_custom),
+                getString(R.string.color_mode_image)
+        };
+        String currentMode = ObsidianPrefs.getString(PREF_BG_MODE, "accent");
+        int current = "custom".equals(currentMode) ? 1 : BG_MODE_IMAGE.equals(currentMode) ? 2 : 0;
+        final int[] selected = {current};
+        ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.power_menu_bg_color_title)
+                .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
+                .setPositiveButton(R.string.apply, (d, w) -> {
+                    if (selected[0] == 2) { pickBgImage(); return; }
+                    ObsidianPrefs.putString(PREF_BG_MODE, selected[0] == 1 ? "custom" : "accent");
+                    rebuild();
+                    if (selected[0] == 1) openBgColorPicker();
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show());
+    }
+
     private String triColorLabel(String modePrefKey, String customPrefKey, String defaultMode) {
         String mode = ObsidianPrefs.getString(modePrefKey, defaultMode);
+        if (BG_MODE_IMAGE.equals(mode)) return getString(R.string.color_mode_image);
         if ("custom".equals(mode)) {
             return String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(customPrefKey, ObsidianTheme.DEFAULT_ACCENT));
         }
         return "accent".equals(mode) ? getString(R.string.color_mode_accent) : getString(R.string.color_mode_stock);
     }
 
-    /** 3-way Stock/Accento/Personalizzato picker, shared by the Riavvia/Spegni gradient and the
-     *  pill background — "Stock" (unlike the button's own 2-way picker above) leaves OOS's
-     *  original colour alone instead of forcing accent or custom. */
-    private void showTriColorDialog(String modePrefKey, String customPrefKey, int dialogId,
-                                     int titleResId, String defaultMode) {
+    /** Same picker/presets as openBgColorPicker(), just for "Sfondo Menù Power"'s own colour pref. */
+    private void openMenuBgColorPicker() {
+        int currentColor = ObsidianPrefs.getInt(PREF_MENU_BG_CUSTOM, BG_PRESET_COLORS[0]);
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).showColorPickerDialog(
+                    DIALOG_MENU_BG_CUSTOM_COLOR, currentColor, true, true, true, BG_PRESET_COLORS);
+        }
+    }
+
+    /** "Sfondo Menù Power" row tap — same 3-way Accento/Colore/Immagine chooser as "Sfondo
+     *  Pillolone", just targeting the whole popup window's own independent mode/colour/image. */
+    private void showMenuBgModeDialog() {
         String[] entries = {
-                getString(R.string.color_mode_stock),
                 getString(R.string.color_mode_accent),
-                getString(R.string.color_mode_custom)
+                getString(R.string.power_menu_bg_mode_custom),
+                getString(R.string.color_mode_image)
         };
-        String currentMode = ObsidianPrefs.getString(modePrefKey, defaultMode);
-        int current = "accent".equals(currentMode) ? 1 : "custom".equals(currentMode) ? 2 : 0;
+        String currentMode = ObsidianPrefs.getString(PREF_MENU_BG_MODE, "accent");
+        int current = "custom".equals(currentMode) ? 1 : BG_MODE_IMAGE.equals(currentMode) ? 2 : 0;
         final int[] selected = {current};
         ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(titleResId)
+                .setTitle(R.string.power_menu_bg_section)
                 .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
                 .setPositiveButton(R.string.apply, (d, w) -> {
-                    String newMode = selected[0] == 1 ? "accent" : selected[0] == 2 ? "custom" : "stock";
-                    ObsidianPrefs.putString(modePrefKey, newMode);
+                    if (selected[0] == 2) { pickMenuBgImage(); return; }
+                    ObsidianPrefs.putString(PREF_MENU_BG_MODE, selected[0] == 1 ? "custom" : "accent");
                     rebuild();
-                    if (selected[0] == 2 && getActivity() instanceof MainActivity) {
-                        int currentColor = ObsidianPrefs.getInt(customPrefKey, ObsidianTheme.DEFAULT_ACCENT);
-                        ((MainActivity) getActivity()).showColorPickerDialog(dialogId, currentColor, true, true, true);
-                    }
+                    if (selected[0] == 1) openMenuBgColorPicker();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());

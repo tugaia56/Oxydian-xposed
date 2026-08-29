@@ -6,6 +6,7 @@
     <string name="color_mode_accent">Colore accento</string>
     <string name="color_mode_custom">Colore personalizzato</string>
     <string name="color_mode_stock">Colore stock</string>
+    <string name="color_mode_image">Immagine</string>
     <string name="color_mode_transparent">Trasparente</string>
     <string name="color_mode_default">Predefinito</string>
     <string name="aod_clock_switch_title">Orologio Personalizzato</string>
@@ -323,8 +324,11 @@
     <string name="advanced_reboot_auth">Autenticazione Riavvio Avanzato</string>
     <string name="advanced_reboot_auth_summary">Autenticarsi per mostrare le opzioni di riavvio avanzato</string>
     <string name="advanced_reboot_auth_failed">Autenticazione fallita</string>
+    <string name="power_menu_pill_section">Pillolone</string>
     <string name="power_menu_gradient_color_title">Colore Riavvia/Spegni</string>
+    <string name="power_menu_bg_section">Sfondo Menù Power</string>
     <string name="power_menu_bg_color_title">Sfondo Pillolone</string>
+    <string name="power_menu_bg_mode_custom">Colore</string>
     <string name="power_menu_border_title">Bordo Pillolone</string>
     <string name="power_menu_border_summary">Disegna un bordo attorno al cursore riavvia/spegni</string>
     <string name="power_menu_border_color_title">Colore Bordo</string>

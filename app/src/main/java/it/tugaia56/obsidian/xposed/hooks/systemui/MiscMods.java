@@ -11,17 +11,24 @@ import static it.tugaia56.obsidian.xposed.XPrefs.Xprefs;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.hardware.biometrics.BiometricManager;
+import android.os.Environment;
 import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.core.content.res.ResourcesCompat;
+
+import java.io.File;
+import java.io.FileInputStream;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -67,6 +74,22 @@ public class MiscMods extends XposedMods {
     private boolean mPowerMenuBorderUseAccent = true;
     private int     mPowerMenuBorderCustomColor = 0xFF908DFF;
 
+    // Pillolone background image ("power_menu_bg_mode" == "image") — file written by
+    // PowerMenuFragment to the same relative path. Cached and only re-decoded when the file's
+    // mtime changes, so a normal prefs sync doesn't re-decode the bitmap every time.
+    private static final String POWER_MENU_BG_IMAGE_SUBPATH = ".obsidian/power_menu_bg_image";
+    private Bitmap mPowerMenuBgBitmap;
+    private long   mPowerMenuBgBitmapMtime = -1;
+
+    // Sfondo Menù Power — background of the WHOLE popup window (Window.setBackgroundDrawable
+    // on the GlobalActions Dialog itself), independent from the pillolone's own background
+    // above. Same "stock"/"accent"/"custom"/"image" shape, own pref keys/file.
+    private static final String POWER_MENU_MENU_BG_IMAGE_SUBPATH = ".obsidian/power_menu_menu_bg_image";
+    private String  mPowerMenuMenuBgMode = "stock";
+    private int     mPowerMenuMenuBgCustomColor = 0xFF908DFF;
+    private Bitmap  mPowerMenuMenuBgBitmap;
+    private long    mPowerMenuMenuBgBitmapMtime = -1;
+
     private Drawable mAdvancedRebootDrawable;
     private int mCenterX, mCenterY, mRadius;
 
@@ -91,6 +114,10 @@ public class MiscMods extends XposedMods {
         mPowerMenuBorderEnabled = Xprefs.getBoolean("power_menu_border_enabled", false);
         mPowerMenuBorderUseAccent = Xprefs.getBoolean("power_menu_border_use_accent", true);
         mPowerMenuBorderCustomColor = Xprefs.getInt("power_menu_border_custom_color", 0xFF908DFF);
+        mPowerMenuMenuBgMode = Xprefs.getString("power_menu_menu_bg_mode", "stock");
+        mPowerMenuMenuBgCustomColor = Xprefs.getInt("power_menu_menu_bg_custom_color", 0xFF908DFF);
+        refreshPowerMenuBgBitmap();
+        refreshPowerMenuMenuBgBitmap();
         if (Key.length > 0 && "misc_remove_rotate_floating".equals(Key[0])) {
             applyButtonVisibility();
         }
@@ -160,6 +187,12 @@ public class MiscMods extends XposedMods {
                     mContext.getTheme());
 
             hookAllMethods(shutdownCls, "onDraw", new XC_MethodHook() {
+                // Drawn BEFORE the stock onDraw runs, so it sits behind the pill's own fill
+                // (forced transparent in "image" mode via the getColor hook below) and behind
+                // the icons/text OOS draws afterwards — a real background, not an overlay.
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    try { drawPillBackgroundImage((Canvas) p.args[0], p.thisObject); } catch (Throwable ignored) {}
+                }
                 @Override protected void afterHookedMethod(MethodHookParam p) {
                     try { drawPillBorder((Canvas) p.args[0], p.thisObject); } catch (Throwable ignored) {}
                     if (!mShowAdvancedReboot) return;
@@ -184,6 +217,30 @@ public class MiscMods extends XposedMods {
             });
         } catch (Throwable t) {
             XposedBridge.log("[ Obsidian ] MiscMods power menu: " + t);
+        }
+
+        try {
+            // "Sfondo Menù Power" — background of the WHOLE popup window, independent from the
+            // pillolone's own background above. The dialog class is
+            // com.oplus.systemui.shutdown.OplusGlobalActionsDialog$ActionsDialog, a real
+            // android.app.Dialog — found via DstDialogStyle's own global Dialog.show() log,
+            // which deliberately SKIPS any class containing "GlobalAction" (that generic
+            // dark-dialog-preset styling isn't meant for the power menu). Hooking Dialog.show()
+            // again here, scoped to SystemUI only, is safe — Xposed supports multiple hooks on
+            // the same method and they all fire independently.
+            hookAllMethods(android.app.Dialog.class, "show", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    try {
+                        if ("stock".equals(mPowerMenuMenuBgMode)) return;
+                        if (!(p.thisObject instanceof android.app.Dialog)) return;
+                        String cls = p.thisObject.getClass().getName();
+                        if (!cls.contains("GlobalAction")) return;
+                        applyMenuBackground((android.app.Dialog) p.thisObject);
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] MiscMods power menu background: " + t);
         }
 
         try {
@@ -254,8 +311,14 @@ public class MiscMods extends XposedMods {
                                 Integer c = powerMenuGradientColor();
                                 if (c != null) p.setResult(c);
                             } else if (resId == barColorId) {
-                                Integer c = powerMenuBgColor();
-                                if (c != null) p.setResult((c & 0x00FFFFFF) | 0xCC000000);
+                                if ("image".equals(mPowerMenuBgMode) && mPowerMenuBgBitmap != null) {
+                                    // Fully transparent: let the bitmap drawn in onDraw's
+                                    // before-hook show through instead of being painted over.
+                                    p.setResult(0x00000000);
+                                } else {
+                                    Integer c = powerMenuBgColor();
+                                    if (c != null) p.setResult((c & 0x00FFFFFF) | 0xCC000000);
+                                }
                             }
                         } catch (Throwable ignored) {}
                     }
@@ -352,6 +415,143 @@ public class MiscMods extends XposedMods {
      *  two can be set to genuinely different colours (e.g. dark background + accent border). */
     private int borderColor() {
         return mPowerMenuBorderUseAccent ? sharedAccentColor() : mPowerMenuBorderCustomColor;
+    }
+
+    /** Re-decodes the pillolone background image only when the file's mtime actually changed
+     *  (called from every updatePrefs(), which fires far more often than the image itself
+     *  changes) — avoids decoding a full bitmap on every prefs sync. Cleared when the mode
+     *  isn't "image" or the file is missing, so drawPillBackgroundImage() cheaply no-ops. */
+    private void refreshPowerMenuBgBitmap() {
+        if (!"image".equals(mPowerMenuBgMode)) {
+            mPowerMenuBgBitmap = null;
+            mPowerMenuBgBitmapMtime = -1;
+            return;
+        }
+        File f = new File(Environment.getExternalStorageDirectory(), POWER_MENU_BG_IMAGE_SUBPATH);
+        if (!f.exists()) {
+            mPowerMenuBgBitmap = null;
+            mPowerMenuBgBitmapMtime = -1;
+            return;
+        }
+        long mtime = f.lastModified();
+        if (mPowerMenuBgBitmap != null && mtime == mPowerMenuBgBitmapMtime) return; // unchanged
+        // decodeStream (not decodeFile) — more reliable from a system process, same reasoning
+        // as QsHeaderImage's loadBitmap().
+        try (FileInputStream fis = new FileInputStream(f)) {
+            Bitmap bmp = BitmapFactory.decodeStream(fis);
+            if (bmp != null) {
+                mPowerMenuBgBitmap = bmp;
+                mPowerMenuBgBitmapMtime = mtime;
+            }
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] MiscMods power menu bg image: " + t);
+        }
+    }
+
+    /** Pillolone background image, drawn BEFORE the stock onDraw so it sits behind the pill's
+     *  own fill (forced transparent in image mode, see the oplus_bar_color getColor hook) and
+     *  behind the icons/text drawn afterwards. Center-cropped + clipped to the same rounded
+     *  rect drawPillBorder() uses, so it always matches the pill's real shape exactly. */
+    private void drawPillBackgroundImage(Canvas canvas, Object shutdownView) {
+        if (!"image".equals(mPowerMenuBgMode) || mPowerMenuBgBitmap == null) return;
+        try {
+            Object rectFObj = getObjectField(shutdownView, "mBarRectF");
+            Object radiusObj = getObjectField(shutdownView, "mBarRadius");
+            if (!(rectFObj instanceof RectF) || !(radiusObj instanceof Integer)) return;
+            RectF rectF = (RectF) rectFObj;
+            float radius = (Integer) radiusObj;
+            if (rectF.width() <= 0 || rectF.height() <= 0) return;
+
+            Rect src = centerCropSrcRect(mPowerMenuBgBitmap, rectF.width(), rectF.height());
+
+            canvas.save();
+            Path clip = new Path();
+            clip.addRoundRect(rectF, radius, radius, Path.Direction.CW);
+            canvas.clipPath(clip);
+            canvas.drawBitmap(mPowerMenuBgBitmap, src, rectF, null);
+            canvas.restore();
+        } catch (Throwable ignored) {}
+    }
+
+    /** Classic center-crop math: picks the largest same-aspect-ratio rect out of the source
+     *  bitmap that covers the destination area without distortion. */
+    private static Rect centerCropSrcRect(Bitmap bmp, float dstW, float dstH) {
+        int bw = bmp.getWidth(), bh = bmp.getHeight();
+        float srcAspect = (float) bw / bh;
+        float dstAspect = dstW / dstH;
+        if (srcAspect > dstAspect) {
+            int cropW = Math.round(bh * dstAspect);
+            int left = Math.max(0, (bw - cropW) / 2);
+            return new Rect(left, 0, left + cropW, bh);
+        } else {
+            int cropH = Math.round(bw / dstAspect);
+            int top = Math.max(0, (bh - cropH) / 2);
+            return new Rect(0, top, bw, top + cropH);
+        }
+    }
+
+    /** Re-decodes "Sfondo Menù Power"'s image only when the file's mtime changed — same
+     *  reasoning as refreshPowerMenuBgBitmap() above, independent cache/file. */
+    private void refreshPowerMenuMenuBgBitmap() {
+        if (!"image".equals(mPowerMenuMenuBgMode)) {
+            mPowerMenuMenuBgBitmap = null;
+            mPowerMenuMenuBgBitmapMtime = -1;
+            return;
+        }
+        File f = new File(Environment.getExternalStorageDirectory(), POWER_MENU_MENU_BG_IMAGE_SUBPATH);
+        if (!f.exists()) {
+            mPowerMenuMenuBgBitmap = null;
+            mPowerMenuMenuBgBitmapMtime = -1;
+            return;
+        }
+        long mtime = f.lastModified();
+        if (mPowerMenuMenuBgBitmap != null && mtime == mPowerMenuMenuBgBitmapMtime) return;
+        try (FileInputStream fis = new FileInputStream(f)) {
+            Bitmap bmp = BitmapFactory.decodeStream(fis);
+            if (bmp != null) {
+                mPowerMenuMenuBgBitmap = bmp;
+                mPowerMenuMenuBgBitmapMtime = mtime;
+            }
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] MiscMods power menu menu-bg image: " + t);
+        }
+    }
+
+    /** Applies "Sfondo Menù Power" to the whole GlobalActions Dialog window — a plain solid
+     *  colour for accent/custom, a center-cropped image Drawable for image mode. Unlike the
+     *  pillolone's own background (a Canvas draw clipped to the pill's rounded rect), this sets
+     *  the WHOLE window's background directly since there's no single shape to clip to here. */
+    private void applyMenuBackground(android.app.Dialog d) {
+        android.view.Window w = d.getWindow();
+        if (w == null) return;
+        if ("image".equals(mPowerMenuMenuBgMode)) {
+            if (mPowerMenuMenuBgBitmap == null) return;
+            w.setBackgroundDrawable(new CenterCropBitmapDrawable(mPowerMenuMenuBgBitmap));
+        } else {
+            int color = "accent".equals(mPowerMenuMenuBgMode) ? sharedAccentColor() : mPowerMenuMenuBgCustomColor;
+            android.graphics.drawable.GradientDrawable gd = new android.graphics.drawable.GradientDrawable();
+            gd.setColor(color);
+            w.setBackgroundDrawable(gd);
+        }
+    }
+
+    /** Draws a bitmap center-cropped to whatever bounds it's given — used as a Window background
+     *  Drawable, where the bounds are the window's own client rect (set by the framework). */
+    private static class CenterCropBitmapDrawable extends Drawable {
+        private final Bitmap mBmp;
+        private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+        CenterCropBitmapDrawable(Bitmap bmp) { mBmp = bmp; }
+
+        @Override public void draw(Canvas canvas) {
+            Rect b = getBounds();
+            if (b.width() <= 0 || b.height() <= 0) return;
+            Rect src = centerCropSrcRect(mBmp, b.width(), b.height());
+            canvas.drawBitmap(mBmp, src, b, mPaint);
+        }
+        @Override public void setAlpha(int alpha) { mPaint.setAlpha(alpha); }
+        @Override public void setColorFilter(android.graphics.ColorFilter cf) { mPaint.setColorFilter(cf); }
+        @Override public int getOpacity() { return android.graphics.PixelFormat.TRANSLUCENT; }
     }
 
     /** Outline around the Riavvia/Spegni pill. Reuses OplusShutdownView's own public

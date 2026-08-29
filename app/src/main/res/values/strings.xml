@@ -6,6 +6,7 @@
     <string name="color_mode_accent">Accent color</string>
     <string name="color_mode_custom">Custom color</string>
     <string name="color_mode_stock">Stock color</string>
+    <string name="color_mode_image">Image</string>
     <string name="color_mode_transparent">Transparent</string>
     <string name="color_mode_default">Default</string>
     <string name="aod_clock_switch_title">Custom AOD Clock</string>
@@ -325,8 +326,11 @@
     <string name="advanced_reboot_title">Advanced Reboot</string>
     <string name="advanced_reboot_auth">Advanced Reboot Authentication</string>
     <string name="advanced_reboot_auth_summary">Authenticate to show advanced reboot options</string>
+    <string name="power_menu_pill_section">Slider</string>
     <string name="power_menu_gradient_color_title">Reboot/Shutdown Color</string>
+    <string name="power_menu_bg_section">Power Menu Background</string>
     <string name="power_menu_bg_color_title">Slider Background</string>
+    <string name="power_menu_bg_mode_custom">Color</string>
     <string name="power_menu_border_title">Slider Border</string>
     <string name="power_menu_border_summary">Draw an outline around the reboot/shutdown slider</string>
     <string name="power_menu_border_color_title">Border Color</string>
