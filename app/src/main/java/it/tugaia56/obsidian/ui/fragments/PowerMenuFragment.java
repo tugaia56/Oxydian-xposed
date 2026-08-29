@@ -62,10 +62,11 @@ public class PowerMenuFragment extends Fragment {
     private static final int DIALOG_BORDER_CUSTOM_COLOR = PREF_BORDER_CUSTOM_COLOR.hashCode();
 
     private RecyclerView mRv;
-    /** Independent of the switch itself — tap the row NAME to expand/collapse, switch only enables. */
-    private boolean mAdvancedRebootExpanded = false;
-    private boolean mBorderExpanded = false;
-    private boolean mBgExpanded = false;
+    /** Switch ON/OFF keeps this in sync (auto expand/collapse on activation); tapping the row
+     *  NAME independently toggles it on top of that — same pattern as everywhere else in the app. */
+    private boolean mAdvancedRebootExpanded = ObsidianPrefs.getBoolean("show_advanced_reboot", false);
+    private boolean mBorderExpanded = ObsidianPrefs.getBoolean(PREF_BORDER, false);
+    private boolean mBgExpanded = "custom".equals(ObsidianPrefs.getString(PREF_BG_MODE, "stock"));
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -144,7 +145,9 @@ public class PowerMenuFragment extends Fragment {
                 null);
         advancedRebootItem.onChanged = () -> {
             ObsidianPrefs.putBoolean("show_advanced_reboot", advancedRebootItem.checked);
+            mAdvancedRebootExpanded = advancedRebootItem.checked;
             AppUtils.showRestartReminder(requireContext());
+            rebuild();
         };
         advancedRebootItem.onRowClick = () -> {
             mAdvancedRebootExpanded = !mAdvancedRebootExpanded;
@@ -163,8 +166,11 @@ public class PowerMenuFragment extends Fragment {
                 getString(R.string.power_menu_bg_color_title), null,
                 "custom".equals(ObsidianPrefs.getString(PREF_BG_MODE, "stock")),
                 null);
-        bgItem.onChanged = () ->
-                ObsidianPrefs.putString(PREF_BG_MODE, bgItem.checked ? "custom" : "stock");
+        bgItem.onChanged = () -> {
+            ObsidianPrefs.putString(PREF_BG_MODE, bgItem.checked ? "custom" : "stock");
+            mBgExpanded = bgItem.checked;
+            rebuild();
+        };
         bgItem.onRowClick = () -> {
             mBgExpanded = !mBgExpanded;
             rebuild();
@@ -178,7 +184,9 @@ public class PowerMenuFragment extends Fragment {
                 null);
         borderItem.onChanged = () -> {
             ObsidianPrefs.putBoolean(PREF_BORDER, borderItem.checked);
+            mBorderExpanded = borderItem.checked;
             AppUtils.showRestartReminder(requireContext());
+            rebuild();
         };
         borderItem.onRowClick = () -> {
             mBorderExpanded = !mBorderExpanded;
