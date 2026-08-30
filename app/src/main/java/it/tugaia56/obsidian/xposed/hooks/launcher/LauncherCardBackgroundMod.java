@@ -6,10 +6,12 @@ import static de.robv.android.xposed.XposedHelpers.findClass;
 import static it.tugaia56.obsidian.utils.Constants.Packages.LAUNCHER;
 import static it.tugaia56.obsidian.xposed.XPrefs.Xprefs;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -39,12 +41,20 @@ import it.tugaia56.obsidian.xposed.XposedMods;
  * UI (Handler+Looper.getMainLooper() — CalledFromWrongThreadException altrimenti, stesso bug
  * gia' trovato e risolto oggi in SettingsCardBackgroundMod).
  *
- * Sfondo pagina (nero, mai toccato dall'overlay) NON risolto qui: setBackgroundDrawable() sulla
- * finestra di LauncherSettingsActivity la rende trasparente invece che opaca — questa Activity
- * ha evidentemente windowShowWallpaper/simile nel tema, si vede il wallpaper della home dietro
- * invece del colore pieno. Serve un approccio diverso (probabilmente tingere una View reale
- * nell'albero, come fatto per l'header di Impostazioni, non la finestra). Tentativo scartato,
- * non peggiorare cambiando la finestra — solo le card sono corrette per ora.
+ * Sfondo pagina (nero, mai toccato dall'overlay) — 2026-08-30 pomeriggio, PARZIALMENTE risolto.
+ * Primo tentativo con getWindow().setBackgroundDrawable() SCARTATO: rendeva la finestra
+ * trasparente invece che opaca (windowShowWallpaper/simile nel tema di questa Activity, si
+ * vedeva il wallpaper della home dietro). Corretto invece: tingere android:id/content (il
+ * FrameLayout radice standard che ogni Activity ha sempre) — funziona per tutto il corpo della
+ * pagina. La striscia dell'header ("Impostazioni schermata iniziale" + freccia indietro,
+ * dentro appBarLayout/toolbar) resta nera: setBackgroundColor su appBarLayout (un
+ * com.google.android.material.appbar.AppBarLayout reale, id e view trovati correttamente, log
+ * di conferma visto) non ha alcun effetto visibile — quasi certamente perche' il suo figlio
+ * "toolbar" (un ViewGroup che copre quasi tutta l'area, 368px su 369) ha un proprio sfondo
+ * opaco che lo copre, stessa famiglia del caso collapsingToolbarLayout/searchView gia' risolto
+ * in Impostazioni (dove pero' il fix era tingere il figlio, non il genitore — qui non ancora
+ * tentato). Lasciato cosi' su richiesta dell'utente ("lascia stare"): se mai ripreso, il
+ * prossimo passo ovvio e' tingere "toolbar" invece di (o oltre a) "appBarLayout".
  */
 public class LauncherCardBackgroundMod extends XposedMods {
 
@@ -52,9 +62,13 @@ public class LauncherCardBackgroundMod extends XposedMods {
     // android:color/button_material_dark, il colore grigio scuro standard AOSP che l'overlay
     // "Stile Launcher" avrebbe dovuto assegnare alle card (finito scambiato con lo sfondo di
     // pagina invece — vedi project_launcher_mods_rollout memory).
-    private final int mCardColor = 0xFF404040;
+    // Stesso hex navy ovunque (DST_BACKGROUND) — card E sfondo uguali, "invisibili" come in
+    // Impostazioni, su richiesta esplicita dell'utente (non piu' grigio button_material_dark).
+    private final int mCardColor = 0xFF1B2029;
+    private final int mPageColor = 0xFF1B2029;
 
     private final List<WeakReference<Object>> mCardInstances = new CopyOnWriteArrayList<>();
+    private final List<WeakReference<Activity>> mActivities = new CopyOnWriteArrayList<>();
 
     public LauncherCardBackgroundMod(Context context) { super(context); }
 
@@ -62,7 +76,10 @@ public class LauncherCardBackgroundMod extends XposedMods {
     public void updatePrefs(String... Key) {
         if (Xprefs == null) return;
         mThemeApplied = Xprefs.getBoolean("launcher_theme_applied", false);
-        new Handler(Looper.getMainLooper()).post(this::reapplyCardColors);
+        new Handler(Looper.getMainLooper()).post(() -> {
+            reapplyCardColors();
+            reapplyPageColor();
+        });
     }
 
     private void reapplyCardColors() {
@@ -77,6 +94,34 @@ public class LauncherCardBackgroundMod extends XposedMods {
                 callMethod(card, "refreshCardBg", mCardColor);
             } catch (Throwable ignored) {}
         }
+    }
+
+    private void reapplyPageColor() {
+        if (!mThemeApplied || !isNight()) return;
+        for (WeakReference<Activity> ref : mActivities) {
+            Activity activity = ref.get();
+            if (activity == null) {
+                mActivities.remove(ref);
+                continue;
+            }
+            tintContent(activity);
+        }
+    }
+
+    private void tintContent(Activity activity) {
+        try {
+            View content = activity.findViewById(android.R.id.content);
+            if (content != null) content.setBackgroundColor(mPageColor);
+        } catch (Throwable ignored) {}
+        // android:id/content da solo non copre l'header: appBarLayout (contiene la toolbar con
+        // freccia indietro + titolo) e' un fratello impilato sopra con sfondo proprio opaco
+        // nero (bounds [0,160][1440,369], trovato via uiautomator dump — stessa famiglia del
+        // caso collapsingToolbarLayout/searchView gia' risolto per Impostazioni).
+        try {
+            int id = activity.getResources().getIdentifier("appBarLayout", "id", LAUNCHER);
+            View appBar = (id != 0) ? activity.findViewById(id) : null;
+            if (appBar != null) appBar.setBackgroundColor(mPageColor);
+        } catch (Throwable ignored) {}
     }
 
     @Override
@@ -97,6 +142,22 @@ public class LauncherCardBackgroundMod extends XposedMods {
             });
         } catch (Throwable t) {
             XposedBridge.log("[ Obsidian ] LauncherCardBackgroundMod: COUICardListSelectedItemLayout hook failed: " + t);
+        }
+
+        try {
+            findAndHookMethod(Activity.class, "onResume", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    try {
+                        Activity activity = (Activity) p.thisObject;
+                        if (!"com.android.launcher.settings.LauncherSettingsActivity".equals(activity.getClass().getName())) return;
+                        mActivities.add(new WeakReference<>(activity));
+                        if (!mThemeApplied || !isNight()) return;
+                        tintContent(activity);
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] LauncherCardBackgroundMod: Activity.onResume hook failed: " + t);
         }
     }
 
