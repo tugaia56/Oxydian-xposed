@@ -42,6 +42,7 @@ import it.tugaia56.obsidian.xposed.hooks.framework.LockScreenPowerMenuMod;
 import it.tugaia56.obsidian.xposed.hooks.settings.CustomShortcut;
 import it.tugaia56.obsidian.xposed.hooks.settings.SettingsCardBackgroundMod;
 import it.tugaia56.obsidian.xposed.hooks.launcher.LauncherMod;
+import it.tugaia56.obsidian.xposed.hooks.launcher.LauncherCardBackgroundMod;
 
 public class ModPacks {
     public static List<Class<? extends XposedMods>> getMods(String packageName) {
@@ -91,6 +92,7 @@ public class ModPacks {
         }
         if (Constants.Packages.LAUNCHER.equals(packageName)) {
             mods.add(LauncherMod.class);
+            mods.add(LauncherCardBackgroundMod.class);
         }
         return mods;
     }
