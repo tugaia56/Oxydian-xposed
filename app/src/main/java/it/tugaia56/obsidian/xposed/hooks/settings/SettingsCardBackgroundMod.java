@@ -12,6 +12,10 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.view.View;
 
+import java.lang.ref.WeakReference;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
@@ -46,12 +50,55 @@ public class SettingsCardBackgroundMod extends XposedMods {
     // identico al background di pagina deve corrispondere esattamente, senza schiarimenti.
     private int mCardColor = 0xFF1B2029;
 
+    // Card costruite (COUICardListSelectedItemLayout.init()) PRIMA che Xprefs consegnasse
+    // updatePrefs() la prima volta: mThemeApplied era ancora false in quel momento, quindi
+    // sono rimaste col colore stock per sempre (nessun redraw automatico dopo). Tenerne un
+    // riferimento debole e ripassarle in refreshCardBg() non appena le prefs sono pronte
+    // risolve la corsa una volta per tutte, senza dover indovinare un ritardo fisso.
+    private final List<WeakReference<Object>> mCardInstances = new CopyOnWriteArrayList<>();
+    // Stessa corsa, stesso rimedio, per l'header/barra ricerca (vedi sotto).
+    private final List<WeakReference<Activity>> mHomepageActivities = new CopyOnWriteArrayList<>();
+
     public SettingsCardBackgroundMod(Context context) { super(context); }
 
     @Override
     public void updatePrefs(String... Key) {
         if (Xprefs == null) return;
         mThemeApplied = Xprefs.getBoolean("settings_theme_applied", false);
+        reapplyCardColors();
+        reapplyHeaderColors();
+    }
+
+    private void reapplyCardColors() {
+        if (!mThemeApplied || !isNight()) return;
+        for (WeakReference<Object> ref : mCardInstances) {
+            Object card = ref.get();
+            if (card == null) {
+                mCardInstances.remove(ref);
+                continue;
+            }
+            try {
+                callMethod(card, "refreshCardBg", mCardColor);
+            } catch (Throwable ignored) {}
+        }
+    }
+
+    private void reapplyHeaderColors() {
+        if (!mThemeApplied || !isNight()) return;
+        for (WeakReference<Activity> ref : mHomepageActivities) {
+            Activity activity = ref.get();
+            if (activity == null) {
+                mHomepageActivities.remove(ref);
+                continue;
+            }
+            applyHeaderTheme(activity);
+        }
+    }
+
+    private void applyHeaderTheme(Activity activity) {
+        if (!mThemeApplied || !isNight()) return;
+        tintViewById(activity, "collapsingToolbarLayout");
+        tintViewById(activity, "searchView");
     }
 
     @Override
@@ -82,6 +129,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
                     "com.coui.appcompat.cardlist.COUICardListSelectedItemLayout", lp.classLoader);
             findAndHookMethod(cardLayoutCls, "init", Context.class, boolean.class, new XC_MethodHook() {
                 @Override protected void afterHookedMethod(MethodHookParam p) {
+                    mCardInstances.add(new WeakReference<>(p.thisObject));
                     if (!mThemeApplied || !isNight()) return;
                     try {
                         callMethod(p.thisObject, "refreshCardBg", mCardColor);
@@ -115,22 +163,19 @@ public class SettingsCardBackgroundMod extends XposedMods {
                         String cls = activity.getClass().getName();
                         if (!"com.oplus.settings.feature.homepage.OplusSettingsHomepageActivity".equals(cls)
                                 && !"com.android.settings.homepage.SettingsHomepageActivity".equals(cls)) return;
-                        // onResume e' presto: verificato che a questo punto Xprefs non ha ancora
-                        // ricevuto updatePrefs() su un cold start (mThemeApplied ancora false un
-                        // frame dopo con un post() semplice) — stesso "qualcosa non e' ancora
-                        // pronto" gia' visto per il refresh delle icone QS, stessa soluzione:
-                        // un paio di retry ritardati invece di un singolo post() immediato.
+                        // Tracciata anche qui: se a questo giro Xprefs non e' ancora pronta,
+                        // updatePrefs() la ritrova via reapplyHeaderColors() non appena arriva —
+                        // stessa corsa, stesso rimedio delle card qui sopra. I postDelayed sotto
+                        // restano solo come rete di sicurezza (coprono il caso limite in cui
+                        // l'Activity sia gia' sparita prima che Xprefs sia pronta).
+                        mHomepageActivities.add(new WeakReference<>(activity));
                         // "app_bar"/"search_action_bar" (da search_bar.xml, libreria collapsing
                         // toolbar generica) erano un abbaglio: mai presenti nell'albero reale di
                         // questa Activity (findViewById sempre null). Gli id VERI, confermati con
                         // uiautomator dump sullo schermo dal vivo: collapsingToolbarLayout
                         // (l'header "Impostazioni") e searchView (la pillola di ricerca).
                         View decor = activity.getWindow().getDecorView();
-                        Runnable tint = () -> {
-                            if (!mThemeApplied || !isNight()) return;
-                            tintViewById(activity, "collapsingToolbarLayout");
-                            tintViewById(activity, "searchView");
-                        };
+                        Runnable tint = () -> applyHeaderTheme(activity);
                         decor.postDelayed(tint, 400);
                         decor.postDelayed(tint, 1500);
                         decor.postDelayed(tint, 4000);
@@ -146,7 +191,15 @@ public class SettingsCardBackgroundMod extends XposedMods {
         try {
             int id = activity.getResources().getIdentifier(idName, "id", SETTINGS);
             View v = (id != 0) ? activity.findViewById(id) : null;
-            if (v != null) v.setBackgroundColor(mCardColor);
+            if (v == null) return;
+            // Tentato setContentScrimColor/setStatusBarScrimColor per evitare un flash nero
+            // visto durante lo scroll con setBackgroundColor: risultato peggiore (nero anche a
+            // riposo, da espansa, perche' lo scrim dipinge solo da collassata in su — a riposo
+            // espansa quella View non ha background proprio e resta trasparente). Tornato al
+            // setBackgroundColor semplice, che a riposo (espansa E collassata) e' corretto,
+            // confermato via screenshot; il flash durante il trascinamento resta un difetto
+            // minore e transitorio, non un colore sbagliato fisso.
+            v.setBackgroundColor(mCardColor);
         } catch (Throwable ignored) {}
     }
 
