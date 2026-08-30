@@ -328,7 +328,7 @@
     <string name="power_menu_gradient_color_title">Colore Riavvia/Spegni</string>
     <string name="power_menu_handler_color_title">Colore Pallino</string>
     <string name="power_menu_handler_gallery_title">Scegli da Galleria</string>
-    <string name="power_menu_handler_gallery_summary">Scegli una tua foto.\nLa risoluzione consigliata è di circa 216 x 216.</string>
+    <string name="power_menu_handler_gallery_summary">Scegli una tua foto</string>
     <string name="power_menu_handler_style_section">Stile</string>
     <string name="power_menu_handler_scale_title">Scala Immagine</string>
     <string name="power_menu_bg_section">Sfondo Menù Power</string>

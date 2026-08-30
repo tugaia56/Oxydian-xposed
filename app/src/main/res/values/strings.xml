@@ -330,7 +330,7 @@
     <string name="power_menu_gradient_color_title">Reboot/Shutdown Color</string>
     <string name="power_menu_handler_color_title">Handle Color</string>
     <string name="power_menu_handler_gallery_title">Choose from Gallery</string>
-    <string name="power_menu_handler_gallery_summary">Pick your own photo.\nRecommended resolution is around 216 x 216.</string>
+    <string name="power_menu_handler_gallery_summary">Pick your own photo</string>
     <string name="power_menu_handler_style_section">Style</string>
     <string name="power_menu_handler_scale_title">Image Scale</string>
     <string name="power_menu_bg_section">Power Menu Background</string>
