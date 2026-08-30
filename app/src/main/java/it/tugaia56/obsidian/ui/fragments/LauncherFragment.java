@@ -96,6 +96,7 @@ public class LauncherFragment extends Fragment {
     private static final int RECENTS_COLOR_DIALOG_ID = KEY_RECENTS_BTN_COLOR.hashCode();
 
     private RecyclerView mRv;
+    private boolean mRecentsColorExpanded = ObsidianPrefs.getBoolean(KEY_RECENTS_BTN_COLOR + "_on", false);
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -135,7 +136,7 @@ public class LauncherFragment extends Fragment {
                 boolItem(R.string.launcher_disable_recents_previous_page_title, R.string.launcher_disable_recents_previous_page_summary, KEY_DISABLE_PREV_RECENTS),
                 boolItem(R.string.launcher_replace_lock_title, R.string.launcher_replace_lock_summary, KEY_REPLACE_LOCK),
                 recentsButtonColorSwitch()));
-        if (ObsidianPrefs.getBoolean(KEY_RECENTS_BTN_COLOR + "_on", false)) {
+        if (mRecentsColorExpanded) {
             recentsRows.add(recentsButtonColorPickerItem());
         }
         GroupUtils.addGroup(chain, recentsRows);
@@ -199,6 +200,7 @@ public class LauncherFragment extends Fragment {
                 getString(R.string.launcher_recents_color_no_reboot), on, null);
         item.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_RECENTS_BTN_COLOR + "_on", item.checked);
+            mRecentsColorExpanded = item.checked;
             if (item.checked) {
                 new Thread(() -> applyRecentsBtnColor(ObsidianPrefs.getInt(KEY_RECENTS_BTN_COLOR, 0xFF6200EE))).start();
             } else {
@@ -206,6 +208,7 @@ public class LauncherFragment extends Fragment {
             }
             rebuild();
         };
+        item.onRowClick = () -> { mRecentsColorExpanded = !mRecentsColorExpanded; rebuild(); };
         return item;
     }
 

@@ -33,6 +33,7 @@ public class LauncherDockBackgroundFragment extends Fragment {
     private static final String KEY_DOCK_BG_RADIUS   = "dockBackgroundRadius";
 
     private RecyclerView mRv;
+    private boolean mMaterialExpanded = ObsidianPrefs.getBoolean(KEY_DOCK_BG_MATERIAL, false);
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -56,12 +57,22 @@ public class LauncherDockBackgroundFragment extends Fragment {
     private void rebuild() {
         List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
 
+        SwitchWidgetAdapter.SwitchItem materialItem = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.dock_background_material), getString(R.string.dock_background_material_summary),
+                ObsidianPrefs.getBoolean(KEY_DOCK_BG_MATERIAL, false), null);
+        materialItem.onChanged = () -> {
+            ObsidianPrefs.putBoolean(KEY_DOCK_BG_MATERIAL, materialItem.checked);
+            mMaterialExpanded = materialItem.checked;
+            rebuild();
+        };
+        materialItem.onRowClick = () -> { mMaterialExpanded = !mMaterialExpanded; rebuild(); };
+
         List<Object> rows = new ArrayList<>(List.of(
                 boolItem(getString(R.string.dock_background), getString(R.string.dock_background_summary), KEY_DOCK_BG),
-                boolItem(getString(R.string.dock_background_material), getString(R.string.dock_background_material_summary), KEY_DOCK_BG_MATERIAL)));
+                materialItem));
 
         // Quantità/Raggio angolo si applicano solo a "Materiale" — visibili solo con quella attiva.
-        if (ObsidianPrefs.getBoolean(KEY_DOCK_BG_MATERIAL, false)) {
+        if (mMaterialExpanded) {
             rows.add(sliderItem(getString(R.string.dock_background_amount), KEY_DOCK_BG_AMOUNT, 0, 4, 0));
             rows.add(sliderItem(getString(R.string.dock_background_radius), KEY_DOCK_BG_RADIUS, 0, 100, 30));
         }
@@ -73,10 +84,7 @@ public class LauncherDockBackgroundFragment extends Fragment {
     private SwitchWidgetAdapter.SwitchItem boolItem(String title, String summary, String key) {
         SwitchWidgetAdapter.SwitchItem item = new SwitchWidgetAdapter.SwitchItem(
                 title, summary, ObsidianPrefs.getBoolean(key, false), null);
-        item.onChanged = () -> {
-            ObsidianPrefs.putBoolean(key, item.checked);
-            if (KEY_DOCK_BG_MATERIAL.equals(key)) rebuild();
-        };
+        item.onChanged = () -> ObsidianPrefs.putBoolean(key, item.checked);
         return item;
     }
 
