@@ -35,6 +35,7 @@ import java.util.List;
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
+import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
 import it.tugaia56.obsidian.utils.AppUtils;
 import it.tugaia56.obsidian.utils.ObsidianPrefs;
 import it.tugaia56.obsidian.utils.ObsidianTheme;
@@ -51,6 +52,7 @@ import it.tugaia56.obsidian.utils.ObsidianTheme;
 public class PowerMenuHandlerPresetFragment extends Fragment {
 
     private static final String PREF_HANDLER_MODE = "power_menu_handler_mode";
+    private static final String PREF_HANDLER_SCALE = "power_menu_handler_scale";
     private static final String HANDLER_IMAGE_FILENAME = "power_menu_handler_image";
     private static final String BG_MODE_IMAGE = "image";
 
@@ -87,6 +89,17 @@ public class PowerMenuHandlerPresetFragment extends Fragment {
                 () -> mPickImage.launch("image/*"));
         ListWidgetAdapter galleryAdapter = new ListWidgetAdapter(List.of(galleryItem));
 
+        // Subito qui, non sullo screen principale — così regolare la scala non richiede di
+        // tornare indietro e di riaprire questo screen per rivederla. Tacche fisse invece di
+        // scorrimento continuo (richiesta esplicita) — più fitte vicino al 100% dato che
+        // rimpicciolire è il caso più comune (immagini non pensate per un cerchio piccolo).
+        int currentPct = Math.round(ObsidianPrefs.getFloat(PREF_HANDLER_SCALE, 1.0f) * 100);
+        SliderWidgetAdapter.SliderItem scaleItem = new SliderWidgetAdapter.SliderItem(
+                getString(R.string.power_menu_handler_scale_title), currentPct, 50, 200, "%", 100,
+                value -> ObsidianPrefs.putFloat(PREF_HANDLER_SCALE, value / 100f));
+        scaleItem.stops = new int[]{50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 175, 200};
+        SliderWidgetAdapter scaleAdapter = new SliderWidgetAdapter(List.of(scaleItem));
+
         List<Integer> styles = new ArrayList<>();
         Resources res = requireContext().getResources();
         String pkg = requireContext().getPackageName();
@@ -98,6 +111,7 @@ public class PowerMenuHandlerPresetFragment extends Fragment {
 
         RecyclerView.Adapter<?>[] chain = {
                 galleryAdapter,
+                scaleAdapter,
                 new SectionTitleAdapter(List.of(getString(R.string.power_menu_handler_style_section))),
                 mAdapter
         };

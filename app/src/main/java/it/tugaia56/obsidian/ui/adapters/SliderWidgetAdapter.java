@@ -35,6 +35,12 @@ public class SliderWidgetAdapter extends RecyclerView.Adapter<SliderWidgetAdapte
         public int    defaultValue;
         /** Incremento per ogni "scatto" del cursore — 1 di default (com'era prima). */
         public int    step = 1;
+        /** Tacche fisse NON equidistanti (es. -50,-20,0,20,50,200) — quando impostato, il
+         *  cursore internamente si muove su un indice 0..stops.length-1 equidistante (così le
+         *  tacche restano ugualmente spaziate da toccare/trascinare), ma value/onChanged/
+         *  onLivePreview/etichetta usano sempre il vero numero cercato in questo array, mai
+         *  l'indice grezzo. Null (default) = comportamento normale min..max/step invariato. */
+        public int[]  stops;
         public Consumer<Integer> onChanged;
         /** Optional: fires on every drag step for live preview; null by default. */
         public Consumer<Integer> onLivePreview;
@@ -79,17 +85,28 @@ public class SliderWidgetAdapter extends RecyclerView.Adapter<SliderWidgetAdapte
         SliderItem item = items.get(pos);
         h.title.setText(item.title);
 
-        // Clamp value to [min, max], poi allinea allo step — con step > 1 il valore salvato
-        // in precedenza (con step 1) potrebbe non essere un multiplo esatto, e lo Slider
-        // di Material lancia un'eccezione se il valore non è allineato allo stepSize.
-        float clamped = Math.max(item.min, Math.min(item.max, item.value));
-        if (item.step > 1) {
-            clamped = item.min + Math.round((clamped - item.min) / (float) item.step) * item.step;
+        if (item.stops != null && item.stops.length > 0) {
+            // Tacche fisse: il cursore si muove su un indice equidistante 0..N-1, non sul
+            // vero valore — evita l'illusione di "scorrimento continuo" quando le tacche
+            // reali non sono equidistanti (es. -50,-20,0,20,50,200).
+            int idx = nearestStopIndex(item.stops, item.value);
+            h.slider.setValueFrom(0);
+            h.slider.setValueTo(item.stops.length - 1);
+            h.slider.setStepSize(1);
+            h.slider.setValue(idx);
+        } else {
+            // Clamp value to [min, max], poi allinea allo step — con step > 1 il valore salvato
+            // in precedenza (con step 1) potrebbe non essere un multiplo esatto, e lo Slider
+            // di Material lancia un'eccezione se il valore non è allineato allo stepSize.
+            float clamped = Math.max(item.min, Math.min(item.max, item.value));
+            if (item.step > 1) {
+                clamped = item.min + Math.round((clamped - item.min) / (float) item.step) * item.step;
+            }
+            h.slider.setValueFrom(item.min);
+            h.slider.setValueTo(item.max);
+            h.slider.setStepSize(item.step);
+            h.slider.setValue(clamped);
         }
-        h.slider.setValueFrom(item.min);
-        h.slider.setValueTo(item.max);
-        h.slider.setStepSize(item.step);
-        h.slider.setValue(clamped);
         h.slider.setTickVisible(false);
         h.value.setText(item.value + item.suffix);
 
@@ -122,9 +139,12 @@ public class SliderWidgetAdapter extends RecyclerView.Adapter<SliderWidgetAdapte
             // così si vede a colpo d'occhio se lo slider è stato modificato.
             updateResetBtnAppearance(h.resetBtn, item.value == item.defaultValue);
             h.resetBtn.setOnClickListener(v -> {
-                int def = Math.max(item.min, Math.min(item.max, item.defaultValue));
+                int def = item.stops != null && item.stops.length > 0
+                        ? item.defaultValue
+                        : Math.max(item.min, Math.min(item.max, item.defaultValue));
                 item.value = def;
-                h.slider.setValue(def);
+                h.slider.setValue(item.stops != null && item.stops.length > 0
+                        ? nearestStopIndex(item.stops, def) : def);
                 h.value.setText(def + item.suffix);
                 updateResetBtnAppearance(h.resetBtn, true);
                 if (item.onChanged != null) item.onChanged.accept(def);
@@ -140,10 +160,12 @@ public class SliderWidgetAdapter extends RecyclerView.Adapter<SliderWidgetAdapte
 
         h.slider.addOnChangeListener((slider, value, fromUser) -> {
             if (fromUser) {
-                item.value = (int) value;
-                h.value.setText((int) value + item.suffix);
+                int mapped = item.stops != null && item.stops.length > 0
+                        ? item.stops[(int) value] : (int) value;
+                item.value = mapped;
+                h.value.setText(mapped + item.suffix);
                 updateResetBtnAppearance(h.resetBtn, item.value == item.defaultValue);
-                if (item.onLivePreview != null) item.onLivePreview.accept((int) value);
+                if (item.onLivePreview != null) item.onLivePreview.accept(mapped);
             }
         });
 
@@ -153,6 +175,18 @@ public class SliderWidgetAdapter extends RecyclerView.Adapter<SliderWidgetAdapte
                 if (item.onChanged != null) item.onChanged.accept(item.value);
             }
         });
+    }
+
+    /** Indice della tacca più vicina al valore reale corrente — usato per posizionare il
+     *  cursore quando item.value non coincide esattamente con una tacca (es. valore salvato
+     *  prima che questa riga passasse a usare le tacche fisse). */
+    private static int nearestStopIndex(int[] stops, int value) {
+        int best = 0, bestDist = Integer.MAX_VALUE;
+        for (int i = 0; i < stops.length; i++) {
+            int dist = Math.abs(stops[i] - value);
+            if (dist < bestDist) { bestDist = dist; best = i; }
+        }
+        return best;
     }
 
     /** Icona piena + anello di accento quando il valore è diverso dal default — stesso stile

@@ -77,7 +77,6 @@ public class PowerMenuFragment extends Fragment {
     private static final String PREF_HANDLER_MODE   = "power_menu_handler_mode";
     private static final String PREF_HANDLER_CUSTOM = "power_menu_handler_custom_color";
     private static final int DIALOG_HANDLER_CUSTOM_COLOR = PREF_HANDLER_CUSTOM.hashCode();
-    private static final String PREF_HANDLER_SCALE = "power_menu_handler_scale";
 
     // Sfondo Menù Power — background of the WHOLE popup window, independent from the
     // pillolone's own background above. Same 3-way shape, own pref keys/file.
@@ -293,16 +292,6 @@ public class PowerMenuFragment extends Fragment {
             if (!"stock".equals(ObsidianPrefs.getString(PREF_HANDLER_MODE, "stock"))) showHandlerModeDialog();
         };
 
-        // "Scala Immagine" — solo quando il Pallino è in modalità Immagine.
-        boolean handlerImageMode = BG_MODE_IMAGE.equals(ObsidianPrefs.getString(PREF_HANDLER_MODE, "stock"));
-        SliderWidgetAdapter.SliderItem handlerScaleItem = null;
-        if (handlerImageMode) {
-            int currentPct = Math.round(ObsidianPrefs.getFloat(PREF_HANDLER_SCALE, 1.0f) * 100);
-            handlerScaleItem = new SliderWidgetAdapter.SliderItem(
-                    getString(R.string.power_menu_handler_scale_title), currentPct, 50, 200, "%", 100,
-                    value -> ObsidianPrefs.putFloat(PREF_HANDLER_SCALE, value / 100f));
-        }
-
         SwitchWidgetAdapter.SwitchItem bgItem = new SwitchWidgetAdapter.SwitchItem(
                 getString(R.string.power_menu_bg_color_title),
                 !"stock".equals(ObsidianPrefs.getString(PREF_BG_MODE, "stock"))
@@ -372,11 +361,7 @@ public class PowerMenuFragment extends Fragment {
         // ── Pillolone: Colore Riavvia/Spegni → Sfondo Pillolone → Bordo Pillolone, un'unica
         // card continua, una riga sola ciascuno. ─────────────────────────────────────────
         sections.add(new SectionTitleAdapter(List.of(getString(R.string.power_menu_pill_section))));
-        List<Object> pillRows = new java.util.ArrayList<>(List.of(gradientSwitch, handlerSwitch));
-        if (handlerScaleItem != null) pillRows.add(handlerScaleItem);
-        pillRows.add(bgItem);
-        pillRows.add(borderItem);
-        GroupUtils.addGroup(sections, pillRows);
+        GroupUtils.addGroup(sections, List.of(gradientSwitch, handlerSwitch, bgItem, borderItem));
 
         mRv.setAdapter(new ConcatAdapter(sections));
     }
