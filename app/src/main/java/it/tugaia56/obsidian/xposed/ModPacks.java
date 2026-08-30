@@ -40,6 +40,7 @@ import it.tugaia56.obsidian.xposed.hooks.systemui.QsWidgetsMod;
 import it.tugaia56.obsidian.xposed.hooks.systemui.QsSeparateMod;
 import it.tugaia56.obsidian.xposed.hooks.framework.LockScreenPowerMenuMod;
 import it.tugaia56.obsidian.xposed.hooks.settings.CustomShortcut;
+import it.tugaia56.obsidian.xposed.hooks.settings.SettingsCardBackgroundMod;
 import it.tugaia56.obsidian.xposed.hooks.launcher.LauncherMod;
 
 public class ModPacks {
@@ -83,6 +84,7 @@ public class ModPacks {
         }
         if (Constants.Packages.SETTINGS.equals(packageName)) {
             mods.add(CustomShortcut.class);
+            mods.add(SettingsCardBackgroundMod.class);
         }
         if (Constants.Packages.FRAMEWORK.equals(packageName)) {
             mods.add(LockScreenPowerMenuMod.class);
