@@ -73,6 +73,12 @@ public class PowerMenuFragment extends Fragment {
     private static final String PREF_BORDER_CUSTOM_COLOR = "power_menu_border_custom_color";
     private static final int DIALOG_BORDER_CUSTOM_COLOR = PREF_BORDER_CUSTOM_COLOR.hashCode();
 
+    // Colore Pallino — the draggable thumb (mHandlerColor in OplusShutdownView).
+    private static final String PREF_HANDLER_MODE   = "power_menu_handler_mode";
+    private static final String PREF_HANDLER_CUSTOM = "power_menu_handler_custom_color";
+    private static final int DIALOG_HANDLER_CUSTOM_COLOR = PREF_HANDLER_CUSTOM.hashCode();
+    private static final String PREF_HANDLER_SCALE = "power_menu_handler_scale";
+
     // Sfondo Menù Power — background of the WHOLE popup window, independent from the
     // pillolone's own background above. Same 3-way shape, own pref keys/file.
     private static final String PREF_MENU_BG_MODE   = "power_menu_menu_bg_mode";
@@ -86,7 +92,9 @@ public class PowerMenuFragment extends Fragment {
      *  NAME independently toggles it on top of that — same pattern as everywhere else in the app. */
     private boolean mAdvancedRebootExpanded = ObsidianPrefs.getBoolean("show_advanced_reboot", false);
     /** Shared by both image pickers (pillolone bg + whole-menu bg) — only one can be open at a
-     *  time, so a single launcher + a "which target" flag avoids registering two. */
+     *  time, so a single launcher + a "which target" flag avoids registering two. Colore Pallino
+     *  has its own picker screen (PowerMenuHandlerPresetFragment, with its own launcher) instead
+     *  of using this one directly — see navigateToHandlerImagePicker(). */
     private ActivityResultLauncher<String> mPickImage;
     private String mPendingImageTarget; // "pill" or "menu"
 
@@ -100,8 +108,9 @@ public class PowerMenuFragment extends Fragment {
                     if (uri == null) return;
                     boolean pill = "pill".equals(mPendingImageTarget);
                     File dest = pill ? getBgImageFile() : getMenuBgImageFile();
+                    String modeKey = pill ? PREF_BG_MODE : PREF_MENU_BG_MODE;
                     if (copyImageToExternal(uri, dest)) {
-                        ObsidianPrefs.putString(pill ? PREF_BG_MODE : PREF_MENU_BG_MODE, BG_MODE_IMAGE);
+                        ObsidianPrefs.putString(modeKey, BG_MODE_IMAGE);
                         rebuild();
                         Toast.makeText(requireContext(), R.string.obs_restart_ui_hint, Toast.LENGTH_SHORT).show();
                     } else {
@@ -173,6 +182,9 @@ public class PowerMenuFragment extends Fragment {
         } else if (event.dialogId() == DIALOG_MENU_BG_CUSTOM_COLOR) {
             ObsidianPrefs.putInt(PREF_MENU_BG_CUSTOM, event.color());
             ObsidianPrefs.putString(PREF_MENU_BG_MODE, "custom");
+        } else if (event.dialogId() == DIALOG_HANDLER_CUSTOM_COLOR) {
+            ObsidianPrefs.putInt(PREF_HANDLER_CUSTOM, event.color());
+            ObsidianPrefs.putString(PREF_HANDLER_MODE, "custom");
         } else {
             return;
         }
@@ -266,6 +278,31 @@ public class PowerMenuFragment extends Fragment {
             }
         };
 
+        SwitchWidgetAdapter.SwitchItem handlerSwitch = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.power_menu_handler_color_title),
+                !"stock".equals(ObsidianPrefs.getString(PREF_HANDLER_MODE, "stock"))
+                        ? triColorLabel(PREF_HANDLER_MODE, PREF_HANDLER_CUSTOM, "accent") : null,
+                !"stock".equals(ObsidianPrefs.getString(PREF_HANDLER_MODE, "stock")),
+                null);
+        handlerSwitch.onChanged = () -> {
+            ObsidianPrefs.putString(PREF_HANDLER_MODE, handlerSwitch.checked ? "accent" : "stock");
+            rebuild();
+            if (handlerSwitch.checked) showHandlerModeDialog();
+        };
+        handlerSwitch.onRowClick = () -> {
+            if (!"stock".equals(ObsidianPrefs.getString(PREF_HANDLER_MODE, "stock"))) showHandlerModeDialog();
+        };
+
+        // "Scala Immagine" — solo quando il Pallino è in modalità Immagine.
+        boolean handlerImageMode = BG_MODE_IMAGE.equals(ObsidianPrefs.getString(PREF_HANDLER_MODE, "stock"));
+        SliderWidgetAdapter.SliderItem handlerScaleItem = null;
+        if (handlerImageMode) {
+            int currentPct = Math.round(ObsidianPrefs.getFloat(PREF_HANDLER_SCALE, 1.0f) * 100);
+            handlerScaleItem = new SliderWidgetAdapter.SliderItem(
+                    getString(R.string.power_menu_handler_scale_title), currentPct, 50, 200, "%", 100,
+                    value -> ObsidianPrefs.putFloat(PREF_HANDLER_SCALE, value / 100f));
+        }
+
         SwitchWidgetAdapter.SwitchItem bgItem = new SwitchWidgetAdapter.SwitchItem(
                 getString(R.string.power_menu_bg_color_title),
                 !"stock".equals(ObsidianPrefs.getString(PREF_BG_MODE, "stock"))
@@ -335,7 +372,11 @@ public class PowerMenuFragment extends Fragment {
         // ── Pillolone: Colore Riavvia/Spegni → Sfondo Pillolone → Bordo Pillolone, un'unica
         // card continua, una riga sola ciascuno. ─────────────────────────────────────────
         sections.add(new SectionTitleAdapter(List.of(getString(R.string.power_menu_pill_section))));
-        GroupUtils.addGroup(sections, List.of(gradientSwitch, bgItem, borderItem));
+        List<Object> pillRows = new java.util.ArrayList<>(List.of(gradientSwitch, handlerSwitch));
+        if (handlerScaleItem != null) pillRows.add(handlerScaleItem);
+        pillRows.add(bgItem);
+        pillRows.add(borderItem);
+        GroupUtils.addGroup(sections, pillRows);
 
         mRv.setAdapter(new ConcatAdapter(sections));
     }
@@ -501,5 +542,49 @@ public class PowerMenuFragment extends Fragment {
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());
+    }
+
+    /** Same picker/presets as openBgColorPicker(), just for "Colore Pallino"'s own colour pref. */
+    private void openHandlerColorPicker() {
+        int currentColor = ObsidianPrefs.getInt(PREF_HANDLER_CUSTOM, BG_PRESET_COLORS[0]);
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).showColorPickerDialog(
+                    DIALOG_HANDLER_CUSTOM_COLOR, currentColor, true, true, true, BG_PRESET_COLORS);
+        }
+    }
+
+    /** "Colore Pallino" row tap — same 3-way Accento/Colore/Immagine chooser as "Sfondo
+     *  Pillolone", targeting the draggable thumb's own independent mode/colour/image. */
+    private void showHandlerModeDialog() {
+        String[] entries = {
+                getString(R.string.color_mode_accent),
+                getString(R.string.power_menu_bg_mode_custom),
+                getString(R.string.color_mode_image)
+        };
+        String currentMode = ObsidianPrefs.getString(PREF_HANDLER_MODE, "accent");
+        int current = "custom".equals(currentMode) ? 1 : BG_MODE_IMAGE.equals(currentMode) ? 2 : 0;
+        final int[] selected = {current};
+        ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.power_menu_handler_color_title)
+                .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
+                .setPositiveButton(R.string.apply, (d, w) -> {
+                    if (selected[0] == 2) { navigateToHandlerImagePicker(); return; }
+                    ObsidianPrefs.putString(PREF_HANDLER_MODE, selected[0] == 1 ? "custom" : "accent");
+                    rebuild();
+                    if (selected[0] == 1) openHandlerColorPicker();
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show());
+    }
+
+    /** "Immagine" per il Pallino — a differenza di Sfondo Pillolone/Menù Power (foto diretta
+     *  da galleria), qui apre uno screen dedicato con anche i preset fingerprint_N già inclusi
+     *  nell'app (stessa richiesta esplicita dell'utente: "apre le anteprime delle impronte"),
+     *  oltre alla scelta di una foto propria. */
+    private void navigateToHandlerImagePicker() {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).navigateTo(new PowerMenuHandlerPresetFragment(),
+                    getString(R.string.power_menu_handler_color_title));
+        }
     }
 }

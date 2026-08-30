@@ -5,6 +5,7 @@ import static de.robv.android.xposed.XposedBridge.hookAllMethods;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
 import static de.robv.android.xposed.XposedHelpers.setBooleanField;
+import static de.robv.android.xposed.XposedHelpers.setIntField;
 import static it.tugaia56.obsidian.utils.Constants.Packages.SYSTEM_UI;
 import static it.tugaia56.obsidian.xposed.XPrefs.Xprefs;
 
@@ -73,6 +74,17 @@ public class MiscMods extends XposedMods {
     private boolean mPowerMenuBorderEnabled = false;
     private boolean mPowerMenuBorderUseAccent = true;
     private int     mPowerMenuBorderCustomColor = 0xFF908DFF;
+    // Pallino (draggable thumb) colour/image — real field names confirmed via a live reflection
+    // field dump of OplusShutdownView: "mHandlerColor" (int, default -1/white) + "mHandlerPaint"
+    // (already-built Paint, not resource-driven so no getColor hook applies here) +
+    // "mHandlerRectF" (its bounding box, same "populated only once actually drawn" behaviour as
+    // mBarRectF — empty in a field dump taken before layout, fine once read from onDraw itself).
+    private static final String POWER_MENU_HANDLER_IMAGE_SUBPATH = ".obsidian/power_menu_handler_image";
+    private String  mPowerMenuHandlerMode = "stock";
+    private int     mPowerMenuHandlerCustomColor = 0xFF908DFF;
+    private float   mPowerMenuHandlerScale = 1.0f;
+    private Bitmap  mPowerMenuHandlerBitmap;
+    private long    mPowerMenuHandlerBitmapMtime = -1;
 
     // Pillolone background image ("power_menu_bg_mode" == "image") — file written by
     // PowerMenuFragment to the same relative path. Cached and only re-decoded when the file's
@@ -114,10 +126,14 @@ public class MiscMods extends XposedMods {
         mPowerMenuBorderEnabled = Xprefs.getBoolean("power_menu_border_enabled", false);
         mPowerMenuBorderUseAccent = Xprefs.getBoolean("power_menu_border_use_accent", true);
         mPowerMenuBorderCustomColor = Xprefs.getInt("power_menu_border_custom_color", 0xFF908DFF);
+        mPowerMenuHandlerMode = Xprefs.getString("power_menu_handler_mode", "stock");
+        mPowerMenuHandlerCustomColor = Xprefs.getInt("power_menu_handler_custom_color", 0xFF908DFF);
+        mPowerMenuHandlerScale = Xprefs.getFloat("power_menu_handler_scale", 1.0f);
         mPowerMenuMenuBgMode = Xprefs.getString("power_menu_menu_bg_mode", "stock");
         mPowerMenuMenuBgCustomColor = Xprefs.getInt("power_menu_menu_bg_custom_color", 0xFF908DFF);
         refreshPowerMenuBgBitmap();
         refreshPowerMenuMenuBgBitmap();
+        refreshPowerMenuHandlerBitmap();
         if (Key.length > 0 && "misc_remove_rotate_floating".equals(Key[0])) {
             applyButtonVisibility();
         }
@@ -191,10 +207,12 @@ public class MiscMods extends XposedMods {
                 // (forced transparent in "image" mode via the getColor hook below) and behind
                 // the icons/text OOS draws afterwards — a real background, not an overlay.
                 @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    try { applyHandlerColor(p.thisObject); } catch (Throwable ignored) {}
                     try { drawPillBackgroundImage((Canvas) p.args[0], p.thisObject); } catch (Throwable ignored) {}
                 }
                 @Override protected void afterHookedMethod(MethodHookParam p) {
                     try { drawPillBorder((Canvas) p.args[0], p.thisObject); } catch (Throwable ignored) {}
+                    try { drawHandlerImage((Canvas) p.args[0], p.thisObject); } catch (Throwable ignored) {}
                     if (!mShowAdvancedReboot) return;
                     try { drawAdvancedReboot((Canvas) p.args[0], p.thisObject); } catch (Throwable ignored) {}
                 }
@@ -417,6 +435,42 @@ public class MiscMods extends XposedMods {
         return mPowerMenuBorderUseAccent ? sharedAccentColor() : mPowerMenuBorderCustomColor;
     }
 
+    /** Colore Pallino — null means "stock" (leave OOS's default white handler alone). */
+    private Integer handlerColor() {
+        switch (mPowerMenuHandlerMode) {
+            case "accent": return sharedAccentColor();
+            case "custom": return mPowerMenuHandlerCustomColor;
+            default:       return null; // stock or image (image draws over it instead)
+        }
+    }
+
+    /** Applies "Colore Pallino" to the draggable thumb. mHandlerColor isn't resource-driven
+     *  (no getColor hook applies, unlike oplus_bar_color) — it's a plain instance field read
+     *  into mHandlerPaint by OOS itself, so both are set directly: the field (in case OOS
+     *  re-syncs the Paint from it later in the same draw) and the Paint object in place
+     *  (guarantees this exact frame is coloured regardless of that timing).
+     *  In "image" mode this instead forces the stock circle FULLY TRANSPARENT (same trick as
+     *  oplus_bar_color for the pill background) — without this, a custom image with transparent
+     *  pixels let the stock white circle show through underneath it, since drawHandlerImage()
+     *  only draws OVER the already-drawn stock circle, never erases it. */
+    private void applyHandlerColor(Object shutdownView) {
+        if ("image".equals(mPowerMenuHandlerMode) && mPowerMenuHandlerBitmap != null) {
+            try {
+                setIntField(shutdownView, "mHandlerColor", 0x00000000);
+                Object paintObj = getObjectField(shutdownView, "mHandlerPaint");
+                if (paintObj instanceof Paint) ((Paint) paintObj).setColor(0x00000000);
+            } catch (Throwable ignored) {}
+            return;
+        }
+        Integer c = handlerColor();
+        if (c == null) return;
+        try {
+            setIntField(shutdownView, "mHandlerColor", c);
+            Object paintObj = getObjectField(shutdownView, "mHandlerPaint");
+            if (paintObj instanceof Paint) ((Paint) paintObj).setColor(c);
+        } catch (Throwable ignored) {}
+    }
+
     /** Re-decodes the pillolone background image only when the file's mtime actually changed
      *  (called from every updatePrefs(), which fires far more often than the image itself
      *  changes) — avoids decoding a full bitmap on every prefs sync. Cleared when the mode
@@ -552,6 +606,66 @@ public class MiscMods extends XposedMods {
         @Override public void setAlpha(int alpha) { mPaint.setAlpha(alpha); }
         @Override public void setColorFilter(android.graphics.ColorFilter cf) { mPaint.setColorFilter(cf); }
         @Override public int getOpacity() { return android.graphics.PixelFormat.TRANSLUCENT; }
+    }
+
+    /** Re-decodes the pallino's image only when the file's mtime changed — same reasoning as
+     *  refreshPowerMenuBgBitmap() above, independent cache/file. */
+    private void refreshPowerMenuHandlerBitmap() {
+        if (!"image".equals(mPowerMenuHandlerMode)) {
+            mPowerMenuHandlerBitmap = null;
+            mPowerMenuHandlerBitmapMtime = -1;
+            return;
+        }
+        File f = new File(Environment.getExternalStorageDirectory(), POWER_MENU_HANDLER_IMAGE_SUBPATH);
+        if (!f.exists()) {
+            mPowerMenuHandlerBitmap = null;
+            mPowerMenuHandlerBitmapMtime = -1;
+            return;
+        }
+        long mtime = f.lastModified();
+        if (mPowerMenuHandlerBitmap != null && mtime == mPowerMenuHandlerBitmapMtime) return;
+        try (FileInputStream fis = new FileInputStream(f)) {
+            Bitmap bmp = BitmapFactory.decodeStream(fis);
+            if (bmp != null) {
+                mPowerMenuHandlerBitmap = bmp;
+                mPowerMenuHandlerBitmapMtime = mtime;
+            }
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] MiscMods power menu handler image: " + t);
+        }
+    }
+
+    /** Pallino image — drawn AFTER the stock onDraw (like the border), so it paints directly
+     *  over the already-drawn default circle instead of being hidden underneath it. Center-
+     *  cropped + clipped to an OVAL matching mHandlerRectF, the same field OOS itself uses to
+     *  draw/hit-test the handle, so the image always lines up with the real draggable area. */
+    private void drawHandlerImage(Canvas canvas, Object shutdownView) {
+        if (!"image".equals(mPowerMenuHandlerMode) || mPowerMenuHandlerBitmap == null) return;
+        try {
+            Object rectFObj = getObjectField(shutdownView, "mHandlerRectF");
+            if (!(rectFObj instanceof RectF)) return;
+            RectF rectF = (RectF) rectFObj;
+            if (rectF.width() <= 0 || rectF.height() <= 0) return;
+
+            // "Scala Immagine" shrinks/grows the drawn area around the handle's own centre —
+            // the clip path stays the full handle circle, only the image itself gets smaller.
+            RectF dst = rectF;
+            if (mPowerMenuHandlerScale != 1.0f) {
+                float cx = rectF.centerX(), cy = rectF.centerY();
+                float hw = rectF.width() / 2f * mPowerMenuHandlerScale;
+                float hh = rectF.height() / 2f * mPowerMenuHandlerScale;
+                dst = new RectF(cx - hw, cy - hh, cx + hw, cy + hh);
+            }
+
+            Rect src = centerCropSrcRect(mPowerMenuHandlerBitmap, dst.width(), dst.height());
+
+            canvas.save();
+            Path clip = new Path();
+            clip.addOval(rectF, Path.Direction.CW);
+            canvas.clipPath(clip);
+            canvas.drawBitmap(mPowerMenuHandlerBitmap, src, dst, null);
+            canvas.restore();
+        } catch (Throwable ignored) {}
     }
 
     /** Outline around the Riavvia/Spegni pill. Reuses OplusShutdownView's own public
