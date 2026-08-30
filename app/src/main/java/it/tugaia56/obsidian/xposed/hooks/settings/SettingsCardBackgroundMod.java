@@ -10,6 +10,8 @@ import static it.tugaia56.obsidian.xposed.XPrefs.Xprefs;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 
 import java.lang.ref.WeakReference;
@@ -65,8 +67,15 @@ public class SettingsCardBackgroundMod extends XposedMods {
     public void updatePrefs(String... Key) {
         if (Xprefs == null) return;
         mThemeApplied = Xprefs.getBoolean("settings_theme_applied", false);
-        reapplyCardColors();
-        reapplyHeaderColors();
+        // updatePrefs() gira sul thread di callback di Xprefs, non su quello UI — confermato
+        // da CalledFromWrongThreadException nei log (refreshCardBg()/setBackgroundColor()
+        // toccavano le View da un thread sbagliato, fallendo in modo silenzioso: nessun
+        // crash, ma l'aggiornamento non arrivava mai a schermo). Stesso pattern gia' usato in
+        // StatusbarClock per lo stesso identico problema.
+        new Handler(Looper.getMainLooper()).post(() -> {
+            reapplyCardColors();
+            reapplyHeaderColors();
+        });
     }
 
     private void reapplyCardColors() {
@@ -97,6 +106,14 @@ public class SettingsCardBackgroundMod extends XposedMods {
 
     private void applyHeaderTheme(Activity activity) {
         if (!mThemeApplied || !isNight()) return;
+        // app_bar_layout e' il diretto genitore di collapsingToolbarLayout (trovato via
+        // uiautomator dump dal vivo, non "app_bar" — id sbagliato di un tentativo precedente).
+        // Durante lo scroll parziale, tra il titolo e la barra ricerca (entrambi figli di
+        // collapsingToolbarLayout) si apre uno spazio vuoto che non viene ridipinto dal
+        // background di collapsingToolbarLayout stesso — tingerlo NON basta da solo. Tingendo
+        // anche il genitore, quello spazio mostra il nostro colore invece del nero della
+        // finestra sotto, indipendentemente da come collapsingToolbarLayout dipinge se stesso.
+        tintViewById(activity, "app_bar_layout");
         tintViewById(activity, "collapsingToolbarLayout");
         tintViewById(activity, "searchView");
     }
