@@ -188,6 +188,13 @@ public class DstFabricatedUtil {
             String  toastPreset  = ObsidianPrefs.getString("DST_PRESET_TOAST",  "");
             String  notifPreset  = ObsidianPrefs.getString("DST_PRESET_NOTIF",  "");
             int     notifCorner  = ObsidianPrefs.getInt(   "DST_NOTIF_CORNER",   24);
+            int     notifTexSize  = ObsidianPrefs.getInt(  "DST_NOTIF_TEXTURE_SIZE",  100);
+            int     notifTexAlpha = ObsidianPrefs.getInt(  "DST_NOTIF_TEXTURE_ALPHA", 25);
+            String  notifTexColMode  = ObsidianPrefs.getString("DST_NOTIF_TEXTURE_COLOR_MODE", "accent");
+            int     notifTexCol      = ObsidianPrefs.getInt(   "DST_NOTIF_TEXTURE_COLOR_CUSTOM", 0xFF9C27B0);
+            boolean notifTexBrdOn    = ObsidianPrefs.getBoolean("DST_NOTIF_TEXTURE_BORDER_ENABLED", false);
+            String  notifTexBrdMode  = ObsidianPrefs.getString("DST_NOTIF_TEXTURE_BORDER_MODE", "accent");
+            int     notifTexBrdCol   = ObsidianPrefs.getInt(   "DST_NOTIF_TEXTURE_BORDER_CUSTOM", 0xFF9C27B0);
             boolean qsBgOn       = ObsidianPrefs.getBoolean("DST_QS_BG_ENABLED", false);
 
             Shell.Result propsResult = Shell.cmd(
@@ -208,6 +215,13 @@ public class DstFabricatedUtil {
                 "setprop persist.obsidian.dst.toast_preset  \"" + (toastPreset == null ? "" : toastPreset) + "\"",
                 "setprop persist.obsidian.dst.notif_preset  \"" + (notifPreset == null ? "" : notifPreset) + "\"",
                 "setprop persist.obsidian.dst.notif_corner  " + notifCorner,
+                "setprop persist.obsidian.dst.notif_tex_size  " + notifTexSize,
+                "setprop persist.obsidian.dst.notif_tex_alpha " + notifTexAlpha,
+                "setprop persist.obsidian.dst.notif_tex_col_mode \"" + notifTexColMode + "\"",
+                "setprop persist.obsidian.dst.notif_tex_col      " + notifTexCol,
+                "setprop persist.obsidian.dst.notif_tex_brd_on   " + (notifTexBrdOn ? "true" : "false"),
+                "setprop persist.obsidian.dst.notif_tex_brd_mode \"" + notifTexBrdMode + "\"",
+                "setprop persist.obsidian.dst.notif_tex_brd_col  " + notifTexBrdCol,
                 "setprop persist.obsidian.dst.qs_bg_on      " + (qsBgOn ? "1" : "0")
             ).exec();
             if (!propsResult.isSuccess()) {

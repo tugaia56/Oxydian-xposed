@@ -25,13 +25,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntConsumer;
 
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.activity.MainActivity;
+import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.NavAdapter;
+import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
+import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
+import it.tugaia56.obsidian.ui.events.ColorSelectedEvent;
 import it.tugaia56.obsidian.utils.AppUtils;
 import it.tugaia56.obsidian.utils.DstFabricatedUtil;
 import it.tugaia56.obsidian.utils.ObsidianPrefs;
@@ -55,11 +63,25 @@ public class ThemeStyleFragment extends Fragment {
         "DSTDMT", "DSTDMTO", "DSTDS",  "DSTDSO"
     };
 
-    // Dialog-style item index in mNavItems (for refresh after picker)
-    private static final int IDX_DLG = 3;
+    // Dialog-style item index in mNavItems (for refresh after picker) — +1 dopo l'aggiunta
+    // della riga "Regolazioni varie" (indice 2, subito dopo Raggio Angolo Notifiche).
+    private static final int IDX_DLG = 4;
+    private static final String PREF_TEX_SIZE  = "DST_NOTIF_TEXTURE_SIZE";
+    private static final String PREF_TEX_ALPHA = "DST_NOTIF_TEXTURE_ALPHA";
+    private static final String PREF_TEX_COLOR_MODE    = "DST_NOTIF_TEXTURE_COLOR_MODE";
+    private static final String PREF_TEX_COLOR_CUSTOM  = "DST_NOTIF_TEXTURE_COLOR_CUSTOM";
+    private static final String PREF_TEX_BORDER_ON     = "DST_NOTIF_TEXTURE_BORDER_ENABLED";
+    private static final String PREF_TEX_BORDER_MODE   = "DST_NOTIF_TEXTURE_BORDER_MODE";
+    private static final String PREF_TEX_BORDER_CUSTOM = "DST_NOTIF_TEXTURE_BORDER_CUSTOM";
+    private static final int DIALOG_TEX_COLOR_CUSTOM  = PREF_TEX_COLOR_CUSTOM.hashCode();
+    private static final int DIALOG_TEX_BORDER_CUSTOM = PREF_TEX_BORDER_CUSTOM.hashCode();
 
     private final List<NavAdapter.NavItem> mNavItems = new ArrayList<>();
     private NavAdapter mNavAdapter;
+    /** Se il dialogo "Regolazioni varie" è aperto, questo lo ridisegna dopo che un colore
+     *  personalizzato torna dal ColorPickerDialog (altrimenti l'etichetta resterebbe vecchia
+     *  finché il dialogo non viene chiuso e riaperto). Null quando il dialogo non è aperto. */
+    private Runnable mTextureDialogRefresh;
 
     private static final String[] NOTIF_OVERLAYS = {
         "DSTNFNTOT", "DSTNFNO25", "DSTNFNO50", "DSTNFNO75",
@@ -69,7 +91,7 @@ public class ThemeStyleFragment extends Fragment {
         "DSTNFNSTK", "DSTNFNSS",  "DSTNFNOL4",
         "DSTNFNLT1", "DSTNFNLT2", "DSTNFNLT3", "DSTNFNNM2", "DSTNFNCP1",
         "DSTNFNCP2", "DSTNFNTL",  "DSTNFNFD",  "DSTNFNDB",
-        "DSTNFNDL",  "DSTNFNIOS", "DSTNFNDOT"
+        "DSTNFNDL",  "DSTNFNIOS", "DSTNFNDOT", "DSTNFNLNS", "DSTNFNGRN"
     };
 
     private static final String[] TOAST_OVERLAYS = {
@@ -79,6 +101,34 @@ public class ThemeStyleFragment extends Fragment {
     };
 
     private static final int[] CORNER_VALUES = { 8, 12, 16, 20, 24, 28, 32 };
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onColorSelected(ColorSelectedEvent event) {
+        if (event.dialogId() == DIALOG_TEX_COLOR_CUSTOM) {
+            ObsidianPrefs.putInt(PREF_TEX_COLOR_CUSTOM, event.color());
+            ObsidianPrefs.putString(PREF_TEX_COLOR_MODE, "custom");
+        } else if (event.dialogId() == DIALOG_TEX_BORDER_CUSTOM) {
+            ObsidianPrefs.putInt(PREF_TEX_BORDER_CUSTOM, event.color());
+            ObsidianPrefs.putString(PREF_TEX_BORDER_MODE, "custom");
+        } else {
+            return;
+        }
+        DstFabricatedUtil.saveBootProps();
+        AppUtils.showRestartReminder(requireContext());
+        if (mTextureDialogRefresh != null) mTextureDialogRefresh.run();
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -130,6 +180,12 @@ public class ThemeStyleFragment extends Fragment {
                 () -> showCornerPickerDialog(cornerNames)));
 
         mNavItems.add(new NavAdapter.NavItem(
+                R.drawable.ic_ui_styles,
+                getString(R.string.nav_notif_texture_settings),
+                getString(R.string.nav_notif_texture_settings_summary),
+                this::showTextureSettingsDialog));
+
+        mNavItems.add(new NavAdapter.NavItem(
                 R.drawable.ic_drawing,
                 getString(R.string.nav_toast_style),
                 getString(R.string.nav_toast_style_summary),
@@ -143,6 +199,143 @@ public class ThemeStyleFragment extends Fragment {
 
         mNavAdapter = new NavAdapter(mNavItems, 0xFF00BCD4); // cyan, colore categoria "Stili Notifica e Toast"
         rv.setAdapter(new ConcatAdapter(headerAdapter, mNavAdapter));
+    }
+
+    // ── "Regolazioni varie" — Dimensione/Opacità/Colore/Bordo per Puntini/Righe/Rumore ──────
+    // Riga a sé, stesso stile delle altre card di questa schermata (icona+titolo+summary),
+    // apre un proprio dialogo — non più annidato dentro il dialogo dei preset notifica.
+
+    private int texColor() {
+        boolean useAccent = !"custom".equals(ObsidianPrefs.getString(PREF_TEX_COLOR_MODE, "accent"));
+        return useAccent ? currentAccent()
+                : ObsidianPrefs.getInt(PREF_TEX_COLOR_CUSTOM, ObsidianTheme.DEFAULT_ACCENT);
+    }
+
+    private boolean texBorderOn() {
+        return ObsidianPrefs.getBoolean(PREF_TEX_BORDER_ON, false);
+    }
+
+    private int texBorderColor() {
+        boolean useAccent = !"custom".equals(ObsidianPrefs.getString(PREF_TEX_BORDER_MODE, "accent"));
+        return useAccent ? currentAccent()
+                : ObsidianPrefs.getInt(PREF_TEX_BORDER_CUSTOM, ObsidianTheme.DEFAULT_ACCENT);
+    }
+
+    private String modeAccentCustomLabel(String modeKey, String customKey) {
+        boolean useAccent = !"custom".equals(ObsidianPrefs.getString(modeKey, "accent"));
+        if (useAccent) return getString(R.string.color_mode_accent);
+        return String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(customKey, ObsidianTheme.DEFAULT_ACCENT));
+    }
+
+    private void showTextureSettingsDialog() {
+        RecyclerView rv = new RecyclerView(requireContext());
+        rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+        int pad = dp(8);
+        rv.setPadding(pad, pad, pad, pad);
+        rv.setClipToPadding(false);
+        rv.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        Runnable[] refreshRef = new Runnable[1];
+        refreshRef[0] = () -> rv.setAdapter(buildTextureSettingsAdapter(refreshRef[0]));
+        rv.setAdapter(buildTextureSettingsAdapter(refreshRef[0]));
+
+        AlertDialog dlg = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.nav_notif_texture_settings)
+                .setView(rv)
+                .setPositiveButton(R.string.close, null)
+                .show();
+        applyDialogBg(dlg);
+        fixButtonCaps(dlg);
+
+        mTextureDialogRefresh = refreshRef[0];
+        dlg.setOnDismissListener(d -> mTextureDialogRefresh = null);
+    }
+
+    private RecyclerView.Adapter<?> buildTextureSettingsAdapter(Runnable onLiveChange) {
+        int sizePct  = ObsidianPrefs.getInt(PREF_TEX_SIZE, 100);
+        int alphaPct = ObsidianPrefs.getInt(PREF_TEX_ALPHA, 25);
+
+        SliderWidgetAdapter.SliderItem sizeItem = new SliderWidgetAdapter.SliderItem(
+                getString(R.string.nav_notif_texture_size), sizePct, 50, 200, "%", 100,
+                value -> {
+                    ObsidianPrefs.putInt(PREF_TEX_SIZE, value);
+                    DstFabricatedUtil.saveBootProps();
+                    AppUtils.showRestartReminder(requireContext());
+                });
+        sizeItem.nested = true;
+        sizeItem.groupPos = ObsidianTheme.GroupPos.TOP;
+
+        SliderWidgetAdapter.SliderItem alphaItem = new SliderWidgetAdapter.SliderItem(
+                getString(R.string.nav_notif_texture_alpha), alphaPct, 5, 70, "%", 25,
+                value -> {
+                    ObsidianPrefs.putInt(PREF_TEX_ALPHA, value);
+                    DstFabricatedUtil.saveBootProps();
+                    AppUtils.showRestartReminder(requireContext());
+                });
+        alphaItem.nested = true;
+        alphaItem.groupPos = ObsidianTheme.GroupPos.BOTTOM;
+
+        SliderWidgetAdapter sliders = new SliderWidgetAdapter(List.of(sizeItem, alphaItem));
+
+        // Colore — sempre accento o personalizzato, nessuno stato "stock" (stesso pattern di
+        // "Colore Pulsante" nel Menù Accensione).
+        ListWidgetAdapter.ListItem colorItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.notif_texture_color_title),
+                modeAccentCustomLabel(PREF_TEX_COLOR_MODE, PREF_TEX_COLOR_CUSTOM),
+                () -> showTexModeDialog(PREF_TEX_COLOR_MODE, PREF_TEX_COLOR_CUSTOM,
+                        DIALOG_TEX_COLOR_CUSTOM, R.string.notif_texture_color_title, onLiveChange));
+        ListWidgetAdapter colorAdapter = new ListWidgetAdapter(List.of(colorItem));
+
+        // Bordo — switch di attivazione + accento/personalizzato, stesso pattern di "Bordo
+        // Pillolone" nel Menù Accensione (switch ON apre subito il dialogo colore).
+        SwitchWidgetAdapter.SwitchItem borderItem = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.notif_texture_border_title),
+                texBorderOn()
+                        ? modeAccentCustomLabel(PREF_TEX_BORDER_MODE, PREF_TEX_BORDER_CUSTOM)
+                        : getString(R.string.notif_texture_border_summary),
+                texBorderOn(),
+                null);
+        borderItem.onChanged = () -> {
+            ObsidianPrefs.putBoolean(PREF_TEX_BORDER_ON, borderItem.checked);
+            DstFabricatedUtil.saveBootProps();
+            AppUtils.showRestartReminder(requireContext());
+            if (onLiveChange != null) onLiveChange.run();
+            if (borderItem.checked) showTexModeDialog(PREF_TEX_BORDER_MODE, PREF_TEX_BORDER_CUSTOM,
+                    DIALOG_TEX_BORDER_CUSTOM, R.string.notif_texture_border_title, onLiveChange);
+        };
+        borderItem.onRowClick = () -> {
+            if (texBorderOn()) showTexModeDialog(PREF_TEX_BORDER_MODE, PREF_TEX_BORDER_CUSTOM,
+                    DIALOG_TEX_BORDER_CUSTOM, R.string.notif_texture_border_title, onLiveChange);
+        };
+        SwitchWidgetAdapter borderAdapter = new SwitchWidgetAdapter(List.of(borderItem));
+
+        return new ConcatAdapter(sliders, colorAdapter, borderAdapter);
+    }
+
+    /** 2-way Accento/Personalizzato — stesso dialogo usato per i colori del Menù Accensione. */
+    private void showTexModeDialog(String modeKey, String customKey, int dialogId, int titleResId,
+                                    Runnable onLiveChange) {
+        String[] entries = { getString(R.string.color_mode_accent), getString(R.string.color_mode_custom) };
+        String currentMode = ObsidianPrefs.getString(modeKey, "accent");
+        int current = "custom".equals(currentMode) ? 1 : 0;
+        final int[] selected = {current};
+        ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(titleResId)
+                .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
+                .setPositiveButton(R.string.apply, (d, w) -> {
+                    boolean useAccent = selected[0] == 0;
+                    ObsidianPrefs.putString(modeKey, useAccent ? "accent" : "custom");
+                    DstFabricatedUtil.saveBootProps();
+                    AppUtils.showRestartReminder(requireContext());
+                    if (onLiveChange != null) onLiveChange.run();
+                    if (!useAccent && getActivity() instanceof MainActivity) {
+                        int currentColor = ObsidianPrefs.getInt(customKey, ObsidianTheme.DEFAULT_ACCENT);
+                        ((MainActivity) getActivity()).showColorPickerDialog(dialogId, currentColor, true, true, true);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show());
     }
 
     // ── Notification / Toast preset picker — griglia con anteprima reale ───────
@@ -171,7 +364,9 @@ public class ThemeStyleFragment extends Fragment {
         float density = getResources().getDisplayMetrics().density;
 
         showPresetPreviewDialog(title, names, PREF_NOTIF_PRESET, NOTIF_OVERLAYS,
-                preset -> DstNotifStyle.buildNotifBg(preset, accent, bg, density, cornerDp),
+                preset -> DstNotifStyle.buildNotifBg(preset, accent, bg, density, cornerDp,
+                        ObsidianPrefs.getInt(PREF_TEX_SIZE, 100), ObsidianPrefs.getInt(PREF_TEX_ALPHA, 25),
+                        texColor(), texBorderOn(), texBorderColor()),
                 1, 64, idx -> {
             if (idx < 0) ObsidianPrefs.remove(PREF_NOTIF_PRESET);
             else ObsidianPrefs.putString(PREF_NOTIF_PRESET, NOTIF_OVERLAYS[idx]);

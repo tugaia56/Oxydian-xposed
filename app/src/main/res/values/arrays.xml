@@ -300,6 +300,8 @@
         <item>Duoline</item>
         <item>iOS</item>
         <item>Dots</item>
+        <item>Lines</item>
+        <item>Noise</item>
     </string-array>
 
     <!-- Date format -->

@@ -61,6 +61,8 @@ import de.robv.android.xposed.callbacks.XC_InitPackageResources;
  *   DSTNFNDL  – Duoline                   (gradiente verticale accent-bg-accent)
  *   DSTNFNIOS – iOS                       (gradiente verticale bg chiarito → bg)
  *   DSTNFNDOT – Puntini                   (texture di puntini accento su bg pieno, a runtime)
+ *   DSTNFNLNS – Righe                     (hatching diagonale accento su bg pieno, a runtime)
+ *   DSTNFNGRN – Rumore                    (grana/rumore fine accento su bg pieno, a runtime)
  */
 public class DstNotifStyle {
 
@@ -69,10 +71,19 @@ public class DstNotifStyle {
     private static final String PREF_ACCENT1 = "DST_ACCENT1";
     private static final String PREF_BG      = "DST_BACKGROUND";
     private static final String PREF_CORNER  = "DST_NOTIF_CORNER";
+    private static final String PREF_TEX_SIZE  = "DST_NOTIF_TEXTURE_SIZE";  // % — Puntini/Righe/Rumore
+    private static final String PREF_TEX_ALPHA = "DST_NOTIF_TEXTURE_ALPHA"; // % — idem
+    private static final String PREF_TEX_COLOR_MODE   = "DST_NOTIF_TEXTURE_COLOR_MODE";   // "accent"/"custom"
+    private static final String PREF_TEX_COLOR_CUSTOM = "DST_NOTIF_TEXTURE_COLOR_CUSTOM";
+    private static final String PREF_TEX_BORDER_ON     = "DST_NOTIF_TEXTURE_BORDER_ENABLED";
+    private static final String PREF_TEX_BORDER_MODE   = "DST_NOTIF_TEXTURE_BORDER_MODE";   // "accent"/"custom"
+    private static final String PREF_TEX_BORDER_CUSTOM = "DST_NOTIF_TEXTURE_BORDER_CUSTOM";
     private static final String PREFS_FILE   =
         "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml";
 
     private static final int DEFAULT_CORNER_DP = 24;
+    private static final int DEFAULT_TEX_SIZE_PCT  = 100;
+    private static final int DEFAULT_TEX_ALPHA_PCT = 25;
 
     private static final String[] NOTIF_DRAWABLES = {
         "notification_material_bg",
@@ -92,6 +103,11 @@ public class DstNotifStyle {
     private static volatile int    sAccent    = 0xFF9C27B0;
     private static volatile int    sBg        = 0xFF1B2029;
     private static volatile int    sCornerDp  = DEFAULT_CORNER_DP;
+    private static volatile int    sTexSizePct  = DEFAULT_TEX_SIZE_PCT;
+    private static volatile int    sTexAlphaPct = DEFAULT_TEX_ALPHA_PCT;
+    private static volatile int    sTexColor       = 0xFF9C27B0; // risolto: sAccent o custom
+    private static volatile boolean sTexBorderOn   = false;
+    private static volatile int    sTexBorderColor = 0xFF9C27B0; // risolto: sAccent o custom
 
     // ── Boot-time preload ────────────────────────────────────────────────────
 
@@ -111,6 +127,19 @@ public class DstNotifStyle {
             sBg       = parseInt(parseAttr(xml, PREF_BG,      "value"), 0xFF1B2029);
             int corner = parseInt(parseAttr(xml, PREF_CORNER, "value"), DEFAULT_CORNER_DP);
             sCornerDp = (corner > 0) ? corner : DEFAULT_CORNER_DP;
+            int texSize  = parseInt(parseAttr(xml, PREF_TEX_SIZE,  "value"), DEFAULT_TEX_SIZE_PCT);
+            sTexSizePct  = (texSize > 0) ? texSize : DEFAULT_TEX_SIZE_PCT;
+            sTexAlphaPct = parseInt(parseAttr(xml, PREF_TEX_ALPHA, "value"), DEFAULT_TEX_ALPHA_PCT);
+
+            String texColorMode = parseStringContent(xml, PREF_TEX_COLOR_MODE);
+            int texColorCustom  = parseInt(parseAttr(xml, PREF_TEX_COLOR_CUSTOM, "value"), sAccent);
+            sTexColor = "custom".equals(texColorMode) ? texColorCustom : sAccent;
+
+            sTexBorderOn = "true".equals(parseAttr(xml, PREF_TEX_BORDER_ON, "value"));
+            String texBorderMode = parseStringContent(xml, PREF_TEX_BORDER_MODE);
+            int texBorderCustom  = parseInt(parseAttr(xml, PREF_TEX_BORDER_CUSTOM, "value"), sAccent);
+            sTexBorderColor = "custom".equals(texBorderMode) ? texBorderCustom : sAccent;
+
             XposedBridge.log("[ Obsidian ] DstNotifStyle.preload(file): preset=" + sPreset
                     + " corner=" + sCornerDp);
         } catch (Throwable t) {
@@ -126,6 +155,13 @@ public class DstNotifStyle {
             String a1Str   = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.a1",           "");
             String bgStr   = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.bg",            "");
             String cornStr = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.notif_corner",  "24");
+            String texSzStr = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.notif_tex_size",  "");
+            String texAlStr = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.notif_tex_alpha", "");
+            String texColModeStr = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.notif_tex_col_mode", "");
+            String texColStr     = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.notif_tex_col",      "");
+            String texBrdOnStr   = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.notif_tex_brd_on",   "");
+            String texBrdModeStr = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.notif_tex_brd_mode", "");
+            String texBrdColStr  = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.notif_tex_brd_col",  "");
             XposedBridge.log("[ Obsidian ] DstNotifStyle.preloadFromProps: preset='" + preset + "'");
             if (preset.isEmpty()) return;
             sPreset = preset;
@@ -137,6 +173,23 @@ public class DstNotifStyle {
                     sCornerDp = (c > 0) ? c : DEFAULT_CORNER_DP;
                 } catch (NumberFormatException ignored) {}
             }
+            if (!texSzStr.isEmpty()) {
+                try {
+                    int s = Integer.parseInt(texSzStr);
+                    sTexSizePct = (s > 0) ? s : DEFAULT_TEX_SIZE_PCT;
+                } catch (NumberFormatException ignored) {}
+            }
+            if (!texAlStr.isEmpty()) {
+                try { sTexAlphaPct = Integer.parseInt(texAlStr); } catch (NumberFormatException ignored) {}
+            }
+            int texColorCustom = sAccent;
+            if (!texColStr.isEmpty()) { try { texColorCustom = Integer.parseInt(texColStr); } catch (NumberFormatException ignored) {} }
+            sTexColor = "custom".equals(texColModeStr) ? texColorCustom : sAccent;
+
+            sTexBorderOn = "true".equals(texBrdOnStr);
+            int texBorderCustom = sAccent;
+            if (!texBrdColStr.isEmpty()) { try { texBorderCustom = Integer.parseInt(texBrdColStr); } catch (NumberFormatException ignored) {} }
+            sTexBorderColor = "custom".equals(texBrdModeStr) ? texBorderCustom : sAccent;
             XposedBridge.log("[ Obsidian ] DstNotifStyle.preload(props): preset=" + sPreset
                     + " corner=" + sCornerDp);
         } catch (Throwable t) {
@@ -160,7 +213,8 @@ public class DstNotifStyle {
         preloadFromFile();
         if (sPreset == null) return null;
         if (density <= 0f) density = 3.0f;
-        return buildNotifBg(sPreset, sAccent, sBg, density, sCornerDp);
+        return buildNotifBg(sPreset, sAccent, sBg, density, sCornerDp, sTexSizePct, sTexAlphaPct,
+                sTexColor, sTexBorderOn, sTexBorderColor);
     }
 
     // ── Called from ResourceManager.handleInitPackageResources ───────────────
@@ -190,10 +244,16 @@ public class DstNotifStyle {
                 int    accent   = sAccent;
                 int    bg       = sBg;
                 int    cornerDp = sCornerDp;
+                int    texSize  = sTexSizePct;
+                int    texAlpha = sTexAlphaPct;
+                int    texColor = sTexColor;
+                boolean texBorderOn = sTexBorderOn;
+                int    texBorderColor = sTexBorderColor;
                 if (preset == null) return new GradientDrawable();
                 float density = res.getDisplayMetrics().density;
                 if (density <= 0f) density = 3.0f;
-                return buildNotifBg(preset, accent, bg, density, cornerDp);
+                return buildNotifBg(preset, accent, bg, density, cornerDp, texSize, texAlpha,
+                        texColor, texBorderOn, texBorderColor);
             }
         };
 
@@ -208,10 +268,31 @@ public class DstNotifStyle {
 
     // ── Drawable factory ──────────────────────────────────────────────────────
 
-    /** Public so the UI (preset preview picker) can render the exact same drawable used at runtime. */
+    /** Retrocompatibile — usa i default di dimensione/opacità/colore/bordo texture. */
     public static Drawable buildNotifBg(String preset, int accent, int bg,
                                           float density, int cornerDp) {
-        Drawable d = buildNotifBgRaw(preset, accent, bg, density, cornerDp);
+        return buildNotifBg(preset, accent, bg, density, cornerDp,
+                DEFAULT_TEX_SIZE_PCT, DEFAULT_TEX_ALPHA_PCT, accent, false, accent);
+    }
+
+    /** Retrocompatibile — usa i default di colore/bordo texture (accento, bordo assente). */
+    public static Drawable buildNotifBg(String preset, int accent, int bg,
+                                          float density, int cornerDp,
+                                          int texSizePct, int texAlphaPct) {
+        return buildNotifBg(preset, accent, bg, density, cornerDp,
+                texSizePct, texAlphaPct, accent, false, accent);
+    }
+
+    /** Public so the UI (preset preview picker) can render the exact same drawable used at
+     *  runtime. texSizePct/texAlphaPct/texColor/texBorderOn/texBorderColor sono usati solo dai
+     *  preset texture (Puntini/Righe/Rumore) — ignorati da tutti gli altri, innocuo passarli
+     *  sempre. texColor è già risolto (accento o personalizzato), non una "mode" string. */
+    public static Drawable buildNotifBg(String preset, int accent, int bg,
+                                          float density, int cornerDp,
+                                          int texSizePct, int texAlphaPct,
+                                          int texColor, boolean texBorderOn, int texBorderColor) {
+        Drawable d = buildNotifBgRaw(preset, accent, bg, density, cornerDp, texSizePct, texAlphaPct,
+                texColor, texBorderOn, texBorderColor);
         if (d == null) return null;
         // NotificationBackgroundView.setCustomBackground() -> setTint() -> getStatefulBackgroundLayer()
         // reads layer index 1 of whatever LayerDrawable it's given. A bare GradientDrawable (or
@@ -227,13 +308,26 @@ public class DstNotifStyle {
         // index 0 or index ≥2. This wrapper only still needs to handle the plain
         // single-GradientDrawable presets (gradients with no distinct layers).
         if (d instanceof LayerDrawable) return d;
-        Drawable filler = buildNotifBgRaw(preset, accent, bg, density, cornerDp);
+        Drawable filler = buildNotifBgRaw(preset, accent, bg, density, cornerDp, texSizePct, texAlphaPct,
+                texColor, texBorderOn, texBorderColor);
         return tintBlockedLayer(new Drawable[]{filler != null ? filler : d, indexOneGuard(cornerDp * density), d});
     }
 
     private static Drawable buildNotifBgRaw(String preset, int accent, int bg,
-                                          float density, int cornerDp) {
+                                          float density, int cornerDp,
+                                          int texSizePct, int texAlphaPct,
+                                          int texColor, boolean texBorderOn, int texBorderColor) {
         float r = cornerDp * density;
+        float texSizeMul   = texSizePct / 100f;
+        float texDensity   = density * texSizeMul; // trucco: le classi texture calcolano
+                                                     // spacing/raggio come K*density — passare
+                                                     // una density già scalata evita di toccare
+                                                     // la formula interna di ciascuna.
+        float texAlphaFrac = Math.max(0f, Math.min(1f, texAlphaPct / 100f));
+        // Bordo texture: stesso trucco/spessore di "Bordo Sottile" (DSTNFNTO2, 2dp) — solo
+        // quando attivo, altrimenti il riempimento pieno resta senza contorno come prima.
+        int texBorderWidth = texBorderOn ? Math.round(2f * density) : 0;
+        int texBorderStrokeColor = texBorderOn ? texBorderColor : 0;
 
         switch (preset) {
             case "DSTNFNTOT": // Thin Outline Transparent
@@ -401,13 +495,26 @@ public class DstNotifStyle {
                 return gradient(GradientDrawable.Orientation.TOP_BOTTOM,
                         new int[]{accent, bg, accent}, r);
 
-            case "DSTNFNDOT": { // Puntini — pattern di puntini accento, sottile, sopra bg pieno
+            case "DSTNFNDOT": { // Puntini — pattern di puntini, sottile, sopra bg pieno
                                 // (prototipo "Notif PNG background": texture disegnata a
                                 // runtime invece di un vero asset PNG — stessa idea, coerente
                                 // con tutto il resto del file che è 100% programmatico).
-                GradientDrawable base = simpleShape(bg, 0, 0, r);
-                GradientDrawable dots = dotGridOverlay(withAlpha(accent, 0.55f), density, r);
+                                // Dimensione/Opacità/Colore/Bordo regolabili da "Regolazioni varie".
+                GradientDrawable base = simpleShape(bg, texBorderStrokeColor, texBorderWidth, r);
+                GradientDrawable dots = dotGridOverlay(withAlpha(texColor, texAlphaFrac), texDensity, r);
                 return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), dots});
+            }
+
+            case "DSTNFNLNS": { // Righe — hatching diagonale sottile, sopra bg pieno
+                GradientDrawable base = simpleShape(bg, texBorderStrokeColor, texBorderWidth, r);
+                GradientDrawable lines = hatchOverlay(withAlpha(texColor, texAlphaFrac), texDensity, r);
+                return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), lines});
+            }
+
+            case "DSTNFNGRN": { // Rumore — grana/rumore fine, sopra bg pieno
+                GradientDrawable base = simpleShape(bg, texBorderStrokeColor, texBorderWidth, r);
+                GradientDrawable grain = grainOverlay(texColor, texDensity, r, texAlphaFrac);
+                return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), grain});
             }
 
             case "DSTNFNIOS": // iOS — prima era bg chiarito → bg, troppo simile a Neumorph.
@@ -567,8 +674,8 @@ public class DstNotifStyle {
 
         DotGridDrawable(int dotColor, float density, float cornerRadius) {
             mDotColor = dotColor;
-            mSpacing = 9f * density;
-            mRadius = 1.5f * density;
+            mSpacing = 14f * density;
+            mRadius = 1.0f * density;
             mCornerRadius = cornerRadius;
             mPaint.setColor(dotColor);
             setShape(GradientDrawable.RECTANGLE);
@@ -599,9 +706,134 @@ public class DstNotifStyle {
         @Override public ConstantState getConstantState() {
             return new ConstantState() {
                 @Override public Drawable newDrawable() {
-                    // density passato = mSpacing/9f ricostruisce esattamente lo stesso mSpacing
+                    // density passato = mSpacing/14f ricostruisce esattamente lo stesso mSpacing
                     // di partenza (mRadius ne è derivato con lo stesso fattore, coerente).
-                    return new DotGridDrawable(mDotColor, mSpacing / 9f, mCornerRadius);
+                    return new DotGridDrawable(mDotColor, mSpacing / 14f, mCornerRadius);
+                }
+                @Override public int getChangingConfigurations() { return 0; }
+            };
+        }
+    }
+
+    private static GradientDrawable hatchOverlay(int lineColor, float density, float cornerRadius) {
+        return new HatchDrawable(lineColor, density, cornerRadius);
+    }
+
+    /** Righe diagonali sottili (45°) — stessa tecnica/gotcha di {@link DotGridDrawable}: classe
+     *  nominata, deve estendere GradientDrawable, getConstantState() ricostruisce la sottoclasse
+     *  vera. Disegna oltre i bordi (lunghezza = diagonale del rettangolo) prima di ruotare, così
+     *  copre tutto l'angolo visibile indipendentemente da dove cade il centro di rotazione. */
+    private static final class HatchDrawable extends GradientDrawable {
+        private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final float mSpacing, mCornerRadius;
+        private final int mLineColor;
+
+        HatchDrawable(int lineColor, float density, float cornerRadius) {
+            mLineColor = lineColor;
+            mSpacing = 7f * density;
+            mCornerRadius = cornerRadius;
+            mPaint.setColor(lineColor);
+            mPaint.setStrokeWidth(Math.max(1f, 1f * density));
+            setShape(GradientDrawable.RECTANGLE);
+            setColor(Color.TRANSPARENT);
+            setCornerRadius(cornerRadius);
+        }
+
+        @Override public void draw(Canvas canvas) {
+            super.draw(canvas);
+            Rect b = getBounds();
+            if (b.width() <= 0 || b.height() <= 0) return;
+            float diag = (float) Math.sqrt((double) b.width() * b.width() + (double) b.height() * b.height());
+            canvas.save();
+            canvas.clipRect(b);
+            canvas.rotate(45f, b.centerX(), b.centerY());
+            float half = diag / 2f;
+            for (float y = -half; y < half; y += mSpacing) {
+                canvas.drawLine(b.centerX() - half, b.centerY() + y, b.centerX() + half, b.centerY() + y, mPaint);
+            }
+            canvas.restore();
+        }
+
+        @Override public void setTint(int tintColor) { /* block OOS tint */ }
+        @Override public void setTintList(ColorStateList tint) { /* block OOS tint */ }
+        @Override public void setTintMode(PorterDuff.Mode tintMode) { /* block */ }
+        @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
+        @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
+        @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+
+        @Override public ConstantState getConstantState() {
+            return new ConstantState() {
+                @Override public Drawable newDrawable() {
+                    return new HatchDrawable(mLineColor, mSpacing / 7f, mCornerRadius);
+                }
+                @Override public int getChangingConfigurations() { return 0; }
+            };
+        }
+    }
+
+    private static GradientDrawable grainOverlay(int baseColor, float density, float cornerRadius,
+                                                  float alphaFrac) {
+        return new GrainDrawable(baseColor, density, cornerRadius, alphaFrac);
+    }
+
+    /** Grana/rumore — tanti puntini piccolissimi a posizione/dimensione/alpha pseudo-casuali ma
+     *  RIPRODUCIBILI (seed fisso): senza un seed fisso il pattern cambierebbe ad ogni draw() (più
+     *  volte al secondo durante animazioni) mostrando un rumore video fastidioso invece di una
+     *  texture statica. Stessa tecnica/gotcha delle altre due texture qui sopra. */
+    private static final class GrainDrawable extends GradientDrawable {
+        private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final float mCornerRadius, mDensity, mAlphaFrac;
+        private final int mBaseColor;
+
+        GrainDrawable(int baseColor, float density, float cornerRadius, float alphaFrac) {
+            mBaseColor = baseColor;
+            mDensity = density;
+            mCornerRadius = cornerRadius;
+            mAlphaFrac = alphaFrac;
+            setShape(GradientDrawable.RECTANGLE);
+            setColor(Color.TRANSPARENT);
+            setCornerRadius(cornerRadius);
+        }
+
+        @Override public void draw(Canvas canvas) {
+            super.draw(canvas);
+            Rect b = getBounds();
+            if (b.width() <= 0 || b.height() <= 0) return;
+            java.util.Random rnd = new java.util.Random(0x0B51D1A5); // seed fisso — riproducibile
+            float cell = 6f * mDensity;
+            int cols = Math.max(1, (int) (b.width() / cell));
+            int rows = Math.max(1, (int) (b.height() / cell));
+            int r0 = Color.red(mBaseColor), g0 = Color.green(mBaseColor), b0 = Color.blue(mBaseColor);
+            // La finestra alpha per-puntino (min..max su 255) scala con l'opacità scelta
+            // dall'utente — a mAlphaFrac=0.25 (default) resta ~20..69 come prima del cursore.
+            int maxAlpha = Math.max(1, Math.round(255 * mAlphaFrac));
+            int minAlpha = Math.max(0, maxAlpha - 50);
+            for (int cy = 0; cy < rows; cy++) {
+                for (int cx = 0; cx < cols; cx++) {
+                    // Non un punto per cella: ~40% di riempimento, per un aspetto grana/rumore
+                    // vero invece di una griglia regolare.
+                    if (rnd.nextFloat() > 0.4f) continue;
+                    float x = b.left + cx * cell + rnd.nextFloat() * cell;
+                    float y = b.top + cy * cell + rnd.nextFloat() * cell;
+                    float radius = (0.4f + rnd.nextFloat() * 0.5f) * mDensity;
+                    int alpha = minAlpha + rnd.nextInt(Math.max(1, maxAlpha - minAlpha + 1));
+                    mPaint.setColor(Color.argb(alpha, r0, g0, b0));
+                    canvas.drawCircle(x, y, radius, mPaint);
+                }
+            }
+        }
+
+        @Override public void setTint(int tintColor) { /* block OOS tint */ }
+        @Override public void setTintList(ColorStateList tint) { /* block OOS tint */ }
+        @Override public void setTintMode(PorterDuff.Mode tintMode) { /* block */ }
+        @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
+        @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
+        @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+
+        @Override public ConstantState getConstantState() {
+            return new ConstantState() {
+                @Override public Drawable newDrawable() {
+                    return new GrainDrawable(mBaseColor, mDensity, mCornerRadius, mAlphaFrac);
                 }
                 @Override public int getChangingConfigurations() { return 0; }
             };

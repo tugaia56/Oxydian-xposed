@@ -840,6 +840,14 @@
     <string name="nav_notif_style_summary">Stile sfondo personalizzato per le notifiche</string>
     <string name="nav_notif_corner">Raggio Angolo Notifiche</string>
     <string name="nav_notif_corner_summary">Raggio degli angoli per lo sfondo delle notifiche</string>
+    <string name="nav_notif_texture_settings">Regolazioni varie</string>
+    <string name="nav_notif_texture_settings_summary">Solo Notifiche Puntini, Righe, Rumore</string>
+    <string name="notif_texture_section_title">Regolazioni varie</string>
+    <string name="nav_notif_texture_size">Dimensione</string>
+    <string name="nav_notif_texture_alpha">Opacità</string>
+    <string name="notif_texture_color_title">Colore</string>
+    <string name="notif_texture_border_title">Bordo</string>
+    <string name="notif_texture_border_summary">Aggiunge un bordo colorato attorno alla notifica</string>
     <string name="nav_navbar_style">Stile Barra di Navigazione</string>
     <string name="nav_navbar_style_summary">Stile delle icone della barra di navigazione</string>
 
