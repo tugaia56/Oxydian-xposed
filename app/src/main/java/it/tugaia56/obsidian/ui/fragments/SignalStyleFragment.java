@@ -57,6 +57,15 @@ public class SignalStyleFragment extends Fragment {
     private ListWidgetAdapter mScaleAdapter;
     private int mPendingDialogId = -1;
     private int mPendingIndex    = -1;
+    private RecyclerView mRecyclerView;
+    // Tap sul TITOLO di "Icone Segnale WI-FI"/"Mobile" espande/comprime la riga Colore
+    // sottostante (switch+expand, come altrove in app) — l'interruttore sulla riga NON
+    // attiva/disattiva niente, apre invece la schermata di scelta stile (WifiIconsFragment/
+    // SignalIconsFragment): l'utente lo ha chiesto esplicitamente perché uno switch "salta
+    // all'occhio" più di una freccia come punto da toccare, anche se qui non rispecchia un
+    // vero stato on/off — resta sempre spento, la richiesta è solo visiva/di scoperta.
+    private boolean mWifiColorExpanded   = false;
+    private boolean mMobileColorExpanded = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,22 +88,14 @@ public class SignalStyleFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mRecyclerView = (RecyclerView) view;
+        rebuild();
+    }
 
-        // ── Nav cards (coloured, same style as Barra di Stato) ─────────────────────
-        List<NavAdapter.NavItem> navItems = new ArrayList<>();
-        navItems.add(new NavAdapter.NavItem(
-                R.drawable.obs_wifi_aurora_signal_4,
-                getString(R.string.nav_wifi_icons),
-                getString(R.string.nav_wifi_icons_summary),
-                () -> navigate(new WifiIconsFragment(), getString(R.string.nav_wifi_icons))));
-        navItems.add(new NavAdapter.NavItem(
-                R.drawable.obs_signal_bars_3,
-                getString(R.string.nav_signal_icons),
-                getString(R.string.nav_signal_icons_summary),
-                () -> navigate(new SignalIconsFragment(), getString(R.string.nav_signal_icons))));
-        NavAdapter navAdapter = new NavAdapter(navItems, 0xFF4CAF50); // green, colore categoria "Stile icone Segnale"
-
-        // ── Colore Icona Segnale — separate Wi-Fi / Mobile rows ────────────────────
+    /** Ricostruisce l'intera catena — chiamata all'avvio e ogni volta che si espande/comprime
+     *  la riga Colore di Wi-Fi o Mobile (stesso pattern usato altrove in app per righe che si
+     *  espandono sotto se stesse). */
+    private void rebuild() {
         colorItems.clear();
         colorItems.add(new DarkShadowItem(
                 getString(R.string.signal_icon_color_wifi_title), "WIFI_ICON_COLOR",
@@ -110,8 +111,47 @@ public class SignalStyleFragment extends Fragment {
                 colorItems,
                 this::onColorEnabled,
                 this::onColorDisabled,
-                this::onColorSwatch
+                this::onColorSwatch,
+                true, ObsidianTheme.GroupPos.SINGLE
         );
+
+        // ── "Icone Segnale WI-FI"/"Mobile" — switch+expand invertito su richiesta utente:
+        // tocco sul NOME espande/comprime la riga Colore sotto; l'INTERRUTTORE (non il
+        // nome) apre la schermata di scelta stile. Lo switch non riflette un vero stato
+        // on/off, resta sempre spento — serve solo come punto di tocco ben visibile. ──────
+        SwitchWidgetAdapter.SwitchItem wifiItem = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.nav_wifi_icons), getString(R.string.nav_wifi_icons_summary),
+                R.drawable.obs_wifi_aurora_signal_4, false, null);
+        wifiItem.onChanged = () -> {
+            wifiItem.checked = false; // momentaneo, non persiste stato
+            navigate(new WifiIconsFragment(), getString(R.string.nav_wifi_icons));
+        };
+        wifiItem.onRowClick = () -> { mWifiColorExpanded = !mWifiColorExpanded; rebuild(); };
+        wifiItem.groupPos = mWifiColorExpanded ? ObsidianTheme.GroupPos.TOP : ObsidianTheme.GroupPos.SINGLE;
+        SwitchWidgetAdapter wifiAdapter = new SwitchWidgetAdapter(List.of(wifiItem));
+
+        DarkShadowColorListener wifiColorAdapter = mWifiColorExpanded
+                ? new DarkShadowColorListener(List.of(colorItems.get(0)),
+                        this::onColorEnabled, this::onColorDisabled, this::onColorSwatch,
+                        true, ObsidianTheme.GroupPos.BOTTOM)
+                : null;
+
+        SwitchWidgetAdapter.SwitchItem mobileItem = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.nav_signal_icons), getString(R.string.nav_signal_icons_summary),
+                R.drawable.obs_signal_bars_3, false, null);
+        mobileItem.onChanged = () -> {
+            mobileItem.checked = false;
+            navigate(new SignalIconsFragment(), getString(R.string.nav_signal_icons));
+        };
+        mobileItem.onRowClick = () -> { mMobileColorExpanded = !mMobileColorExpanded; rebuild(); };
+        mobileItem.groupPos = mMobileColorExpanded ? ObsidianTheme.GroupPos.TOP : ObsidianTheme.GroupPos.SINGLE;
+        SwitchWidgetAdapter mobileAdapter = new SwitchWidgetAdapter(List.of(mobileItem));
+
+        DarkShadowColorListener mobileColorAdapter = mMobileColorExpanded
+                ? new DarkShadowColorListener(List.of(colorItems.get(1)),
+                        this::onColorEnabled, this::onColorDisabled, this::onColorSwatch,
+                        true, ObsidianTheme.GroupPos.BOTTOM)
+                : null;
 
         // ── Dimensione Icone — single slider driving both Wi-Fi and Mobile ─────────
         mScaleAdapter = scaleRow();
@@ -119,7 +159,14 @@ public class SignalStyleFragment extends Fragment {
         // ── Hide in/out arrows switches ─────────────────────────────────────────
         SwitchWidgetAdapter switches = new SwitchWidgetAdapter(buildIconSwitches());
 
-        ((RecyclerView) view).setAdapter(new ConcatAdapter(navAdapter, mColorAdapter, mScaleAdapter, switches));
+        List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
+        chain.add(wifiAdapter);
+        if (wifiColorAdapter != null) chain.add(wifiColorAdapter);
+        chain.add(mobileAdapter);
+        if (mobileColorAdapter != null) chain.add(mobileColorAdapter);
+        chain.add(mScaleAdapter);
+        chain.add(switches);
+        mRecyclerView.setAdapter(new ConcatAdapter(chain));
     }
 
     // ── Dimensione Icone ─────────────────────────────────────────────────────

@@ -158,24 +158,26 @@
 
     <!-- Wi-Fi / Mobile signal icon size (dp) — stock size is 15dp -->
     <string-array name="signal_icon_scale_entries">
+        <item>12 dp</item>
+        <item>13 dp</item>
+        <item>14 dp</item>
         <item>15 dp (default)</item>
         <item>16 dp</item>
         <item>17 dp</item>
         <item>18 dp</item>
         <item>19 dp</item>
         <item>20 dp</item>
-        <item>21 dp</item>
-        <item>22 dp</item>
     </string-array>
     <integer-array name="signal_icon_scale_values">
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
         <item>15</item>
         <item>16</item>
         <item>17</item>
         <item>18</item>
         <item>19</item>
         <item>20</item>
-        <item>21</item>
-        <item>22</item>
     </integer-array>
 
     <!-- Date display -->

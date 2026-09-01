@@ -827,9 +827,9 @@
     <string name="nav_icon_style">Signal Icon Style</string>
     <string name="nav_icon_style_summary">Wi-Fi and mobile signal icon style</string>
     <string name="nav_wifi_icons">Wi-Fi Signal Icons</string>
-    <string name="nav_wifi_icons_summary">Wi-Fi signal icon style</string>
+    <string name="nav_wifi_icons_summary">Tap for color, use the switch to choose the style</string>
     <string name="nav_signal_icons">Mobile Signal Icons</string>
-    <string name="nav_signal_icons_summary">Mobile signal icon style</string>
+    <string name="nav_signal_icons_summary">Tap for color, use the switch to choose the style</string>
     <string name="signal_icon_scale_title">Icon Size</string>
     <string name="icon_preset_apply">Apply</string>
     <string name="icon_preset_disable">Disable</string>

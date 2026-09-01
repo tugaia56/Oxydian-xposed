@@ -379,14 +379,15 @@
         <item>CPB Stars</item>
     </string-array>
     <string-array name="signal_icon_scale_entries">
+        <item>12 dp</item>
+        <item>13 dp</item>
+        <item>14 dp</item>
         <item>15 dp (predefinito)</item>
         <item>16 dp</item>
         <item>17 dp</item>
         <item>18 dp</item>
         <item>19 dp</item>
         <item>20 dp</item>
-        <item>21 dp</item>
-        <item>22 dp</item>
     </string-array>
     <string-array name="vol_panel_timeout_entries">
         <item>1 s</item>
