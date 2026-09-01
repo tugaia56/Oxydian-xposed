@@ -5,6 +5,7 @@ import static de.robv.android.xposed.XposedBridge.hookAllMethods;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
 import static de.robv.android.xposed.XposedHelpers.setBooleanField;
+import static de.robv.android.xposed.XposedHelpers.setFloatField;
 import static de.robv.android.xposed.XposedHelpers.setIntField;
 import static it.tugaia56.obsidian.utils.Constants.Packages.SYSTEM_UI;
 import static it.tugaia56.obsidian.xposed.XPrefs.Xprefs;
@@ -458,7 +459,31 @@ public class MiscMods extends XposedMods {
             try {
                 setIntField(shutdownView, "mHandlerColor", 0x00000000);
                 Object paintObj = getObjectField(shutdownView, "mHandlerPaint");
-                if (paintObj instanceof Paint) ((Paint) paintObj).setColor(0x00000000);
+                if (paintObj instanceof Paint) {
+                    Paint p = (Paint) paintObj;
+                    p.setColor(0x00000000);
+                    p.setAlpha(0);
+                    p.setShader(null);
+                    p.setShadowLayer(0f, 0f, 0f, 0x00000000);
+                }
+                // Separate scrim layer behind the whole action bar, drawn by stock code
+                // independently of mHandlerColor/mHandlerPaint (found via live field dump,
+                // 2026-09-01) — left opaque it painted a dark disc behind any transparent image.
+                try {
+                    Object scrim = getObjectField(shutdownView, "mActionsBackgroundDrawable");
+                    if (scrim instanceof Drawable) ((Drawable) scrim).setAlpha(0);
+                } catch (Throwable ignored4) {}
+                // mDefaultHandlerColor (int, default -1/white) — the colour actually used for the
+                // handle's resting/idle paint, separate from mHandlerColor.
+                try {
+                    setIntField(shutdownView, "mDefaultHandlerColor", 0x00000000);
+                } catch (Throwable ignored5) {}
+                // mHandlerAlpha (float) — stock re-applies mHandlerPaint.setAlpha(255*mHandlerAlpha)
+                // from its own entrance-animation value INSIDE onDraw, after this before-hook runs,
+                // silently overriding paint.setAlpha(0) above. Force it to 0 too.
+                try {
+                    setFloatField(shutdownView, "mHandlerAlpha", 0f);
+                } catch (Throwable ignored6) {}
             } catch (Throwable ignored) {}
             return;
         }
