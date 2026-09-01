@@ -302,6 +302,13 @@
         <item>Dots</item>
         <item>Lines</item>
         <item>Noise</item>
+        <item>Hearts</item>
+        <item>Diamonds</item>
+        <item>Clubs</item>
+        <item>Spades</item>
+        <item>Checkerboard</item>
+        <item>Waves</item>
+        <item>Crosshatch</item>
     </string-array>
 
     <!-- Date format -->

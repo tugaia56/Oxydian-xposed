@@ -91,7 +91,9 @@ public class ThemeStyleFragment extends Fragment {
         "DSTNFNSTK", "DSTNFNSS",  "DSTNFNOL4",
         "DSTNFNLT1", "DSTNFNLT2", "DSTNFNLT3", "DSTNFNNM2", "DSTNFNCP1",
         "DSTNFNCP2", "DSTNFNTL",  "DSTNFNFD",  "DSTNFNDB",
-        "DSTNFNDL",  "DSTNFNIOS", "DSTNFNDOT", "DSTNFNLNS", "DSTNFNGRN"
+        "DSTNFNDL",  "DSTNFNIOS", "DSTNFNDOT", "DSTNFNLNS", "DSTNFNGRN",
+        "DSTNFNHRT", "DSTNFNDIA", "DSTNFNCLB", "DSTNFNSPD",
+        "DSTNFNCHK", "DSTNFNWAV", "DSTNFNXH"
     };
 
     private static final String[] TOAST_OVERLAYS = {

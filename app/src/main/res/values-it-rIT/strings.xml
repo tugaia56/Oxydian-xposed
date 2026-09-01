@@ -841,7 +841,7 @@
     <string name="nav_notif_corner">Raggio Angolo Notifiche</string>
     <string name="nav_notif_corner_summary">Raggio degli angoli per lo sfondo delle notifiche</string>
     <string name="nav_notif_texture_settings">Regolazioni varie</string>
-    <string name="nav_notif_texture_settings_summary">Solo Notifiche Puntini, Righe, Rumore</string>
+    <string name="nav_notif_texture_settings_summary">Solo per i preset a texture (Puntini, Cuori, Onde…)</string>
     <string name="notif_texture_section_title">Regolazioni varie</string>
     <string name="nav_notif_texture_size">Dimensione</string>
     <string name="nav_notif_texture_alpha">Opacità</string>

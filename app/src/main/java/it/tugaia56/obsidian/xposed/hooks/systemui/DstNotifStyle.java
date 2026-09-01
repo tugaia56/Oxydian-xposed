@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -60,9 +61,18 @@ import de.robv.android.xposed.callbacks.XC_InitPackageResources;
  *   DSTNFNDB  – Dumbbell                  (gradiente orizzontale accent-bg-accent)
  *   DSTNFNDL  – Duoline                   (gradiente verticale accent-bg-accent)
  *   DSTNFNIOS – iOS                       (gradiente verticale bg chiarito → bg)
- *   DSTNFNDOT – Puntini                   (texture di puntini accento su bg pieno, a runtime)
- *   DSTNFNLNS – Righe                     (hatching diagonale accento su bg pieno, a runtime)
- *   DSTNFNGRN – Rumore                    (grana/rumore fine accento su bg pieno, a runtime)
+ *   DSTNFNDOT – Puntini                   (texture di puntini, a runtime)
+ *   DSTNFNLNS – Righe                     (hatching diagonale, a runtime)
+ *   DSTNFNGRN – Rumore                    (grana/rumore fine, a runtime)
+ *   DSTNFNHRT – Cuori                     (griglia di semi "cuori", a runtime)
+ *   DSTNFNDIA – Quadri                    (griglia di semi "quadri", a runtime)
+ *   DSTNFNCLB – Fiori                     (griglia di semi "fiori", a runtime)
+ *   DSTNFNSPD – Picche                    (griglia di semi "picche", a runtime)
+ *   DSTNFNCHK – Scacchiera                (quadretti alternati, a runtime)
+ *   DSTNFNWAV – Onde                      (linee sinusoidali orizzontali, a runtime)
+ *   DSTNFNXH  – Intreccio                 (hatching incrociato 45°/135°, a runtime)
+ * Tutte le texture sopra condividono Dimensione/Opacità/Colore/Bordo regolabili da
+ * "Regolazioni varie" (ThemeStyleFragment).
  */
 public class DstNotifStyle {
 
@@ -517,6 +527,48 @@ public class DstNotifStyle {
                 return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), grain});
             }
 
+            case "DSTNFNHRT": { // Cuori — griglia di semi "cuori", sopra bg pieno
+                GradientDrawable base = simpleShape(bg, texBorderStrokeColor, texBorderWidth, r);
+                GradientDrawable hearts = suitGridOverlay(withAlpha(texColor, texAlphaFrac), texDensity, r, DstNotifStyle::paintHeart);
+                return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), hearts});
+            }
+
+            case "DSTNFNDIA": { // Quadri — griglia di semi "quadri", sopra bg pieno
+                GradientDrawable base = simpleShape(bg, texBorderStrokeColor, texBorderWidth, r);
+                GradientDrawable diamonds = suitGridOverlay(withAlpha(texColor, texAlphaFrac), texDensity, r, DstNotifStyle::paintDiamond);
+                return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), diamonds});
+            }
+
+            case "DSTNFNCLB": { // Fiori — griglia di semi "fiori", sopra bg pieno
+                GradientDrawable base = simpleShape(bg, texBorderStrokeColor, texBorderWidth, r);
+                GradientDrawable clubs = suitGridOverlay(withAlpha(texColor, texAlphaFrac), texDensity, r, DstNotifStyle::paintClub);
+                return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), clubs});
+            }
+
+            case "DSTNFNSPD": { // Picche — griglia di semi "picche", sopra bg pieno
+                GradientDrawable base = simpleShape(bg, texBorderStrokeColor, texBorderWidth, r);
+                GradientDrawable spades = suitGridOverlay(withAlpha(texColor, texAlphaFrac), texDensity, r, DstNotifStyle::paintSpade);
+                return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), spades});
+            }
+
+            case "DSTNFNCHK": { // Scacchiera — quadretti alternati, sopra bg pieno
+                GradientDrawable base = simpleShape(bg, texBorderStrokeColor, texBorderWidth, r);
+                GradientDrawable checker = checkerOverlay(withAlpha(texColor, texAlphaFrac), texDensity, r);
+                return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), checker});
+            }
+
+            case "DSTNFNWAV": { // Onde — linee sinusoidali orizzontali ripetute, sopra bg pieno
+                GradientDrawable base = simpleShape(bg, texBorderStrokeColor, texBorderWidth, r);
+                GradientDrawable waves = waveOverlay(withAlpha(texColor, texAlphaFrac), texDensity, r);
+                return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), waves});
+            }
+
+            case "DSTNFNXH": { // Intreccio — hatching incrociato (45°+135°), sopra bg pieno
+                GradientDrawable base = simpleShape(bg, texBorderStrokeColor, texBorderWidth, r);
+                GradientDrawable cross = crossHatchOverlay(withAlpha(texColor, texAlphaFrac), texDensity, r);
+                return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), cross});
+            }
+
             case "DSTNFNIOS": // iOS — prima era bg chiarito → bg, troppo simile a Neumorph.
                               // Un bianco quasi pieno (primo tentativo) rendeva illeggibile il
                               // testo bianco di OOS — grigio medio: resta chiaro/diverso da
@@ -834,6 +886,286 @@ public class DstNotifStyle {
             return new ConstantState() {
                 @Override public Drawable newDrawable() {
                     return new GrainDrawable(mBaseColor, mDensity, mCornerRadius, mAlphaFrac);
+                }
+                @Override public int getChangingConfigurations() { return 0; }
+            };
+        }
+    }
+
+    /** Disegna un simbolo (cuore/quadri/fiori/picche) centrato in (cx,cy), largo/alto ~size. */
+    private interface SymbolPainter {
+        void paint(Canvas canvas, float cx, float cy, float size, Paint paint);
+    }
+
+    private static GradientDrawable suitGridOverlay(int color, float density, float cornerRadius,
+                                                      SymbolPainter painter) {
+        return new SymbolGridDrawable(color, density, cornerRadius, painter);
+    }
+
+    /** Griglia di semi delle carte — stessa tecnica/gotcha di {@link DotGridDrawable}: classe
+     *  nominata, deve estendere GradientDrawable, getConstantState() ricostruisce la sottoclasse
+     *  vera. Ogni cella disegna il simbolo tramite {@link SymbolPainter} (cerchi/triangoli/rombi
+     *  con canvas.drawCircle/drawPath, niente asset). */
+    private static final class SymbolGridDrawable extends GradientDrawable {
+        private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final float mSpacing, mSymbolSize, mCornerRadius;
+        private final int mColor;
+        private final SymbolPainter mPainter;
+
+        SymbolGridDrawable(int color, float density, float cornerRadius, SymbolPainter painter) {
+            mColor = color;
+            mSpacing = 16f * density;
+            mSymbolSize = 9f * density;
+            mCornerRadius = cornerRadius;
+            mPainter = painter;
+            mPaint.setColor(color);
+            mPaint.setStyle(Paint.Style.FILL);
+            setShape(GradientDrawable.RECTANGLE);
+            setColor(Color.TRANSPARENT);
+            setCornerRadius(cornerRadius);
+        }
+
+        @Override public void draw(Canvas canvas) {
+            super.draw(canvas);
+            Rect b = getBounds();
+            if (b.width() <= 0 || b.height() <= 0) return;
+            for (float y = mSpacing / 2f; y < b.height(); y += mSpacing) {
+                for (float x = mSpacing / 2f; x < b.width(); x += mSpacing) {
+                    mPainter.paint(canvas, b.left + x, b.top + y, mSymbolSize, mPaint);
+                }
+            }
+        }
+
+        @Override public void setTint(int tintColor) { /* block OOS tint */ }
+        @Override public void setTintList(ColorStateList tint) { /* block OOS tint */ }
+        @Override public void setTintMode(PorterDuff.Mode tintMode) { /* block */ }
+        @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
+        @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
+        @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+
+        @Override public ConstantState getConstantState() {
+            return new ConstantState() {
+                @Override public Drawable newDrawable() {
+                    return new SymbolGridDrawable(mColor, mSpacing / 16f, mCornerRadius, mPainter);
+                }
+                @Override public int getChangingConfigurations() { return 0; }
+            };
+        }
+    }
+
+    // ── Simboli — forme semplici (cerchi/triangoli/rombo), niente curve/bezier: robuste e
+    // prevedibili a piccola scala, coerenti con lo stile "programmatico" di tutto il file. ──
+
+    private static void paintHeart(Canvas c, float cx, float cy, float s, Paint p) {
+        float r = s * 0.26f;
+        c.drawCircle(cx - s * 0.22f, cy - s * 0.15f, r, p);
+        c.drawCircle(cx + s * 0.22f, cy - s * 0.15f, r, p);
+        Path tri = new Path();
+        tri.moveTo(cx - s * 0.46f, cy - s * 0.05f);
+        tri.lineTo(cx + s * 0.46f, cy - s * 0.05f);
+        tri.lineTo(cx, cy + s * 0.48f);
+        tri.close();
+        c.drawPath(tri, p);
+    }
+
+    private static void paintSpade(Canvas c, float cx, float cy, float s, Paint p) {
+        float r = s * 0.26f;
+        c.drawCircle(cx - s * 0.22f, cy + s * 0.12f, r, p);
+        c.drawCircle(cx + s * 0.22f, cy + s * 0.12f, r, p);
+        Path tri = new Path();
+        tri.moveTo(cx - s * 0.46f, cy + s * 0.02f);
+        tri.lineTo(cx + s * 0.46f, cy + s * 0.02f);
+        tri.lineTo(cx, cy - s * 0.5f);
+        tri.close();
+        c.drawPath(tri, p);
+        c.drawRect(cx - s * 0.06f, cy + s * 0.15f, cx + s * 0.06f, cy + s * 0.48f, p);
+    }
+
+    private static void paintClub(Canvas c, float cx, float cy, float s, Paint p) {
+        float r = s * 0.22f;
+        c.drawCircle(cx, cy - s * 0.28f, r, p);
+        c.drawCircle(cx - s * 0.22f, cy + s * 0.02f, r, p);
+        c.drawCircle(cx + s * 0.22f, cy + s * 0.02f, r, p);
+        c.drawRect(cx - s * 0.06f, cy + s * 0.05f, cx + s * 0.06f, cy + s * 0.46f, p);
+    }
+
+    private static void paintDiamond(Canvas c, float cx, float cy, float s, Paint p) {
+        Path path = new Path();
+        path.moveTo(cx, cy - s * 0.5f);
+        path.lineTo(cx + s * 0.35f, cy);
+        path.lineTo(cx, cy + s * 0.5f);
+        path.lineTo(cx - s * 0.35f, cy);
+        path.close();
+        c.drawPath(path, p);
+    }
+
+    private static GradientDrawable checkerOverlay(int color, float density, float cornerRadius) {
+        return new CheckerDrawable(color, density, cornerRadius);
+    }
+
+    /** Scacchiera — quadretti pieni su celle alterne (row+col pari). Stessa tecnica/gotcha
+     *  delle altre texture: classe nominata, estende GradientDrawable, getConstantState()
+     *  ricostruisce la sottoclasse vera. */
+    private static final class CheckerDrawable extends GradientDrawable {
+        private final Paint mPaint = new Paint();
+        private final float mCell, mCornerRadius;
+        private final int mColor;
+
+        CheckerDrawable(int color, float density, float cornerRadius) {
+            mColor = color;
+            mCell = 10f * density;
+            mCornerRadius = cornerRadius;
+            mPaint.setColor(color);
+            setShape(GradientDrawable.RECTANGLE);
+            setColor(Color.TRANSPARENT);
+            setCornerRadius(cornerRadius);
+        }
+
+        @Override public void draw(Canvas canvas) {
+            super.draw(canvas);
+            Rect b = getBounds();
+            if (b.width() <= 0 || b.height() <= 0) return;
+            int col = 0;
+            for (float x = 0; x < b.width(); x += mCell, col++) {
+                int row = 0;
+                for (float y = 0; y < b.height(); y += mCell, row++) {
+                    if ((row + col) % 2 != 0) continue;
+                    canvas.drawRect(b.left + x, b.top + y,
+                            b.left + Math.min(x + mCell, b.width()), b.top + Math.min(y + mCell, b.height()), mPaint);
+                }
+            }
+        }
+
+        @Override public void setTint(int tintColor) { /* block OOS tint */ }
+        @Override public void setTintList(ColorStateList tint) { /* block OOS tint */ }
+        @Override public void setTintMode(PorterDuff.Mode tintMode) { /* block */ }
+        @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
+        @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
+        @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+
+        @Override public ConstantState getConstantState() {
+            return new ConstantState() {
+                @Override public Drawable newDrawable() {
+                    return new CheckerDrawable(mColor, mCell / 10f, mCornerRadius);
+                }
+                @Override public int getChangingConfigurations() { return 0; }
+            };
+        }
+    }
+
+    private static GradientDrawable waveOverlay(int color, float density, float cornerRadius) {
+        return new WaveDrawable(color, density, cornerRadius);
+    }
+
+    /** Onde — linee sinusoidali orizzontali ripetute verticalmente, tracciate punto per punto
+     *  (niente Path.quadTo/cubicTo: un campionamento lineare fitto è più semplice da ragionare
+     *  ed è comunque indistinguibile a questa scala). Stessa tecnica/gotcha delle altre texture. */
+    private static final class WaveDrawable extends GradientDrawable {
+        private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final float mSpacing, mAmplitude, mWaveLength, mCornerRadius;
+        private final int mColor;
+
+        WaveDrawable(int color, float density, float cornerRadius) {
+            mColor = color;
+            mSpacing = 10f * density;
+            mAmplitude = 2.5f * density;
+            mWaveLength = 16f * density;
+            mCornerRadius = cornerRadius;
+            mPaint.setColor(color);
+            mPaint.setStyle(Paint.Style.STROKE);
+            mPaint.setStrokeWidth(Math.max(1f, 1f * density));
+            setShape(GradientDrawable.RECTANGLE);
+            setColor(Color.TRANSPARENT);
+            setCornerRadius(cornerRadius);
+        }
+
+        @Override public void draw(Canvas canvas) {
+            super.draw(canvas);
+            Rect b = getBounds();
+            if (b.width() <= 0 || b.height() <= 0) return;
+            canvas.save();
+            canvas.clipRect(b);
+            for (float y = mSpacing / 2f; y < b.height() + mAmplitude; y += mSpacing) {
+                Path p = new Path();
+                boolean first = true;
+                for (float x = 0; x <= b.width(); x += 4f) {
+                    float wy = y + mAmplitude * (float) Math.sin(2f * Math.PI * x / mWaveLength);
+                    if (first) { p.moveTo(b.left + x, b.top + wy); first = false; }
+                    else p.lineTo(b.left + x, b.top + wy);
+                }
+                canvas.drawPath(p, mPaint);
+            }
+            canvas.restore();
+        }
+
+        @Override public void setTint(int tintColor) { /* block OOS tint */ }
+        @Override public void setTintList(ColorStateList tint) { /* block OOS tint */ }
+        @Override public void setTintMode(PorterDuff.Mode tintMode) { /* block */ }
+        @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
+        @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
+        @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+
+        @Override public ConstantState getConstantState() {
+            return new ConstantState() {
+                @Override public Drawable newDrawable() {
+                    return new WaveDrawable(mColor, mSpacing / 10f, mCornerRadius);
+                }
+                @Override public int getChangingConfigurations() { return 0; }
+            };
+        }
+    }
+
+    private static GradientDrawable crossHatchOverlay(int color, float density, float cornerRadius) {
+        return new CrossHatchDrawable(color, density, cornerRadius);
+    }
+
+    /** Intreccio — hatching incrociato, due passate di linee diagonali a 45° e 135° (riusa la
+     *  stessa idea di {@link HatchDrawable} due volte in un solo draw()). Stessa tecnica/gotcha
+     *  delle altre texture. */
+    private static final class CrossHatchDrawable extends GradientDrawable {
+        private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final float mSpacing, mCornerRadius;
+        private final int mColor;
+
+        CrossHatchDrawable(int color, float density, float cornerRadius) {
+            mColor = color;
+            mSpacing = 9f * density;
+            mCornerRadius = cornerRadius;
+            mPaint.setColor(color);
+            mPaint.setStrokeWidth(Math.max(1f, 1f * density));
+            setShape(GradientDrawable.RECTANGLE);
+            setColor(Color.TRANSPARENT);
+            setCornerRadius(cornerRadius);
+        }
+
+        @Override public void draw(Canvas canvas) {
+            super.draw(canvas);
+            Rect b = getBounds();
+            if (b.width() <= 0 || b.height() <= 0) return;
+            float diag = (float) Math.sqrt((double) b.width() * b.width() + (double) b.height() * b.height());
+            float half = diag / 2f;
+            for (float angle : new float[]{45f, -45f}) {
+                canvas.save();
+                canvas.clipRect(b);
+                canvas.rotate(angle, b.centerX(), b.centerY());
+                for (float y = -half; y < half; y += mSpacing) {
+                    canvas.drawLine(b.centerX() - half, b.centerY() + y, b.centerX() + half, b.centerY() + y, mPaint);
+                }
+                canvas.restore();
+            }
+        }
+
+        @Override public void setTint(int tintColor) { /* block OOS tint */ }
+        @Override public void setTintList(ColorStateList tint) { /* block OOS tint */ }
+        @Override public void setTintMode(PorterDuff.Mode tintMode) { /* block */ }
+        @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
+        @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
+        @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+
+        @Override public ConstantState getConstantState() {
+            return new ConstantState() {
+                @Override public Drawable newDrawable() {
+                    return new CrossHatchDrawable(mColor, mSpacing / 9f, mCornerRadius);
                 }
                 @Override public int getChangingConfigurations() { return 0; }
             };

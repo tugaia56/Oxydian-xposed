@@ -971,7 +971,7 @@
     <string name="nav_notif_corner">Notification Corner Radius</string>
     <string name="nav_notif_corner_summary">Corner radius for notification background</string>
     <string name="nav_notif_texture_settings">Various Adjustments</string>
-    <string name="nav_notif_texture_settings_summary">Dots, Lines and Noise notifications only</string>
+    <string name="nav_notif_texture_settings_summary">Texture presets only (Dots, Hearts, Waves…)</string>
     <string name="notif_texture_section_title">Various Adjustments</string>
     <string name="nav_notif_texture_size">Size</string>
     <string name="nav_notif_texture_alpha">Opacity</string>
