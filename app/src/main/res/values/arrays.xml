@@ -350,6 +350,8 @@
 
     <!-- DST: Notification corner radius preset names -->
     <string-array name="dst_notif_corner_names">
+        <item>2 dp</item>
+        <item>4 dp</item>
         <item>8 dp</item>
         <item>12 dp</item>
         <item>16 dp</item>
@@ -390,11 +392,11 @@
     <!-- AOD: edge light style picker (UI-only placeholder names) -->
     <!-- Real OC edge light styles (edge_light_style_entries in OC's own arrays.xml) -->
     <string-array name="edge_light_style_entries">
-        <item>Disegna Linea</item>
-        <item>Lampeggio</item>
-        <item>Linee Laterali</item>
-        <item>Serpente</item>
-        <item>Eco</item>
+        <item>Draw Line</item>
+        <item>Blink</item>
+        <item>Side Lines</item>
+        <item>Snake</item>
+        <item>Echo</item>
     </string-array>
 
     <!-- AOD: edge light re-trigger interval -->
@@ -429,67 +431,67 @@
 
     <!-- Orologio SdB: 61 stili reali, porting dei layout di OC -->
     <string-array name="lockscreen_clock_style_entries">
-        <item>Stile orologio 1</item>
-        <item>Stile orologio 2</item>
-        <item>Stile orologio 3</item>
-        <item>Stile orologio 4</item>
-        <item>Stile orologio 5</item>
-        <item>Stile orologio 6</item>
-        <item>Stile orologio 7</item>
-        <item>Stile orologio 8</item>
-        <item>Stile orologio 9</item>
-        <item>Stile orologio 10</item>
-        <item>Stile orologio 11</item>
-        <item>Stile orologio 12</item>
-        <item>Stile orologio 13</item>
-        <item>Stile orologio 14</item>
-        <item>Stile orologio 15</item>
-        <item>Stile orologio 16</item>
-        <item>Stile orologio 17</item>
-        <item>Stile orologio 18</item>
-        <item>Stile orologio 19</item>
-        <item>Stile orologio 20</item>
-        <item>Stile orologio 21</item>
-        <item>Stile orologio 22</item>
-        <item>Stile orologio 23</item>
-        <item>Stile orologio 24</item>
-        <item>Stile orologio 25</item>
-        <item>Stile orologio 26</item>
-        <item>Stile orologio 27</item>
-        <item>Stile orologio 28</item>
-        <item>Stile orologio 29</item>
-        <item>Stile orologio 30</item>
-        <item>Stile orologio 31</item>
-        <item>Stile orologio 32</item>
-        <item>Stile orologio 33</item>
-        <item>Stile orologio 34</item>
-        <item>Stile orologio 35</item>
-        <item>Stile orologio 36</item>
-        <item>Stile orologio 37</item>
-        <item>Stile orologio 38</item>
-        <item>Stile orologio 39</item>
-        <item>Stile orologio 40</item>
-        <item>Stile orologio 41</item>
-        <item>Stile orologio 42</item>
-        <item>Stile orologio 43</item>
-        <item>Stile orologio 44</item>
-        <item>Stile orologio 45</item>
-        <item>Stile orologio 46</item>
-        <item>Stile orologio 47</item>
-        <item>Stile orologio 48</item>
-        <item>Stile orologio 49</item>
-        <item>Stile orologio 50</item>
-        <item>Stile orologio 51</item>
-        <item>Stile orologio 52</item>
-        <item>Stile orologio 53</item>
-        <item>Stile orologio 54</item>
-        <item>Stile orologio 55</item>
-        <item>Stile orologio 56</item>
-        <item>Stile orologio 57</item>
-        <item>Stile orologio 58</item>
-        <item>Stile orologio 59</item>
-        <item>Stile orologio 60</item>
-        <item>Stile orologio 61</item>
+        <item>Clock Style 1</item>
+        <item>Clock Style 2</item>
+        <item>Clock Style 3</item>
+        <item>Clock Style 4</item>
+        <item>Clock Style 5</item>
+        <item>Clock Style 6</item>
+        <item>Clock Style 7</item>
+        <item>Clock Style 8</item>
+        <item>Clock Style 9</item>
+        <item>Clock Style 10</item>
+        <item>Clock Style 11</item>
+        <item>Clock Style 12</item>
+        <item>Clock Style 13</item>
+        <item>Clock Style 14</item>
+        <item>Clock Style 15</item>
+        <item>Clock Style 16</item>
+        <item>Clock Style 17</item>
+        <item>Clock Style 18</item>
+        <item>Clock Style 19</item>
+        <item>Clock Style 20</item>
+        <item>Clock Style 21</item>
+        <item>Clock Style 22</item>
+        <item>Clock Style 23</item>
+        <item>Clock Style 24</item>
+        <item>Clock Style 25</item>
+        <item>Clock Style 26</item>
+        <item>Clock Style 27</item>
+        <item>Clock Style 28</item>
+        <item>Clock Style 29</item>
+        <item>Clock Style 30</item>
+        <item>Clock Style 31</item>
+        <item>Clock Style 32</item>
+        <item>Clock Style 33</item>
+        <item>Clock Style 34</item>
+        <item>Clock Style 35</item>
+        <item>Clock Style 36</item>
+        <item>Clock Style 37</item>
+        <item>Clock Style 38</item>
+        <item>Clock Style 39</item>
+        <item>Clock Style 40</item>
+        <item>Clock Style 41</item>
+        <item>Clock Style 42</item>
+        <item>Clock Style 43</item>
+        <item>Clock Style 44</item>
+        <item>Clock Style 45</item>
+        <item>Clock Style 46</item>
+        <item>Clock Style 47</item>
+        <item>Clock Style 48</item>
+        <item>Clock Style 49</item>
+        <item>Clock Style 50</item>
+        <item>Clock Style 51</item>
+        <item>Clock Style 52</item>
+        <item>Clock Style 53</item>
+        <item>Clock Style 54</item>
+        <item>Clock Style 55</item>
+        <item>Clock Style 56</item>
+        <item>Clock Style 57</item>
+        <item>Clock Style 58</item>
+        <item>Clock Style 59</item>
+        <item>Clock Style 60</item>
+        <item>Clock Style 61</item>
     </string-array>
 
     <!-- Orologio Intestazione QS -->
@@ -507,10 +509,10 @@
 
     <!-- Orologio Intestazione QS: stock RED clock mode — reale OC, 4 opzioni (non on/off) -->
     <string-array name="qs_header_stock_clock_red_one_entries">
-        <item>Predefinito</item>
-        <item>Disabilita</item>
-        <item>Colore Accento</item>
-        <item>Colore Personalizzato</item>
+        <item>Default</item>
+        <item>Disable</item>
+        <item>Accent Color</item>
+        <item>Custom Color</item>
     </string-array>
 
 <!-- Meteo SdB -->
@@ -528,8 +530,8 @@
         <item>Yandex</item>
     </string-array>
     <string-array name="weather_units_entries">
-        <item>Metrico</item>
-        <item>Imperiale</item>
+        <item>Metric</item>
+        <item>Imperial</item>
     </string-array>
     <string-array name="lockscreen_weather_bg_entries">
         <item>Default</item>
@@ -545,21 +547,21 @@
 
     <!-- Widget SdB -->
     <string-array name="lockscreen_widget_entries">
-        <item>Nessuno</item>
-        <item>App Personalizzata</item>
-        <item>Calcolatrice</item>
+        <item>None</item>
+        <item>Custom App</item>
+        <item>Calculator</item>
         <item>Media</item>
         <item>Timer</item>
-        <item>Torcia</item>
-        <item>Meteo</item>
+        <item>Flashlight</item>
+        <item>Weather</item>
         <item>Wi-Fi</item>
-        <item>Dati Mobili (in costruzione)</item>
-        <item>Suoneria</item>
+        <item>Mobile Data (in progress)</item>
+        <item>Ringtone</item>
         <item>Bluetooth</item>
-        <item>Controlli Casa</item>
-        <item>Fotocamera</item>
+        <item>Home Controls</item>
+        <item>Camera</item>
         <item>Wallet</item>
-        <item>Hotspot (in costruzione)</item>
+        <item>Hotspot (in progress)</item>
     </string-array>
     <!-- Lockscreen album cover filter -->
     <string-array name="lockscreen_album_art_filter_entries">
@@ -641,53 +643,53 @@
 
     <!-- Barra di Navigazione: modalità override tieni premuto -->
     <string-array name="gesture_holdback_mode_entries">
-        <item>Stesso comando per entrambi i lati</item>
-        <item>Scegli comando per lato</item>
+        <item>Same command for both sides</item>
+        <item>Choose command per side</item>
     </string-array>
 
     <!-- Barra di Navigazione: comandi tieni premuto -->
     <string-array name="gesture_holdback_commands_entries">
-        <item>Passa all\'app precedente</item>
-        <item>Chiudi app attiva</item>
+        <item>Switch to previous app</item>
+        <item>Close active app</item>
         <item>Screenshot</item>
-        <item>Screenshot scorrevole</item>
-        <item>Screenshot parziale</item>
-        <item>Apri Impostazioni Rapide (non disponibile)</item>
-        <item>Attiva modalità a una mano (non disponibile)</item>
-        <item>Apri pannello notifiche (non disponibile)</item>
-        <item>Spegni schermo</item>
-        <item>Cerchia per cercare (non disponibile)</item>
-        <item>App personalizzata (non disponibile)</item>
+        <item>Scrolling screenshot</item>
+        <item>Partial screenshot</item>
+        <item>Open Quick Settings (not available)</item>
+        <item>Enable one-handed mode (not available)</item>
+        <item>Open notification panel (not available)</item>
+        <item>Turn off screen</item>
+        <item>Circle to Search (not available)</item>
+        <item>Custom app (not available)</item>
     </string-array>
 
     <!-- Impostazioni rapide: lato apertura rapida -->
     <string-array name="quick_pulldown_side_entries">
-        <item>Sinistra</item>
-        <item>Destra</item>
+        <item>Left</item>
+        <item>Right</item>
     </string-array>
 
     <!-- Notifiche Barra di Stato: espansione predefinita -->
     <string-array name="notif_default_expansion_entries">
-        <item>Predefinito</item>
-        <item>Espandi sempre</item>
-        <item>Comprimi sempre</item>
-        <item>Scelta per app</item>
+        <item>Default</item>
+        <item>Always expand</item>
+        <item>Always collapse</item>
+        <item>Per-app choice</item>
     </string-array>
 
     <!-- Stile Icone Impostazioni (pack HOS): colore sfondo / colore icona -->
     <string-array name="settings_icons_color_entries">
-        <item>Colore Accento</item>
-        <item>Bianco</item>
-        <item>Nero</item>
+        <item>Accent Color</item>
+        <item>White</item>
+        <item>Black</item>
     </string-array>
 
     <!-- Stile Icone Impostazioni (pack HOS): forma sfondo -->
     <string-array name="settings_icons_shape_entries">
-        <item>Cerchio</item>
-        <item>Supercerchio</item>
-        <item>Quadrato arrotondato</item>
-        <item>Goccia</item>
-        <item>Rombo</item>
+        <item>Circle</item>
+        <item>Squircle</item>
+        <item>Rounded Square</item>
+        <item>Teardrop</item>
+        <item>Diamond</item>
     </string-array>
 
     <!-- Stile Icone Impostazioni (pack HOS): sfondo solido on/off -->

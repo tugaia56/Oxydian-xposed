@@ -970,7 +970,13 @@
     <string name="nav_notif_style_summary">Custom background style for notifications</string>
     <string name="nav_notif_corner">Notification Corner Radius</string>
     <string name="nav_notif_corner_summary">Corner radius for notification background</string>
-    <string name="nav_notif_texture_settings">Various Adjustments</string>
+    <string name="nav_misc_settings">Various Adjustments</string>
+    <string name="nav_misc_settings_summary">Corner radius (Notifications/Toast/Dialog) and texture settings</string>
+    <string name="nav_notif_texture_settings">Texture Notification Adjustments</string>
+    <string name="nav_toast_corner">Toast Corner Radius</string>
+    <string name="nav_toast_corner_summary">Corner radius for toast background</string>
+    <string name="nav_dlg_corner">Dialog Window Corner Radius</string>
+    <string name="nav_dlg_corner_summary">Corner radius for dialog windows</string>
     <string name="nav_notif_texture_settings_summary">Texture presets only (Dots, Hearts, Waves…)</string>
     <string name="notif_texture_section_title">Various Adjustments</string>
     <string name="nav_notif_texture_size">Size</string>

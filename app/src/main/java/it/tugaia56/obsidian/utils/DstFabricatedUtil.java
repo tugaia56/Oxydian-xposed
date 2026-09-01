@@ -188,6 +188,8 @@ public class DstFabricatedUtil {
             String  toastPreset  = ObsidianPrefs.getString("DST_PRESET_TOAST",  "");
             String  notifPreset  = ObsidianPrefs.getString("DST_PRESET_NOTIF",  "");
             int     notifCorner  = ObsidianPrefs.getInt(   "DST_NOTIF_CORNER",   24);
+            int     toastCorner  = ObsidianPrefs.getInt(   "DST_TOAST_CORNER",   24);
+            int     dlgCorner    = ObsidianPrefs.getInt(   "DST_DLG_CORNER",     24);
             int     notifTexSize  = ObsidianPrefs.getInt(  "DST_NOTIF_TEXTURE_SIZE",  100);
             int     notifTexAlpha = ObsidianPrefs.getInt(  "DST_NOTIF_TEXTURE_ALPHA", 25);
             String  notifTexColMode  = ObsidianPrefs.getString("DST_NOTIF_TEXTURE_COLOR_MODE", "accent");
@@ -215,6 +217,8 @@ public class DstFabricatedUtil {
                 "setprop persist.obsidian.dst.toast_preset  \"" + (toastPreset == null ? "" : toastPreset) + "\"",
                 "setprop persist.obsidian.dst.notif_preset  \"" + (notifPreset == null ? "" : notifPreset) + "\"",
                 "setprop persist.obsidian.dst.notif_corner  " + notifCorner,
+                "setprop persist.obsidian.dst.toast_corner  " + toastCorner,
+                "setprop persist.obsidian.dst.dlg_corner    " + dlgCorner,
                 "setprop persist.obsidian.dst.notif_tex_size  " + notifTexSize,
                 "setprop persist.obsidian.dst.notif_tex_alpha " + notifTexAlpha,
                 "setprop persist.obsidian.dst.notif_tex_col_mode \"" + notifTexColMode + "\"",

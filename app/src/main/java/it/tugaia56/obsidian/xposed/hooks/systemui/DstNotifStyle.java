@@ -581,11 +581,20 @@ public class DstNotifStyle {
                 return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), cross});
             }
 
-            case "DSTNFNIMG": { // Immagine — foto scelta dall'utente, ritagliata al centro
-                GradientDrawable base = simpleShape(bg, texBorderStrokeColor, texBorderWidth, r);
+            case "DSTNFNIMG": { // Immagine — foto scelta dall'utente, ritagliata al centro.
+                              // Il Bordo di "Regolazioni varie" si applica anche qui, ma NON
+                              // usando lo stroke nativo di GradientDrawable sul layer base come
+                              // le altre texture: a raggi piccoli (8/12dp) quello stroke e il
+                              // clip dell'immagine finivano per curvare in modo diverso, con
+                              // l'angolo della foto che usciva dal bordo. ImageBgDrawable ora
+                              // disegna DA SÉ sia l'anello del bordo che il clip della foto,
+                              // dalla STESSA RectF/raggio derivati — combaciano sempre, a
+                              // qualunque raggio, invece di indovinare la formula dello stroke
+                              // nativo (che a raggi piccoli si è rivelata sbagliata).
+                GradientDrawable base = simpleShape(bg, 0, 0, r);
                 Bitmap bmp = refreshAndGetNotifBgBitmap();
                 if (bmp == null) return base; // niente immagine ancora scelta: solo il bg
-                GradientDrawable image = new ImageBgDrawable(bmp, r);
+                GradientDrawable image = new ImageBgDrawable(bmp, r, texBorderWidth, texBorderStrokeColor);
                 return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), image});
             }
 
@@ -633,6 +642,7 @@ public class DstNotifStyle {
     private static GradientDrawable simpleShape(int fill, int strokeColor, int strokeWidth,
                                                  float cornerRadius) {
         GradientDrawable d = new GradientDrawable() {
+            private boolean mRadiusSet = false;
             @Override public void setTint(int tintColor) { /* block OOS tint */ }
             @Override public void setTintList(ColorStateList tint) { /* block OOS tint */ }
             @Override public void setTintMode(PorterDuff.Mode tintMode) { /* block */ }
@@ -642,6 +652,18 @@ public class DstNotifStyle {
             // sovrascrivendo il canale alpha del colore scelto (un preset al 25% finiva
             // renderizzato quasi a piena opacità, confermato su device con lettura pixel reale).
             @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+            // NotificationBackgroundView.updateBackgroundRadii() chiama setCornerRadii() su
+            // OGNI layer per sincronizzarlo con l'animazione espandi/comprimi della vera
+            // notifica — sovrascrivendo così il "Raggio Angolo Notifiche" scelto dall'utente
+            // con un valore diverso deciso da OOS (bug reale confermato dal vivo, presente su
+            // ogni preset fin dall'inizio: il raggio non ha mai avuto effetto visibile).
+            // setCornerRadius(float) è anche la chiamata che usiamo NOI QUI SOTTO per impostare
+            // il raggio scelto — bloccarla del tutto impedirebbe anche quella. La prima
+            // chiamata (la nostra) passa, tutte le successive (di OOS) vengono ignorate.
+            @Override public void setCornerRadius(float radius) {
+                if (!mRadiusSet) { super.setCornerRadius(radius); mRadiusSet = true; }
+            }
+            @Override public void setCornerRadii(float[] radii) { /* block OOS radii override */ }
         };
         d.setShape(GradientDrawable.RECTANGLE);
         d.setColor(fill);
@@ -671,6 +693,7 @@ public class DstNotifStyle {
     private static GradientDrawable gradient(GradientDrawable.Orientation orientation,
                                               int[] colors, float cornerRadius) {
         GradientDrawable d = new GradientDrawable(orientation, colors) {
+            private boolean mRadiusSet = false;
             @Override public void setTint(int tintColor) { /* block OOS tint */ }
             @Override public void setTintList(ColorStateList tint) { /* block OOS tint */ }
             @Override public void setTintMode(PorterDuff.Mode tintMode) { /* block */ }
@@ -680,6 +703,12 @@ public class DstNotifStyle {
             // sovrascrivendo il canale alpha del colore scelto (un preset al 25% finiva
             // renderizzato quasi a piena opacità, confermato su device con lettura pixel reale).
             @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+            // Vedi simpleShape() sopra: updateBackgroundRadii() sovrascrive il raggio scelto,
+            // qui bloccato dopo la prima chiamata (la nostra, sotto).
+            @Override public void setCornerRadius(float radius) {
+                if (!mRadiusSet) { super.setCornerRadius(radius); mRadiusSet = true; }
+            }
+            @Override public void setCornerRadii(float[] radii) { /* block OOS radii override */ }
         };
         d.setShape(GradientDrawable.RECTANGLE);
         d.setCornerRadius(cornerRadius);
@@ -694,11 +723,18 @@ public class DstNotifStyle {
      *  preciso ma non dipende da un callback che lì semplicemente non arriva. */
     private static GradientDrawable radialGradient(int[] colors, float cornerRadius, float density) {
         GradientDrawable d = new GradientDrawable() {
+            private boolean mRadiusSet = false;
             @Override public void setTint(int tintColor) { /* block OOS tint */ }
             @Override public void setTintList(ColorStateList tint) { /* block OOS tint */ }
             @Override public void setTintMode(PorterDuff.Mode tintMode) { /* block */ }
             @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
             @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
+            // Vedi simpleShape() sopra: updateBackgroundRadii() sovrascrive il raggio scelto,
+            // qui bloccato dopo la prima chiamata (la nostra, sotto).
+            @Override public void setCornerRadius(float radius) {
+                if (!mRadiusSet) { super.setCornerRadius(radius); mRadiusSet = true; }
+            }
+            @Override public void setCornerRadii(float[] radii) { /* block OOS radii override */ }
         };
         d.setColors(colors);
         d.setGradientType(GradientDrawable.RADIAL_GRADIENT);
@@ -743,6 +779,7 @@ public class DstNotifStyle {
         private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final float mSpacing, mRadius, mCornerRadius;
         private final int mDotColor;
+        private boolean mRadiusSet = false;
 
         DotGridDrawable(int dotColor, float density, float cornerRadius) {
             mDotColor = dotColor;
@@ -774,6 +811,12 @@ public class DstNotifStyle {
         // Stesso blocco anti-override di setAlpha usato da tutti gli altri preset — OOS
         // altrimenti sovrascrive il canale alpha scelto durante le sue animazioni.
         @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+        // updateBackgroundRadii() sovrascrive il raggio scelto — bloccato dopo la prima
+        // chiamata (la nostra, nel costruttore sopra). Vedi simpleShape() per i dettagli.
+        @Override public void setCornerRadius(float radius) {
+            if (!mRadiusSet) { super.setCornerRadius(radius); mRadiusSet = true; }
+        }
+        @Override public void setCornerRadii(float[] radii) { /* block OOS radii override */ }
 
         @Override public ConstantState getConstantState() {
             return new ConstantState() {
@@ -799,6 +842,7 @@ public class DstNotifStyle {
         private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final float mSpacing, mCornerRadius;
         private final int mLineColor;
+        private boolean mRadiusSet = false;
 
         HatchDrawable(int lineColor, float density, float cornerRadius) {
             mLineColor = lineColor;
@@ -832,6 +876,10 @@ public class DstNotifStyle {
         @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
         @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
         @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+        @Override public void setCornerRadius(float radius) {
+            if (!mRadiusSet) { super.setCornerRadius(radius); mRadiusSet = true; }
+        }
+        @Override public void setCornerRadii(float[] radii) { /* block OOS radii override */ }
 
         @Override public ConstantState getConstantState() {
             return new ConstantState() {
@@ -856,6 +904,7 @@ public class DstNotifStyle {
         private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final float mCornerRadius, mDensity, mAlphaFrac;
         private final int mBaseColor;
+        private boolean mRadiusSet = false;
 
         GrainDrawable(int baseColor, float density, float cornerRadius, float alphaFrac) {
             mBaseColor = baseColor;
@@ -901,6 +950,10 @@ public class DstNotifStyle {
         @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
         @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
         @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+        @Override public void setCornerRadius(float radius) {
+            if (!mRadiusSet) { super.setCornerRadius(radius); mRadiusSet = true; }
+        }
+        @Override public void setCornerRadii(float[] radii) { /* block OOS radii override */ }
 
         @Override public ConstantState getConstantState() {
             return new ConstantState() {
@@ -931,6 +984,7 @@ public class DstNotifStyle {
         private final float mSpacing, mSymbolSize, mCornerRadius;
         private final int mColor;
         private final SymbolPainter mPainter;
+        private boolean mRadiusSet = false;
 
         SymbolGridDrawable(int color, float density, float cornerRadius, SymbolPainter painter) {
             mColor = color;
@@ -962,6 +1016,10 @@ public class DstNotifStyle {
         @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
         @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
         @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+        @Override public void setCornerRadius(float radius) {
+            if (!mRadiusSet) { super.setCornerRadius(radius); mRadiusSet = true; }
+        }
+        @Override public void setCornerRadii(float[] radii) { /* block OOS radii override */ }
 
         @Override public ConstantState getConstantState() {
             return new ConstantState() {
@@ -1030,6 +1088,7 @@ public class DstNotifStyle {
         private final Paint mPaint = new Paint();
         private final float mCell, mCornerRadius;
         private final int mColor;
+        private boolean mRadiusSet = false;
 
         CheckerDrawable(int color, float density, float cornerRadius) {
             mColor = color;
@@ -1062,6 +1121,10 @@ public class DstNotifStyle {
         @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
         @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
         @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+        @Override public void setCornerRadius(float radius) {
+            if (!mRadiusSet) { super.setCornerRadius(radius); mRadiusSet = true; }
+        }
+        @Override public void setCornerRadii(float[] radii) { /* block OOS radii override */ }
 
         @Override public ConstantState getConstantState() {
             return new ConstantState() {
@@ -1084,6 +1147,7 @@ public class DstNotifStyle {
         private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final float mSpacing, mAmplitude, mWaveLength, mCornerRadius;
         private final int mColor;
+        private boolean mRadiusSet = false;
 
         WaveDrawable(int color, float density, float cornerRadius) {
             mColor = color;
@@ -1124,6 +1188,10 @@ public class DstNotifStyle {
         @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
         @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
         @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+        @Override public void setCornerRadius(float radius) {
+            if (!mRadiusSet) { super.setCornerRadius(radius); mRadiusSet = true; }
+        }
+        @Override public void setCornerRadii(float[] radii) { /* block OOS radii override */ }
 
         @Override public ConstantState getConstantState() {
             return new ConstantState() {
@@ -1146,6 +1214,7 @@ public class DstNotifStyle {
         private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final float mSpacing, mCornerRadius;
         private final int mColor;
+        private boolean mRadiusSet = false;
 
         CrossHatchDrawable(int color, float density, float cornerRadius) {
             mColor = color;
@@ -1181,6 +1250,10 @@ public class DstNotifStyle {
         @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
         @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
         @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+        @Override public void setCornerRadius(float radius) {
+            if (!mRadiusSet) { super.setCornerRadius(radius); mRadiusSet = true; }
+        }
+        @Override public void setCornerRadii(float[] radii) { /* block OOS radii override */ }
 
         @Override public ConstantState getConstantState() {
             return new ConstantState() {
@@ -1216,23 +1289,20 @@ public class DstNotifStyle {
         return sNotifBgBitmap;
     }
 
-    /** Classic center-crop math: picks the largest same-aspect-ratio rect out of the source
-     *  bitmap that covers the destination area without distortion. Stessa formula di
-     *  MiscMods.java's centerCropSrcRect() — duplicata qui perché quella è d'istanza, questa
-     *  classe è tutta statica. */
-    private static Rect centerCropSrcRect(Bitmap bmp, float dstW, float dstH) {
+    /** "Foto fissa" — zoom/inquadratura BLOCCATI (calcolati una volta sola dalla sola larghezza,
+     *  costante su tutte le notifiche), invece del centra-e-riempi per-notifica di
+     *  centerCropSrcRect() (che rifà l'inquadratura da capo per ogni altezza, mostrando "fette"
+     *  diverse della stessa foto). Qui la larghezza usa SEMPRE l'intera foto (stesso zoom
+     *  orizzontale ovunque); l'altezza mostrata segue quello stesso fattore di scala — una
+     *  notifica più bassa mostra semplicemente MENO della stessa inquadratura (tagliata sopra/
+     *  sotto, centrata), non una fetta ricalcolata con uno zoom diverso. */
+    private static Rect fixedZoomSrcRect(Bitmap bmp, float dstW, float dstH) {
         int bw = bmp.getWidth(), bh = bmp.getHeight();
-        float srcAspect = (float) bw / bh;
-        float dstAspect = dstW / dstH;
-        if (srcAspect > dstAspect) {
-            int cropW = Math.round(bh * dstAspect);
-            int left = Math.max(0, (bw - cropW) / 2);
-            return new Rect(left, 0, left + cropW, bh);
-        } else {
-            int cropH = Math.round(bw / dstAspect);
-            int top = Math.max(0, (bh - cropH) / 2);
-            return new Rect(0, top, bw, top + cropH);
-        }
+        float scale = bw / dstW; // px sorgente per px destinazione — fissato dalla sola larghezza
+        float srcH = dstH * scale;
+        if (srcH >= bh) return new Rect(0, 0, bw, bh); // foto non abbastanza alta: usala tutta
+        int top = Math.max(0, Math.round((bh - srcH) / 2f));
+        return new Rect(0, top, bw, top + Math.round(srcH));
     }
 
     /** Immagine scelta dall'utente, ritagliata al centro e clippata all'angolo arrotondato —
@@ -1242,26 +1312,64 @@ public class DstNotifStyle {
     private static final class ImageBgDrawable extends GradientDrawable {
         private final Bitmap mBmp;
         private final float mCornerRadius;
+        private final float mBorderWidth;
+        private final int mBorderColor;
         private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint mBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private boolean mRadiusSet = false;
 
-        ImageBgDrawable(Bitmap bmp, float cornerRadius) {
+        ImageBgDrawable(Bitmap bmp, float cornerRadius, float borderWidth, int borderColor) {
             mBmp = bmp;
             mCornerRadius = cornerRadius;
+            mBorderWidth = Math.max(0f, borderWidth);
+            mBorderColor = borderColor;
+            mBorderPaint.setStyle(Paint.Style.STROKE);
+            mBorderPaint.setStrokeWidth(mBorderWidth);
+            mBorderPaint.setColor(borderColor);
             setShape(GradientDrawable.RECTANGLE);
             setColor(Color.TRANSPARENT);
             setCornerRadius(cornerRadius);
         }
 
+        // Bordo e foto disegnati QUI, non via lo stroke nativo di GradientDrawable sul layer
+        // base: a raggi piccoli quello stroke e il clip dell'immagine curvavano in modo diverso
+        // (formula "corretta" per lo stroke nativo mai trovata con certezza, e comunque diversa
+        // a seconda del rapporto raggio/spessore). Disegnando entrambi da un'unica RectF/raggio
+        // derivati allo stesso modo, combaciano sempre — a qualunque raggio, incluso 0.
         @Override public void draw(Canvas canvas) {
             super.draw(canvas);
             Rect b = getBounds();
             if (b.width() <= 0 || b.height() <= 0 || mBmp == null) return;
+
+            if (mBorderWidth > 0f) {
+                RectF strokeRect = new RectF(b);
+                strokeRect.inset(mBorderWidth / 2f, mBorderWidth / 2f);
+                float strokeRadius = Math.max(0f, mCornerRadius - mBorderWidth / 2f);
+                canvas.drawRoundRect(strokeRect, strokeRadius, strokeRadius, mBorderPaint);
+            }
+
+            // L'immagine si sovrappone di 1px al bordo (inset = borderWidth - 1, non l'intero
+            // borderWidth) invece di combaciare esattamente al pixel — un bordo e un clip
+            // arrotondati calcolati separatamente, anche se matematicamente identici, vengono
+            // anti-aliasati indipendentemente da Skia: senza questo margine restava una fessura
+            // di un pixel scuro (colore di sfondo sotto) tra i due, invisibile su foto scure ma
+            // ben visibile su foto chiare. Un pixel di immagine in più sopra il bordo non si nota.
+            float overlapInset = mBorderWidth > 0f ? Math.max(0f, mBorderWidth - 1f) : 0f;
+            RectF dst = new RectF(b);
+            if (overlapInset > 0f) dst.inset(overlapInset, overlapInset);
+            if (dst.width() <= 0f || dst.height() <= 0f) return;
+            float innerRadius = Math.max(0f, mCornerRadius - overlapInset);
             canvas.save();
             Path clip = new Path();
-            clip.addRoundRect(new RectF(b), mCornerRadius, mCornerRadius, Path.Direction.CW);
+            clip.addRoundRect(dst, innerRadius, innerRadius, Path.Direction.CW);
             canvas.clipPath(clip);
-            Rect src = centerCropSrcRect(mBmp, b.width(), b.height());
-            canvas.drawBitmap(mBmp, src, b, mPaint);
+            // fixedZoomSrcRect usa comunque le dimensioni "vere" (inset completo) per lo zoom,
+            // non quelle leggermente più larghe di dst qui sopra — altrimenti l'1px di
+            // sovrapposizione cambierebbe impercettibilmente lo zoom fisso tra notifiche diverse.
+            RectF zoomRef = new RectF(b);
+            if (mBorderWidth > 0f) zoomRef.inset(mBorderWidth, mBorderWidth);
+            Rect src = fixedZoomSrcRect(mBmp, zoomRef.width(), zoomRef.height());
+            canvas.drawBitmap(mBmp, src, dst, mPaint);
             canvas.restore();
         }
 
@@ -1271,11 +1379,15 @@ public class DstNotifStyle {
         @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
         @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
         @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+        @Override public void setCornerRadius(float radius) {
+            if (!mRadiusSet) { super.setCornerRadius(radius); mRadiusSet = true; }
+        }
+        @Override public void setCornerRadii(float[] radii) { /* block OOS radii override */ }
 
         @Override public ConstantState getConstantState() {
             return new ConstantState() {
                 @Override public Drawable newDrawable() {
-                    return new ImageBgDrawable(mBmp, mCornerRadius);
+                    return new ImageBgDrawable(mBmp, mCornerRadius, mBorderWidth, mBorderColor);
                 }
                 @Override public int getChangingConfigurations() { return 0; }
             };

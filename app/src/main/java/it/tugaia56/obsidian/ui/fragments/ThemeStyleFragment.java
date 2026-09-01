@@ -64,16 +64,19 @@ public class ThemeStyleFragment extends Fragment {
     private static final String PREF_NOTIF_PRESET = "DST_PRESET_NOTIF";
     private static final String PREF_NOTIF_CORNER = "DST_NOTIF_CORNER";
     private static final String PREF_TOAST_PRESET = "DST_PRESET_TOAST";
+    private static final String PREF_TOAST_CORNER = "DST_TOAST_CORNER";
     private static final String PREF_DLG_PRESET   = "DST_DLG_PRESET_NAME";
+    private static final String PREF_DLG_CORNER   = "DST_DLG_CORNER";
 
     private static final String[] DLG_STYLE_KEYS = {
         "DSTDHT", "DSTDHTO", "DSTDLT", "DSTDLYO",
         "DSTDMT", "DSTDMTO", "DSTDS",  "DSTDSO"
     };
 
-    // Dialog-style item index in mNavItems (for refresh after picker) — +1 dopo l'aggiunta
-    // della riga "Regolazioni varie" (indice 2, subito dopo Raggio Angolo Notifiche).
-    private static final int IDX_DLG = 4;
+    // Dialog-style item index in mNavItems (for refresh after picker) — ordine attuale:
+    // 0 Stile Notifica, 1 Stile Toast, 2 Stile Dialogo, 3 Regolazioni Varie (ultima, contiene
+    // Raggio Notifiche/Toast/Dialogo + Regolazioni Notifiche a texture come card annidate).
+    private static final int IDX_DLG = 2;
     private static final String PREF_TEX_SIZE  = "DST_NOTIF_TEXTURE_SIZE";
     private static final String PREF_TEX_ALPHA = "DST_NOTIF_TEXTURE_ALPHA";
     private static final String PREF_TEX_COLOR_MODE    = "DST_NOTIF_TEXTURE_COLOR_MODE";
@@ -110,7 +113,7 @@ public class ThemeStyleFragment extends Fragment {
         "DSTTST9", "DSTTST10", "DSTTST11", "DSTTST12"
     };
 
-    private static final int[] CORNER_VALUES = { 8, 12, 16, 20, 24, 28, 32 };
+    private static final int[] CORNER_VALUES = { 2, 4, 8, 12, 16, 20, 24, 28, 32 };
     private static final String NOTIF_BG_IMAGE_FILENAME = "notif_bg_image";
 
     private ActivityResultLauncher<String> mPickNotifBgImage;
@@ -189,18 +192,6 @@ public class ThemeStyleFragment extends Fragment {
                 () -> showNotifPreviewDialog(getString(R.string.nav_notif_style), notifNames)));
 
         mNavItems.add(new NavAdapter.NavItem(
-                R.drawable.ic_ui_styles,
-                getString(R.string.nav_notif_corner),
-                getString(R.string.nav_notif_corner_summary),
-                () -> showCornerPickerDialog(cornerNames)));
-
-        mNavItems.add(new NavAdapter.NavItem(
-                R.drawable.ic_ui_styles,
-                getString(R.string.nav_notif_texture_settings),
-                getString(R.string.nav_notif_texture_settings_summary),
-                this::showTextureSettingsDialog));
-
-        mNavItems.add(new NavAdapter.NavItem(
                 R.drawable.ic_drawing,
                 getString(R.string.nav_toast_style),
                 getString(R.string.nav_toast_style_summary),
@@ -211,6 +202,12 @@ public class ThemeStyleFragment extends Fragment {
                 getString(R.string.nav_dialog_style),
                 getDlgPresetLabel(),
                 this::showDialogStylePresetDialog));
+
+        mNavItems.add(new NavAdapter.NavItem(
+                R.drawable.ic_ui_styles,
+                getString(R.string.nav_misc_settings),
+                getString(R.string.nav_misc_settings_summary),
+                () -> showMiscSettingsDialog(cornerNames)));
 
         mNavAdapter = new NavAdapter(mNavItems, 0xFF00BCD4); // cyan, colore categoria "Stili Notifica e Toast"
         rv.setAdapter(new ConcatAdapter(headerAdapter, mNavAdapter));
@@ -240,6 +237,57 @@ public class ThemeStyleFragment extends Fragment {
         boolean useAccent = !"custom".equals(ObsidianPrefs.getString(modeKey, "accent"));
         if (useAccent) return getString(R.string.color_mode_accent);
         return String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(customKey, ObsidianTheme.DEFAULT_ACCENT));
+    }
+
+    /** "Regolazioni Varie" — riunisce in un solo dialogo le 4 impostazioni "secondarie" che
+     *  prima erano righe separate nella lista principale: i 3 raggi d'angolo (Notifiche/Toast/
+     *  Finestre Dialogo) + "Regolazioni Notifiche a texture" (che apre a sua volta il proprio
+     *  dialogo Dimensione/Opacità/Colore/Bordo). Le card restano le stesse di prima, solo
+     *  spostate qui dentro invece di essere righe a sé nella lista principale. */
+    private void showMiscSettingsDialog(String[] cornerNames) {
+        RecyclerView rv = new RecyclerView(requireContext());
+        rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+        int pad = dp(8);
+        rv.setPadding(pad, pad, pad, pad);
+        rv.setClipToPadding(false);
+        rv.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        ListWidgetAdapter.ListItem notifCornerItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.nav_notif_corner),
+                getString(R.string.nav_notif_corner_summary),
+                () -> showCornerPickerDialog(cornerNames));
+        notifCornerItem.useAccentColor = false;
+
+        ListWidgetAdapter.ListItem toastCornerItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.nav_toast_corner),
+                getString(R.string.nav_toast_corner_summary),
+                () -> showCornerPickerDialog(cornerNames, PREF_TOAST_CORNER, 24, R.string.nav_toast_corner));
+        toastCornerItem.useAccentColor = false;
+
+        ListWidgetAdapter.ListItem dlgCornerItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.nav_dlg_corner),
+                getString(R.string.nav_dlg_corner_summary),
+                () -> showCornerPickerDialog(cornerNames, PREF_DLG_CORNER, 14, R.string.nav_dlg_corner));
+        dlgCornerItem.useAccentColor = false;
+
+        ListWidgetAdapter.ListItem textureItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.nav_notif_texture_settings),
+                getString(R.string.nav_notif_texture_settings_summary),
+                this::showTextureSettingsDialog);
+        textureItem.useAccentColor = false;
+
+        RecyclerView.Adapter<?> adapter = new ListWidgetAdapter(
+                List.of(notifCornerItem, toastCornerItem, dlgCornerItem, textureItem));
+        rv.setAdapter(adapter);
+
+        AlertDialog dlg = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.nav_misc_settings)
+                .setView(rv)
+                .setPositiveButton(R.string.close, null)
+                .show();
+        applyDialogBg(dlg);
+        fixButtonCaps(dlg);
     }
 
     private void showTextureSettingsDialog() {
@@ -428,10 +476,11 @@ public class ThemeStyleFragment extends Fragment {
     private void showToastPreviewDialog(String title, String[] names) {
         int accent = currentAccent();
         int bg = currentBg();
+        int cornerDp = ObsidianPrefs.getInt(PREF_TOAST_CORNER, 24);
         float density = getResources().getDisplayMetrics().density;
 
         showPresetPreviewDialog(title, names, PREF_TOAST_PRESET, TOAST_OVERLAYS,
-                preset -> DstToastStyle.buildToastBg(preset, accent, bg, density),
+                preset -> DstToastStyle.buildToastBg(preset, accent, bg, density, cornerDp),
                 1, 56, idx -> {
             if (idx < 0) ObsidianPrefs.remove(PREF_TOAST_PRESET);
             else ObsidianPrefs.putString(PREF_TOAST_PRESET, TOAST_OVERLAYS[idx]);
@@ -624,24 +673,31 @@ public class ThemeStyleFragment extends Fragment {
     // ── Corner radius picker ──────────────────────────────────────────────────
 
     private void showCornerPickerDialog(String[] names) {
-        int currentDp = ObsidianPrefs.getInt(PREF_NOTIF_CORNER, 24);
-        int currentIdx = 4; // default index for 24dp
+        showCornerPickerDialog(names, PREF_NOTIF_CORNER, 24, R.string.nav_notif_corner);
+    }
+
+    /** Generico — riusato anche per "Raggio Angolo Toast" e "Raggio Finestre Dialogo", stesso
+     *  elenco di valori (2..32dp), solo pref key/default/titolo cambiano. */
+    private void showCornerPickerDialog(String[] names, String prefKey, int defaultDp, int titleResId) {
+        int currentDp = ObsidianPrefs.getInt(prefKey, defaultDp);
+        int currentIdx = 0;
         for (int i = 0; i < CORNER_VALUES.length; i++) {
             if (CORNER_VALUES[i] == currentDp) { currentIdx = i; break; }
+            if (CORNER_VALUES[i] == defaultDp) currentIdx = i; // fallback se currentDp non combacia
         }
 
         final int[] selected = {currentIdx};
         AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.nav_notif_corner)
+                .setTitle(titleResId)
                 .setSingleChoiceItems(names, currentIdx,
                         (d, which) -> selected[0] = which)
                 .setPositiveButton(R.string.apply, (d, w) -> {
-                    ObsidianPrefs.putInt(PREF_NOTIF_CORNER, CORNER_VALUES[selected[0]]);
+                    ObsidianPrefs.putInt(prefKey, CORNER_VALUES[selected[0]]);
                     DstFabricatedUtil.saveBootProps();
                     AppUtils.showRestartReminder(requireContext());
                 })
                 .setNeutralButton(R.string.reset, (d, w) -> {
-                    ObsidianPrefs.remove(PREF_NOTIF_CORNER);
+                    ObsidianPrefs.remove(prefKey);
                     DstFabricatedUtil.saveBootProps();
                     AppUtils.showRestartReminder(requireContext());
                 })
@@ -667,11 +723,12 @@ public class ThemeStyleFragment extends Fragment {
 
         int accent = currentAccent();
         int bg = currentBg();
+        int cornerDp = ObsidianPrefs.getInt(PREF_DLG_CORNER, 14);
         float density = getResources().getDisplayMetrics().density;
 
         showPresetPreviewDialog(getString(R.string.nav_dialog_style), names, PREF_DLG_PRESET,
                 DLG_STYLE_KEYS,
-                preset -> DstDialogStyle.buildPreviewDrawable(preset, accent, bg, density),
+                preset -> DstDialogStyle.buildPreviewDrawable(preset, accent, bg, density, cornerDp),
                 idx -> {
                     if (idx < 0) ObsidianPrefs.remove(PREF_DLG_PRESET);
                     else ObsidianPrefs.putString(PREF_DLG_PRESET, DLG_STYLE_KEYS[idx]);
@@ -739,7 +796,8 @@ public class ThemeStyleFragment extends Fragment {
         android.graphics.drawable.Drawable bg;
         if (preset != null) {
             float density = getResources().getDisplayMetrics().density;
-            bg = DstDialogStyle.buildDrawable(preset, currentAccent(), currentBg(), density);
+            int cornerDp = ObsidianPrefs.getInt(PREF_DLG_CORNER, 14);
+            bg = DstDialogStyle.buildDrawable(preset, currentAccent(), currentBg(), density, cornerDp);
         } else {
             bg = ObsidianTheme.dialogBackground(requireContext());
         }

@@ -840,7 +840,13 @@
     <string name="nav_notif_style_summary">Stile sfondo personalizzato per le notifiche</string>
     <string name="nav_notif_corner">Raggio Angolo Notifiche</string>
     <string name="nav_notif_corner_summary">Raggio degli angoli per lo sfondo delle notifiche</string>
-    <string name="nav_notif_texture_settings">Regolazioni varie</string>
+    <string name="nav_misc_settings">Regolazioni Varie</string>
+    <string name="nav_misc_settings_summary">Raggio angoli (Notifiche/Toast/Dialogo) e regolazioni texture</string>
+    <string name="nav_notif_texture_settings">Regolazioni Notifiche a texture</string>
+    <string name="nav_toast_corner">Raggio Angolo Toast</string>
+    <string name="nav_toast_corner_summary">Raggio degli angoli per lo sfondo dei toast</string>
+    <string name="nav_dlg_corner">Raggio Finestre Dialogo</string>
+    <string name="nav_dlg_corner_summary">Raggio degli angoli per le finestre di dialogo</string>
     <string name="nav_notif_texture_settings_summary">Solo per i preset a texture (Puntini, Cuori, Onde…)</string>
     <string name="notif_texture_section_title">Regolazioni varie</string>
     <string name="nav_notif_texture_size">Dimensione</string>

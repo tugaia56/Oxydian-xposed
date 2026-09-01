@@ -41,14 +41,17 @@ public class DstDialogStyle {
     private static final String PREF_PRESET   = "DST_DLG_PRESET_NAME";
     private static final String PREF_ACCENT1  = "DST_ACCENT1";
     private static final String PREF_BG       = "DST_BACKGROUND";
+    private static final String PREF_CORNER   = "DST_DLG_CORNER";
     private static final String PREFS_FILE    =
         "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml";
+    private static final int DEFAULT_CORNER_DP = 14;
 
     // ── Preloaded statics — refreshed on every applyPreloaded() call ─────────
     private static volatile boolean sPreloaded = false;
     private static volatile String  sDlgPreset = null;  // "DSTDHT" … "DSTDSO"
     private static volatile int     sAccent    = 0xFFFFFFFF;
     private static volatile int     sBg        = 0xFF1B2029;
+    private static volatile int     sCornerDp  = DEFAULT_CORNER_DP;
 
     // ── SystemProperties helper ───────────────────────────────────────────────
 
@@ -85,6 +88,8 @@ public class DstDialogStyle {
             sDlgPreset = parseStringContent(xml, PREF_PRESET);
             sAccent    = parseInt(parseAttr(xml, PREF_ACCENT1, "value"), 0xFFFFFFFF);
             sBg        = parseInt(parseAttr(xml, PREF_BG,      "value"), 0xFF1B2029);
+            int corner = parseInt(parseAttr(xml, PREF_CORNER, "value"), DEFAULT_CORNER_DP);
+            sCornerDp  = (corner > 0) ? corner : DEFAULT_CORNER_DP;
             sPreloaded = true;
             XposedBridge.log("[ Obsidian ] DstDialogStyle.preload: preset=" + sDlgPreset);
         } catch (Throwable t) {
@@ -117,6 +122,13 @@ public class DstDialogStyle {
                     try { sBg = Integer.parseInt(bgStr); } catch (NumberFormatException ignored) {}
                 }
             } // else sBg stays at default 0xFF1B2029
+            String cornStr = readProp("persist.obsidian.dst.dlg_corner", "");
+            if (!cornStr.isEmpty()) {
+                try {
+                    int c = Integer.parseInt(cornStr);
+                    sCornerDp = (c > 0) ? c : DEFAULT_CORNER_DP;
+                } catch (NumberFormatException ignored) {}
+            }
             sPreloaded = true;
             XposedBridge.log("[ Obsidian ] DstDialogStyle.preload(props): preset=" + sDlgPreset);
         } catch (Throwable t) {
@@ -153,7 +165,7 @@ public class DstDialogStyle {
                         if (!sPreloaded || sDlgPreset == null) preloadFromProps();
                         if (sDlgPreset == null) return new GradientDrawable();
                         return buildDrawable(sDlgPreset, sAccent, sBg,
-                                res.getDisplayMetrics().density);
+                                res.getDisplayMetrics().density, sCornerDp);
                     }
                 });
         } catch (Throwable t) {
@@ -168,7 +180,12 @@ public class DstDialogStyle {
      * our own in-app dialog. The Xposed hook uses the private overload below.
      */
     public static Drawable buildDrawable(String preset, int accent, int bg, float density) {
-        float corner = 14f * density;
+        return buildDrawable(preset, accent, bg, density, DEFAULT_CORNER_DP);
+    }
+
+    /** Come sopra, con raggio d'angolo regolabile ("Raggio Finestre Dialogo"). */
+    public static Drawable buildDrawable(String preset, int accent, int bg, float density, int cornerDp) {
+        float corner = cornerDp * density;
         int   stroke = Math.round(1.5f * density);
 
         if ("DSTDSO".equals(preset)) {
@@ -185,7 +202,11 @@ public class DstDialogStyle {
      * altri preset. Qui si vede solo la forma, alla stessa scala di tutti gli altri.
      */
     public static Drawable buildPreviewDrawable(String preset, int accent, int bg, float density) {
-        float corner = 14f * density;
+        return buildPreviewDrawable(preset, accent, bg, density, DEFAULT_CORNER_DP);
+    }
+
+    public static Drawable buildPreviewDrawable(String preset, int accent, int bg, float density, int cornerDp) {
+        float corner = cornerDp * density;
         int   stroke = Math.round(1.5f * density);
         return shapeForPreset(preset, accent, bg, density, corner, stroke);
     }

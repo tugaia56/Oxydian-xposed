@@ -88,6 +88,8 @@
 
     <!-- DST: Nomi preset Raggio Angolo Notifiche (IT) -->
     <string-array name="dst_notif_corner_names">
+        <item>2 dp</item>
+        <item>4 dp</item>
         <item>8 dp</item>
         <item>12 dp</item>
         <item>16 dp</item>
@@ -291,6 +293,262 @@
         <item>Bianco</item>
         <item>Accento</item>
         <item>Personalizzata</item>
+    </string-array>
+
+    <!-- Array mancanti in italiano — aggiunti 2026-09-01, copiati/tradotti da values/arrays.xml -->
+    <string-array name="clock_ampm_entries">
+        <item>@string/clock_ampm_normal</item>
+        <item>@string/clock_ampm_small</item>
+        <item>@string/clock_ampm_hidden</item>
+    </string-array>
+    <string-array name="clock_chip_style_entries">
+        <item>@string/clock_chip_style_solid</item>
+        <item>@string/clock_chip_style_outline</item>
+        <item>@string/clock_chip_style_mixed</item>
+    </string-array>
+    <string-array name="clock_date_entries">
+        <item>@string/clock_date_off</item>
+        <item>@string/clock_date_small</item>
+        <item>@string/clock_date_normal</item>
+    </string-array>
+    <string-array name="clock_date_position_entries">
+        <item>@string/clock_date_before</item>
+        <item>@string/clock_date_after</item>
+    </string-array>
+    <string-array name="edge_light_blur_mode_entries">
+        <item>@string/edge_light_blur_mode_both</item>
+        <item>@string/edge_light_blur_mode_blur_only</item>
+    </string-array>
+    <string-array name="edge_light_blur_type_entries">
+        <item>@string/edge_light_blur_type_normal</item>
+        <item>@string/edge_light_blur_type_solid</item>
+        <item>@string/edge_light_blur_type_inner</item>
+        <item>@string/edge_light_blur_type_outer</item>
+    </string-array>
+    <string-array name="edge_light_color_mode_entries">
+        <item>@string/accent_color</item>
+        <item>@string/notification_color</item>
+        <item>@string/wallpaper_color</item>
+        <item>@string/edge_light_rainbow_gradient</item>
+        <item>@string/custom_color</item>
+    </string-array>
+    <string-array name="edge_light_retick_entries">
+        <item>@string/edge_light_30_sec</item>
+        <item>@string/edge_light_1_min</item>
+        <item>@string/edge_light_2_min</item>
+        <item>@string/edge_light_5_min</item>
+        <item>@string/edge_light_10_min</item>
+    </string-array>
+    <string-array name="lockscreen_album_art_filter_entries">
+        <item>@string/lockscreen_album_art_filter_none</item>
+        <item>@string/lockscreen_album_art_filter_grayscale</item>
+        <item>@string/lockscreen_album_art_filter_accent</item>
+        <item>@string/lockscreen_album_art_filter_blur</item>
+        <item>@string/lockscreen_album_art_filter_gray_blur</item>
+    </string-array>
+    <string-array name="pin_num_style_entries">
+        <item>@string/pin_style_default</item>
+        <item>@string/pin_style_accent</item>
+        <item>@string/pin_style_accent_shade</item>
+        <item>@string/pin_style_custom</item>
+    </string-array>
+    <string-array name="pin_style_entries">
+        <item>@string/pin_style_default</item>
+        <item>@string/pin_style_accent</item>
+        <item>@string/pin_style_accent_shade</item>
+        <item>@string/pin_style_custom</item>
+    </string-array>
+    <string-array name="qs_header_red_one_mode_entries">
+        <item>@string/default_value</item>
+        <item>@string/dst_disable</item>
+        <item>@string/accent_color</item>
+        <item>@string/custom_color</item>
+    </string-array>
+    <string-array name="vol_panel_position_entries">
+        <item>@string/vol_panel_position_default</item>
+        <item>@string/vol_panel_position_right</item>
+        <item>@string/vol_panel_position_left</item>
+    </string-array>
+
+    <!-- Nomi propri / valori neutri — identici in ogni lingua -->
+    <string-array name="dst_cpb_preset_names">
+        <item>CPB Aurora Theme</item>
+        <item>CPB Arrow</item>
+        <item>CPB Radioactive</item>
+        <item>CPB Sprite Theme</item>
+        <item>CPB Stars</item>
+    </string-array>
+    <string-array name="signal_icon_scale_entries">
+        <item>15 dp (predefinito)</item>
+        <item>16 dp</item>
+        <item>17 dp</item>
+        <item>18 dp</item>
+        <item>19 dp</item>
+        <item>20 dp</item>
+        <item>21 dp</item>
+        <item>22 dp</item>
+    </string-array>
+    <string-array name="vol_panel_timeout_entries">
+        <item>1 s</item>
+        <item>2 s</item>
+        <item>3 s</item>
+        <item>5 s</item>
+        <item>7 s</item>
+        <item>10 s</item>
+    </string-array>
+    <string-array name="weather_provider_entries">
+        <item>OpenWeatherMap</item>
+        <item>MET Norway</item>
+        <item>OpenMeteo</item>
+        <item>Yandex</item>
+    </string-array>
+    <string-array name="weather_update_interval_entries">
+        <item>30 min</item>
+        <item>1 h</item>
+        <item>3 h</item>
+        <item>6 h</item>
+    </string-array>
+
+    <!-- Testo italiano già corretto (era erroneamente nel file EN base) -->
+    <string-array name="edge_light_style_entries">
+        <item>Disegna Linea</item>
+        <item>Lampeggio</item>
+        <item>Linee Laterali</item>
+        <item>Serpente</item>
+        <item>Eco</item>
+    </string-array>
+    <string-array name="gesture_holdback_commands_entries">
+        <item>Passa all\'app precedente</item>
+        <item>Chiudi app attiva</item>
+        <item>Screenshot</item>
+        <item>Screenshot scorrevole</item>
+        <item>Screenshot parziale</item>
+        <item>Apri Impostazioni Rapide (non disponibile)</item>
+        <item>Attiva modalità a una mano (non disponibile)</item>
+        <item>Apri pannello notifiche (non disponibile)</item>
+        <item>Spegni schermo</item>
+        <item>Cerchia per cercare (non disponibile)</item>
+        <item>App personalizzata (non disponibile)</item>
+    </string-array>
+    <string-array name="gesture_holdback_mode_entries">
+        <item>Stesso comando per entrambi i lati</item>
+        <item>Scegli comando per lato</item>
+    </string-array>
+    <string-array name="lockscreen_clock_style_entries">
+        <item>Stile orologio 1</item>
+        <item>Stile orologio 2</item>
+        <item>Stile orologio 3</item>
+        <item>Stile orologio 4</item>
+        <item>Stile orologio 5</item>
+        <item>Stile orologio 6</item>
+        <item>Stile orologio 7</item>
+        <item>Stile orologio 8</item>
+        <item>Stile orologio 9</item>
+        <item>Stile orologio 10</item>
+        <item>Stile orologio 11</item>
+        <item>Stile orologio 12</item>
+        <item>Stile orologio 13</item>
+        <item>Stile orologio 14</item>
+        <item>Stile orologio 15</item>
+        <item>Stile orologio 16</item>
+        <item>Stile orologio 17</item>
+        <item>Stile orologio 18</item>
+        <item>Stile orologio 19</item>
+        <item>Stile orologio 20</item>
+        <item>Stile orologio 21</item>
+        <item>Stile orologio 22</item>
+        <item>Stile orologio 23</item>
+        <item>Stile orologio 24</item>
+        <item>Stile orologio 25</item>
+        <item>Stile orologio 26</item>
+        <item>Stile orologio 27</item>
+        <item>Stile orologio 28</item>
+        <item>Stile orologio 29</item>
+        <item>Stile orologio 30</item>
+        <item>Stile orologio 31</item>
+        <item>Stile orologio 32</item>
+        <item>Stile orologio 33</item>
+        <item>Stile orologio 34</item>
+        <item>Stile orologio 35</item>
+        <item>Stile orologio 36</item>
+        <item>Stile orologio 37</item>
+        <item>Stile orologio 38</item>
+        <item>Stile orologio 39</item>
+        <item>Stile orologio 40</item>
+        <item>Stile orologio 41</item>
+        <item>Stile orologio 42</item>
+        <item>Stile orologio 43</item>
+        <item>Stile orologio 44</item>
+        <item>Stile orologio 45</item>
+        <item>Stile orologio 46</item>
+        <item>Stile orologio 47</item>
+        <item>Stile orologio 48</item>
+        <item>Stile orologio 49</item>
+        <item>Stile orologio 50</item>
+        <item>Stile orologio 51</item>
+        <item>Stile orologio 52</item>
+        <item>Stile orologio 53</item>
+        <item>Stile orologio 54</item>
+        <item>Stile orologio 55</item>
+        <item>Stile orologio 56</item>
+        <item>Stile orologio 57</item>
+        <item>Stile orologio 58</item>
+        <item>Stile orologio 59</item>
+        <item>Stile orologio 60</item>
+        <item>Stile orologio 61</item>
+    </string-array>
+    <string-array name="lockscreen_widget_entries">
+        <item>Nessuno</item>
+        <item>App Personalizzata</item>
+        <item>Calcolatrice</item>
+        <item>Media</item>
+        <item>Timer</item>
+        <item>Torcia</item>
+        <item>Meteo</item>
+        <item>Wi-Fi</item>
+        <item>Dati Mobili (in costruzione)</item>
+        <item>Suoneria</item>
+        <item>Bluetooth</item>
+        <item>Controlli Casa</item>
+        <item>Fotocamera</item>
+        <item>Wallet</item>
+        <item>Hotspot (in costruzione)</item>
+    </string-array>
+    <string-array name="notif_default_expansion_entries">
+        <item>Predefinito</item>
+        <item>Espandi sempre</item>
+        <item>Comprimi sempre</item>
+        <item>Scelta per app</item>
+    </string-array>
+    <string-array name="qs_header_stock_clock_red_one_entries">
+        <item>Predefinito</item>
+        <item>Disabilita</item>
+        <item>Colore Accento</item>
+        <item>Colore Personalizzato</item>
+    </string-array>
+    <string-array name="quick_pulldown_side_entries">
+        <item>Sinistra</item>
+        <item>Destra</item>
+    </string-array>
+    <string-array name="settings_icons_color_entries">
+        <item>Colore Accento</item>
+        <item>Bianco</item>
+        <item>Nero</item>
+    </string-array>
+    <string-array name="settings_icons_shape_entries">
+        <item>Cerchio</item>
+        <item>Supercerchio</item>
+        <item>Quadrato arrotondato</item>
+        <item>Goccia</item>
+        <item>Rombo</item>
+    </string-array>
+    <string-array name="settings_icons_solid_entries">
+        <item>Off</item>
+        <item>On</item>
+    </string-array>
+    <string-array name="weather_units_entries">
+        <item>Metrico</item>
+        <item>Imperiale</item>
     </string-array>
 
 </resources>

@@ -47,8 +47,10 @@ public class DstToastStyle {
     private static final String PREF_PRESET  = "DST_PRESET_TOAST";
     private static final String PREF_ACCENT1 = "DST_ACCENT1";
     private static final String PREF_BG      = "DST_BACKGROUND";
+    private static final String PREF_CORNER  = "DST_TOAST_CORNER";
     private static final String PREFS_FILE   =
         "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml";
+    private static final int DEFAULT_CORNER_DP = 24;
 
     // Toast drawables to replace in com.android.systemui
     private static final String[] TOAST_DRAWABLES = {
@@ -59,9 +61,10 @@ public class DstToastStyle {
         "toast_sub_mutl_line_bg",
     };
 
-    private static volatile String sPreset = null;
-    private static volatile int    sAccent = 0xFF9C27B0;
-    private static volatile int    sBg     = 0xFF1B2029;
+    private static volatile String sPreset   = null;
+    private static volatile int    sAccent   = 0xFF9C27B0;
+    private static volatile int    sBg       = 0xFF1B2029;
+    private static volatile int    sCornerDp = DEFAULT_CORNER_DP;
 
     // ── Boot-time preload ────────────────────────────────────────────────────
 
@@ -79,6 +82,8 @@ public class DstToastStyle {
             sPreset = parseStringContent(xml, PREF_PRESET);
             sAccent = parseInt(parseAttr(xml, PREF_ACCENT1, "value"), 0xFF9C27B0);
             sBg     = parseInt(parseAttr(xml, PREF_BG,      "value"), 0xFF1B2029);
+            int corner = parseInt(parseAttr(xml, PREF_CORNER, "value"), DEFAULT_CORNER_DP);
+            sCornerDp = (corner > 0) ? corner : DEFAULT_CORNER_DP;
             XposedBridge.log("[ Obsidian ] DstToastStyle.preload(file): preset=" + sPreset);
         } catch (Throwable t) {
             XposedBridge.log("[ Obsidian ] DstToastStyle.preload(file) ERROR: " + t + " — trying props");
@@ -92,11 +97,18 @@ public class DstToastStyle {
             String preset = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.toast_preset", "");
             String a1Str  = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.a1", "");
             String bgStr  = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.bg", "");
+            String cornStr = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.toast_corner", "24");
             XposedBridge.log("[ Obsidian ] DstToastStyle.preloadFromProps: preset='" + preset + "'");
             if (preset.isEmpty()) return;
             sPreset = preset;
             if (!a1Str.isEmpty()) { try { sAccent = Integer.parseInt(a1Str); } catch (NumberFormatException ignored) {} }
             if (!bgStr.isEmpty())  { try { sBg     = Integer.parseInt(bgStr);  } catch (NumberFormatException ignored) {} }
+            if (!cornStr.isEmpty()) {
+                try {
+                    int c = Integer.parseInt(cornStr);
+                    sCornerDp = (c > 0) ? c : DEFAULT_CORNER_DP;
+                } catch (NumberFormatException ignored) {}
+            }
             XposedBridge.log("[ Obsidian ] DstToastStyle.preload(props): preset=" + sPreset);
         } catch (Throwable t) {
             XposedBridge.log("[ Obsidian ] DstToastStyle.preload(props) ERROR: " + t);
@@ -126,13 +138,14 @@ public class DstToastStyle {
                         == android.content.res.Configuration.UI_MODE_NIGHT_YES;
                 if (!isNight) return null;
                 preloadFromFile();
-                String preset = sPreset;
-                int    accent = sAccent;
-                int    bg     = sBg;
+                String preset  = sPreset;
+                int    accent  = sAccent;
+                int    bg      = sBg;
+                int    cornerDp = sCornerDp;
                 if (preset == null) return new GradientDrawable();
                 float density = res.getDisplayMetrics().density;
                 if (density <= 0f) density = 3.0f;
-                return buildToastBg(preset, accent, bg, density);
+                return buildToastBg(preset, accent, bg, density, cornerDp);
             }
         };
 
@@ -147,10 +160,14 @@ public class DstToastStyle {
 
     // ── Drawable factory ──────────────────────────────────────────────────────
 
-    /** Public so the UI (preset preview picker) can render the exact same drawable used at runtime. */
+    /** Retrocompatibile — usa il raggio di default (24dp). */
     public static Drawable buildToastBg(String preset, int accent, int bg, float density) {
-        // Corner radius ~24dp — matches OOS toast style
-        float corner = 24f * density;
+        return buildToastBg(preset, accent, bg, density, DEFAULT_CORNER_DP);
+    }
+
+    /** Public so the UI (preset preview picker) can render the exact same drawable used at runtime. */
+    public static Drawable buildToastBg(String preset, int accent, int bg, float density, int cornerDp) {
+        float corner = cornerDp * density;
 
         switch (preset) {
             case "DSTTST1": // Solido (BG color)
