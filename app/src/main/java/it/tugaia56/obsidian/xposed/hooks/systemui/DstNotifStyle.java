@@ -1,6 +1,8 @@
 package it.tugaia56.obsidian.xposed.hooks.systemui;
 
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -8,12 +10,17 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.os.Environment;
 import android.view.Gravity;
 
 import android.content.res.XResources;
+
+import java.io.File;
+import java.io.FileInputStream;
 
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
@@ -71,8 +78,9 @@ import de.robv.android.xposed.callbacks.XC_InitPackageResources;
  *   DSTNFNCHK – Scacchiera                (quadretti alternati, a runtime)
  *   DSTNFNWAV – Onde                      (linee sinusoidali orizzontali, a runtime)
  *   DSTNFNXH  – Intreccio                 (hatching incrociato 45°/135°, a runtime)
- * Tutte le texture sopra condividono Dimensione/Opacità/Colore/Bordo regolabili da
- * "Regolazioni varie" (ThemeStyleFragment).
+ *   DSTNFNIMG – Immagine                  (foto scelta dall'utente, .obsidian/notif_bg_image)
+ * Tutte le texture sopra (tranne Immagine) condividono Dimensione/Opacità/Colore/Bordo
+ * regolabili da "Regolazioni varie" (ThemeStyleFragment).
  */
 public class DstNotifStyle {
 
@@ -118,6 +126,10 @@ public class DstNotifStyle {
     private static volatile int    sTexColor       = 0xFF9C27B0; // risolto: sAccent o custom
     private static volatile boolean sTexBorderOn   = false;
     private static volatile int    sTexBorderColor = 0xFF9C27B0; // risolto: sAccent o custom
+
+    private static final String NOTIF_BG_IMAGE_SUBPATH = ".obsidian/notif_bg_image";
+    private static volatile Bitmap sNotifBgBitmap;
+    private static volatile long   sNotifBgBitmapMtime = -1;
 
     // ── Boot-time preload ────────────────────────────────────────────────────
 
@@ -567,6 +579,14 @@ public class DstNotifStyle {
                 GradientDrawable base = simpleShape(bg, texBorderStrokeColor, texBorderWidth, r);
                 GradientDrawable cross = crossHatchOverlay(withAlpha(texColor, texAlphaFrac), texDensity, r);
                 return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), cross});
+            }
+
+            case "DSTNFNIMG": { // Immagine — foto scelta dall'utente, ritagliata al centro
+                GradientDrawable base = simpleShape(bg, texBorderStrokeColor, texBorderWidth, r);
+                Bitmap bmp = refreshAndGetNotifBgBitmap();
+                if (bmp == null) return base; // niente immagine ancora scelta: solo il bg
+                GradientDrawable image = new ImageBgDrawable(bmp, r);
+                return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), image});
             }
 
             case "DSTNFNIOS": // iOS — prima era bg chiarito → bg, troppo simile a Neumorph.
@@ -1166,6 +1186,96 @@ public class DstNotifStyle {
             return new ConstantState() {
                 @Override public Drawable newDrawable() {
                     return new CrossHatchDrawable(mColor, mSpacing / 9f, mCornerRadius);
+                }
+                @Override public int getChangingConfigurations() { return 0; }
+            };
+        }
+    }
+
+    /** Ri-decodifica l'immagine di sfondo notifica solo se il file è cambiato (mtime) — stessa
+     *  tecnica di refreshPowerMenuBgBitmap()/refreshPowerMenuHandlerBitmap() in MiscMods.java.
+     *  Qui in versione statica: nessun Context necessario, è solo un file su disco. */
+    private static Bitmap refreshAndGetNotifBgBitmap() {
+        File f = new File(Environment.getExternalStorageDirectory(), NOTIF_BG_IMAGE_SUBPATH);
+        if (!f.exists()) {
+            sNotifBgBitmap = null;
+            sNotifBgBitmapMtime = -1;
+            return null;
+        }
+        long mtime = f.lastModified();
+        if (sNotifBgBitmap != null && mtime == sNotifBgBitmapMtime) return sNotifBgBitmap;
+        try (FileInputStream fis = new FileInputStream(f)) {
+            Bitmap bmp = BitmapFactory.decodeStream(fis);
+            if (bmp != null) {
+                sNotifBgBitmap = bmp;
+                sNotifBgBitmapMtime = mtime;
+            }
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] DstNotifStyle: notif bg image decode error: " + t);
+        }
+        return sNotifBgBitmap;
+    }
+
+    /** Classic center-crop math: picks the largest same-aspect-ratio rect out of the source
+     *  bitmap that covers the destination area without distortion. Stessa formula di
+     *  MiscMods.java's centerCropSrcRect() — duplicata qui perché quella è d'istanza, questa
+     *  classe è tutta statica. */
+    private static Rect centerCropSrcRect(Bitmap bmp, float dstW, float dstH) {
+        int bw = bmp.getWidth(), bh = bmp.getHeight();
+        float srcAspect = (float) bw / bh;
+        float dstAspect = dstW / dstH;
+        if (srcAspect > dstAspect) {
+            int cropW = Math.round(bh * dstAspect);
+            int left = Math.max(0, (bw - cropW) / 2);
+            return new Rect(left, 0, left + cropW, bh);
+        } else {
+            int cropH = Math.round(bw / dstAspect);
+            int top = Math.max(0, (bh - cropH) / 2);
+            return new Rect(0, top, bw, top + cropH);
+        }
+    }
+
+    /** Immagine scelta dall'utente, ritagliata al centro e clippata all'angolo arrotondato —
+     *  stessa tecnica/gotcha delle altre texture: classe nominata, estende GradientDrawable,
+     *  getConstantState() ricostruisce la sottoclasse vera (qui il Bitmap stesso viene
+     *  riportato, non ridecodificato — è già in RAM, nessun costo aggiuntivo). */
+    private static final class ImageBgDrawable extends GradientDrawable {
+        private final Bitmap mBmp;
+        private final float mCornerRadius;
+        private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+        ImageBgDrawable(Bitmap bmp, float cornerRadius) {
+            mBmp = bmp;
+            mCornerRadius = cornerRadius;
+            setShape(GradientDrawable.RECTANGLE);
+            setColor(Color.TRANSPARENT);
+            setCornerRadius(cornerRadius);
+        }
+
+        @Override public void draw(Canvas canvas) {
+            super.draw(canvas);
+            Rect b = getBounds();
+            if (b.width() <= 0 || b.height() <= 0 || mBmp == null) return;
+            canvas.save();
+            Path clip = new Path();
+            clip.addRoundRect(new RectF(b), mCornerRadius, mCornerRadius, Path.Direction.CW);
+            canvas.clipPath(clip);
+            Rect src = centerCropSrcRect(mBmp, b.width(), b.height());
+            canvas.drawBitmap(mBmp, src, b, mPaint);
+            canvas.restore();
+        }
+
+        @Override public void setTint(int tintColor) { /* block OOS tint */ }
+        @Override public void setTintList(ColorStateList tint) { /* block OOS tint */ }
+        @Override public void setTintMode(PorterDuff.Mode tintMode) { /* block */ }
+        @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
+        @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
+        @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+
+        @Override public ConstantState getConstantState() {
+            return new ConstantState() {
+                @Override public Drawable newDrawable() {
+                    return new ImageBgDrawable(mBmp, mCornerRadius);
                 }
                 @Override public int getChangingConfigurations() { return 0; }
             };

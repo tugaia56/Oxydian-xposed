@@ -309,6 +309,7 @@
         <item>Checkerboard</item>
         <item>Waves</item>
         <item>Crosshatch</item>
+        <item>Image</item>
     </string-array>
 
     <!-- Date format -->

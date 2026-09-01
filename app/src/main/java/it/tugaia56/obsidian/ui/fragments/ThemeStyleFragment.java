@@ -2,7 +2,9 @@ package it.tugaia56.obsidian.ui.fragments;
 
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +15,10 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -29,6 +34,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntConsumer;
@@ -93,7 +101,7 @@ public class ThemeStyleFragment extends Fragment {
         "DSTNFNCP2", "DSTNFNTL",  "DSTNFNFD",  "DSTNFNDB",
         "DSTNFNDL",  "DSTNFNIOS", "DSTNFNDOT", "DSTNFNLNS", "DSTNFNGRN",
         "DSTNFNHRT", "DSTNFNDIA", "DSTNFNCLB", "DSTNFNSPD",
-        "DSTNFNCHK", "DSTNFNWAV", "DSTNFNXH"
+        "DSTNFNCHK", "DSTNFNWAV", "DSTNFNXH",  "DSTNFNIMG"
     };
 
     private static final String[] TOAST_OVERLAYS = {
@@ -103,11 +111,16 @@ public class ThemeStyleFragment extends Fragment {
     };
 
     private static final int[] CORNER_VALUES = { 8, 12, 16, 20, 24, 28, 32 };
+    private static final String NOTIF_BG_IMAGE_FILENAME = "notif_bg_image";
+
+    private ActivityResultLauncher<String> mPickNotifBgImage;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
+        mPickNotifBgImage = registerForActivityResult(
+                new ActivityResultContracts.GetContent(), this::onNotifBgImagePicked);
     }
 
     @Override
@@ -370,11 +383,46 @@ public class ThemeStyleFragment extends Fragment {
                         ObsidianPrefs.getInt(PREF_TEX_SIZE, 100), ObsidianPrefs.getInt(PREF_TEX_ALPHA, 25),
                         texColor(), texBorderOn(), texBorderColor()),
                 1, 64, idx -> {
+            // "Immagine" non si applica subito come gli altri preset: prima serve scegliere
+            // davvero una foto. Se l'utente annulla il picker, il preset resta quello di prima
+            // (stesso pattern "safe cancel" di PowerMenuHandlerPresetFragment).
+            if (idx >= 0 && "DSTNFNIMG".equals(NOTIF_OVERLAYS[idx])) {
+                mPickNotifBgImage.launch("image/*");
+                return;
+            }
             if (idx < 0) ObsidianPrefs.remove(PREF_NOTIF_PRESET);
             else ObsidianPrefs.putString(PREF_NOTIF_PRESET, NOTIF_OVERLAYS[idx]);
             DstFabricatedUtil.saveBootProps();
             AppUtils.showRestartReminder(requireContext());
         });
+    }
+
+    /** Copia la foto scelta in .obsidian/notif_bg_image e attiva il preset "Immagine" solo se
+     *  la copia va a buon fine — annullare il picker di sistema lascia il preset precedente
+     *  invariato, stesso pattern di PowerMenuHandlerPresetFragment.onImagePicked(). */
+    private void onNotifBgImagePicked(Uri uri) {
+        if (uri == null) return;
+        try {
+            File dest = getNotifBgImageFile();
+            File dir = dest.getParentFile();
+            if (dir != null && !dir.exists()) dir.mkdirs();
+            try (InputStream in = requireContext().getContentResolver().openInputStream(uri);
+                 FileOutputStream out = new FileOutputStream(dest)) {
+                if (in == null) return;
+                byte[] buf = new byte[8192];
+                int n;
+                while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            }
+            ObsidianPrefs.putString(PREF_NOTIF_PRESET, "DSTNFNIMG");
+            DstFabricatedUtil.saveBootProps();
+            AppUtils.showRestartReminder(requireContext());
+        } catch (Throwable t) {
+            Toast.makeText(requireContext(), R.string.qs_header_pick_error, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private File getNotifBgImageFile() {
+        return new File(Environment.getExternalStorageDirectory(), ".obsidian/" + NOTIF_BG_IMAGE_FILENAME);
     }
 
     private void showToastPreviewDialog(String title, String[] names) {
