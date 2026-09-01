@@ -1,9 +1,12 @@
 package it.tugaia56.obsidian.xposed.hooks.systemui;
 
 import android.content.res.ColorStateList;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -57,6 +60,7 @@ import de.robv.android.xposed.callbacks.XC_InitPackageResources;
  *   DSTNFNDB  – Dumbbell                  (gradiente orizzontale accent-bg-accent)
  *   DSTNFNDL  – Duoline                   (gradiente verticale accent-bg-accent)
  *   DSTNFNIOS – iOS                       (gradiente verticale bg chiarito → bg)
+ *   DSTNFNDOT – Puntini                   (texture di puntini accento su bg pieno, a runtime)
  */
 public class DstNotifStyle {
 
@@ -397,6 +401,15 @@ public class DstNotifStyle {
                 return gradient(GradientDrawable.Orientation.TOP_BOTTOM,
                         new int[]{accent, bg, accent}, r);
 
+            case "DSTNFNDOT": { // Puntini — pattern di puntini accento, sottile, sopra bg pieno
+                                // (prototipo "Notif PNG background": texture disegnata a
+                                // runtime invece di un vero asset PNG — stessa idea, coerente
+                                // con tutto il resto del file che è 100% programmatico).
+                GradientDrawable base = simpleShape(bg, 0, 0, r);
+                GradientDrawable dots = dotGridOverlay(withAlpha(accent, 0.55f), density, r);
+                return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), dots});
+            }
+
             case "DSTNFNIOS": // iOS — prima era bg chiarito → bg, troppo simile a Neumorph.
                               // Un bianco quasi pieno (primo tentativo) rendeva illeggibile il
                               // testo bianco di OOS — grigio medio: resta chiaro/diverso da
@@ -526,6 +539,73 @@ public class DstNotifStyle {
         LayerDrawable layered = tintBlockedLayer(new Drawable[]{outer, indexOneGuard(cornerRadius), inner});
         layered.setLayerInset(2, ringWidth, ringWidth, ringWidth, ringWidth);
         return layered;
+    }
+
+    /** Texture a puntini disegnata a runtime (niente asset PNG) — griglia di piccoli cerchi
+     *  colore accento, spaziatura/raggio in dp così scala con la densità come tutto il resto
+     *  del file. Le posizioni si calcolano ad ogni draw() da getBounds() invece che essere
+     *  cachate in onBoundsChange: quel callback si è già dimostrato inaffidabile nella pipeline
+     *  live delle notifiche (vedi radialGradient sopra), disegnare dal vivo lo evita alla radice.
+     *  DEVE estendere GradientDrawable (non un Drawable qualsiasi): NotificationBackgroundView.
+     *  updateBackgroundRadii() fa un cast diretto a GradientDrawable su ogni layer per leggerne
+     *  gli angoli — confermato dal vivo con un crash reale di SystemUI (ClassCastException,
+     *  mandato LSPosed in safe mode) quando questo layer era un Drawable generico. */
+    private static GradientDrawable dotGridOverlay(int dotColor, float density, float cornerRadius) {
+        return new DotGridDrawable(dotColor, density, cornerRadius);
+    }
+
+    /** Classe nominata (non anonima) apposta: un GradientDrawable anonimo perde il proprio
+     *  draw() custom se il sistema lo ricostruisce dal ConstantState (successo confermato dal
+     *  vivo — nessun crash dopo il fix del cast, ma i puntini non comparivano mai: colore/raggio
+     *  d'angolo restavano giusti, segno che veniva ricreato un GradientDrawable "pulito" dallo
+     *  stato salvato, perdendo la sottoclasse). getConstantState() qui sotto ricostruisce sempre
+     *  un'istanza VERA di DotGridDrawable, mai il GradientDrawable base. */
+    private static final class DotGridDrawable extends GradientDrawable {
+        private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final float mSpacing, mRadius, mCornerRadius;
+        private final int mDotColor;
+
+        DotGridDrawable(int dotColor, float density, float cornerRadius) {
+            mDotColor = dotColor;
+            mSpacing = 9f * density;
+            mRadius = 1.5f * density;
+            mCornerRadius = cornerRadius;
+            mPaint.setColor(dotColor);
+            setShape(GradientDrawable.RECTANGLE);
+            setColor(Color.TRANSPARENT);
+            setCornerRadius(cornerRadius);
+        }
+
+        @Override public void draw(Canvas canvas) {
+            super.draw(canvas); // riempimento trasparente della shape sottostante
+            Rect b = getBounds();
+            if (b.width() <= 0 || b.height() <= 0) return;
+            for (float y = mSpacing / 2f; y < b.height(); y += mSpacing) {
+                for (float x = mSpacing / 2f; x < b.width(); x += mSpacing) {
+                    canvas.drawCircle(b.left + x, b.top + y, mRadius, mPaint);
+                }
+            }
+        }
+
+        @Override public void setTint(int tintColor) { /* block OOS tint */ }
+        @Override public void setTintList(ColorStateList tint) { /* block OOS tint */ }
+        @Override public void setTintMode(PorterDuff.Mode tintMode) { /* block */ }
+        @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
+        @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
+        // Stesso blocco anti-override di setAlpha usato da tutti gli altri preset — OOS
+        // altrimenti sovrascrive il canale alpha scelto durante le sue animazioni.
+        @Override public void setAlpha(int alpha) { /* block OOS alpha override */ }
+
+        @Override public ConstantState getConstantState() {
+            return new ConstantState() {
+                @Override public Drawable newDrawable() {
+                    // density passato = mSpacing/9f ricostruisce esattamente lo stesso mSpacing
+                    // di partenza (mRadius ne è derivato con lo stesso fattore, coerente).
+                    return new DotGridDrawable(mDotColor, mSpacing / 9f, mCornerRadius);
+                }
+                @Override public int getChangingConfigurations() { return 0; }
+            };
+        }
     }
 
     private static int withAlpha(int color, float alphaFraction) {

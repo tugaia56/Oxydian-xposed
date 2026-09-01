@@ -7,7 +7,6 @@
         <item>com.android.settings</item>
         <item>com.android.launcher</item>
         <item>it.simonesestito.ntiles</item>
-        <item>projekt.substratum.lite</item>
 	</string-array>
 
     <!-- DST ACCENT1 resource names (24 entries) -->
@@ -300,6 +299,7 @@
         <item>Dumbbell</item>
         <item>Duoline</item>
         <item>iOS</item>
+        <item>Dots</item>
     </string-array>
 
     <!-- Date format -->
