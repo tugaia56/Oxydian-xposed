@@ -54,6 +54,12 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <!-- Safety net: se BOOT_COMPLETED arriva mentre il telefono è ancora bloccato
+                     (storage credential-encrypted non leggibile, i prefs letti sotto potrebbero
+                     tornare vuoti/default), questo secondo trigger rifà lo stesso lavoro appena
+                     l'utente sblocca — stesso pattern di OC (commit bfe28e4e, "USER_UNLOCKED
+                     intent for boot reload"). -->
+                <action android:name="android.intent.action.USER_UNLOCKED" />
             </intent-filter>
         </receiver>
 
