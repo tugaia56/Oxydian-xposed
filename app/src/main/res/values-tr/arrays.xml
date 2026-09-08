@@ -1,0 +1,839 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- LSPosed scope -->
+    <string-array name="xposed_scope">
+        <item>android</item>
+        <item>com.android.systemui</item>
+        <item>com.android.settings</item>
+        <item>com.android.launcher</item>
+        <item>it.simonesestito.ntiles</item>
+        <item>com.oplus.appplatform</item>
+        <item>com.oplus.multiapp</item>
+        <item>com.oplus.screenshot</item>
+        <item>com.oplus.wirelesssettings</item>
+        <item>com.oplus.cast</item>
+        <item>com.oplus.linker</item>
+        <item>com.oplus.wallpapers</item>
+        <item>com.oplus.notificationmanager</item>
+        <item>com.oplus.uxdesign</item>
+        <item>com.oplus.sos</item>
+        <item>com.oplus.battery</item>
+        <item>com.oplus.pantanal.ums</item>
+        <item>com.coloros.operationManual</item>
+        <item>com.heytap.mydevices</item>
+        <item>com.android.phone</item>
+        <item>com.oplus.cota</item>
+        <item>com.oplus.ota</item>
+        <item>com.oplus.games</item>
+        <item>com.coloros.smartsidebar</item>
+        <item>com.oplus.beaconlink</item>
+        <item>com.oplus.appbooster</item>
+        <item>com.oneplus.calculator</item>
+        <item>com.oplus.safecenter</item>
+        <item>com.oplus.keyguard.clock.base</item>
+        <item>com.coloros.systemclone</item>
+        <item>com.oplus.eyeprotect</item>
+        <item>com.heytap.accessory</item>
+        <item>com.oplus.remotecontrol</item>
+        <item>com.oplus.aiwriter</item>
+        <item>com.oplus.melody</item>
+        <item>com.oneplus.gallery</item>
+        <item>com.oplus.camera</item>
+        <item>com.oplus.gesture</item>
+        <item>com.oplus.securitypermission</item>
+        <item>com.oplus.phonemanager</item>
+        <item>com.android.server.telecom</item>
+        <item>com.heytap.browser</item>
+        <item>net.oneplus.weather</item>
+        <item>com.oplus.aimemory</item>
+        <item>com.coloros.scenemode</item>
+        <item>com.oplus.aiunit</item>
+        <item>com.oplus.uiengine</item>
+        <item>com.oplus.pscanvas</item>
+        <item>com.oneplus.account</item>
+        <item>com.oneplus.oshare</item>
+        <item>com.oneplus.deskclock</item>
+        <item>com.oplus.contentportal</item>
+        <item>com.oplus.securepay</item>
+        <item>com.oplus.apprecover</item>
+        <item>com.coloros.bootreg</item>
+        <item>com.oplus.screenrecorder</item>
+        <item>com.oppo.quicksearchbox</item>
+        <item>com.coloros.colordirectservice</item>
+        <item>com.heytap.pictorial</item>
+        <item>com.oplus.aod</item>
+        <item>com.android.wallpaper.livepicker</item>
+        <item>com.coloros.floatassistant</item>
+        <item>com.coloros.assistantscreen</item>
+        <item>com.coloros.accessibilityassistant</item>
+        <item>com.oplus.trafficmonitor</item>
+        <item>com.oplus.vdc</item>
+        <item>com.coloros.video</item>
+	</string-array>
+
+    <!-- DST ACCENT1 resource names (24 entries) -->
+    <string-array name="dst_accent1_res_names">
+        <item>accent_material_dark</item>
+        <item>holo_blue_light</item>
+        <item>system_accent1_100</item>
+        <item>system_accent1_200</item>
+        <item>system_accent1_300</item>
+        <item>system_accent1_400</item>
+        <item>system_accent1_500</item>
+        <item>system_accent1_600</item>
+        <item>system_accent1_700</item>
+        <item>system_accent2_100</item>
+        <item>system_accent2_200</item>
+        <item>system_accent2_300</item>
+        <item>system_accent2_400</item>
+        <item>system_accent2_500</item>
+        <item>system_accent2_600</item>
+        <item>system_accent2_700</item>
+        <item>system_accent3_100</item>
+        <item>system_accent3_200</item>
+        <item>system_accent3_300</item>
+        <item>system_accent3_400</item>
+        <item>system_accent3_500</item>
+        <item>system_accent3_600</item>
+        <item>system_accent3_700</item>
+        <item>system_secondary_container</item>
+    </string-array>
+
+    <!-- PIN Sfondo (background key) style entries -->
+    <string-array name="pin_style_entries">
+        <item>@string/pin_style_default</item>
+        <item>@string/pin_style_accent</item>
+        <item>@string/pin_style_accent_shade</item>
+        <item>@string/pin_style_custom</item>
+    </string-array>
+    <string-array name="pin_style_values">
+        <item>default</item>
+        <item>DSTPINAccent</item>
+        <item>DSTPINAccentShade</item>
+        <item>DSTPINCustom</item>
+    </string-array>
+
+    <!-- PIN Numeri (number text color) style entries -->
+    <string-array name="pin_num_style_entries">
+        <item>@string/pin_style_default</item>
+        <item>@string/pin_style_accent</item>
+        <item>@string/pin_style_accent_shade</item>
+        <item>@string/pin_style_custom</item>
+    </string-array>
+    <string-array name="pin_num_style_values">
+        <item>default</item>
+        <item>DSTNUMPINAccent</item>
+        <item>DSTNUMPINAccentShade</item>
+        <item>DSTNUMPINCustom</item>
+    </string-array>
+
+    <!-- Clock position -->
+    <string-array name="clock_position_entries">
+        <item>@string/clock_position_left</item>
+        <item>@string/clock_position_center</item>
+        <item>@string/clock_position_right</item>
+    </string-array>
+    <string-array name="clock_position_values">
+        <item>2</item>
+        <item>1</item>
+        <item>0</item>
+    </string-array>
+
+    <!-- Clock font size (sp) -->
+    <string-array name="clock_size_entries">
+        <item>12 sp (varsayılan)</item>
+        <item>13 sp</item>
+        <item>14 sp</item>
+        <item>15 sp</item>
+        <item>16 sp</item>
+        <item>17 sp</item>
+        <item>18 sp</item>
+        <item>19 sp</item>
+        <item>20 sp</item>
+    </string-array>
+    <integer-array name="clock_size_values">
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+    </integer-array>
+
+    <!-- Clock extra padding (dp) -->
+    <string-array name="clock_padding_entries">
+        <item>0 dp (varsayılan)</item>
+        <item>4 dp</item>
+        <item>8 dp</item>
+        <item>12 dp</item>
+        <item>16 dp</item>
+    </string-array>
+    <integer-array name="clock_padding_values">
+        <item>0</item>
+        <item>4</item>
+        <item>8</item>
+        <item>12</item>
+        <item>16</item>
+    </integer-array>
+
+    <!-- Clock background chip style -->
+    <string-array name="clock_chip_style_entries">
+        <item>@string/clock_chip_style_solid</item>
+        <item>@string/clock_chip_style_outline</item>
+        <item>@string/clock_chip_style_mixed</item>
+    </string-array>
+
+    <!-- Clock chip corner radius -->
+    <string-array name="clock_chip_corner_entries">
+        <item>0 dp (kare)</item>
+        <item>7 dp</item>
+        <item>14 dp (varsayılan)</item>
+        <item>21 dp</item>
+        <item>28 dp (hap)</item>
+    </string-array>
+    <integer-array name="clock_chip_corner_values">
+        <item>0</item>
+        <item>7</item>
+        <item>14</item>
+        <item>21</item>
+        <item>28</item>
+    </integer-array>
+
+    <!-- Clock chip padding -->
+    <string-array name="clock_chip_padding_entries">
+        <item>0 dp</item>
+        <item>4 dp</item>
+        <item>8 dp (varsayılan)</item>
+        <item>12 dp</item>
+        <item>16 dp</item>
+    </string-array>
+    <integer-array name="clock_chip_padding_values">
+        <item>0</item>
+        <item>4</item>
+        <item>8</item>
+        <item>12</item>
+        <item>16</item>
+    </integer-array>
+
+    <!-- Wi-Fi / Mobile signal icon size (dp) — stock size is 15dp -->
+    <string-array name="signal_icon_scale_entries">
+        <item>12 dp</item>
+        <item>13 dp</item>
+        <item>14 dp</item>
+        <item>15 dp (varsayılan)</item>
+        <item>16 dp</item>
+        <item>17 dp</item>
+        <item>18 dp</item>
+        <item>19 dp</item>
+        <item>20 dp</item>
+    </string-array>
+    <integer-array name="signal_icon_scale_values">
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+    </integer-array>
+
+    <!-- Date display -->
+    <string-array name="clock_date_entries">
+        <item>@string/clock_date_off</item>
+        <item>@string/clock_date_small</item>
+        <item>@string/clock_date_normal</item>
+    </string-array>
+    <string-array name="clock_date_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <!-- Date position -->
+    <string-array name="clock_date_position_entries">
+        <item>@string/clock_date_before</item>
+        <item>@string/clock_date_after</item>
+    </string-array>
+    <string-array name="clock_date_position_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <!-- AM/PM style -->
+    <string-array name="clock_ampm_entries">
+        <item>@string/clock_ampm_normal</item>
+        <item>@string/clock_ampm_small</item>
+        <item>@string/clock_ampm_hidden</item>
+    </string-array>
+    <string-array name="clock_ampm_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <!-- DST: CPB preset names (matches DSTCPB1..5 overlay order) -->
+    <string-array name="dst_cpb_preset_names">
+        <item>CPB Aurora Theme</item>
+        <item>CPB Arrow</item>
+        <item>CPB Radioactive</item>
+        <item>CPB Sprite Theme</item>
+        <item>CPB Stars</item>
+    </string-array>
+
+    <!-- DST: RVD preset names (DSTRVDAccent..DSTRVDOutlinedTrasp) -->
+    <string-array name="dst_rvd_preset_names">
+        <item>Yuvarlak Vurgu</item>
+        <item>Yuvarlak Vurgu Tonu</item>
+        <item>Yuvarlak Koyu Gri</item>
+        <item>Yuvarlak Açık Gri</item>
+        <item>Yuvarlak Beyaz</item>
+        <item>Yuvarlak Dış Çizgili</item>
+        <item>Yuvarlak Yarı Saydam</item>
+        <item>Yuvarlak Dış Çizgili Saydam</item>
+    </string-array>
+
+    <!-- DST: SVD preset names (DSTSVDAccent..DSTSVDOutlinedTrasp) -->
+    <string-array name="dst_svd_preset_names">
+        <item>Kare Vurgu</item>
+        <item>Kare Vurgu Tonu</item>
+        <item>Kare Koyu Gri</item>
+        <item>Kare Açık Gri</item>
+        <item>Kare Beyaz</item>
+        <item>Kare Dış Çizgili</item>
+        <item>Kare Yarı Saydam</item>
+        <item>Kare Dış Çizgili Saydam</item>
+    </string-array>
+
+    <string-array name="dst_toast_preset_names">
+        <item>Katı</item>
+        <item>İnce Kenar</item>
+        <item>Kalın Kenar</item>
+        <item>Katı Vurgu</item>
+        <item>Yarı Saydam</item>
+        <item>Vurgu Geçişi</item>
+        <item>Cam</item>
+        <item>Gri</item>
+        <item>Çift Vurgu</item>
+        <item>Nötr Saydam</item>
+        <item>Vurgu + Kaplama</item>
+        <item>Asimetrik Hap</item>
+    </string-array>
+
+    <!-- QS Header Clock: Red One behavior modes (order must match RED_ONE_MODE_* in
+         QsHeaderClockFragment: 0=default, 1=disable, 2=accent, 3=custom) -->
+    <string-array name="qs_header_red_one_mode_entries">
+        <item>@string/default_value</item>
+        <item>@string/dst_disable</item>
+        <item>@string/accent_color</item>
+        <item>@string/custom_color</item>
+    </string-array>
+
+    <!-- DST: Notification style preset names — order must match ThemeStyleFragment.NOTIF_OVERLAYS
+         (Image first, then the 4 transparent ones, then the procedural textures, then the rest). -->
+    <string-array name="dst_notif_preset_names">
+        <item>Resim</item>
+        <item>İnce Çizgi Saydam</item>
+        <item>Çizgi Saydam %25</item>
+        <item>Çizgi Saydam %50</item>
+        <item>Çizgi Saydam %75</item>
+        <item>Noktalar</item>
+        <item>Çizgiler</item>
+        <item>Gürültü</item>
+        <item>Kalpler</item>
+        <item>Karolar</item>
+        <item>Sinekler</item>
+        <item>Maçalar</item>
+        <item>Dama Tahtası</item>
+        <item>Dalgalar</item>
+        <item>Örgü</item>
+        <item>Çizgi Vurgu</item>
+        <item>Yarı Saydam</item>
+        <item>Saydam</item>
+        <item>Zifiri Siyah</item>
+        <item>Monet</item>
+        <item>Katı Vurgu</item>
+        <item>Katmanlar</item>
+        <item>İnce Çizgi</item>
+        <item>Alt Çizgi</item>
+        <item>Neumorph</item>
+        <item>Yığın</item>
+        <item>Yan Yığın</item>
+        <item>Kalın Çizgi</item>
+        <item>Lighty</item>
+        <item>Lighty v2</item>
+        <item>Lighty v3</item>
+        <item>Neumorph Çizgi</item>
+        <item>Cyberponk</item>
+        <item>Cyberponk v2</item>
+        <item>İplik Çizgisi</item>
+        <item>Solmuş</item>
+        <item>Dambıl</item>
+        <item>Çift Çizgi</item>
+        <item>iOS</item>
+    </string-array>
+
+    <!-- Date format -->
+    <string-array name="clock_date_format_entries">
+        <item>dd/MM/yy</item>
+        <item>MM/dd/yy</item>
+        <item>yyyy-MM-dd</item>
+        <item>dd-MM-yyyy</item>
+        <item>MMM dd</item>
+        <item>MMM dd, yyyy</item>
+        <item>MMMM dd, yyyy</item>
+        <item>EEE</item>
+        <item>EEE dd</item>
+        <item>EEE dd/MM</item>
+        <item>EEE dd MMM</item>
+        <item>EEE MMM dd</item>
+        <item>EEE MMMM dd</item>
+        <item>EEEE dd/MM</item>
+        <item>EEE, d MMM (varsayılan)</item>
+    </string-array>
+    <string-array name="clock_date_format_values">
+        <item>dd/MM/yy</item>
+        <item>MM/dd/yy</item>
+        <item>yyyy-MM-dd</item>
+        <item>dd-MM-yyyy</item>
+        <item>MMM dd</item>
+        <item>MMM dd, yyyy</item>
+        <item>MMMM dd, yyyy</item>
+        <item>EEE</item>
+        <item>EEE dd</item>
+        <item>EEE dd/MM</item>
+        <item>EEE dd MMM</item>
+        <item>EEE MMM dd</item>
+        <item>EEE MMMM dd</item>
+        <item>EEEE dd/MM</item>
+        <item>EEE, d MMM</item>
+    </string-array>
+
+    <!-- DST: Notification corner radius preset names -->
+    <string-array name="dst_notif_corner_names">
+        <item>2 dp</item>
+        <item>4 dp</item>
+        <item>8 dp</item>
+        <item>12 dp</item>
+        <item>16 dp</item>
+        <item>20 dp</item>
+        <item>24 dp (varsayılan)</item>
+        <item>28 dp</item>
+        <item>32 dp</item>
+    </string-array>
+
+    <!-- Volume Panel -->
+    <string-array name="vol_panel_position_entries">
+        <item>@string/vol_panel_position_default</item>
+        <item>@string/vol_panel_position_right</item>
+        <item>@string/vol_panel_position_left</item>
+    </string-array>
+    <string-array name="vol_panel_position_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="vol_panel_timeout_entries">
+        <item>1 sn</item>
+        <item>2 sn</item>
+        <item>3 sn</item>
+        <item>5 sn</item>
+        <item>7 sn</item>
+        <item>10 sn</item>
+    </string-array>
+    <integer-array name="vol_panel_timeout_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>5</item>
+        <item>7</item>
+        <item>10</item>
+    </integer-array>
+
+    <!-- AOD: edge light style picker (UI-only placeholder names) -->
+    <!-- Real OC edge light styles (edge_light_style_entries in OC's own arrays.xml) -->
+    <string-array name="edge_light_style_entries">
+        <item>Çizgi Çiz</item>
+        <item>Yanıp Sön</item>
+        <item>Yan Çizgiler</item>
+        <item>Yılan</item>
+        <item>Yankı</item>
+    </string-array>
+
+    <!-- AOD: edge light re-trigger interval -->
+    <string-array name="edge_light_retick_entries">
+        <item>@string/edge_light_30_sec</item>
+        <item>@string/edge_light_1_min</item>
+        <item>@string/edge_light_2_min</item>
+        <item>@string/edge_light_5_min</item>
+        <item>@string/edge_light_10_min</item>
+    </string-array>
+
+    <!-- AOD: edge light blur mode / type -->
+    <string-array name="edge_light_blur_mode_entries">
+        <item>@string/edge_light_blur_mode_both</item>
+        <item>@string/edge_light_blur_mode_blur_only</item>
+    </string-array>
+    <string-array name="edge_light_blur_type_entries">
+        <item>@string/edge_light_blur_type_normal</item>
+        <item>@string/edge_light_blur_type_solid</item>
+        <item>@string/edge_light_blur_type_inner</item>
+        <item>@string/edge_light_blur_type_outer</item>
+    </string-array>
+
+    <!-- AOD: edge light color mode -->
+    <string-array name="edge_light_color_mode_entries">
+        <item>@string/accent_color</item>
+        <item>@string/notification_color</item>
+        <item>@string/wallpaper_color</item>
+        <item>@string/edge_light_rainbow_gradient</item>
+        <item>@string/custom_color</item>
+    </string-array>
+
+    <!-- Orologio SdB: 61 stili reali, porting dei layout di OC -->
+    <string-array name="lockscreen_clock_style_entries">
+        <item>Saat Stili 1</item>
+        <item>Saat Stili 2</item>
+        <item>Saat Stili 3</item>
+        <item>Saat Stili 4</item>
+        <item>Saat Stili 5</item>
+        <item>Saat Stili 6</item>
+        <item>Saat Stili 7</item>
+        <item>Saat Stili 8</item>
+        <item>Saat Stili 9</item>
+        <item>Saat Stili 10</item>
+        <item>Saat Stili 11</item>
+        <item>Saat Stili 12</item>
+        <item>Saat Stili 13</item>
+        <item>Saat Stili 14</item>
+        <item>Saat Stili 15</item>
+        <item>Saat Stili 16</item>
+        <item>Saat Stili 17</item>
+        <item>Saat Stili 18</item>
+        <item>Saat Stili 19</item>
+        <item>Saat Stili 20</item>
+        <item>Saat Stili 21</item>
+        <item>Saat Stili 22</item>
+        <item>Saat Stili 23</item>
+        <item>Saat Stili 24</item>
+        <item>Saat Stili 25</item>
+        <item>Saat Stili 26</item>
+        <item>Saat Stili 27</item>
+        <item>Saat Stili 28</item>
+        <item>Saat Stili 29</item>
+        <item>Saat Stili 30</item>
+        <item>Saat Stili 31</item>
+        <item>Saat Stili 32</item>
+        <item>Saat Stili 33</item>
+        <item>Saat Stili 34</item>
+        <item>Saat Stili 35</item>
+        <item>Saat Stili 36</item>
+        <item>Saat Stili 37</item>
+        <item>Saat Stili 38</item>
+        <item>Saat Stili 39</item>
+        <item>Saat Stili 40</item>
+        <item>Saat Stili 41</item>
+        <item>Saat Stili 42</item>
+        <item>Saat Stili 43</item>
+        <item>Saat Stili 44</item>
+        <item>Saat Stili 45</item>
+        <item>Saat Stili 46</item>
+        <item>Saat Stili 47</item>
+        <item>Saat Stili 48</item>
+        <item>Saat Stili 49</item>
+        <item>Saat Stili 50</item>
+        <item>Saat Stili 51</item>
+        <item>Saat Stili 52</item>
+        <item>Saat Stili 53</item>
+        <item>Saat Stili 54</item>
+        <item>Saat Stili 55</item>
+        <item>Saat Stili 56</item>
+        <item>Saat Stili 57</item>
+        <item>Saat Stili 58</item>
+        <item>Saat Stili 59</item>
+        <item>Saat Stili 60</item>
+        <item>Saat Stili 61</item>
+    </string-array>
+
+    <!-- Orologio Intestazione QS -->
+    <string-array name="qs_header_clock_style_entries">
+        <item>Yok</item>
+        <item>Saat Stili 1</item>
+        <item>Saat Stili 2</item>
+        <item>Saat Stili 3</item>
+        <item>Saat Stili 4</item>
+        <item>Saat Stili 5</item>
+        <item>Saat Stili 6</item>
+        <item>Saat Stili 7</item>
+        <item>Saat Stili 8</item>
+    </string-array>
+
+    <!-- Orologio Intestazione QS: stock RED clock mode — reale OC, 4 opzioni (non on/off) -->
+    <string-array name="qs_header_stock_clock_red_one_entries">
+        <item>Varsayılan</item>
+        <item>Devre dışı bırak</item>
+        <item>Vurgu Rengi</item>
+        <item>Özel Renk</item>
+    </string-array>
+
+<!-- Meteo SdB -->
+    <string-array name="weather_update_interval_entries">
+        <item>30 dk</item>
+        <item>1 sa</item>
+        <item>3 sa</item>
+        <item>6 sa</item>
+    </string-array>
+    <!-- Ordine allineato a OC: 0=OpenWeatherMap, 1=MET Norway, 2=OpenMeteo, 3=Yandex -->
+    <string-array name="weather_provider_entries">
+        <item>OpenWeatherMap</item>
+        <item>MET Norway</item>
+        <item>OpenMeteo</item>
+        <item>Yandex</item>
+    </string-array>
+    <string-array name="weather_units_entries">
+        <item>Metrik</item>
+        <item>Emperyal</item>
+    </string-array>
+    <string-array name="lockscreen_weather_bg_entries">
+        <item>Varsayılan</item>
+        <item>Yarı saydam kutu</item>
+        <item>Yarı saydam kutu (yuvarlak)</item>
+        <item>Hap</item>
+        <item>Yuvarlak, basit ve vurgulu</item>
+        <item>Yuvarlak, saydam ve vurgulu</item>
+        <item>Geçiş</item>
+        <item>Vurgulu kenarlıklarla koyu</item>
+        <item>Geçişli kenarlıklarla koyu</item>
+    </string-array>
+
+    <!-- Widget SdB -->
+    <string-array name="lockscreen_widget_entries">
+        <item>Yok</item>
+        <item>Özel Uygulama</item>
+        <item>Hesap Makinesi</item>
+        <item>Medya</item>
+        <item>Zamanlayıcı</item>
+        <item>Fener</item>
+        <item>Hava Durumu</item>
+        <item>Wi-Fi</item>
+        <item>Mobil Veri (geliştirme aşamasında)</item>
+        <item>Zil Sesi</item>
+        <item>Bluetooth</item>
+        <item>Cihaz Denetimleri</item>
+        <item>Kamera</item>
+        <item>Cüzdan</item>
+        <item>Hotspot (geliştirme aşamasında)</item>
+    </string-array>
+    <!-- Lockscreen album cover filter -->
+    <string-array name="lockscreen_album_art_filter_entries">
+        <item>@string/lockscreen_album_art_filter_none</item>
+        <item>@string/lockscreen_album_art_filter_grayscale</item>
+        <item>@string/lockscreen_album_art_filter_accent</item>
+        <item>@string/lockscreen_album_art_filter_blur</item>
+        <item>@string/lockscreen_album_art_filter_gray_blur</item>
+    </string-array>
+
+    <!-- Battery percentage font size -->
+    <string-array name="battery_percent_size_entries">
+        <item>8 sp</item>
+        <item>9 sp</item>
+        <item>10 sp</item>
+        <item>11 sp</item>
+        <item>12 sp (varsayılan)</item>
+        <item>13 sp</item>
+        <item>14 sp</item>
+        <item>15 sp</item>
+        <item>16 sp</item>
+        <item>18 sp</item>
+        <item>20 sp</item>
+    </string-array>
+    <integer-array name="battery_percent_size_values">
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>18</item>
+        <item>20</item>
+    </integer-array>
+
+    <!-- Battery icon style names (index matches BatteryIconFragment.STYLE_VALUES) -->
+    <string-array name="battery_style_names">
+        <item>RLandscape (Varsayılan)</item>
+        <item>Landscape</item>
+        <item>Portrait Capsule</item>
+        <item>Portrait Lorn</item>
+        <item>Portrait MX</item>
+        <item>Portrait Airoo</item>
+        <item>RLandscape Style A</item>
+        <item>Landscape Style A</item>
+        <item>RLandscape Style B</item>
+        <item>Landscape Style B</item>
+        <item>Landscape iOS 15</item>
+        <item>Landscape iOS 16</item>
+        <item>Portrait Origami</item>
+        <item>Landscape Smiley</item>
+        <item>Landscape MIUI Pill</item>
+        <item>Landscape ColorOS</item>
+        <item>RLandscape ColorOS</item>
+        <item>Landscape Battery A</item>
+        <item>Landscape Battery B</item>
+        <item>Landscape Battery C</item>
+        <item>Landscape Battery D</item>
+        <item>Landscape Battery E</item>
+        <item>Landscape Battery F</item>
+        <item>Landscape Battery G</item>
+        <item>Landscape Battery H</item>
+        <item>Landscape Battery I</item>
+        <item>Landscape Battery J</item>
+        <item>Landscape Battery K</item>
+        <item>Landscape Battery L</item>
+        <item>Landscape Battery M</item>
+        <item>Landscape Battery N</item>
+        <item>Landscape Battery O</item>
+        <item>Circle</item>
+        <item>Dotted Circle</item>
+        <item>Filled Circle</item>
+        <item>Landscape Kim</item>
+        <item>Landscape One UI 7</item>
+    </string-array>
+
+    <!-- Barra di Navigazione: modalità override tieni premuto -->
+    <string-array name="gesture_holdback_mode_entries">
+        <item>Her iki taraf için aynı komut</item>
+        <item>Tarafa göre komut seç</item>
+    </string-array>
+
+    <!-- Barra di Navigazione: comandi tieni premuto -->
+    <string-array name="gesture_holdback_commands_entries">
+        <item>Önceki uygulamaya geç</item>
+        <item>Etkin uygulamayı kapat</item>
+        <item>Ekran görüntüsü</item>
+        <item>Kaydırmalı ekran görüntüsü</item>
+        <item>Kısmi ekran görüntüsü</item>
+        <item>Hızlı Ayarları aç (kullanılamıyor)</item>
+        <item>Tek el modunu etkinleştir (kullanılamıyor)</item>
+        <item>Bildirim panelini aç (kullanılamıyor)</item>
+        <item>Ekranı kapat</item>
+        <item>Circle to Search (kullanılamıyor)</item>
+        <item>Özel uygulama (kullanılamıyor)</item>
+    </string-array>
+
+    <!-- Impostazioni rapide: lato apertura rapida -->
+    <string-array name="quick_pulldown_side_entries">
+        <item>Sol</item>
+        <item>Sağ</item>
+    </string-array>
+
+    <!-- Notifiche Barra di Stato: espansione predefinita -->
+    <string-array name="notif_default_expansion_entries">
+        <item>Varsayılan</item>
+        <item>Her zaman genişlet</item>
+        <item>Her zaman daralt</item>
+        <item>Uygulama başına seçim</item>
+    </string-array>
+
+    <!-- Stile Icone Impostazioni (pack HOS): colore sfondo / colore icona -->
+    <string-array name="settings_icons_color_entries">
+        <item>Vurgu Rengi</item>
+        <item>Beyaz</item>
+        <item>Siyah</item>
+    </string-array>
+
+    <!-- Stile Icone Impostazioni (pack HOS): forma sfondo -->
+    <string-array name="settings_icons_shape_entries">
+        <item>Daire</item>
+        <item>Squircle</item>
+        <item>Yuvarlatılmış Kare</item>
+        <item>Damla</item>
+        <item>Elmas</item>
+    </string-array>
+
+    <!-- Stile Icone Impostazioni (pack HOS): sfondo solido on/off -->
+    <string-array name="settings_icons_solid_entries">
+        <item>Kapalı</item>
+        <item>Açık</item>
+    </string-array>
+
+    <!-- Personalizza Riquadri (QsTilesCustomizeFragment) -->
+    <string-array name="qs_tile_animation_style_entries">
+        <item>Kapalı</item>
+        <item>Döndür</item>
+        <item>X Ekseninde Çevir</item>
+        <item>Y Ekseninde Çevir</item>
+        <item>Salla</item>
+        <item>Belirerek Gir</item>
+        <item>X Ekseninde Sekme</item>
+        <item>Y Ekseninde Sekme</item>
+        <item>X Ekseninde Nabız</item>
+        <item>Y Ekseninde Nabız</item>
+    </string-array>
+    <string-array name="qs_tile_animation_interpolator_entries">
+        <item>Doğrusal</item>
+        <item>Hızlandır</item>
+        <item>Yavaşlat</item>
+        <item>Hızlandır/Yavaşlat</item>
+        <item>Sekme</item>
+        <item>Aşırı Geçiş</item>
+        <item>Öngörme</item>
+        <item>Öngörme/Aşırı Geçiş</item>
+    </string-array>
+    <string-array name="qs_tile_transitions_entries">
+        <item>Kapalı</item>
+        <item>Küp İçeri</item>
+        <item>Küp Dışarı</item>
+        <item>Akordeon</item>
+        <item>Arka Plandan Ön Plana</item>
+        <item>Derinlik Sayfası</item>
+        <item>Soldur</item>
+        <item>Ön Plandan Arka Plana</item>
+        <item>Aşağı Döndür</item>
+        <item>Yukarı Döndür</item>
+        <item>Yığın</item>
+        <item>Tablet</item>
+        <item>Yakınlaştır</item>
+        <item>Uzaklaştır</item>
+        <item>Uzaklaştır ve Kaydır</item>
+        <item>Merkezden Yüksel</item>
+        <item>Alttan Döndür</item>
+        <item>Y\'de Kaydır (üstten alta)</item>
+        <item>Y\'de Kaydır (alttan üste)</item>
+    </string-array>
+    <string-array name="brightness_slider_style_entries">
+        <item>Varsayılan</item>
+        <item>Vurgu Rengi</item>
+        <item>Özel Renk</item>
+    </string-array>
+    <string-array name="qs_brightness_icon_entries">
+        <item>Varsayılan</item>
+        <item>Koyu</item>
+        <item>Beyaz</item>
+        <item>Vurgu</item>
+        <item>Özel</item>
+    </string-array>
+
+    <!-- Language picker: names of each supported language translated into THIS language,
+         so the reader always understands the list in their own tongue. Order matches
+         SettingsGeneralFragment.LANGUAGE_TAGS[1..11]. -->
+    <string-array name="language_localized_names">
+        <item>İngilizce</item>
+        <item>İtalyanca</item>
+        <item>Rusça</item>
+        <item>Portekizce (Brezilya)</item>
+        <item>Endonezce</item>
+        <item>İspanyolca</item>
+        <item>Türkçe</item>
+        <item>Almanca</item>
+        <item>Çince (Basitleştirilmiş)</item>
+        <item>Vietnamca</item>
+        <item>Ukraynaca</item>
+    </string-array>
+</resources>
