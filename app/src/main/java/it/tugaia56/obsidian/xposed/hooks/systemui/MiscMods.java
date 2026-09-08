@@ -140,6 +140,56 @@ public class MiscMods extends XposedMods {
         }
     }
 
+    /** 2026-09-07: segnalato dall'utente ("il pillolone e lo sfondo spesso tornano stock") —
+     *  a differenza di SettingsCardBackgroundMod/DstCpbStyle/DstNotifStyle, questa classe non
+     *  aveva MAI avuto un fallback: fino a che updatePrefs() non arrivava dal ContentProvider
+     *  (la stessa corsa al boot già vista altrove in questo progetto), il menù accensione
+     *  mostrava sempre lo stock — SystemUI parte prestissimo al boot, quindi la finestra in cui
+     *  l'utente può aprirlo prima che Xprefs sia pronto è tutt'altro che rara. Stesso canale
+     *  (system properties, scritte da DstFabricatedUtil.saveBootProps() quando si esce dalla
+     *  schermata "Menù accensione") usato ovunque altro in questo file per lo stesso motivo. */
+    @Override
+    public void preloadFallback() {
+        try {
+            mPowerMenuGradientMode = readSysProp("persist.obsidian.dst.pm_gradient_mode", "accent");
+            mPowerMenuGradientCustomColor = parseIntProp(
+                    readSysProp("persist.obsidian.dst.pm_gradient_color", ""), 0xFF908DFF);
+            mPowerMenuBgMode = readSysProp("persist.obsidian.dst.pm_bg_mode", "stock");
+            mPowerMenuBgCustomColor = parseIntProp(
+                    readSysProp("persist.obsidian.dst.pm_bg_color", ""), 0xFF908DFF);
+            mPowerMenuBorderEnabled = "1".equals(readSysProp("persist.obsidian.dst.pm_border_on", "0"));
+            mPowerMenuBorderUseAccent = "1".equals(readSysProp("persist.obsidian.dst.pm_border_accent", "1"));
+            mPowerMenuBorderCustomColor = parseIntProp(
+                    readSysProp("persist.obsidian.dst.pm_border_color", ""), 0xFF908DFF);
+            mPowerMenuHandlerMode = readSysProp("persist.obsidian.dst.pm_handler_mode", "stock");
+            mPowerMenuHandlerCustomColor = parseIntProp(
+                    readSysProp("persist.obsidian.dst.pm_handler_color", ""), 0xFF908DFF);
+            mPowerMenuMenuBgMode = readSysProp("persist.obsidian.dst.pm_menu_bg_mode", "stock");
+            mPowerMenuMenuBgCustomColor = parseIntProp(
+                    readSysProp("persist.obsidian.dst.pm_menu_bg_color", ""), 0xFF908DFF);
+            refreshPowerMenuBgBitmap();
+            refreshPowerMenuMenuBgBitmap();
+            refreshPowerMenuHandlerBitmap();
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] MiscMods.preloadFallback failed: " + t);
+        }
+    }
+
+    private static String readSysProp(String key, String def) {
+        try {
+            Class<?> sp = de.robv.android.xposed.XposedHelpers.findClass("android.os.SystemProperties", null);
+            Object val = de.robv.android.xposed.XposedHelpers.callStaticMethod(sp, "get", key, def);
+            return val != null ? (String) val : def;
+        } catch (Throwable t) {
+            return def;
+        }
+    }
+
+    private static int parseIntProp(String s, int def) {
+        if (s == null || s.isEmpty()) return def;
+        try { return Integer.parseInt(s); } catch (NumberFormatException ex) { return def; }
+    }
+
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lp) throws Throwable {
         if (!SYSTEM_UI.equals(lp.packageName)) return;

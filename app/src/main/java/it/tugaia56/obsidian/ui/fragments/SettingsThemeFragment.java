@@ -105,6 +105,9 @@ public class SettingsThemeFragment extends Fragment {
             if (success) {
                 ObsidianPrefs.putBoolean(KEY_APPLIED, true);
                 ObsidianPrefs.putBoolean(KEY_PENDING_REBOOT, !nowActive);
+                // 2026-09-05: serve al fallback file-property di SettingsCardBackgroundMod per
+                // le app che non possono mai vedere il ContentProvider — vedi lì.
+                it.tugaia56.obsidian.utils.DstFabricatedUtil.saveBootProps();
             }
             boolean finalSuccess = success;
             boolean finalActive = nowActive;
@@ -134,6 +137,7 @@ public class SettingsThemeFragment extends Fragment {
             OverlayUtil.disableOverlays(OVERLAY);
             ObsidianPrefs.putBoolean(KEY_APPLIED, false);
             ObsidianPrefs.putBoolean(KEY_PENDING_REBOOT, false);
+            it.tugaia56.obsidian.utils.DstFabricatedUtil.saveBootProps();
             new Handler(Looper.getMainLooper()).post(() -> {
                 if (!isAdded()) return;
                 setBusy(false);

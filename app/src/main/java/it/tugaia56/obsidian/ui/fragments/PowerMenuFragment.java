@@ -167,6 +167,18 @@ public class PowerMenuFragment extends Fragment {
         EventBus.getDefault().unregister(this);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        // 2026-09-07: "il pillolone e lo sfondo spesso tornano stock" — MiscMods non aveva un
+        // preloadFallback come SettingsCardBackgroundMod/DstCpbStyle/DstNotifStyle, quindi le
+        // property di boot per il menù accensione restavano sempre a zero. Salviamole quando si
+        // esce da questa schermata (invece che ad ogni singola opzione) — copre tutte le
+        // modifiche di questa sessione in un colpo solo, non serve toccare ogni singolo
+        // ObsidianPrefs.put... sparso nel file.
+        new Thread(it.tugaia56.obsidian.utils.DstFabricatedUtil::saveBootProps).start();
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onColorSelected(ColorSelectedEvent event) {
         if (event.dialogId() == DIALOG_CUSTOM_COLOR) {

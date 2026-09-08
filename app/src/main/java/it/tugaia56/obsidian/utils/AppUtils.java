@@ -65,6 +65,17 @@ public class AppUtils {
                         R.string.restart_systemui_reminder, Toast.LENGTH_SHORT).show());
     }
 
+    /**
+     * Reminder for settings applied via a hook installed once in ZYGOTE at boot
+     * (es. DstDialogStyle.hookDialogGlobal, "Raggio Finestre Dialogo") — a SystemUI
+     * restart does NOT reload zygote-cached hooks, only a full device reboot does.
+     */
+    public static void showRebootReminder(Context context) {
+        new Handler(Looper.getMainLooper()).post(() ->
+                Toast.makeText(context.getApplicationContext(),
+                        R.string.reboot_device_reminder, Toast.LENGTH_LONG).show());
+    }
+
     /** Percorsi APK/split del pacchetto — servono ad aapt2 come riferimento risorse
      *  aggiuntivo (-I) quando compila un overlay contro un target reale (es. com.android.settings). */
     public static String[] getSplitLocations(String packageName) {

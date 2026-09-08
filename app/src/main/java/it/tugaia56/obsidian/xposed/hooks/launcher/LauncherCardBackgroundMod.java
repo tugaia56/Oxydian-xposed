@@ -59,13 +59,15 @@ import it.tugaia56.obsidian.xposed.XposedMods;
 public class LauncherCardBackgroundMod extends XposedMods {
 
     private boolean mThemeApplied = false;
-    // android:color/button_material_dark, il colore grigio scuro standard AOSP che l'overlay
-    // "Stile Launcher" avrebbe dovuto assegnare alle card (finito scambiato con lo sfondo di
-    // pagina invece — vedi project_launcher_mods_rollout memory).
-    // Stesso hex navy ovunque (DST_BACKGROUND) — card E sfondo uguali, "invisibili" come in
-    // Impostazioni, su richiesta esplicita dell'utente (non piu' grigio button_material_dark).
-    private final int mCardColor = 0xFF1B2029;
-    private final int mPageColor = 0xFF1B2029;
+    private static final int DEFAULT_CARD_COLOR = 0xFF1B2029;
+    // 2026-09-04: era un valore fisso (stesso bug segnalato dall'utente per Settings) — ora legge
+    // il "Colore Sfondo" (DST_BACKGROUND) dal vivo, stesse chiavi/logica di MonetFreeze/
+    // SettingsCardBackgroundMod, così card e pagina seguono il colore scelto invece di restare
+    // bloccate sul default.
+    private static final String PREF_BG_ON = "DST_BACKGROUND_on";
+    private static final String PREF_BG    = "DST_BACKGROUND";
+    private int mCardColor = DEFAULT_CARD_COLOR;
+    private int mPageColor = DEFAULT_CARD_COLOR;
 
     private final List<WeakReference<Object>> mCardInstances = new CopyOnWriteArrayList<>();
     private final List<WeakReference<Activity>> mActivities = new CopyOnWriteArrayList<>();
@@ -76,6 +78,10 @@ public class LauncherCardBackgroundMod extends XposedMods {
     public void updatePrefs(String... Key) {
         if (Xprefs == null) return;
         mThemeApplied = Xprefs.getBoolean("launcher_theme_applied", false);
+        mCardColor = Xprefs.getBoolean(PREF_BG_ON, false)
+                ? (Xprefs.getInt(PREF_BG, DEFAULT_CARD_COLOR) | 0xFF000000)
+                : DEFAULT_CARD_COLOR;
+        mPageColor = mCardColor;
         new Handler(Looper.getMainLooper()).post(() -> {
             reapplyCardColors();
             reapplyPageColor();

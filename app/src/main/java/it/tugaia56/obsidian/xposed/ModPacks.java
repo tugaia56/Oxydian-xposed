@@ -1,7 +1,10 @@
 package it.tugaia56.obsidian.xposed;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import it.tugaia56.obsidian.utils.Constants;
 import it.tugaia56.obsidian.xposed.hooks.framework.MonetFreeze;
@@ -45,6 +48,35 @@ import it.tugaia56.obsidian.xposed.hooks.launcher.LauncherMod;
 import it.tugaia56.obsidian.xposed.hooks.launcher.LauncherCardBackgroundMod;
 
 public class ModPacks {
+    // 2026-09-05: elenco lungo fornito dall'utente (app di sistema già temate via Substratum),
+    // verificate TUTTE una per una via script su device (unzip -p + grep sul dex reale) prima di
+    // aggiungerle — 58 su 61 avevano davvero le classi COUI card. Vedi SettingsCardBackgroundMod
+    // per l'elenco commentato e i 3 esclusi (nessuna classe COUI: cellbroadcastreceiver,
+    // providers.media, engineermode).
+    private static final Set<String> CARD_BG_PACKAGES = new HashSet<>(Arrays.asList(
+            "com.oplus.wirelesssettings", "com.oplus.cast", "com.oplus.linker",
+            "com.oplus.wallpapers", "com.oplus.notificationmanager", "com.oplus.uxdesign",
+            "com.oplus.sos", "com.oplus.battery", "com.oplus.pantanal.ums",
+            "com.coloros.operationManual", "com.heytap.mydevices", "com.android.phone",
+            "com.oplus.cota", "com.oplus.ota", "com.oplus.multiapp", "com.oplus.games",
+            "com.coloros.smartsidebar", "com.oplus.beaconlink", "com.oplus.appbooster",
+            "com.oneplus.calculator", "com.oplus.safecenter", "com.oplus.keyguard.clock.base",
+            "com.coloros.systemclone", "com.oplus.eyeprotect", "com.heytap.accessory",
+            "com.oplus.remotecontrol", "com.oplus.aiwriter", "com.oplus.melody",
+            "com.oneplus.gallery", "com.oplus.camera", "com.oplus.gesture",
+            "com.oplus.securitypermission", "com.oplus.phonemanager", "com.android.server.telecom",
+            "com.heytap.browser", "net.oneplus.weather", "com.oplus.aimemory",
+            "com.coloros.scenemode", "com.oplus.aiunit", "com.oplus.uiengine",
+            "com.oplus.pscanvas", "com.oneplus.account", "com.oneplus.oshare",
+            "com.oneplus.deskclock", "com.oplus.contentportal", "com.oplus.securepay",
+            "com.oplus.apprecover", "com.coloros.bootreg", "com.oplus.screenrecorder",
+            "com.oppo.quicksearchbox", "com.coloros.colordirectservice", "com.oplus.screenshot",
+            "com.heytap.pictorial", "com.oplus.aod", "com.android.wallpaper.livepicker",
+            "com.coloros.floatassistant", "com.coloros.assistantscreen",
+            "com.coloros.accessibilityassistant", "com.oplus.trafficmonitor", "com.oplus.vdc",
+            "com.coloros.video"
+    ));
+
     public static List<Class<? extends XposedMods>> getMods(String packageName) {
         List<Class<? extends XposedMods>> mods = new ArrayList<>();
         if (Constants.Packages.SYSTEM_UI.equals(packageName)) {
@@ -85,6 +117,12 @@ public class ModPacks {
         }
         if (Constants.Packages.SETTINGS.equals(packageName)) {
             mods.add(CustomShortcut.class);
+            mods.add(SettingsCardBackgroundMod.class);
+        }
+        // 2026-09-04/05: card "invisibili" + sfondo pagina estesi alle app OEM raggiunte da
+        // dentro Impostazioni — verificate PRIMA di aggiungerle (stesse classi COUI di Settings
+        // nel dex reale, vedi CARD_BG_PACKAGES sopra).
+        if (CARD_BG_PACKAGES.contains(packageName)) {
             mods.add(SettingsCardBackgroundMod.class);
         }
         if (Constants.Packages.FRAMEWORK.equals(packageName)) {

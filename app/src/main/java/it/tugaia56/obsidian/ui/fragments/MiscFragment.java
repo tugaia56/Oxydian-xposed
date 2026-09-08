@@ -70,8 +70,22 @@ public class MiscFragment extends Fragment {
         settingsEntryItem.onChanged = () ->
                 ObsidianPrefs.putBoolean("show_entry_settings", settingsEntryItem.checked);
 
-        SwitchWidgetAdapter togglesAdapter =
-                new SwitchWidgetAdapter(List.of(rotationItem, usbItem, settingsEntryItem));
+        SwitchWidgetAdapter.SwitchItem screenshotItem = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.nav_screenshot_enabler),
+                getString(R.string.nav_screenshot_enabler_summary),
+                ObsidianPrefs.getBoolean("DST_SCREENSHOT_ENABLER_ON", false),
+                null);
+        screenshotItem.onChanged = () -> {
+            ObsidianPrefs.putBoolean("DST_SCREENSHOT_ENABLER_ON", screenshotItem.checked);
+            new Thread(() -> {
+                it.tugaia56.obsidian.utils.DstFabricatedUtil.saveBootProps();
+                requireActivity().runOnUiThread(() ->
+                        it.tugaia56.obsidian.utils.AppUtils.showRebootReminder(requireContext()));
+            }).start();
+        };
+
+        SwitchWidgetAdapter togglesAdapter = new SwitchWidgetAdapter(
+                List.of(rotationItem, usbItem, settingsEntryItem, screenshotItem));
 
         List<NavAdapter.NavItem> items = List.of(
 
@@ -80,7 +94,21 @@ public class MiscFragment extends Fragment {
                         getString(R.string.nav_misc_power_menu),
                         getString(R.string.nav_misc_power_menu_summary),
                         () -> navigate(new PowerMenuFragment(),
-                                getString(R.string.nav_misc_power_menu)))
+                                getString(R.string.nav_misc_power_menu))),
+
+                new NavAdapter.NavItem(
+                        R.drawable.ic_settings,
+                        getString(R.string.nav_corepatch),
+                        getString(R.string.nav_corepatch_summary),
+                        () -> navigate(new CorePatchFragment(),
+                                getString(R.string.nav_corepatch))),
+
+                new NavAdapter.NavItem(
+                        R.drawable.ic_settings,
+                        getString(R.string.nav_lucky_extras),
+                        getString(R.string.nav_lucky_extras_summary),
+                        () -> navigate(new LuckyExtrasFragment(),
+                                getString(R.string.nav_lucky_extras)))
         );
         rv.setAdapter(new ConcatAdapter(togglesAdapter, new NavAdapter(items, 0xFFFF6E40))); // deep orange accent, colore categoria "Varie"
     }

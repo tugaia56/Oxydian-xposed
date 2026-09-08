@@ -178,6 +178,14 @@ public class DstFabricatedUtil {
             int     a3   = ObsidianPrefs.getInt(    "DST_ACCENT3",        0);
             boolean bgOn = ObsidianPrefs.getBoolean("DST_BACKGROUND_on", false);
             int     bg   = ObsidianPrefs.getInt(    "DST_BACKGROUND",     0);
+            // 2026-09-05: serve a SettingsCardBackgroundMod.preloadFallback() — alcune app
+            // (com.oneplus.account, com.oplus.games) non possono MAI vedere il ContentProvider
+            // di Obsidian (filtro di visibilità pacchetti di Android, permanente, non un
+            // problema di timing) né leggere il file prefs (cartella privata di un'altra app,
+            // permesso negato all'UID di quell'app anche con la stessa causa). Le system
+            // properties sono l'UNICO canale leggibile da qualunque app indipendentemente da
+            // entrambi questi limiti — stesso motivo per cui MonetFreeze le usa già.
+            boolean settingsThemeApplied = ObsidianPrefs.getBoolean("settings_theme_applied", false);
             String  pin       = ObsidianPrefs.getString("DST_PIN",              "");
             String  pinNum    = ObsidianPrefs.getString("DST_PIN_NUM",          "");
             String  dlgPreset = ObsidianPrefs.getString("DST_DLG_PRESET_NAME",  "");
@@ -197,7 +205,36 @@ public class DstFabricatedUtil {
             boolean notifTexBrdOn    = ObsidianPrefs.getBoolean("DST_NOTIF_TEXTURE_BORDER_ENABLED", false);
             String  notifTexBrdMode  = ObsidianPrefs.getString("DST_NOTIF_TEXTURE_BORDER_MODE", "accent");
             int     notifTexBrdCol   = ObsidianPrefs.getInt(   "DST_NOTIF_TEXTURE_BORDER_CUSTOM", 0xFF9C27B0);
+            int     notifImgOffsetY = ObsidianPrefs.getInt(   "DST_NOTIF_IMG_OFFSET_Y", 50);
             boolean qsBgOn       = ObsidianPrefs.getBoolean("DST_QS_BG_ENABLED", false);
+            boolean cpDowngrade      = ObsidianPrefs.getBoolean("DST_COREPATCH_DOWNGRADE",      true);
+            boolean cpBypassBlock    = ObsidianPrefs.getBoolean("DST_COREPATCH_BYPASS_BLOCK",    true);
+            boolean cpDisableVerify  = ObsidianPrefs.getBoolean("DST_COREPATCH_DISABLE_VERIFY",  true);
+            boolean screenshotEnabler = ObsidianPrefs.getBoolean("DST_SCREENSHOT_ENABLER_ON",    false);
+            boolean lkAdbConfirm  = ObsidianPrefs.getBoolean("DST_LUCKY_ADB_NO_CONFIRM",     false);
+            boolean lkPowerMenu   = ObsidianPrefs.getBoolean("DST_LUCKY_FAST_POWER_MENU",    false);
+            boolean lkVolFlash    = ObsidianPrefs.getBoolean("DST_LUCKY_VOLUME_FLASHLIGHT",  false);
+            boolean lkMultiApp    = ObsidianPrefs.getBoolean("DST_LUCKY_MULTIAPP_NO_BLACKLIST", false);
+            boolean lkPngShot     = ObsidianPrefs.getBoolean("DST_LUCKY_PNG_SCREENSHOT", false);
+            boolean lkLongshot    = ObsidianPrefs.getBoolean("DST_LUCKY_LONGSHOT_NO_LIMIT", false);
+            // 2026-09-07: segnalato dall'utente ("il pillolone e lo sfondo spesso tornano
+            // stock") — MiscMods (menù accensione: pillolone, sfondo, bordo, pallino) non aveva
+            // MAI avuto un preloadFallback come SettingsCardBackgroundMod/DstCpbStyle/DstNotifStyle,
+            // quindi era interamente in balìa della stessa corsa al boot (ContentProvider non
+            // ancora raggiungibile) senza alcuna rete di sicurezza — se l'utente apriva il menù
+            // accensione abbastanza presto, vedeva sempre lo stock finché updatePrefs() non
+            // arrivava. Stesso canale/stesso motivo delle altre.
+            String  pmGradientMode  = ObsidianPrefs.getString("power_menu_gradient_mode", "accent");
+            int     pmGradientColor = ObsidianPrefs.getInt(   "power_menu_gradient_custom_color", 0xFF908DFF);
+            String  pmBgMode        = ObsidianPrefs.getString("power_menu_bg_mode", "stock");
+            int     pmBgColor       = ObsidianPrefs.getInt(   "power_menu_bg_custom_color", 0xFF908DFF);
+            boolean pmBorderOn      = ObsidianPrefs.getBoolean("power_menu_border_enabled", false);
+            boolean pmBorderAccent  = ObsidianPrefs.getBoolean("power_menu_border_use_accent", true);
+            int     pmBorderColor   = ObsidianPrefs.getInt(   "power_menu_border_custom_color", 0xFF908DFF);
+            String  pmHandlerMode   = ObsidianPrefs.getString("power_menu_handler_mode", "stock");
+            int     pmHandlerColor  = ObsidianPrefs.getInt(   "power_menu_handler_custom_color", 0xFF908DFF);
+            String  pmMenuBgMode    = ObsidianPrefs.getString("power_menu_menu_bg_mode", "stock");
+            int     pmMenuBgColor   = ObsidianPrefs.getInt(   "power_menu_menu_bg_custom_color", 0xFF908DFF);
 
             Shell.Result propsResult = Shell.cmd(
                 "setprop persist.obsidian.dst.a1_on       " + (a1On ? "1" : "0"),
@@ -208,6 +245,7 @@ public class DstFabricatedUtil {
                 "setprop persist.obsidian.dst.a3          " + a3,
                 "setprop persist.obsidian.dst.bg_on       " + (bgOn ? "1" : "0"),
                 "setprop persist.obsidian.dst.bg          " + bg,
+                "setprop persist.obsidian.dst.settings_theme_on " + (settingsThemeApplied ? "1" : "0"),
                 "setprop persist.obsidian.dst.pin          \"" + (pin       == null ? "" : pin)       + "\"",
                 "setprop persist.obsidian.dst.pin_num      \"" + (pinNum    == null ? "" : pinNum)    + "\"",
                 "setprop persist.obsidian.dst.dlg_preset   \"" + (dlgPreset == null ? "" : dlgPreset) + "\"",
@@ -226,7 +264,29 @@ public class DstFabricatedUtil {
                 "setprop persist.obsidian.dst.notif_tex_brd_on   " + (notifTexBrdOn ? "true" : "false"),
                 "setprop persist.obsidian.dst.notif_tex_brd_mode \"" + notifTexBrdMode + "\"",
                 "setprop persist.obsidian.dst.notif_tex_brd_col  " + notifTexBrdCol,
-                "setprop persist.obsidian.dst.qs_bg_on      " + (qsBgOn ? "1" : "0")
+                "setprop persist.obsidian.dst.notif_img_offset_y " + notifImgOffsetY,
+                "setprop persist.obsidian.dst.qs_bg_on      " + (qsBgOn ? "1" : "0"),
+                "setprop persist.obsidian.dst.cp_downgrade    " + (cpDowngrade ? "1" : "0"),
+                "setprop persist.obsidian.dst.cp_bypassblock  " + (cpBypassBlock ? "1" : "0"),
+                "setprop persist.obsidian.dst.cp_disableverify " + (cpDisableVerify ? "1" : "0"),
+                "setprop persist.obsidian.dst.screenshot_enabler " + (screenshotEnabler ? "1" : "0"),
+                "setprop persist.obsidian.dst.lk_adbconfirm  " + (lkAdbConfirm ? "1" : "0"),
+                "setprop persist.obsidian.dst.lk_powermenu   " + (lkPowerMenu ? "1" : "0"),
+                "setprop persist.obsidian.dst.lk_volflash    " + (lkVolFlash ? "1" : "0"),
+                "setprop persist.obsidian.dst.lk_multiapp    " + (lkMultiApp ? "1" : "0"),
+                "setprop persist.obsidian.dst.lk_pngshot     " + (lkPngShot ? "1" : "0"),
+                "setprop persist.obsidian.dst.lk_longshot    " + (lkLongshot ? "1" : "0"),
+                "setprop persist.obsidian.dst.pm_gradient_mode  \"" + pmGradientMode + "\"",
+                "setprop persist.obsidian.dst.pm_gradient_color " + pmGradientColor,
+                "setprop persist.obsidian.dst.pm_bg_mode        \"" + pmBgMode + "\"",
+                "setprop persist.obsidian.dst.pm_bg_color       " + pmBgColor,
+                "setprop persist.obsidian.dst.pm_border_on      " + (pmBorderOn ? "1" : "0"),
+                "setprop persist.obsidian.dst.pm_border_accent  " + (pmBorderAccent ? "1" : "0"),
+                "setprop persist.obsidian.dst.pm_border_color   " + pmBorderColor,
+                "setprop persist.obsidian.dst.pm_handler_mode   \"" + pmHandlerMode + "\"",
+                "setprop persist.obsidian.dst.pm_handler_color  " + pmHandlerColor,
+                "setprop persist.obsidian.dst.pm_menu_bg_mode   \"" + pmMenuBgMode + "\"",
+                "setprop persist.obsidian.dst.pm_menu_bg_color  " + pmMenuBgColor
             ).exec();
             if (!propsResult.isSuccess()) {
                 android.util.Log.e("Obsidian", "DstFabricatedUtil.saveBootProps: setprop FAILED code="

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Glifo reale "OnePlus AI" (settings_system_breeno_ic), estratto byte-per-byte dal vero
+     Settings.apk installato (jadx su /system_ext/priv-app/Settings/Settings.apk) — path +
+     gradiente diagonale rosso->rosa->ciano originali, non un ridisegno a mano.
+     PARCHEGGIATO 2026-09-07, non usato da nessun hook al momento: la riga "OnePlus AI" in
+     Impostazioni NON legge questo drawable né settings_system_breeno_ic (il pacchetto icone
+     CompileOnDemand non ha mai avuto effetto), e il tentativo di hook runtime su
+     androidx.preference.Preference#getIcon()/#setIcon(Drawable) filtrato per key
+     "personal_assist" non ha mai intercettato NEMMENO UNA chiamata (confermato con un log
+     incondizionato, zero hit su qualunque Preference) — probabile classloader diverso da
+     quello visto da handleLoadPackage (Settings.apk è enorme, 241MB, verosimilmente con moduli
+     dinamici/split caricati a parte). Vero meccanismo comunque confermato leggendo il sorgente
+     decompilato: TopLevelCustomizeEntryPreferenceController.setPossibleCustomizeIcon() carica
+     l'icona da UMS.apk (com.oplus.pantanal.ums) via Icon.createWithResource(...), bypassando
+     l'android:icon statico — ma anche hookare QUELLO non ha funzionato. Stesso livello di
+     difficoltà delle altre icone/elementi OEM già parcheggiati in questo progetto. Non
+     riprendere senza uno strumento diverso (debugger reale/Frida) o senza chiedere all'utente
+     se vuole ancora investire tempo — vedi project_settings_theme_header_gap memory. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:pathData="M2,3.989V19.958H17.934V10.823H16.163V18.167H3.797V5.749H11.125V3.989H2ZM11.094,15.819V8.029H9.536C9.55,8.247 9.516,8.464 9.438,8.668C9.36,8.871 9.239,9.055 9.084,9.208C8.731,9.465 8.299,9.59 7.863,9.561H7.671V10.839H9.338V15.819H11.094ZM12.091,4.913C12.984,4.829 13.87,4.676 14.74,4.456C15.204,4.327 15.625,4.074 15.956,3.723C16.288,3.373 16.517,2.938 16.62,2.467C16.814,1.654 16.958,0.83 17.051,0C17.141,0.83 17.283,1.654 17.476,2.467C17.579,2.938 17.808,3.373 18.14,3.723C18.471,4.074 18.892,4.327 19.357,4.456C20.224,4.677 21.108,4.828 22,4.908C21.105,4.992 20.218,5.145 19.346,5.365C18.881,5.494 18.461,5.747 18.129,6.098C17.798,6.448 17.569,6.883 17.466,7.354C17.276,8.151 17.135,8.959 17.045,9.774C16.95,8.96 16.808,8.152 16.62,7.354C16.517,6.883 16.288,6.448 15.956,6.098C15.625,5.747 15.204,5.494 14.74,5.365C13.876,5.136 12.995,4.977 12.106,4.887L12.091,4.913Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear"
+                android:startX="1.99" android:startY="19.933"
+                android:endX="19.517" android:endY="2.405">
+                <item android:color="#fff50514" android:offset="0"/>
+                <item android:color="#ffff96e8" android:offset="0.4"/>
+                <item android:color="#ff00c9ff" android:offset="1"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>
