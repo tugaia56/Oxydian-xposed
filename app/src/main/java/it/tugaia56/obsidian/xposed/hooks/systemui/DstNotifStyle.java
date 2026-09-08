@@ -96,12 +96,14 @@ public class DstNotifStyle {
     private static final String PREF_TEX_BORDER_ON     = "DST_NOTIF_TEXTURE_BORDER_ENABLED";
     private static final String PREF_TEX_BORDER_MODE   = "DST_NOTIF_TEXTURE_BORDER_MODE";   // "accent"/"custom"
     private static final String PREF_TEX_BORDER_CUSTOM = "DST_NOTIF_TEXTURE_BORDER_CUSTOM";
+    private static final String PREF_IMG_OFFSET_Y = "DST_NOTIF_IMG_OFFSET_Y"; // 0=alto..100=basso, solo Immagine
     private static final String PREFS_FILE   =
         "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml";
 
     private static final int DEFAULT_CORNER_DP = 24;
     private static final int DEFAULT_TEX_SIZE_PCT  = 100;
     private static final int DEFAULT_TEX_ALPHA_PCT = 25;
+    private static final int DEFAULT_IMG_OFFSET_Y  = 50; // centrato
 
     private static final String[] NOTIF_DRAWABLES = {
         "notification_material_bg",
@@ -126,6 +128,7 @@ public class DstNotifStyle {
     private static volatile int    sTexColor       = 0xFF9C27B0; // risolto: sAccent o custom
     private static volatile boolean sTexBorderOn   = false;
     private static volatile int    sTexBorderColor = 0xFF9C27B0; // risolto: sAccent o custom
+    private static volatile int    sImgOffsetY     = DEFAULT_IMG_OFFSET_Y;
 
     private static final String NOTIF_BG_IMAGE_SUBPATH = ".obsidian/notif_bg_image";
     private static volatile Bitmap sNotifBgBitmap;
@@ -162,6 +165,9 @@ public class DstNotifStyle {
             int texBorderCustom  = parseInt(parseAttr(xml, PREF_TEX_BORDER_CUSTOM, "value"), sAccent);
             sTexBorderColor = "custom".equals(texBorderMode) ? texBorderCustom : sAccent;
 
+            int imgOffsetY = parseInt(parseAttr(xml, PREF_IMG_OFFSET_Y, "value"), DEFAULT_IMG_OFFSET_Y);
+            sImgOffsetY = (imgOffsetY >= 0 && imgOffsetY <= 100) ? imgOffsetY : DEFAULT_IMG_OFFSET_Y;
+
             XposedBridge.log("[ Obsidian ] DstNotifStyle.preload(file): preset=" + sPreset
                     + " corner=" + sCornerDp);
         } catch (Throwable t) {
@@ -184,6 +190,7 @@ public class DstNotifStyle {
             String texBrdOnStr   = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.notif_tex_brd_on",   "");
             String texBrdModeStr = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.notif_tex_brd_mode", "");
             String texBrdColStr  = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.notif_tex_brd_col",  "");
+            String imgOffYStr    = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.notif_img_offset_y", "");
             XposedBridge.log("[ Obsidian ] DstNotifStyle.preloadFromProps: preset='" + preset + "'");
             if (preset.isEmpty()) return;
             sPreset = preset;
@@ -212,6 +219,12 @@ public class DstNotifStyle {
             int texBorderCustom = sAccent;
             if (!texBrdColStr.isEmpty()) { try { texBorderCustom = Integer.parseInt(texBrdColStr); } catch (NumberFormatException ignored) {} }
             sTexBorderColor = "custom".equals(texBrdModeStr) ? texBorderCustom : sAccent;
+            if (!imgOffYStr.isEmpty()) {
+                try {
+                    int o = Integer.parseInt(imgOffYStr);
+                    sImgOffsetY = (o >= 0 && o <= 100) ? o : DEFAULT_IMG_OFFSET_Y;
+                } catch (NumberFormatException ignored) {}
+            }
             XposedBridge.log("[ Obsidian ] DstNotifStyle.preload(props): preset=" + sPreset
                     + " corner=" + sCornerDp);
         } catch (Throwable t) {
@@ -236,7 +249,7 @@ public class DstNotifStyle {
         if (sPreset == null) return null;
         if (density <= 0f) density = 3.0f;
         return buildNotifBg(sPreset, sAccent, sBg, density, sCornerDp, sTexSizePct, sTexAlphaPct,
-                sTexColor, sTexBorderOn, sTexBorderColor);
+                sTexColor, sTexBorderOn, sTexBorderColor, sImgOffsetY);
     }
 
     // ── Called from ResourceManager.handleInitPackageResources ───────────────
@@ -271,11 +284,12 @@ public class DstNotifStyle {
                 int    texColor = sTexColor;
                 boolean texBorderOn = sTexBorderOn;
                 int    texBorderColor = sTexBorderColor;
+                int    imgOffsetY = sImgOffsetY;
                 if (preset == null) return new GradientDrawable();
                 float density = res.getDisplayMetrics().density;
                 if (density <= 0f) density = 3.0f;
                 return buildNotifBg(preset, accent, bg, density, cornerDp, texSize, texAlpha,
-                        texColor, texBorderOn, texBorderColor);
+                        texColor, texBorderOn, texBorderColor, imgOffsetY);
             }
         };
 
@@ -294,7 +308,7 @@ public class DstNotifStyle {
     public static Drawable buildNotifBg(String preset, int accent, int bg,
                                           float density, int cornerDp) {
         return buildNotifBg(preset, accent, bg, density, cornerDp,
-                DEFAULT_TEX_SIZE_PCT, DEFAULT_TEX_ALPHA_PCT, accent, false, accent);
+                DEFAULT_TEX_SIZE_PCT, DEFAULT_TEX_ALPHA_PCT, accent, false, accent, DEFAULT_IMG_OFFSET_Y);
     }
 
     /** Retrocompatibile — usa i default di colore/bordo texture (accento, bordo assente). */
@@ -302,19 +316,30 @@ public class DstNotifStyle {
                                           float density, int cornerDp,
                                           int texSizePct, int texAlphaPct) {
         return buildNotifBg(preset, accent, bg, density, cornerDp,
-                texSizePct, texAlphaPct, accent, false, accent);
+                texSizePct, texAlphaPct, accent, false, accent, DEFAULT_IMG_OFFSET_Y);
+    }
+
+    /** Retrocompatibile — usa il default di posizione foto (centrata). */
+    public static Drawable buildNotifBg(String preset, int accent, int bg,
+                                          float density, int cornerDp,
+                                          int texSizePct, int texAlphaPct,
+                                          int texColor, boolean texBorderOn, int texBorderColor) {
+        return buildNotifBg(preset, accent, bg, density, cornerDp, texSizePct, texAlphaPct,
+                texColor, texBorderOn, texBorderColor, DEFAULT_IMG_OFFSET_Y);
     }
 
     /** Public so the UI (preset preview picker) can render the exact same drawable used at
      *  runtime. texSizePct/texAlphaPct/texColor/texBorderOn/texBorderColor sono usati solo dai
      *  preset texture (Puntini/Righe/Rumore) — ignorati da tutti gli altri, innocuo passarli
-     *  sempre. texColor è già risolto (accento o personalizzato), non una "mode" string. */
+     *  sempre. texColor è già risolto (accento o personalizzato), non una "mode" string.
+     *  imgOffsetY (0=alto..100=basso) è usato solo dal preset Immagine. */
     public static Drawable buildNotifBg(String preset, int accent, int bg,
                                           float density, int cornerDp,
                                           int texSizePct, int texAlphaPct,
-                                          int texColor, boolean texBorderOn, int texBorderColor) {
+                                          int texColor, boolean texBorderOn, int texBorderColor,
+                                          int imgOffsetY) {
         Drawable d = buildNotifBgRaw(preset, accent, bg, density, cornerDp, texSizePct, texAlphaPct,
-                texColor, texBorderOn, texBorderColor);
+                texColor, texBorderOn, texBorderColor, imgOffsetY);
         if (d == null) return null;
         // NotificationBackgroundView.setCustomBackground() -> setTint() -> getStatefulBackgroundLayer()
         // reads layer index 1 of whatever LayerDrawable it's given. A bare GradientDrawable (or
@@ -331,14 +356,15 @@ public class DstNotifStyle {
         // single-GradientDrawable presets (gradients with no distinct layers).
         if (d instanceof LayerDrawable) return d;
         Drawable filler = buildNotifBgRaw(preset, accent, bg, density, cornerDp, texSizePct, texAlphaPct,
-                texColor, texBorderOn, texBorderColor);
+                texColor, texBorderOn, texBorderColor, imgOffsetY);
         return tintBlockedLayer(new Drawable[]{filler != null ? filler : d, indexOneGuard(cornerDp * density), d});
     }
 
     private static Drawable buildNotifBgRaw(String preset, int accent, int bg,
                                           float density, int cornerDp,
                                           int texSizePct, int texAlphaPct,
-                                          int texColor, boolean texBorderOn, int texBorderColor) {
+                                          int texColor, boolean texBorderOn, int texBorderColor,
+                                          int imgOffsetY) {
         float r = cornerDp * density;
         float texSizeMul   = texSizePct / 100f;
         float texDensity   = density * texSizeMul; // trucco: le classi texture calcolano
@@ -594,7 +620,7 @@ public class DstNotifStyle {
                 GradientDrawable base = simpleShape(bg, 0, 0, r);
                 Bitmap bmp = refreshAndGetNotifBgBitmap();
                 if (bmp == null) return base; // niente immagine ancora scelta: solo il bg
-                GradientDrawable image = new ImageBgDrawable(bmp, r, texBorderWidth, texBorderStrokeColor);
+                GradientDrawable image = new ImageBgDrawable(bmp, r, texBorderWidth, texBorderStrokeColor, imgOffsetY);
                 return tintBlockedLayer(new Drawable[]{base, indexOneGuard(r), image});
             }
 
@@ -1296,12 +1322,16 @@ public class DstNotifStyle {
      *  orizzontale ovunque); l'altezza mostrata segue quello stesso fattore di scala — una
      *  notifica più bassa mostra semplicemente MENO della stessa inquadratura (tagliata sopra/
      *  sotto, centrata), non una fetta ricalcolata con uno zoom diverso. */
-    private static Rect fixedZoomSrcRect(Bitmap bmp, float dstW, float dstH) {
+    private static Rect fixedZoomSrcRect(Bitmap bmp, float dstW, float dstH, int offsetYPct) {
         int bw = bmp.getWidth(), bh = bmp.getHeight();
         float scale = bw / dstW; // px sorgente per px destinazione — fissato dalla sola larghezza
         float srcH = dstH * scale;
         if (srcH >= bh) return new Rect(0, 0, bw, bh); // foto non abbastanza alta: usala tutta
-        int top = Math.max(0, Math.round((bh - srcH) / 2f));
+        // offsetYPct 0=alto, 50=centrato (comportamento originale), 100=basso — "Posizione Foto"
+        // in Regolazioni Notifiche a texture, per scegliere quale fetta verticale mostrare invece
+        // del centro fisso (es. una foto con soggetto in alto, che a centro cade su tutto nero).
+        float frac = Math.max(0f, Math.min(100f, offsetYPct)) / 100f;
+        int top = Math.max(0, Math.round((bh - srcH) * frac));
         return new Rect(0, top, bw, top + Math.round(srcH));
     }
 
@@ -1314,15 +1344,17 @@ public class DstNotifStyle {
         private final float mCornerRadius;
         private final float mBorderWidth;
         private final int mBorderColor;
+        private final int mOffsetY;
         private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint mBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private boolean mRadiusSet = false;
 
-        ImageBgDrawable(Bitmap bmp, float cornerRadius, float borderWidth, int borderColor) {
+        ImageBgDrawable(Bitmap bmp, float cornerRadius, float borderWidth, int borderColor, int offsetY) {
             mBmp = bmp;
             mCornerRadius = cornerRadius;
             mBorderWidth = Math.max(0f, borderWidth);
             mBorderColor = borderColor;
+            mOffsetY = offsetY;
             mBorderPaint.setStyle(Paint.Style.STROKE);
             mBorderPaint.setStrokeWidth(mBorderWidth);
             mBorderPaint.setColor(borderColor);
@@ -1368,7 +1400,7 @@ public class DstNotifStyle {
             // sovrapposizione cambierebbe impercettibilmente lo zoom fisso tra notifiche diverse.
             RectF zoomRef = new RectF(b);
             if (mBorderWidth > 0f) zoomRef.inset(mBorderWidth, mBorderWidth);
-            Rect src = fixedZoomSrcRect(mBmp, zoomRef.width(), zoomRef.height());
+            Rect src = fixedZoomSrcRect(mBmp, zoomRef.width(), zoomRef.height(), mOffsetY);
             canvas.drawBitmap(mBmp, src, dst, mPaint);
             canvas.restore();
         }
@@ -1387,7 +1419,7 @@ public class DstNotifStyle {
         @Override public ConstantState getConstantState() {
             return new ConstantState() {
                 @Override public Drawable newDrawable() {
-                    return new ImageBgDrawable(mBmp, mCornerRadius, mBorderWidth, mBorderColor);
+                    return new ImageBgDrawable(mBmp, mCornerRadius, mBorderWidth, mBorderColor, mOffsetY);
                 }
                 @Override public int getChangingConfigurations() { return 0; }
             };

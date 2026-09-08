@@ -204,11 +204,16 @@ public class DstCpbStyle {
                         if (incoming == null) return;
                         // Skip if already our LayerDrawable replacement to avoid double-apply
                         if (incoming instanceof LayerDrawable) return;
-                        // Skip non-circular (e.g. horizontal boot-progress) bars: their
-                        // indeterminate drawable isn't square, ours always is.
+                        // Barre non circolari (es. "Avvio del telefono" durante il boot, richiesta
+                        // esplicita dell'utente 2026-09-06): i 5 preset CPB sono tutti forme
+                        // circolari, sostituire il drawable qui sarebbe sbagliato — ci limitiamo a
+                        // tingere quella ESISTENTE, forma invariata.
                         if (!isSquareDrawable(incoming)) {
-                            XposedBridge.log("[ Obsidian ] DstCpbStyle: hookPB skip non-circular "
-                                + incoming.getIntrinsicWidth() + "x" + incoming.getIntrinsicHeight());
+                            try {
+                                incoming.mutate().setTint(sAccent);
+                            } catch (Throwable t) {
+                                XposedBridge.log("[ Obsidian ] DstCpbStyle: hookPB tint non-circular error: " + t);
+                            }
                             return;
                         }
 

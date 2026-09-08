@@ -234,11 +234,21 @@ public class DstDialogStyle {
     private static GradientDrawable shape(int fill, int strokeColor, int strokeWidth,
                                           float cornerRadius) {
         GradientDrawable d = new GradientDrawable() {
+            private boolean mRadiusSet = false;
             @Override public void setTint(int tintColor) { /* block OOS tint */ }
             @Override public void setTintList(ColorStateList tint) { /* block OOS tint */ }
             @Override public void setTintMode(PorterDuff.Mode tintMode) { /* block */ }
             @Override public void setColorFilter(ColorFilter cf) { /* block OOS colorFilter */ }
             @Override public void setColorFilter(int color, PorterDuff.Mode mode) { /* block */ }
+            // Stesso bug/fix di DstNotifStyle.java (2026-09-01): il sistema può richiamare
+            // setCornerRadius()/setCornerRadii() DOPO che gli consegniamo il drawable,
+            // sovrascrivendo il raggio scelto dall'utente con un valore proprio — per questo
+            // "Raggio Finestre Dialogo" restava sempre uguale. La nostra stessa chiamata (nel
+            // costruttore sotto) passa perché è la PRIMA; quelle successive vengono ignorate.
+            @Override public void setCornerRadius(float radius) {
+                if (!mRadiusSet) { super.setCornerRadius(radius); mRadiusSet = true; }
+            }
+            @Override public void setCornerRadii(float[] radii) { /* block OOS radii override */ }
         };
         d.setShape(GradientDrawable.RECTANGLE);
         d.setColor(fill);
@@ -372,14 +382,95 @@ public class DstDialogStyle {
                 ? parseInt(readProp("persist.obsidian.dst.bg", ""), 0xFF1B2029)
                 : 0xFF1B2029;
 
+        int cornerDpTmp = parseInt(readProp("persist.obsidian.dst.dlg_corner", ""), DEFAULT_CORNER_DP);
+        if (cornerDpTmp <= 0) cornerDpTmp = DEFAULT_CORNER_DP;
+        final int cornerDp = cornerDpTmp;
+
         android.app.Dialog d = (android.app.Dialog) p.thisObject;
         android.view.Window w = d.getWindow();
         if (w == null) { XposedBridge.log("[ Obsidian ] DstDialog: window null"); return; }
 
-        w.setBackgroundDrawable(buildDrawable(preset, accent, bg,
-                d.getContext().getResources().getDisplayMetrics().density));
+        float density = d.getContext().getResources().getDisplayMetrics().density;
+        w.setBackgroundDrawable(buildDrawable(preset, accent, bg, density, cornerDp));
         XposedBridge.log("[ Obsidian ] DstDialog: applied preset=" + preset + " bg=0x"
-                + Integer.toHexString(bg) + " in " + android.os.Process.myProcessName());
+                + Integer.toHexString(bg) + " cornerDp=" + cornerDp
+                + " in " + android.os.Process.myProcessName());
+        clearInnerDialogBackground(d);
+
+        // Stesso bug/fix del refresh icone QS (2026-08-29): alcune COUI/OOS dialog
+        // helper class riapplicano il proprio sfondo/stile DOPO che Dialog.show() è già
+        // tornato (su un layout pass successivo), sovrascrivendo il nostro drawable —
+        // per questo il colore/bordo si vedeva ma il RAGGIO restava sempre quello di
+        // sistema. Riapplichiamo di nuovo poco dopo per vincere quell'eventuale reset.
+        try {
+            android.view.View decor = w.peekDecorView();
+            if (decor != null) {
+                decor.postDelayed(() -> {
+                    try {
+                        android.view.Window w2 = d.getWindow();
+                        if (w2 == null) return;
+                        w2.setBackgroundDrawable(buildDrawable(preset, accent, bg, density, cornerDp));
+                        clearInnerDialogBackground(d);
+                        XposedBridge.log("[ Obsidian ] DstDialog: re-applied (delayed) cornerDp=" + cornerDp);
+                    } catch (Throwable ignored) {}
+                }, 150);
+            }
+        } catch (Throwable ignored) {}
+    }
+
+    /** "Doppio sfondo" segnalato dall'utente 2026-09-05 (dialog "Modifica nome dispositivo" di
+     *  Bluetooth, com.android.settings): la finestra (sopra) è già nostra, ma dentro c'è un
+     *  contenitore separato — "rootView", confermato via uiautomator dump dal vivo — con un
+     *  proprio sfondo card COUI stock (leggermente più chiaro), che crea una cucitura visibile
+     *  tra i due strati. Id generico condiviso dalla stessa classe builder di AlertDialog COUI
+     *  in molte app — svuotarlo qui (non solo per Settings) lascia mostrare solo lo sfondo della
+     *  finestra già tinto sopra, stesso look "invisibile" già usato per le card altrove. */
+    private static final String[] INNER_DIALOG_PANEL_IDS = {
+            "rootView", "topPanel", "contentPanel", "customPanel", "buttonPanel", "custom"
+    };
+
+    private static void clearInnerDialogBackground(android.app.Dialog d) {
+        try {
+            android.content.Context ctx = d.getContext();
+            // "rootView" da solo restava nero: non è il suo sfondo a fare la cucitura, sono i
+            // pannelli FIGLI (topPanel/contentPanel/customPanel/buttonPanel), ognuno con un
+            // proprio sfondo scuro indipendente — svuotarli tutti, non solo il contenitore.
+            for (String name : INNER_DIALOG_PANEL_IDS) {
+                int id = ctx.getResources().getIdentifier(name, "id", ctx.getPackageName());
+                android.view.View v = (id != 0) ? d.findViewById(id) : null;
+                if (v != null) v.setBackgroundColor(0x00000000);
+            }
+        } catch (Throwable ignored) {}
+        // 2026-09-05, com.coloros.smartsidebar ("Salva nel Dock dei file"): la cucitura restava
+        // visibile anche dopo il fix sopra — trovato via uiautomator dump dal vivo un id
+        // DUPLICATO: "rootView" esiste DUE volte in questo dialog (un LinearLayoutCompat esterno
+        // già pulito sopra, e un RelativeLayout interno con lo stesso id — il vero colpevole,
+        // parent diretto di ViewPager/indicatori/bottone). d.findViewById() restituisce solo la
+        // PRIMA corrispondenza (quella esterna): la seconda resta intoccata per sempre, qualunque
+        // fix per id singolo non può raggiungerla. Unica soluzione robusta: camminare l'intero
+        // albero del decor a mano e svuotare OGNI view il cui id si risolve a uno dei nomi target,
+        // duplicati inclusi — non solo la prima.
+        try {
+            android.view.View decor = d.getWindow() != null ? d.getWindow().peekDecorView() : null;
+            if (decor != null) clearBackgroundsByIdNameRecursive(decor);
+        } catch (Throwable ignored) {}
+    }
+
+    private static void clearBackgroundsByIdNameRecursive(android.view.View v) {
+        try {
+            int id = v.getId();
+            if (id != android.view.View.NO_ID) {
+                String name = v.getResources().getResourceEntryName(id);
+                for (String target : INNER_DIALOG_PANEL_IDS) {
+                    if (target.equals(name)) { v.setBackgroundColor(0x00000000); break; }
+                }
+            }
+        } catch (Throwable ignored) {}
+        if (v instanceof android.view.ViewGroup vg) {
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                clearBackgroundsByIdNameRecursive(vg.getChildAt(i));
+            }
+        }
     }
 
     // ── XML parse helpers (duplicated from MonetFreeze for independence) ──────

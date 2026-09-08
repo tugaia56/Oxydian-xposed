@@ -84,6 +84,7 @@ public class ThemeStyleFragment extends Fragment {
     private static final String PREF_TEX_BORDER_ON     = "DST_NOTIF_TEXTURE_BORDER_ENABLED";
     private static final String PREF_TEX_BORDER_MODE   = "DST_NOTIF_TEXTURE_BORDER_MODE";
     private static final String PREF_TEX_BORDER_CUSTOM = "DST_NOTIF_TEXTURE_BORDER_CUSTOM";
+    private static final String PREF_IMG_OFFSET_Y      = "DST_NOTIF_IMG_OFFSET_Y"; // solo preset Immagine
     private static final int DIALOG_TEX_COLOR_CUSTOM  = PREF_TEX_COLOR_CUSTOM.hashCode();
     private static final int DIALOG_TEX_BORDER_CUSTOM = PREF_TEX_BORDER_CUSTOM.hashCode();
 
@@ -94,17 +95,23 @@ public class ThemeStyleFragment extends Fragment {
      *  finché il dialogo non viene chiuso e riaperto). Null quando il dialogo non è aperto. */
     private Runnable mTextureDialogRefresh;
 
+    // Ordine 2026-09-02 (richiesta utente): Immagine subito dopo Nessuno, prima delle
+    // trasparenze; le texture procedurali (Puntini..Intreccio) subito dopo le prime 4
+    // trasparenze (Trasparente con bordo sottile / Trasparenza Alta/Media/Bassa con bordo),
+    // prima di "Scuro con bordo" — resto dell'ordine originale invariato.
     private static final String[] NOTIF_OVERLAYS = {
+        "DSTNFNIMG",
         "DSTNFNTOT", "DSTNFNO25", "DSTNFNO50", "DSTNFNO75",
+        "DSTNFNDOT", "DSTNFNLNS", "DSTNFNGRN",
+        "DSTNFNHRT", "DSTNFNDIA", "DSTNFNCLB", "DSTNFNSPD",
+        "DSTNFNCHK", "DSTNFNWAV", "DSTNFNXH",
         "DSTNFNOAC", "DSTNFNST",  "DSTNFNTR",  "DSTNFNPB",
         "DSTNFNMN",  "DSTNFNAS",
         "DSTNFNLYR", "DSTNFNTO2", "DSTNFNBTM", "DSTNFNNM1",
         "DSTNFNSTK", "DSTNFNSS",  "DSTNFNOL4",
         "DSTNFNLT1", "DSTNFNLT2", "DSTNFNLT3", "DSTNFNNM2", "DSTNFNCP1",
         "DSTNFNCP2", "DSTNFNTL",  "DSTNFNFD",  "DSTNFNDB",
-        "DSTNFNDL",  "DSTNFNIOS", "DSTNFNDOT", "DSTNFNLNS", "DSTNFNGRN",
-        "DSTNFNHRT", "DSTNFNDIA", "DSTNFNCLB", "DSTNFNSPD",
-        "DSTNFNCHK", "DSTNFNWAV", "DSTNFNXH",  "DSTNFNIMG"
+        "DSTNFNDL",  "DSTNFNIOS"
     };
 
     private static final String[] TOAST_OVERLAYS = {
@@ -116,14 +123,18 @@ public class ThemeStyleFragment extends Fragment {
     private static final int[] CORNER_VALUES = { 2, 4, 8, 12, 16, 20, 24, 28, 32 };
     private static final String NOTIF_BG_IMAGE_FILENAME = "notif_bg_image";
 
-    private ActivityResultLauncher<String> mPickNotifBgImage;
+    private ActivityResultLauncher<com.canhub.cropper.CropImageContractOptions> mPickNotifBgImage;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
+        // Ritaglio nativo (stessa libreria com.vanniktech:android-image-cropper usata da OC per
+        // "Immagine personalizzata"): l'utente trascina/ridimensiona il riquadro direttamente
+        // sulla foto intera — molto più semplice del dialogo con slider+anteprima duplicata
+        // costruito in un primo momento (rimosso su richiesta esplicita dell'utente 2026-09-02).
         mPickNotifBgImage = registerForActivityResult(
-                new ActivityResultContracts.GetContent(), this::onNotifBgImagePicked);
+                new com.canhub.cropper.CropImageContract(), this::onNotifBgImageCropped);
     }
 
     @Override
@@ -316,30 +327,39 @@ public class ThemeStyleFragment extends Fragment {
     }
 
     private RecyclerView.Adapter<?> buildTextureSettingsAdapter(Runnable onLiveChange) {
+        boolean isImage = "DSTNFNIMG".equals(ObsidianPrefs.getString(PREF_NOTIF_PRESET, null));
         int sizePct  = ObsidianPrefs.getInt(PREF_TEX_SIZE, 100);
         int alphaPct = ObsidianPrefs.getInt(PREF_TEX_ALPHA, 25);
 
-        SliderWidgetAdapter.SliderItem sizeItem = new SliderWidgetAdapter.SliderItem(
-                getString(R.string.nav_notif_texture_size), sizePct, 50, 200, "%", 100,
-                value -> {
-                    ObsidianPrefs.putInt(PREF_TEX_SIZE, value);
-                    DstFabricatedUtil.saveBootProps();
-                    AppUtils.showRestartReminder(requireContext());
-                });
-        sizeItem.nested = true;
-        sizeItem.groupPos = ObsidianTheme.GroupPos.TOP;
+        // Dimensione/Opacità sono ignorate dal preset Immagine (non sono texture procedurali) —
+        // mostrarle lì confondeva senza fare nulla di visibile. L'inquadratura per Immagine ora
+        // si sceglie direttamente al momento della scelta della foto, con il ritaglio nativo
+        // (vedi mPickNotifBgImage) — niente da regolare qui dopo.
+        RecyclerView.Adapter<?> sliders;
+        if (isImage) {
+            sliders = new ListWidgetAdapter(List.of());
+        } else {
+            SliderWidgetAdapter.SliderItem sizeItem = new SliderWidgetAdapter.SliderItem(
+                    getString(R.string.nav_notif_texture_size), sizePct, 50, 200, "%", 100,
+                    value -> {
+                        ObsidianPrefs.putInt(PREF_TEX_SIZE, value);
+                        DstFabricatedUtil.saveBootProps();
+                        AppUtils.showRestartReminder(requireContext());
+                    });
+            sizeItem.nested = true;
+            sizeItem.groupPos = ObsidianTheme.GroupPos.TOP;
 
-        SliderWidgetAdapter.SliderItem alphaItem = new SliderWidgetAdapter.SliderItem(
-                getString(R.string.nav_notif_texture_alpha), alphaPct, 5, 70, "%", 25,
-                value -> {
-                    ObsidianPrefs.putInt(PREF_TEX_ALPHA, value);
-                    DstFabricatedUtil.saveBootProps();
-                    AppUtils.showRestartReminder(requireContext());
-                });
-        alphaItem.nested = true;
-        alphaItem.groupPos = ObsidianTheme.GroupPos.BOTTOM;
-
-        SliderWidgetAdapter sliders = new SliderWidgetAdapter(List.of(sizeItem, alphaItem));
+            SliderWidgetAdapter.SliderItem alphaItem = new SliderWidgetAdapter.SliderItem(
+                    getString(R.string.nav_notif_texture_alpha), alphaPct, 5, 70, "%", 25,
+                    value -> {
+                        ObsidianPrefs.putInt(PREF_TEX_ALPHA, value);
+                        DstFabricatedUtil.saveBootProps();
+                        AppUtils.showRestartReminder(requireContext());
+                    });
+            alphaItem.nested = true;
+            alphaItem.groupPos = ObsidianTheme.GroupPos.BOTTOM;
+            sliders = new SliderWidgetAdapter(List.of(sizeItem, alphaItem));
+        }
 
         // Colore — sempre accento o personalizzato, nessuno stato "stock" (stesso pattern di
         // "Colore Pulsante" nel Menù Accensione).
@@ -429,13 +449,21 @@ public class ThemeStyleFragment extends Fragment {
         showPresetPreviewDialog(title, names, PREF_NOTIF_PRESET, NOTIF_OVERLAYS,
                 preset -> DstNotifStyle.buildNotifBg(preset, accent, bg, density, cornerDp,
                         ObsidianPrefs.getInt(PREF_TEX_SIZE, 100), ObsidianPrefs.getInt(PREF_TEX_ALPHA, 25),
-                        texColor(), texBorderOn(), texBorderColor()),
+                        texColor(), texBorderOn(), texBorderColor(),
+                        ObsidianPrefs.getInt(PREF_IMG_OFFSET_Y, 50)),
                 1, 64, idx -> {
             // "Immagine" non si applica subito come gli altri preset: prima serve scegliere
             // davvero una foto. Se l'utente annulla il picker, il preset resta quello di prima
             // (stesso pattern "safe cancel" di PowerMenuHandlerPresetFragment).
             if (idx >= 0 && "DSTNFNIMG".equals(NOTIF_OVERLAYS[idx])) {
-                mPickNotifBgImage.launch("image/*");
+                // I campi sono @JvmField (Kotlin) — proprietà pubbliche, non setter Java.
+                // Default già a posto per noi: galleria sì, guide ON, rapporto libero (non fisso).
+                com.canhub.cropper.CropImageOptions cropOpts = new com.canhub.cropper.CropImageOptions();
+                cropOpts.imageSourceIncludeCamera = false;
+                // Default della libreria è bianco: con foto più piccole della finestra si vedeva
+                // troppo bordo bianco intorno — usiamo lo sfondo scuro dell'app.
+                cropOpts.activityBackgroundColor = currentBg();
+                mPickNotifBgImage.launch(new com.canhub.cropper.CropImageContractOptions(null, cropOpts));
                 return;
             }
             if (idx < 0) ObsidianPrefs.remove(PREF_NOTIF_PRESET);
@@ -445,9 +473,16 @@ public class ThemeStyleFragment extends Fragment {
         });
     }
 
-    /** Copia la foto scelta in .obsidian/notif_bg_image e attiva il preset "Immagine" solo se
-     *  la copia va a buon fine — annullare il picker di sistema lascia il preset precedente
-     *  invariato, stesso pattern di PowerMenuHandlerPresetFragment.onImagePicked(). */
+    /** Risultato del ritaglio nativo (com.vanniktech:android-image-cropper) — annullare il
+     *  picker/ritaglio lascia il preset precedente invariato, stesso pattern "safe cancel" di
+     *  PowerMenuHandlerPresetFragment. */
+    private void onNotifBgImageCropped(com.canhub.cropper.CropImageView.CropResult result) {
+        if (result == null || !result.isSuccessful()) return;
+        onNotifBgImagePicked(result.getUriContent());
+    }
+
+    /** Copia la foto (già ritagliata dall'utente) in .obsidian/notif_bg_image e attiva il
+     *  preset "Immagine" solo se la copia va a buon fine. */
     private void onNotifBgImagePicked(Uri uri) {
         if (uri == null) return;
         try {
@@ -694,12 +729,17 @@ public class ThemeStyleFragment extends Fragment {
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putInt(prefKey, CORNER_VALUES[selected[0]]);
                     DstFabricatedUtil.saveBootProps();
-                    AppUtils.showRestartReminder(requireContext());
+                    // "Raggio Finestre Dialogo" gira sull'hook globale Dialog.show(), installato
+                    // una sola volta in zygote all'avvio — un semplice "Riavvia SystemUI" non lo
+                    // ricarica, serve il riavvio completo del telefono (bug 2026-09-02).
+                    if (PREF_DLG_CORNER.equals(prefKey)) AppUtils.showRebootReminder(requireContext());
+                    else AppUtils.showRestartReminder(requireContext());
                 })
                 .setNeutralButton(R.string.reset, (d, w) -> {
                     ObsidianPrefs.remove(prefKey);
                     DstFabricatedUtil.saveBootProps();
-                    AppUtils.showRestartReminder(requireContext());
+                    if (PREF_DLG_CORNER.equals(prefKey)) AppUtils.showRebootReminder(requireContext());
+                    else AppUtils.showRestartReminder(requireContext());
                 })
                 .setNegativeButton(R.string.close, null)
                 .show();
