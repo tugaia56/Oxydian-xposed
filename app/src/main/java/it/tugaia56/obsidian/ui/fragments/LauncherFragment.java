@@ -156,7 +156,8 @@ public class LauncherFragment extends Fragment {
                 sliderItem(getString(R.string.launcher_folder_columns), KEY_FOLDER_MAX_COLUMNS, 3, 7, 3),
                 sliderItem(getString(R.string.launcher_folder_rows), KEY_FOLDER_MAX_ROWS, 3, 7, 3),
                 boolItem(R.string.launcher_folder_update_preview, null, KEY_REARRANGE_PREVIEW),
-                boolItem(R.string.remove_folder_pagination_title, null, KEY_REMOVE_FOLDER_PAGE)));
+                boolItem(R.string.remove_folder_pagination_title, null, KEY_REMOVE_FOLDER_PAGE),
+                boolItem(R.string.launcher_auto_close_folder, R.string.launcher_auto_close_folder_summary, "autoCloseFolder")));
 
         // ── Drawer ───────────────────────────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.drawer))));
@@ -170,6 +171,8 @@ public class LauncherFragment extends Fragment {
         chain.add(new ListWidgetAdapter(List.of(new ListWidgetAdapter.ListItem(
                 getString(R.string.dock_background), null,
                 () -> navigate(new LauncherDockBackgroundFragment(), getString(R.string.dock_background))))));
+        GroupUtils.addGroup(chain, List.of(
+                boolItem(R.string.dock_remove_max_limit, R.string.dock_remove_max_limit_summary, "removeDockMaxLimit")));
 
         // ── Miscellaneous ────────────────────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.misc_category))));

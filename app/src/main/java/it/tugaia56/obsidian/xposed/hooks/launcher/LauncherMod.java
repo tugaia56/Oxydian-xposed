@@ -4,6 +4,7 @@ import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
 import static de.robv.android.xposed.XposedBridge.hookAllMethods;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
+import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
 import static de.robv.android.xposed.XposedHelpers.getIntField;
@@ -85,6 +86,8 @@ public class LauncherMod extends XposedMods {
     private static final String KEY_DOCK_BG_MATERIAL = "dockBackgroundMaterial";
     private static final String KEY_DOCK_BG_AMOUNT   = "dockBackgroundMaterialAmount";
     private static final String KEY_DOCK_BG_RADIUS   = "dockBackgroundRadius";
+    private static final String KEY_DOCK_MAX_LIMIT   = "removeDockMaxLimit";
+    private static final String KEY_AUTO_CLOSE_FOLDER = "autoCloseFolder";
     private static final int[] DOCK_BLUR_AMOUNTS = { 240, 300, 480, 660, 800 };
 
     private boolean mHideDesktopLabels = false;
@@ -102,6 +105,8 @@ public class LauncherMod extends XposedMods {
     private boolean mDockBackgroundMaterial = false;
     private int mDockBackgroundBlurAmount = DOCK_BLUR_AMOUNTS[0];
     private int mDockBackgroundRadius = 30;
+    private boolean mRemoveDockMaxLimit = false;
+    private boolean mAutoCloseFolder = false;
     private Object mBlurProp; // com.android.launcher3.uioverrides.states.blurdrawable.OplusBlurProperties instance
 
     private boolean mRearrangeHome = false;
@@ -139,6 +144,8 @@ public class LauncherMod extends XposedMods {
         int amountIndex = Xprefs.getInt(KEY_DOCK_BG_AMOUNT, 0);
         mDockBackgroundBlurAmount = DOCK_BLUR_AMOUNTS[Math.max(0, Math.min(amountIndex, DOCK_BLUR_AMOUNTS.length - 1))];
         mDockBackgroundRadius = Xprefs.getInt(KEY_DOCK_BG_RADIUS, 30);
+        mRemoveDockMaxLimit = Xprefs.getBoolean(KEY_DOCK_MAX_LIMIT, false);
+        mAutoCloseFolder = Xprefs.getBoolean(KEY_AUTO_CLOSE_FOLDER, false);
 
         mRearrangeHome = Xprefs.getBoolean(KEY_REARRANGE_HOME, false);
         mMaxColumns    = Xprefs.getInt(KEY_LAUNCHER_COLUMNS, 4);
@@ -167,8 +174,94 @@ public class LauncherMod extends XposedMods {
         hookHideScroller(lpparam);
         hookSwipeRightBehavior(lpparam);
         hookDockBackground(lpparam);
+        hookRemoveDockMaxLimit(lpparam);
+        hookAutoCloseFolder(lpparam);
         hookDrawerColumns(lpparam);
         hookHomeLayout(lpparam);
+    }
+
+    // ── Rimuovi limite icone Dock — porting da LuckyTool (github.com/luckyzyx/LuckyTool,
+    // RemoveDockerMaxNumberLimit.kt), verificato presente su questo device reale via grep sul
+    // dex di OplusLauncher.apk (2026-09-02) prima del porting. Un tentativo precedente
+    // (isDockerMax5 + getDockerNumShownHotseatIcons, vedi commento più sopra) aveva fallito
+    // perché puntava a classi legacy che su questa build non controllano più il vero limite.
+    //
+    // 2026-09-03: primo porting inefficace confermato dal vivo dall'utente (non riusciva ad
+    // aggiungere icone) — decompilato di nuovo con jadx per trovare il VERO gate: è
+    // HotseatDragController.isHotseatShouldAcceptOnDrop() → isOutOfNormalAreaSpace(), che
+    // confronta il conteggio attuale con ExpandConfig.getHotseatNormalItemMaxCount() — quel
+    // metodo a sua volta chiama proprio getHotseatNormalItemsMaxCountBy(boolean,boolean) (il
+    // metodo già agganciato, firma corretta), quindi l'hook di per sé era quello giusto. Il bug
+    // vero era nella condizione "solo se colonne home > limite attuale": su telefono (non
+    // tablet) il valore stock è già hardcoded a 5 (vedi ExpandConfig sorgente reale), stesso
+    // ordine di grandezza delle colonne home — la condizione non scattava mai. Fix: forzare
+    // sempre un valore più alto (colonne+3, minimo 8) quando il toggle è ON, senza confronti.
+    private void hookRemoveDockMaxLimit(XC_LoadPackage.LoadPackageParam lpparam) {
+        try {
+            Class<?> expandConfig = lpparam.classLoader.loadClass(
+                    "com.android.launcher3.hotseat.expand.ExpandConfig");
+            Class<?> launcherAppState = lpparam.classLoader.loadClass(
+                    "com.android.launcher3.LauncherAppState");
+            findAndHookMethod(expandConfig, "getHotseatNormalItemsMaxCountBy",
+                    boolean.class, boolean.class, new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam param) {
+                    if (!mRemoveDockMaxLimit) return;
+                    try {
+                        int col = 5;
+                        Object state = callStaticMethod(launcherAppState, "getInstanceNoCreate");
+                        if (state != null) {
+                            Object idp = callMethod(state, "getInvariantDeviceProfile");
+                            if (idp != null) col = (Integer) callMethod(idp, "getNumColumns");
+                        }
+                        param.setResult(Math.max(col + 3, 8));
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) {
+            log("hookRemoveDockMaxLimit failed: " + t);
+        }
+    }
+
+    // ── Chiudi automaticamente la cartella dopo aver aperto un'app — porting da LuckyTool
+    // (EnableAutoCloseFolder.kt), verificato presente su questo device reale via grep sul dex
+    // (2026-09-02). AbstractFloatingView.closeOpenViews() è il metodo generico del launcher che
+    // chiude popup/overlay aperti; quando il bitmask "type" del chiamante include già
+    // TYPE_FOLDER (il caso che scatta aprendo un'app da dentro una cartella) rinforziamo la
+    // chiusura cercando a mano la cartella aperta nel DragLayer e chiamando close() su di essa —
+    // hookAllMethods invece di un overload esatto perché il 4° parametro non è verificabile a
+    // priori (stesso approccio difensivo già usato in hookHideLabels).
+    private void hookAutoCloseFolder(XC_LoadPackage.LoadPackageParam lpparam) {
+        try {
+            Class<?> afv = lpparam.classLoader.loadClass("com.android.launcher3.AbstractFloatingView");
+            int typeFolder = getStaticIntField(afv, "TYPE_FOLDER");
+            hookAllMethods(afv, "closeOpenViews", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    if (!mAutoCloseFolder) return;
+                    if (param.args.length != 4) return;
+                    try {
+                        if (!(param.args[1] instanceof Boolean) || !(param.args[2] instanceof Integer)) return;
+                        boolean animate = (Boolean) param.args[1];
+                        int type = (Integer) param.args[2];
+                        if ((type & typeFolder) == 0) return;
+
+                        Object activityContext = param.args[0];
+                        Object dragLayerObj = callMethod(activityContext, "getDragLayer");
+                        if (!(dragLayerObj instanceof ViewGroup)) return;
+                        ViewGroup dragLayer = (ViewGroup) dragLayerObj;
+                        for (int i = 0; i < dragLayer.getChildCount(); i++) {
+                            View child = dragLayer.getChildAt(i);
+                            if (!afv.isInstance(child)) continue;
+                            Object isFolderObj = callMethod(child, "isOfType", typeFolder);
+                            if (Boolean.TRUE.equals(isFolderObj)) {
+                                callMethod(child, "close", animate);
+                            }
+                        }
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) {
+            log("hookAutoCloseFolder failed: " + t);
+        }
     }
 
     // ── Nascondi Etichette (Home/Drawer) ────────────────────────────────────
