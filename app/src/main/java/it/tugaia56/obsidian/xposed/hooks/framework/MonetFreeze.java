@@ -299,7 +299,22 @@ public class MonetFreeze extends XposedMods {
         xRes.setReplacement(SYSTEM_UI, "color", "coui_numeric_keyboard_outer_gradient_color_2",   outer2);
         xRes.setReplacement(SYSTEM_UI, "color", "coui_numeric_keyboard_outer_gradient_color_3",   outer3);
         xRes.setReplacement(SYSTEM_UI, "color", "coui_simple_lock_transparent_filled_rectangle_icon_color",   full);
-        xRes.setReplacement(SYSTEM_UI, "color", "coui_simple_lock_transparent_outlined_rectangle_icon_color", 0x33FFFFFF);
+        // 2026-09-08: era bianco fisso (0x33FFFFFF) — segnalato dall'utente, il pallino "vuoto"
+        // (non ancora digitato) restava bianco invece di seguire l'accento come quello pieno.
+        xRes.setReplacement(SYSTEM_UI, "color", "coui_simple_lock_transparent_outlined_rectangle_icon_color", outer2);
+        // 2026-09-08: famiglia di risorse GEMELLA mai coperta, trovata via aapt2 dump reale su
+        // SystemUI.apk (non per analogia) dopo che l'utente ha mandato una FOTO (non screenshot
+        // — quello non cattura fedelmente questa animazione) mostrando i pallini del PIN teal
+        // appena dopo il boot. "coui_simple_lock_*" (senza "transparent_") e soprattutto
+        // "kgd_color_simple_lock_*" (prefisso "kgd" = KeyGuarD) sono probabilmente le risorse
+        // VERE lette dalla schermata di sblocco PIN, distinte da quelle "transparent_" già
+        // coperte sopra (che potrebbero servire a un altro elemento simple-lock).
+        setColor(xRes, SYSTEM_UI, "coui_simple_lock_filled_rectangle_icon_color",        full);
+        setColor(xRes, SYSTEM_UI, "coui_simple_lock_filled_rectangle_icon_dark_color",   full);
+        setColor(xRes, SYSTEM_UI, "coui_simple_lock_outlined_rectangle_icon_color",      outer2);
+        setColor(xRes, SYSTEM_UI, "coui_simple_lock_outlined_rectangle_icon_dark_color", outer2);
+        setColor(xRes, SYSTEM_UI, "kgd_color_simple_lock_filled_rectangle_icon_color",   full);
+        setColor(xRes, SYSTEM_UI, "kgd_color_simple_lock_outlined_rectangle_icon_color", outer2);
         xRes.setReplacement(SYSTEM_UI, "color", "coui_numeric_keyboard_dark_word_text_normal_color",       full);
         xRes.setReplacement(SYSTEM_UI, "color", "coui_numeric_keyboard_dark_word_text_normal_light_color", full);
     }
