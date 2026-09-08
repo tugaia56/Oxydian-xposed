@@ -7,6 +7,68 @@
         <item>com.android.settings</item>
         <item>com.android.launcher</item>
         <item>it.simonesestito.ntiles</item>
+        <item>com.oplus.appplatform</item>
+        <item>com.oplus.multiapp</item>
+        <item>com.oplus.screenshot</item>
+        <item>com.oplus.wirelesssettings</item>
+        <item>com.oplus.cast</item>
+        <item>com.oplus.linker</item>
+        <item>com.oplus.wallpapers</item>
+        <item>com.oplus.notificationmanager</item>
+        <item>com.oplus.uxdesign</item>
+        <item>com.oplus.sos</item>
+        <item>com.oplus.battery</item>
+        <item>com.oplus.pantanal.ums</item>
+        <item>com.coloros.operationManual</item>
+        <item>com.heytap.mydevices</item>
+        <item>com.android.phone</item>
+        <item>com.oplus.cota</item>
+        <item>com.oplus.ota</item>
+        <item>com.oplus.games</item>
+        <item>com.coloros.smartsidebar</item>
+        <item>com.oplus.beaconlink</item>
+        <item>com.oplus.appbooster</item>
+        <item>com.oneplus.calculator</item>
+        <item>com.oplus.safecenter</item>
+        <item>com.oplus.keyguard.clock.base</item>
+        <item>com.coloros.systemclone</item>
+        <item>com.oplus.eyeprotect</item>
+        <item>com.heytap.accessory</item>
+        <item>com.oplus.remotecontrol</item>
+        <item>com.oplus.aiwriter</item>
+        <item>com.oplus.melody</item>
+        <item>com.oneplus.gallery</item>
+        <item>com.oplus.camera</item>
+        <item>com.oplus.gesture</item>
+        <item>com.oplus.securitypermission</item>
+        <item>com.oplus.phonemanager</item>
+        <item>com.android.server.telecom</item>
+        <item>com.heytap.browser</item>
+        <item>net.oneplus.weather</item>
+        <item>com.oplus.aimemory</item>
+        <item>com.coloros.scenemode</item>
+        <item>com.oplus.aiunit</item>
+        <item>com.oplus.uiengine</item>
+        <item>com.oplus.pscanvas</item>
+        <item>com.oneplus.account</item>
+        <item>com.oneplus.oshare</item>
+        <item>com.oneplus.deskclock</item>
+        <item>com.oplus.contentportal</item>
+        <item>com.oplus.securepay</item>
+        <item>com.oplus.apprecover</item>
+        <item>com.coloros.bootreg</item>
+        <item>com.oplus.screenrecorder</item>
+        <item>com.oppo.quicksearchbox</item>
+        <item>com.coloros.colordirectservice</item>
+        <item>com.heytap.pictorial</item>
+        <item>com.oplus.aod</item>
+        <item>com.android.wallpaper.livepicker</item>
+        <item>com.coloros.floatassistant</item>
+        <item>com.coloros.assistantscreen</item>
+        <item>com.coloros.accessibilityassistant</item>
+        <item>com.oplus.trafficmonitor</item>
+        <item>com.oplus.vdc</item>
+        <item>com.coloros.video</item>
 	</string-array>
 
     <!-- DST ACCENT1 resource names (24 entries) -->
@@ -271,12 +333,25 @@
         <item>@string/custom_color</item>
     </string-array>
 
-    <!-- DST: Notification style preset names (DSTNFN* order — 4 transparent first) -->
+    <!-- DST: Notification style preset names — order must match ThemeStyleFragment.NOTIF_OVERLAYS
+         (Image first, then the 4 transparent ones, then the procedural textures, then the rest —
+         reordered 2026-09-02 per user request). -->
     <string-array name="dst_notif_preset_names">
+        <item>Image</item>
         <item>Thin Outline Transparent</item>
         <item>Outline Transparent 25%</item>
         <item>Outline Transparent 50%</item>
         <item>Outline Transparent 75%</item>
+        <item>Dots</item>
+        <item>Lines</item>
+        <item>Noise</item>
+        <item>Hearts</item>
+        <item>Diamonds</item>
+        <item>Clubs</item>
+        <item>Spades</item>
+        <item>Checkerboard</item>
+        <item>Waves</item>
+        <item>Crosshatch</item>
         <item>Outline Accent</item>
         <item>Semi Transparent</item>
         <item>Transparent</item>
@@ -301,17 +376,6 @@
         <item>Dumbbell</item>
         <item>Duoline</item>
         <item>iOS</item>
-        <item>Dots</item>
-        <item>Lines</item>
-        <item>Noise</item>
-        <item>Hearts</item>
-        <item>Diamonds</item>
-        <item>Clubs</item>
-        <item>Spades</item>
-        <item>Checkerboard</item>
-        <item>Waves</item>
-        <item>Crosshatch</item>
-        <item>Image</item>
     </string-array>
 
     <!-- Date format -->
@@ -755,5 +819,22 @@
         <item>White</item>
         <item>Accent</item>
         <item>Custom</item>
+    </string-array>
+
+    <!-- Language picker: names of each supported language translated into THIS language,
+         so the reader always understands the list in their own tongue. Order matches
+         SettingsGeneralFragment.LANGUAGE_TAGS[1..11]. -->
+    <string-array name="language_localized_names">
+        <item>English</item>
+        <item>Italian</item>
+        <item>Russian</item>
+        <item>Portuguese (Brazil)</item>
+        <item>Indonesian</item>
+        <item>Spanish</item>
+        <item>Turkish</item>
+        <item>German</item>
+        <item>Chinese (Simplified)</item>
+        <item>Vietnamese</item>
+        <item>Ukrainian</item>
     </string-array>
 </resources>

@@ -344,6 +344,16 @@
     <string name="advanced_reboot_systemui">Riavvia SystemUI</string>
     <string name="nav_misc_settings_entry">Mostra Voce nelle Impostazioni</string>
     <string name="nav_misc_settings_entry_summary">Aggiunge la voce Obsidian nelle Impostazioni di sistema</string>
+    <string name="nav_screenshot_enabler">Abilita Screenshot</string>
+    <string name="nav_screenshot_enabler_summary">Consente screenshot e registrazione schermo nelle app che normalmente li bloccano</string>
+    <string name="nav_corepatch">Core Patch</string>
+    <string name="nav_corepatch_summary">Consente il downgrade delle app e altri controlli del gestore pacchetti</string>
+    <string name="corepatch_downgrade">Consenti Downgrade</string>
+    <string name="corepatch_downgrade_summary">Consente di installare una versione più vecchia sopra una più recente</string>
+    <string name="corepatch_bypass_block">Bypassa Blocchi</string>
+    <string name="corepatch_bypass_block_summary">Bypassa la lista di blocco installazione/avvio usata da alcuni produttori per certi dispositivi (es. Nothing Phone) — nessun effetto su questo dispositivo</string>
+    <string name="corepatch_disable_verify">Disabilita Verifica Pacchetti</string>
+    <string name="corepatch_disable_verify_summary">Disabilita l\'agente di verifica dell\'installazione app (es. Google Play Protect)</string>
 
     <!-- Launcher (rispecchia launcher_mods.xml di OC — chiavi pref identiche a OC) -->
     <string name="general_off">Disattivato</string>
@@ -371,6 +381,10 @@
     <string name="dock_background_material_summary">Usane una alla volta — ignorata se sopra è attivo anche Sfondo dock</string>
     <string name="dock_background_amount">Livello sfocatura</string>
     <string name="dock_background_radius">Raggio sfondo</string>
+    <string name="dock_remove_max_limit">Rimuovi Limite Icone Dock</string>
+    <string name="dock_remove_max_limit_summary">Permette tante icone nel Dock quante le colonne della home, non solo il default del produttore</string>
+    <string name="launcher_auto_close_folder">Chiudi Automaticamente la Cartella Dopo Aver Aperto un\'App</string>
+    <string name="launcher_auto_close_folder_summary">Chiude la cartella non appena tocchi un\'app al suo interno</string>
     <string name="launcher_recents">Recenti</string>
     <string name="launcher_reboot_banner">⚠ Attiva le mod che vuoi, poi riavvia il telefono\nNon basta forzare l\'arresto del Launcher</string>
     <string name="launcher_recents_color_no_reboot">Si applica subito, non serve riavviare — riapri Recenti se non lo vedi cambiare al momento</string>
@@ -665,6 +679,7 @@
     <string name="restart_systemui">Riavvia SystemUI</string>
     <string name="restart_systemui_toast">Riavvio SystemUI in corso…</string>
     <string name="restart_systemui_reminder">Riavvia SystemUI per applicare le modifiche</string>
+    <string name="reboot_device_reminder">Riavvia il telefono (solo la prima volta, poi basta Riavvia SystemUI)</string>
     <string name="obs_restart_ui_hint">Riavvia SystemUI per applicare</string>
     <string name="qs_header_gravity">Posizione verticale</string>
 
@@ -854,6 +869,8 @@
     <string name="notif_texture_color_title">Colore</string>
     <string name="notif_texture_border_title">Bordo</string>
     <string name="notif_texture_border_summary">Aggiunge un bordo colorato attorno alla notifica</string>
+    <string name="notif_img_offset_title">Posizione Foto</string>
+    <string name="notif_img_offset_summary">Scegli quale parte della foto mostrare, con anteprima dal vivo</string>
     <string name="nav_navbar_style">Stile Barra di Navigazione</string>
     <string name="nav_navbar_style_summary">Stile delle icone della barra di navigazione</string>
 
@@ -896,6 +913,23 @@
     <string name="gesture_override_back_hold_command_notification_panel">Apri pannello notifiche</string>
     <string name="gesture_override_back_hold_command_screen_off">Schermo Spento</string>
     <string name="gesture_override_back_hold_command_circle_to_search">Cerchia per cercare</string>
+
+    <!-- Extra OOS — 7 mod a basso rischio portate da LuckyTool (stesso codebase ColorOS/OOS),
+         verificate presenti sul device reale prima del porting, 2026-09-02 -->
+    <string name="nav_lucky_extras">Extra OOS</string>
+    <string name="nav_lucky_extras_summary">Mod extra portate da LuckyTool, verificate su questo device</string>
+    <string name="lucky_adb_confirm">Salta Conferma Installazione ADB</string>
+    <string name="lucky_adb_confirm_summary">Installa le app via \'adb install\' senza la finestra di conferma</string>
+    <string name="lucky_power_menu">Menù Accensione Più Veloce</string>
+    <string name="lucky_power_menu_summary">Riduce il ritardo prima che compaia il menù accensione tenendo premuto</string>
+    <string name="lucky_volume_flashlight">Volume ⇒ Torcia</string>
+    <string name="lucky_volume_flashlight_summary">Tieni premuto un tasto volume a schermo spento per accendere/spegnere la torcia</string>
+    <string name="lucky_multiapp">Rimuovi Blocco Multi App</string>
+    <string name="lucky_multiapp_summary">Permette di clonare più app in Multi App / App Twin, non solo quelle scelte dal produttore</string>
+    <string name="lucky_png_screenshot">Salva Screenshot in PNG</string>
+    <string name="lucky_png_screenshot_summary">Usa PNG invece di JPEG per gli screenshot normali (senza perdita, file più grandi)</string>
+    <string name="lucky_longshot_limit">Rimuovi Limite Screenshot Scorrevole</string>
+    <string name="lucky_longshot_limit_summary">Rimuove il limite massimo di pagine/dimensione per gli screenshot scorrevoli (lunghi)</string>
 
     <!-- Icone Wi-Fi / Segnale nav -->
     <string name="nav_icon_style">Stile icone Segnale</string>

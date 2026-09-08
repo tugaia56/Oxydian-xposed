@@ -347,6 +347,16 @@
     <string name="advanced_reboot_systemui">Restart SystemUI</string>
     <string name="nav_misc_settings_entry">Show Entry in Settings</string>
     <string name="nav_misc_settings_entry_summary">Adds Obsidian entry to system Settings</string>
+    <string name="nav_screenshot_enabler">Enable Screenshot</string>
+    <string name="nav_screenshot_enabler_summary">Allow screenshots and screen recording in apps that normally block them</string>
+    <string name="nav_corepatch">Core Patch</string>
+    <string name="nav_corepatch_summary">Allow downgrading apps and other package manager checks</string>
+    <string name="corepatch_downgrade">Allow Downgrade</string>
+    <string name="corepatch_downgrade_summary">Allow installing an older version over a newer one</string>
+    <string name="corepatch_bypass_block">Bypass Blocklist</string>
+    <string name="corepatch_bypass_block_summary">Bypass the install/launch blocklist some OEMs use for certain devices (e.g. Nothing Phone) — no effect on this device</string>
+    <string name="corepatch_disable_verify">Disable Package Verifier</string>
+    <string name="corepatch_disable_verify_summary">Disable the app install verification agent (e.g. Google Play Protect)</string>
 
     <!-- Launcher (mirrors OC's launcher_mods.xml — pref keys match OC exactly) -->
     <string name="general_off">Off</string>
@@ -374,6 +384,10 @@
     <string name="dock_background_material_summary">Use one at a time — ignored if Dock Background above is also on</string>
     <string name="dock_background_amount">Blur amount</string>
     <string name="dock_background_radius">Background radius</string>
+    <string name="dock_remove_max_limit">Remove Dock Icon Count Limit</string>
+    <string name="dock_remove_max_limit_summary">Allows as many Dock icons as the home screen column count, not just the OEM default</string>
+    <string name="launcher_auto_close_folder">Auto-Close Folder After Opening an App</string>
+    <string name="launcher_auto_close_folder_summary">Closes the folder as soon as you tap an app inside it</string>
     <string name="launcher_recents">Recents</string>
     <string name="launcher_reboot_banner">⚠ Turn on whatever mods you want, then reboot\nForce-stopping the Launcher app is not enough</string>
     <string name="launcher_recents_color_no_reboot">Applies live, no reboot needed — reopen Recents if you don\'t see it right away</string>
@@ -664,6 +678,7 @@
     <string name="restart_systemui">Restart SystemUI</string>
     <string name="restart_systemui_toast">Restarting SystemUI…</string>
     <string name="restart_systemui_reminder">Restart SystemUI to apply changes</string>
+    <string name="reboot_device_reminder">Reboot the device (only the first time, then a SystemUI restart is enough)</string>
     <string name="obs_restart_ui_hint">Restart SystemUI to apply</string>
     <string name="qs_header_gravity">Vertical position</string>
 
@@ -984,6 +999,8 @@
     <string name="notif_texture_color_title">Color</string>
     <string name="notif_texture_border_title">Border</string>
     <string name="notif_texture_border_summary">Adds a colored border around the notification</string>
+    <string name="notif_img_offset_title">Photo Position</string>
+    <string name="notif_img_offset_summary">Choose which part of the photo to show, with a live preview</string>
     <string name="nav_navbar_style">Navigation Bar Style</string>
     <string name="nav_navbar_style_summary">Navigation button icon style</string>
 
@@ -1026,4 +1043,21 @@
     <string name="gesture_override_back_hold_command_notification_panel">Open Notification Panel</string>
     <string name="gesture_override_back_hold_command_screen_off">Screen Off</string>
     <string name="gesture_override_back_hold_command_circle_to_search">Circle to Search</string>
+
+    <!-- Extra OOS — 7 low-risk mods ported from LuckyTool (ColorOS/OOS shared codebase),
+         verified present on real device dex before porting, 2026-09-02 -->
+    <string name="nav_lucky_extras">Extra OOS</string>
+    <string name="nav_lucky_extras_summary">Extra mods ported from LuckyTool, verified on this device</string>
+    <string name="lucky_adb_confirm">Skip ADB Install Confirmation</string>
+    <string name="lucky_adb_confirm_summary">Installs apps via \'adb install\' without the confirmation dialog</string>
+    <string name="lucky_power_menu">Faster Power Menu</string>
+    <string name="lucky_power_menu_summary">Reduces the long-press delay before the power menu appears</string>
+    <string name="lucky_volume_flashlight">Volume Key ⇒ Flashlight</string>
+    <string name="lucky_volume_flashlight_summary">Hold a volume key with the screen off to toggle the flashlight</string>
+    <string name="lucky_multiapp">Remove Multi App Blocklist</string>
+    <string name="lucky_multiapp_summary">Lets more apps be cloned in Multi App / App Twin, not just the OEM-curated shortlist</string>
+    <string name="lucky_png_screenshot">Save Screenshots as PNG</string>
+    <string name="lucky_png_screenshot_summary">Use PNG instead of JPEG for regular screenshots (lossless, larger files)</string>
+    <string name="lucky_longshot_limit">Remove Scrolling Screenshot Limit</string>
+    <string name="lucky_longshot_limit_summary">Removes the maximum page/size cap for scrolling (long) screenshots</string>
 </resources>

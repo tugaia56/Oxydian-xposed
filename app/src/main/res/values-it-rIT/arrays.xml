@@ -45,10 +45,21 @@
 
     <!-- DST: Nomi preset Stile Notifica (IT) — 4 trasparenti per primi -->
     <string-array name="dst_notif_preset_names">
+        <item>Immagine</item>
         <item>Trasparente con bordo sottile</item>
         <item>Trasparenza Alta con bordo</item>
         <item>Trasparenza Media con bordo</item>
         <item>Trasparenza Bassa con bordo</item>
+        <item>Puntini</item>
+        <item>Righe</item>
+        <item>Rumore</item>
+        <item>Cuori</item>
+        <item>Quadri</item>
+        <item>Fiori</item>
+        <item>Picche</item>
+        <item>Scacchiera</item>
+        <item>Onde</item>
+        <item>Intreccio</item>
         <item>Scuro con bordo</item>
         <item>Semi Trasparente</item>
         <item>Trasparente</item>
@@ -73,17 +84,6 @@
         <item>Manubrio</item>
         <item>Doppia Linea</item>
         <item>iOS</item>
-        <item>Puntini</item>
-        <item>Righe</item>
-        <item>Rumore</item>
-        <item>Cuori</item>
-        <item>Quadri</item>
-        <item>Fiori</item>
-        <item>Picche</item>
-        <item>Scacchiera</item>
-        <item>Onde</item>
-        <item>Intreccio</item>
-        <item>Immagine</item>
     </string-array>
 
     <!-- DST: Nomi preset Raggio Angolo Notifiche (IT) -->
@@ -550,6 +550,23 @@
     <string-array name="weather_units_entries">
         <item>Metrico</item>
         <item>Imperiale</item>
+    </string-array>
+
+    <!-- Language picker: names of each supported language translated into THIS language,
+         so the reader always understands the list in their own tongue. Order matches
+         SettingsGeneralFragment.LANGUAGE_TAGS[1..11]. -->
+    <string-array name="language_localized_names">
+        <item>Inglese</item>
+        <item>Italiano</item>
+        <item>Russo</item>
+        <item>Portoghese (Brasile)</item>
+        <item>Indonesiano</item>
+        <item>Spagnolo</item>
+        <item>Turco</item>
+        <item>Tedesco</item>
+        <item>Cinese (semplificato)</item>
+        <item>Vietnamita</item>
+        <item>Ucraino</item>
     </string-array>
 
 </resources>
