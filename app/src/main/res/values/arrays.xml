@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- LSPosed scope -->
+    <!-- 2026-09-08: RIVERTITO al minimo pre-rollout — vedi [[project_oem_scope_boot_regression]]
+         (LSPosed perdeva la corsa ad agganciare com.android.settings al boot quando lo scope
+         totale era grande, confermato via logcat, riproducibile ad ogni riavvio; lo split in
+         un modulo companion non aveva aiutato). L'utente è tornato a Substratum per il theming
+         delle app OEM. com.oplus.screenshot tenuto per il floating toolbar già approvato
+         (installScreenshotFloatButtonHook in SettingsCardBackgroundMod), non solo card-theming;
+         com.oplus.appplatform tenuto per "Abilita Screenshot" (ScreenshotEnablerMod), feature
+         indipendente da questo rollout. -->
     <string-array name="xposed_scope">
         <item>android</item>
         <item>com.android.systemui</item>
@@ -8,67 +16,7 @@
         <item>com.android.launcher</item>
         <item>it.simonesestito.ntiles</item>
         <item>com.oplus.appplatform</item>
-        <item>com.oplus.multiapp</item>
         <item>com.oplus.screenshot</item>
-        <item>com.oplus.wirelesssettings</item>
-        <item>com.oplus.cast</item>
-        <item>com.oplus.linker</item>
-        <item>com.oplus.wallpapers</item>
-        <item>com.oplus.notificationmanager</item>
-        <item>com.oplus.uxdesign</item>
-        <item>com.oplus.sos</item>
-        <item>com.oplus.battery</item>
-        <item>com.oplus.pantanal.ums</item>
-        <item>com.coloros.operationManual</item>
-        <item>com.heytap.mydevices</item>
-        <item>com.android.phone</item>
-        <item>com.oplus.cota</item>
-        <item>com.oplus.ota</item>
-        <item>com.oplus.games</item>
-        <item>com.coloros.smartsidebar</item>
-        <item>com.oplus.beaconlink</item>
-        <item>com.oplus.appbooster</item>
-        <item>com.oneplus.calculator</item>
-        <item>com.oplus.safecenter</item>
-        <item>com.oplus.keyguard.clock.base</item>
-        <item>com.coloros.systemclone</item>
-        <item>com.oplus.eyeprotect</item>
-        <item>com.heytap.accessory</item>
-        <item>com.oplus.remotecontrol</item>
-        <item>com.oplus.aiwriter</item>
-        <item>com.oplus.melody</item>
-        <item>com.oneplus.gallery</item>
-        <item>com.oplus.camera</item>
-        <item>com.oplus.gesture</item>
-        <item>com.oplus.securitypermission</item>
-        <item>com.oplus.phonemanager</item>
-        <item>com.android.server.telecom</item>
-        <item>com.heytap.browser</item>
-        <item>net.oneplus.weather</item>
-        <item>com.oplus.aimemory</item>
-        <item>com.coloros.scenemode</item>
-        <item>com.oplus.aiunit</item>
-        <item>com.oplus.uiengine</item>
-        <item>com.oplus.pscanvas</item>
-        <item>com.oneplus.account</item>
-        <item>com.oneplus.oshare</item>
-        <item>com.oneplus.deskclock</item>
-        <item>com.oplus.contentportal</item>
-        <item>com.oplus.securepay</item>
-        <item>com.oplus.apprecover</item>
-        <item>com.coloros.bootreg</item>
-        <item>com.oplus.screenrecorder</item>
-        <item>com.oppo.quicksearchbox</item>
-        <item>com.coloros.colordirectservice</item>
-        <item>com.heytap.pictorial</item>
-        <item>com.oplus.aod</item>
-        <item>com.android.wallpaper.livepicker</item>
-        <item>com.coloros.floatassistant</item>
-        <item>com.coloros.assistantscreen</item>
-        <item>com.coloros.accessibilityassistant</item>
-        <item>com.oplus.trafficmonitor</item>
-        <item>com.oplus.vdc</item>
-        <item>com.coloros.video</item>
 	</string-array>
 
     <!-- DST ACCENT1 resource names (24 entries) -->

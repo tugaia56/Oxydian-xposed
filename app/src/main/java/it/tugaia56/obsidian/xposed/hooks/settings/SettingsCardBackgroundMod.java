@@ -79,49 +79,26 @@ public class SettingsCardBackgroundMod extends XposedMods {
     private static final String MY_DEVICES = "com.heytap.mydevices";
     private static final String PHONE = "com.android.phone";
     private static final String SCREENSHOT = "com.oplus.screenshot";
-    // Esclusi (nessuna classe COUI card nel dex reale, verificato 2026-09-04): GMS, Google
-    // Permission Controller, Google Wellbeing — Material Design puro di Google, nessun theming
-    // COUI possibile lì; GMS anche troppo grande/delicato per toccarlo comunque.
-    private static final String[] CORE_PACKAGES = {
-            SETTINGS, WIRELESS_SETTINGS, CAST, OP_SYNERGY, WALLPAPERS, NOTIFICATION_CENTER,
-            UX_DESIGN, SOS, BATTERY, PANTANAL_UMS, OPERATION_MANUAL, MY_DEVICES, PHONE
-    };
-    // 2026-09-05: lista lunga fornita dall'utente (app di sistema che aveva già temato via
-    // Substratum) — verificate TUTTE una per una via script su device (unzip -p + grep sul dex
-    // reale di ciascuna, non per analogia) prima di aggiungerle: 58 su 61 hanno le classi COUI
-    // giuste. Esclusi (nessuna classe COUI nel dex, confermato): com.android.cellbroadcastreceiver,
-    // com.android.providers.media, com.oplus.engineermode — puro AOSP/diagnostica, niente da temare.
-    // Molte di queste sono servizi senza UI mai mostrata all'utente: innocuo includerle comunque
-    // (l'hook semplicemente non trova mai nessuna vista da tingere), ma tenerne traccia qui evita
-    // di doverle re-includere/verificare una per una in futuro.
-    // public: riusata da XPLauncher per ritardare l'avvio dei mod in questi processi al boot
-    // (vedi XPLauncher.DEFERRED_STARTUP_DELAY_MS) — richiesta utente 2026-09-06.
+    // 2026-09-08: RIVERTITO — vedi [[project_oem_scope_boot_regression]]. Il rollout a ~70
+    // pacchetti totali (CORE_PACKAGES + EXTRA_OEM_PACKAGES) causava una corsa reale in LSPosed:
+    // più pacchetti sono in scope, più lento è il setup di LSPosed dentro Zygote al boot, più
+    // probabile che il fork prestissimo di com.android.settings (FallbackHome, la home
+    // temporanea di sistema) avvenga PRIMA che LSPosed sia pronto ad agganciarlo — confermato
+    // via logcat dal vivo, riproducibile a ogni riavvio, non un caso isolato. Uno split in un
+    // modulo companion separato (:oemtheme, 2026-09-07/08) NON ha aiutato: il totale scoped
+    // conta, non quale modulo possiede cosa. L'utente ha scelto di tornare a Substratum per il
+    // theming di queste app OEM, tenendo Obsidian scoped al minimo. com.oplus.multiapp
+    // (LuckyExtrasMod "niente blacklist multi-app") tolto perché l'utente non lo usa;
+    // com.oplus.screenshot tenuto perché ha il floating toolbar già approvato
+    // (installScreenshotFloatButtonHook) — non è "solo" card-theming.
+    private static final String[] CORE_PACKAGES = { SETTINGS };
     public static final String[] EXTRA_OEM_PACKAGES = {
-            "com.oplus.cota", "com.oplus.ota", "com.oplus.multiapp", "com.oplus.games",
-            "com.coloros.smartsidebar", "com.oplus.beaconlink", "com.oplus.appbooster",
-            "com.oneplus.calculator", "com.oplus.safecenter", "com.oplus.keyguard.clock.base",
-            "com.coloros.systemclone", "com.oplus.eyeprotect", "com.heytap.accessory",
-            "com.oplus.remotecontrol", "com.oplus.aiwriter", "com.oplus.melody",
-            "com.oneplus.gallery", "com.oplus.camera", "com.oplus.gesture",
-            "com.oplus.securitypermission", "com.oplus.phonemanager", "com.android.server.telecom",
-            "com.heytap.browser", "net.oneplus.weather", "com.oplus.aimemory",
-            "com.coloros.scenemode", "com.oplus.aiunit", "com.oplus.uiengine",
-            "com.oplus.pscanvas", "com.oneplus.account", "com.oneplus.oshare",
-            "com.oneplus.deskclock", "com.oplus.contentportal", "com.oplus.securepay",
-            "com.oplus.apprecover", "com.coloros.bootreg", "com.oplus.screenrecorder",
-            "com.oppo.quicksearchbox", "com.coloros.colordirectservice", "com.oplus.screenshot",
-            "com.heytap.pictorial", "com.oplus.aod", "com.android.wallpaper.livepicker",
-            "com.coloros.floatassistant", "com.coloros.assistantscreen",
-            "com.coloros.accessibilityassistant", "com.oplus.trafficmonitor", "com.oplus.vdc",
-            "com.coloros.video"
+            "com.oplus.screenshot"
     };
     private static final String[] CARD_TARGET_PACKAGES = concat(CORE_PACKAGES, EXTRA_OEM_PACKAGES);
     // Sottoinsieme di CARD_TARGET_PACKAGES che riceve anche il tint dello sfondo pagina (tutte
     // tranne SETTINGS, che ha già il proprio overlay OMS separato).
-    private static final String[] PAGE_BG_TARGET_PACKAGES = concat(new String[] {
-            WIRELESS_SETTINGS, CAST, OP_SYNERGY, WALLPAPERS, NOTIFICATION_CENTER,
-            UX_DESIGN, SOS, BATTERY, PANTANAL_UMS, OPERATION_MANUAL, MY_DEVICES, PHONE
-    }, EXTRA_OEM_PACKAGES);
+    private static final String[] PAGE_BG_TARGET_PACKAGES = EXTRA_OEM_PACKAGES;
 
     private static String[] concat(String[] a, String[] b) {
         String[] r = new String[a.length + b.length];
