@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -135,6 +136,32 @@ public class SettingsIconsFragment extends Fragment {
         mIconColor = ObsidianPrefs.getInt(KEY_ICON_COLOR, 0);
 
         rebuild();
+
+        // "Applica" ricompila anche l'overlay SIP2 (Obsidian stessa, per l'anteprima interna) —
+        // abilitarlo/disabilitarlo cambia gli asset path della NOSTRA app, e Android RILANCIA
+        // MainActivity per questo (confermato dal vivo: "adjustedChanges={CONFIG_ASSETS_PATHS}"
+        // in logcat) — non un bug nostro, comportamento di piattaforma per qualsiasi app quando
+        // il proprio set di overlay attivi cambia. mSelected si auto-recupera già da
+        // ObsidianPrefs sopra, ma lo SCROLL no: lo ripristiniamo dal Bundle standard di
+        // ricreazione Activity/Fragment, non da un trucco sull'adapter (quello presuppone la
+        // STESSA istanza Fragment viva, qui invece è sempre una nuova).
+        if (savedInstanceState != null) {
+            Parcelable lmState = savedInstanceState.getParcelable(STATE_LAYOUT_MANAGER);
+            if (lmState != null) {
+                RecyclerView.LayoutManager lm = mRv.getLayoutManager();
+                if (lm != null) lm.onRestoreInstanceState(lmState);
+            }
+        }
+    }
+
+    private static final String STATE_LAYOUT_MANAGER = "SettingsIconsFragment.layoutManagerState";
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mRv != null && mRv.getLayoutManager() != null) {
+            outState.putParcelable(STATE_LAYOUT_MANAGER, mRv.getLayoutManager().onSaveInstanceState());
+        }
     }
 
     private boolean packHasOptions(int idx) {
@@ -148,6 +175,27 @@ public class SettingsIconsFragment extends Fragment {
     }
 
     private void rebuild(boolean scrollToSelection) {
+        // Bug segnalato dall'utente 2026-09-06: "Applica" (rebuild(false), niente cambio di
+        // selezione) faceva ripartire lo scroll da zero — setAdapter() su un ConcatAdapter
+        // NUOVO azzera sempre la posizione, a prescindere da scrollToSelection. Catturiamo la
+        // posizione/offset attuali PRIMA e li ripristiniamo dopo quando non dobbiamo saltare
+        // alla selezione (scrollToSelection=false, es. dopo Applica/Disabilita) — quando invece
+        // scrollToSelection=true (tap su un pack diverso) resta il comportamento voluto, salta
+        // alla nuova selezione.
+        int restorePos = RecyclerView.NO_POSITION;
+        int restoreOffset = 0;
+        if (!scrollToSelection) {
+            RecyclerView.LayoutManager prevLm = mRv.getLayoutManager();
+            if (prevLm instanceof LinearLayoutManager) {
+                LinearLayoutManager llm = (LinearLayoutManager) prevLm;
+                restorePos = llm.findFirstVisibleItemPosition();
+                if (restorePos != RecyclerView.NO_POSITION) {
+                    View firstView = llm.findViewByPosition(restorePos);
+                    restoreOffset = firstView != null ? firstView.getTop() : 0;
+                }
+            }
+        }
+
         mButtonsAdapter = new ButtonsAdapter();
 
         List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
@@ -192,11 +240,13 @@ public class SettingsIconsFragment extends Fragment {
 
         mRv.setAdapter(new ConcatAdapter(chain));
 
+        RecyclerView.LayoutManager lm = mRv.getLayoutManager();
         if (scrollToSelection && scrollTargetPos >= 0) {
-            RecyclerView.LayoutManager lm = mRv.getLayoutManager();
             if (lm instanceof LinearLayoutManager) {
                 ((LinearLayoutManager) lm).scrollToPositionWithOffset(scrollTargetPos, dp(8));
             }
+        } else if (restorePos != RecyclerView.NO_POSITION && lm instanceof LinearLayoutManager) {
+            ((LinearLayoutManager) lm).scrollToPositionWithOffset(restorePos, restoreOffset);
         }
     }
 
@@ -278,7 +328,15 @@ public class SettingsIconsFragment extends Fragment {
 
     private void setBusy(boolean busy) {
         mBusy = busy;
-        rebuild();
+        // Bug segnalato dall'utente 2026-09-06: un rebuild() COMPLETO (nuovo ConcatAdapter, vedi
+        // sotto) qui faceva ripartire lo scroll da zero due volte extra ad ogni "Applica"/
+        // "Disabilita" (setBusy(true) all'inizio + setBusy(false) alla fine, PIÙ il rebuild()
+        // esplicito finale — tre reset invece di uno solo) — il ripristino scroll in rebuild()
+        // arriva sempre troppo tardi rispetto al reset immediato di setAdapter(), quindi le
+        // chiamate extra vincevano la corsa. Il pulsante Applica/Disabilita è un solo item
+        // autosufficiente (onBindViewHolder legge mBusy/mAppliedSet/... da solo): un
+        // notifyItemChanged mirato basta, senza toccare l'intero adapter/lo scroll.
+        if (mButtonsAdapter != null) mButtonsAdapter.notifyItemChanged(0);
     }
 
     // ── Notice row ───────────────────────────────────────────────────────────
