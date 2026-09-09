@@ -16,8 +16,17 @@ public final class ModuleConstants {
     public static final String OVERLAY_DIR = MODULE_DIR + "/overlays";
 
     // ── Compilatore overlay APK (icon pack Impostazioni) ─────────────────────────
-    public static final String SYSTEM_OVERLAY_DIR       = "/system/product/overlay";
-    public static final String MODULE_SYSTEM_OVERLAY_DIR = MODULE_DIR + "/system/product/overlay";
+    // 2026-09-09: era "/system/product/overlay" — su questo device /product è una partizione
+    // SEPARATA e di sola lettura (EROFS, confermato via `mount`; /system/product è solo un
+    // symlink a /product). Magisk faceva da solo il redirect "system/product/" → "/product/"
+    // dentro i moduli (funzione nota come partition mapping); KernelSU-Next NON lo fa —
+    // confermato dal vivo: il modulo restava con mount:true ma le APK non comparivano mai in
+    // "cmd overlay list" per nessuno dei 3 pack (Settings/SystemUI/Launcher, tutti bloccati su
+    // "Compilato - riavvia il dispositivo"). Path top-level "product/" (non annidato sotto
+    // "system/") è la convenzione universale Magisk/KSU per le partizioni separate, senza
+    // bisogno di redirect furbo.
+    public static final String SYSTEM_OVERLAY_DIR       = "/product/overlay";
+    public static final String MODULE_SYSTEM_OVERLAY_DIR = MODULE_DIR + "/product/overlay";
     public static final String DATA_DIR = Obsidian.getAppContext().getFilesDir().getAbsolutePath();
     public static final String BIN_DIR  = Obsidian.getAppContext().getDataDir() + "/bin";
     public static final String TEMP_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + "/.obsidian";
