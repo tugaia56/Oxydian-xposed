@@ -4,15 +4,21 @@
     android:height="24dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- 2026-09-09: colore fisso qui di proposito — è solo il FALLBACK grafico. Il vero colore
+         (l'accento scelto dall'utente in Obsidian, non un attributo di tema generico) viene
+         applicato via codice in CustomShortcut.java con setTint(), perché deve leggere il
+         valore live da Xprefs, non qualcosa di risolvibile staticamente in XML. -->
     <group android:pivotX="54" android:pivotY="54" android:scaleX="1.4" android:scaleY="1.4">
         <path
             android:fillColor="#FFFFFFFF"
             android:pathData="M54,20 L80,42 L54,88 L28,42 Z" />
         <path
-            android:fillColor="#AAFFFFFF"
+            android:fillColor="#FFFFFFFF"
+            android:fillAlpha="0.67"
             android:pathData="M54,20 L80,42 L54,54 Z" />
         <path
-            android:fillColor="#CCFFFFFF"
+            android:fillColor="#FFFFFFFF"
+            android:fillAlpha="0.8"
             android:pathData="M28,42 L54,54 L54,88 Z" />
     </group>
 </vector>

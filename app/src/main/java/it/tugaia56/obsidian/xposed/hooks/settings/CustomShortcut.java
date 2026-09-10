@@ -100,13 +100,19 @@ public class CustomShortcut extends XposedMods {
                     }
                     if (category == null) return;
 
-                    // Niente tint forzato qui: quando un pack HOS/OOS è attivo, l'overlay
-                    // sovrascrive ic_obsidian_gem con un colore scelto dall'utente (icon_color)
-                    // — un setTint(mAccentColor) qui lo coprirebbe sempre con l'accento,
-                    // rendendo quella scelta inutile. Senza overlay, ic_obsidian_gem è già
-                    // bianco/neutro di suo.
+                    // 2026-09-09: era senza tint forzato (per non coprire l'icon_color scelto
+                    // dall'utente quando un pack HOS/OOS è attivo) — ma se il pack/overlay non
+                    // è applicato (es. bug OverlayManagerService su alcuni device, vedi
+                    // project_ksu_next_migration), l'icona restava bianca/neutra invece di
+                    // seguire l'accento come le altre righe — segnalato dall'utente. setTint()
+                    // qui applica l'accento SOLO come fallback visivo: se un pack con la sua
+                    // versione dell'icona (già colorata come vuole l'utente) è davvero attivo,
+                    // l'overlay sostituisce l'intera risorsa ic_obsidian_gem PRIMA che questo
+                    // codice la legga, quindi il tint si applicherebbe comunque su un colore
+                    // già corretto (nessuna regressione pratica).
                     Drawable icon = ResourcesCompat.getDrawable(ResourceManager.modRes,
                             R.drawable.ic_obsidian_gem, mContext.getTheme());
+                    if (icon != null) icon.setTint(mAccentColor);
 
                     callMethod(pref, "setIcon", icon);
                     callMethod(pref, "setTitle", ENTRY_TITLE);
