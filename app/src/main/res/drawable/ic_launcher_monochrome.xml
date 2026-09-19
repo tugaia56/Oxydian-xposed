@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Logo Oxydian (monogramma OYT + orbita a due toni), disegnato da zero — 2026-09-19.
-     Coordinate del disegno in un box 100x100, scalato al 72% e centrato nella zona sicura
-     dell'icona adattiva (108dp). -->
+<!-- Versione monocromatica (icona a tema) del logo Oxydian: solo lettere e orbita spessa. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
@@ -17,36 +15,28 @@
         <group android:pivotX="50" android:pivotY="52" android:rotation="-28">
             <path
                 android:pathData="M10,52 A40,17 0 0 1 90,52"
-                android:strokeColor="#B9B7FF"
+                android:strokeColor="#FFFFFF"
                 android:strokeWidth="5"
                 android:strokeLineCap="round" />
-            <path
-                android:pathData="M13,47 A37,14 0 0 1 87,47"
-                android:strokeColor="#5E5BBD"
-                android:strokeWidth="2" />
         </group>
         <path
             android:pathData="M13,54 a11,11 0 1,0 22,0 a11,11 0 1,0 -22,0"
-            android:strokeColor="#908DFF"
+            android:strokeColor="#FFFFFF"
             android:strokeWidth="8" />
         <path
             android:pathData="M45,40 L54,56 L63,40 M54,56 L54,70"
-            android:strokeColor="#908DFF"
+            android:strokeColor="#FFFFFF"
             android:strokeWidth="8" />
         <path
             android:pathData="M70,40 L92,40 M81,40 L81,70"
-            android:strokeColor="#908DFF"
+            android:strokeColor="#FFFFFF"
             android:strokeWidth="8" />
         <group android:pivotX="50" android:pivotY="52" android:rotation="-28">
             <path
                 android:pathData="M10,52 A40,17 0 0 0 90,52"
-                android:strokeColor="#B9B7FF"
+                android:strokeColor="#FFFFFF"
                 android:strokeWidth="5"
                 android:strokeLineCap="round" />
-            <path
-                android:pathData="M13,57 A37,14 0 0 0 87,57"
-                android:strokeColor="#5E5BBD"
-                android:strokeWidth="2" />
         </group>
     </group>
 </vector>

@@ -55,7 +55,7 @@ public class UpdateCheckWorker extends Worker {
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx, UpdateScheduler.CHANNEL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_launcher_monochrome)
                 .setContentTitle(ctx.getString(R.string.update_available_title))
                 .setContentText(ctx.getString(R.string.update_available_body, version))
                 .setAutoCancel(true)

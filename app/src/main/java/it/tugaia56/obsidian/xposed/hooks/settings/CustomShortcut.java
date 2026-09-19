@@ -29,7 +29,7 @@ import it.tugaia56.obsidian.xposed.XposedMods;
  */
 public class CustomShortcut extends XposedMods {
 
-    private static final String ENTRY_TITLE = "Obsidian";
+    private static final String ENTRY_TITLE = "Oxydian";
 
     private boolean mShowInSettings = true;
     private int     mAccentColor    = 0xFF6200EE;

@@ -71,7 +71,8 @@ public class CreditsFragment extends Fragment {
                 link("ColorPicker", "Jared Rummler", "https://github.com/jaredrummler/ColorPicker"),
                 link("libsu", "topjohnwu", "https://github.com/topjohnwu/libsu"),
                 link("RemotePreferences", "crossbowffs", "https://github.com/crossbowffs/RemotePreferences"),
-                link("Lottie", "Airbnb", "https://github.com/airbnb/lottie-android")));
+                link("Lottie", "Airbnb", "https://github.com/airbnb/lottie-android"),
+                link("Space Grotesk", "Florian Karsten · SIL Open Font License", "https://github.com/floriankarsten/space-grotesk")));
 
         rv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
