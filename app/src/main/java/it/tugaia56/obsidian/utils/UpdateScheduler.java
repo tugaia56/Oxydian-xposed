@@ -65,7 +65,7 @@ public class UpdateScheduler {
         NotificationManager nm = context.getSystemService(NotificationManager.class);
         if (nm == null) return;
         NotificationChannel channel = new NotificationChannel(
-                CHANNEL_ID, "Aggiornamenti Obsidian", NotificationManager.IMPORTANCE_DEFAULT);
+                CHANNEL_ID, "Aggiornamenti Oxydian", NotificationManager.IMPORTANCE_DEFAULT);
         nm.createNotificationChannel(channel);
     }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Obsidian</string>
+    <string name="app_name">Oxydian</string>
     <string name="search_no_results">Không có kết quả cho \"%s\"</string>
     <string name="search_clear_history">Xóa lịch sử tìm kiếm</string>
     <string name="color_mode_accent">Màu nhấn</string>
@@ -58,7 +58,7 @@
     <string name="edge_light_stroke_width_summary">Độ dày của ánh sáng viền</string>
     <string name="edge_light_advice">Hiển thị ánh sáng động ở các cạnh màn hình cho thông báo khi màn hình tắt (AOD).</string>
     <string name="loading_dialog_wait">Vui lòng chờ…</string>
-    <string name="dst_title">Obsidian</string>
+    <string name="dst_title">Oxydian</string>
     <string name="dst_description">Tùy chỉnh màu nhấn qua FabricatedOverlay</string>
     <string name="enabled">Đã bật</string>
     <string name="disabled">Đã tắt</string>
@@ -72,7 +72,7 @@
     <string name="section_accent3">Màu nhấn Alpha</string>
     <string name="dst_section_preset_accent">Cài đặt sẵn màu nhấn</string>
     <string name="dst_section_preset_sfondo">Cài đặt sẵn hình nền</string>
-    <string name="dst_substratum_style_title">Kiểu Dark Shadow Theme cho Obsidian</string>
+    <string name="dst_substratum_style_title">Kiểu Dark Shadow Theme cho Oxydian</string>
     <string name="dst_substratum_style_notice">Tạo chủ đề cho Cài đặt, SystemUI, Launcher, ứng dụng Video hệ thống, Quả cầu hỗ trợ, Khôi phục ứng dụng, Cổng nội dung, Đồng hồ, OnePlus Share, Máy tính, Trợ lý trò chơi, Thoải mái cho mắt, Ảnh, Máy ảnh, Internet và Wifi/Bluetooth cùng lúc (màu sắc, hình nền, hộp thoại, cửa sổ bật lên, hoạt ảnh vân tay) bằng gói tài nguyên trích xuất từ chủ đề Substratum của riêng bạn, trong một overlay duy nhất. Nhấn Áp dụng (quá trình tạo cả mười sáu mất một chút thời gian). Khởi động lại để xem thay đổi. Yêu cầu quyền "Truy cập tất cả tệp".</string>
     <string name="dst_substratum_style_card_desc">Cài đặt, SystemUI, Launcher, Video, Quả cầu hỗ trợ, Khôi phục ứng dụng, Cổng nội dung, Đồng hồ, OnePlus Share, Máy tính, Trợ lý trò chơi, Thoải mái cho mắt, Ảnh, Máy ảnh, Internet, Wifi/Bluetooth</string>
     <string name="dst_substratum_style_status_none">Chưa áp dụng</string>
@@ -108,17 +108,17 @@
     <string name="section_pin_num_style">Màu số PIN</string>
 
     <!-- Bottom navigation tab labels -->
-    <string name="tab_dst">Chủ đề Obsidian </string>
+    <string name="tab_dst">Chủ đề Oxydian </string>
     <string name="tab_mods">Mod</string>
     <string name="tab_settings">Cài đặt</string>
     <string name="tab_search">Tìm kiếm</string>
-    <!-- Bottom nav label only — full name ("Obsidian Theme") gets clipped by the screen's
+    <!-- Bottom nav label only — full name ("Oxydian Theme") gets clipped by the screen's
          rounded corner at 4-tab width; the "default tab" picker in Impostazioni still uses
          the full tab_dst string, which has room there. -->
-    <string name="tab_dst_short">Obsidian</string>
+    <string name="tab_dst_short">Oxydian</string>
 
     <!-- Home nav menu -->
-    <string name="nav_dst_colors">Chủ đề Obsidian</string>
+    <string name="nav_dst_colors">Chủ đề Oxydian</string>
     <string name="nav_dst_colors_summary">Mẫu màu nhấn, màu nền</string>
     <string name="nav_settings_icons">Kiểu biểu tượng Cài đặt</string>
     <string name="nav_settings_icons_summary">Gói biểu tượng PUI / HOS cho ứng dụng Cài đặt</string>
@@ -357,7 +357,7 @@
     <string name="advanced_reboot_fast_reboot">Khởi động lại nhanh</string>
     <string name="advanced_reboot_systemui">Khởi động lại SystemUI</string>
     <string name="nav_misc_settings_entry">Hiển thị mục trong Cài đặt</string>
-    <string name="nav_misc_settings_entry_summary">Thêm mục Obsidian vào Cài đặt hệ thống</string>
+    <string name="nav_misc_settings_entry_summary">Thêm mục Oxydian vào Cài đặt hệ thống</string>
     <string name="nav_screenshot_enabler">Bật chụp màn hình</string>
     <string name="nav_screenshot_enabler_summary">Cho phép chụp màn hình và quay màn hình trong các ứng dụng thường chặn việc này</string>
     <string name="nav_corepatch">Core Patch</string>
@@ -430,12 +430,12 @@
     <string name="nav_statusbar">Thanh trạng thái</string>
     <string name="nav_statusbar_summary">Biểu tượng, Đồng hồ, Thông báo, Hộp thoại</string>
 
-    <!-- Obsidian sections and new items -->
+    <!-- Oxydian sections and new items -->
     <string name="dst_section_colors">Màu sắc</string>
     <string name="dst_section_qs">Cài đặt nhanh</string>
     <string name="dst_background">Hình nền</string>
     <string name="dst_qs_solid_bg">Màu nền</string>
-    <string name="dst_qs_solid_bg_summary">Thay thế hiệu ứng mờ của QS bằng màu nền Obsidian</string>
+    <string name="dst_qs_solid_bg_summary">Thay thế hiệu ứng mờ của QS bằng màu nền Oxydian</string>
     <string name="dst_qs_bg_customize">Tùy chỉnh</string>
     <string name="dst_qs_bg_color">Màu</string>
     <string name="dst_qs_bg_alpha">Độ mờ</string>
@@ -788,7 +788,7 @@
     <string name="settings_website_summary">MyThemeDarkAndMore</string>
     <string name="settings_theme_compat">Khả năng tương thích chủ đề</string>
     <string name="settings_theme_compat_summary">Hỗ trợ đầy đủ chủ đề tối</string>
-    <string name="settings_theme_compat_body">Giao diện của riêng Obsidian tuân theo Chủ đề bạn chọn (Hệ thống/Sáng/Tối).\n\nMột số mod thay đổi giao diện các thành phần hệ thống — Kiểu thông báo, Kiểu Toast và Kiểu hộp thoại — được thiết kế và thử nghiệm chỉ cho chế độ tối. Khi hệ thống Android ở chế độ sáng, chúng sẽ tự động tắt, giữ nguyên giao diện sáng gốc của OOS thay vì buộc áp dụng kiểu chỉ dành cho chế độ tối.\n\nTất cả các mod khác (biểu tượng, điều hướng, Màn hình luôn bật, v.v.) không bị ảnh hưởng và tiếp tục hoạt động bất kể chủ đề hệ thống.\n\nĐể có trải nghiệm tốt nhất, hãy giữ chủ đề hệ thống của thiết bị ở chế độ tối.</string>
+    <string name="settings_theme_compat_body">Giao diện của riêng Oxydian tuân theo Chủ đề bạn chọn (Hệ thống/Sáng/Tối).\n\nMột số mod thay đổi giao diện các thành phần hệ thống — Kiểu thông báo, Kiểu Toast và Kiểu hộp thoại — được thiết kế và thử nghiệm chỉ cho chế độ tối. Khi hệ thống Android ở chế độ sáng, chúng sẽ tự động tắt, giữ nguyên giao diện sáng gốc của OOS thay vì buộc áp dụng kiểu chỉ dành cho chế độ tối.\n\nTất cả các mod khác (biểu tượng, điều hướng, Màn hình luôn bật, v.v.) không bị ảnh hưởng và tiếp tục hoạt động bất kể chủ đề hệ thống.\n\nĐể có trải nghiệm tốt nhất, hãy giữ chủ đề hệ thống của thiết bị ở chế độ tối.</string>
     <string name="settings_credits">Ghi công</string>
     <string name="settings_credits_summary">Tác giả và thư viện được sử dụng</string>
     <string name="credits_thanks">Lời cảm ơn đặc biệt</string>
@@ -809,7 +809,7 @@
     <string name="system_color_info_title">Cách hoạt động</string>
     <string name="system_color_info_body">Đặt bảng màu "Màu nền trước → Tùy chỉnh" của OOS. Cùng màu với màu nhấn hệ thống trong Cài đặt → Màu sắc → Tùy chỉnh.</string>
 
-    <!-- Obsidian Preset dialogs -->
+    <!-- Oxydian Preset dialogs -->
     <string name="dst_section_colore_preset">Cài đặt sẵn màu</string>
     <string name="dst_none">Không có</string>
     <string name="dst_disable">Tắt</string>
@@ -824,7 +824,7 @@
     <string name="dst_dlg_s">Tối</string>
     <string name="dst_dlg_so">Tối có viền</string>
 
-    <!-- Obsidian CPB + RVD/SVD -->
+    <!-- Oxydian CPB + RVD/SVD -->
     <string name="dark_shadow_preset_cpb">Thanh tiến trình tròn</string>
     <string name="dark_shadow_preset_rvd">Bảng âm lượng</string>
     <string name="search_mods_hint">Tìm mod…</string>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Obsidian</string>
+    <string name="app_name">Oxydian</string>
     <string name="search_no_results">未找到\"%s\"的结果</string>
     <string name="search_clear_history">清除搜索历史</string>
     <string name="color_mode_accent">强调色</string>
@@ -58,7 +58,7 @@
     <string name="edge_light_stroke_width_summary">边缘灯光的粗细</string>
     <string name="edge_light_advice">在屏幕关闭（息屏显示）期间，为通知在屏幕边缘显示动态光效。</string>
     <string name="loading_dialog_wait">请稍候…</string>
-    <string name="dst_title">Obsidian</string>
+    <string name="dst_title">Oxydian</string>
     <string name="dst_description">通过 FabricatedOverlay 自定义强调色</string>
     <string name="enabled">已启用</string>
     <string name="disabled">已禁用</string>
@@ -72,7 +72,7 @@
     <string name="section_accent3">Alpha 强调色</string>
     <string name="dst_section_preset_accent">强调色预设</string>
     <string name="dst_section_preset_sfondo">背景预设</string>
-    <string name="dst_substratum_style_title">Obsidian 的 Dark Shadow Theme 样式</string>
+    <string name="dst_substratum_style_title">Oxydian 的 Dark Shadow Theme 样式</string>
     <string name="dst_substratum_style_notice">使用从你自己的 Substratum 主题中提取的资源包，为设置、SystemUI、桌面启动器、系统视频应用、悬浮球、应用恢复、内容门户、时钟、OnePlus Share、计算器、游戏助手、护眼舒适度、相册、相机、浏览器和 Wifi/蓝牙一起设置主题（颜色、背景、对话框、弹窗、指纹动画），合并为一个 overlay。点击"应用"（构建全部十六个需要一点时间）。重启后生效。需要"所有文件访问权限"。</string>
     <string name="dst_substratum_style_card_desc">设置、SystemUI、桌面启动器、视频、悬浮球、应用恢复、内容门户、时钟、OnePlus Share、计算器、游戏助手、护眼舒适度、相册、相机、浏览器、Wifi/蓝牙</string>
     <string name="dst_substratum_style_status_none">未应用</string>
@@ -108,17 +108,17 @@
     <string name="section_pin_num_style">PIN 数字颜色</string>
 
     <!-- Bottom navigation tab labels -->
-    <string name="tab_dst">Obsidian 主题 </string>
+    <string name="tab_dst">Oxydian 主题 </string>
     <string name="tab_mods">模组</string>
     <string name="tab_settings">设置</string>
     <string name="tab_search">搜索</string>
-    <!-- Bottom nav label only — full name ("Obsidian Theme") gets clipped by the screen's
+    <!-- Bottom nav label only — full name ("Oxydian Theme") gets clipped by the screen's
          rounded corner at 4-tab width; the "default tab" picker in Impostazioni still uses
          the full tab_dst string, which has room there. -->
-    <string name="tab_dst_short">Obsidian</string>
+    <string name="tab_dst_short">Oxydian</string>
 
     <!-- Home nav menu -->
-    <string name="nav_dst_colors">Obsidian 主题</string>
+    <string name="nav_dst_colors">Oxydian 主题</string>
     <string name="nav_dst_colors_summary">强调色、背景色样本</string>
     <string name="nav_settings_icons">设置图标样式</string>
     <string name="nav_settings_icons_summary">设置应用的 PUI / HOS 图标包</string>
@@ -357,7 +357,7 @@
     <string name="advanced_reboot_fast_reboot">快速重启</string>
     <string name="advanced_reboot_systemui">重启 SystemUI</string>
     <string name="nav_misc_settings_entry">在设置中显示入口</string>
-    <string name="nav_misc_settings_entry_summary">在系统设置中添加 Obsidian 入口</string>
+    <string name="nav_misc_settings_entry_summary">在系统设置中添加 Oxydian 入口</string>
 
     <!-- Launcher (mirrors OC's launcher_mods.xml — pref keys match OC exactly) -->
     <string name="general_off">关闭</string>
@@ -420,12 +420,12 @@
     <string name="nav_statusbar">状态栏</string>
     <string name="nav_statusbar_summary">图标、时钟、通知、对话框</string>
 
-    <!-- Obsidian sections and new items -->
+    <!-- Oxydian sections and new items -->
     <string name="dst_section_colors">颜色</string>
     <string name="dst_section_qs">快捷设置</string>
     <string name="dst_background">背景</string>
     <string name="dst_qs_solid_bg">背景颜色</string>
-    <string name="dst_qs_solid_bg_summary">用 Obsidian 背景颜色替换快捷设置的模糊效果</string>
+    <string name="dst_qs_solid_bg_summary">用 Oxydian 背景颜色替换快捷设置的模糊效果</string>
     <string name="dst_qs_bg_customize">自定义</string>
     <string name="dst_qs_bg_color">颜色</string>
     <string name="dst_qs_bg_alpha">不透明度</string>
@@ -778,7 +778,7 @@
     <string name="settings_website_summary">MyThemeDarkAndMore</string>
     <string name="settings_theme_compat">主题兼容性</string>
     <string name="settings_theme_compat_summary">完全支持深色主题</string>
-    <string name="settings_theme_compat_body">Obsidian 自身的界面跟随你选择的主题（系统/浅色/深色）。\n\n一些重新设计系统元素的模组——通知样式、Toast 样式和对话框样式——仅为深色模式设计和测试。当 Android 系统处于浅色模式时，它们会自动关闭，保留 OOS 原生的浅色外观，而不是强制应用仅适用于深色模式的样式。\n\n所有其他模组（图标、导航、常亮显示等）不受影响，无论系统主题如何都能继续正常工作。\n\n为获得最佳体验，请将设备的系统主题保持为深色。</string>
+    <string name="settings_theme_compat_body">Oxydian 自身的界面跟随你选择的主题（系统/浅色/深色）。\n\n一些重新设计系统元素的模组——通知样式、Toast 样式和对话框样式——仅为深色模式设计和测试。当 Android 系统处于浅色模式时，它们会自动关闭，保留 OOS 原生的浅色外观，而不是强制应用仅适用于深色模式的样式。\n\n所有其他模组（图标、导航、常亮显示等）不受影响，无论系统主题如何都能继续正常工作。\n\n为获得最佳体验，请将设备的系统主题保持为深色。</string>
     <string name="settings_credits">鸣谢</string>
     <string name="settings_credits_summary">使用的作者与库</string>
     <string name="credits_thanks">特别鸣谢</string>
@@ -799,7 +799,7 @@
     <string name="system_color_info_title">工作原理</string>
     <string name="system_color_info_body">设置 OOS 的"前景色 → 自定义"调色板。与设置 → 颜色 → 自定义中的系统强调色相同。</string>
 
-    <!-- Obsidian Preset dialogs -->
+    <!-- Oxydian Preset dialogs -->
     <string name="dst_section_colore_preset">颜色预设</string>
     <string name="dst_none">无</string>
     <string name="dst_disable">禁用</string>
@@ -814,7 +814,7 @@
     <string name="dst_dlg_s">深色</string>
     <string name="dst_dlg_so">深色带边框</string>
 
-    <!-- Obsidian CPB + RVD/SVD -->
+    <!-- Oxydian CPB + RVD/SVD -->
     <string name="dark_shadow_preset_cpb">圆形进度条</string>
     <string name="dark_shadow_preset_rvd">音量面板</string>
     <string name="search_mods_hint">搜索模组…</string>

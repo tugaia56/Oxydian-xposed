@@ -42,7 +42,7 @@ import it.tugaia56.obsidian.utils.UpdateChecker;
 import it.tugaia56.obsidian.utils.UpdateScheduler;
 
 /**
- * "Aggiornamento" — controllo reale via GitHub Releases API (repo tugaia56/Obsidian-xposed,
+ * "Aggiornamento" — controllo reale via GitHub Releases API (repo tugaia56/Oxydian-xposed,
  * lo stesso che [[project_ci_cd_release_automation]] pubblica ad ogni tag). Il pulsante
  * "Controlla aggiornamenti" confronta BuildConfig.VERSION_NAME col tag_name della release più
  * recente, mostra il changelog (release body) e scarica/installa l'APK allegato tramite
@@ -173,7 +173,7 @@ public class SettingsUpdateFragment extends Fragment {
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url))
                 .setTitle(getString(R.string.settings_check_updates))
                 .setMimeType("application/vnd.android.package-archive")
-                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Obsidian-" + version + ".apk")
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Oxydian-" + version + ".apk")
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 
         mDownloadId = dm.enqueue(request);

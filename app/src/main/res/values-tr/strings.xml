@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Obsidian</string>
+    <string name="app_name">Oxydian</string>
     <string name="search_no_results">\"%s\" için sonuç bulunamadı</string>
     <string name="search_clear_history">Arama geçmişini temizle</string>
     <string name="color_mode_accent">Vurgu rengi</string>
@@ -58,7 +58,7 @@
     <string name="edge_light_stroke_width_summary">Kenar ışığı parlaklığının kalınlığı</string>
     <string name="edge_light_advice">Ekran kapalıyken (AOD) bildirimler için ekran kenarlarında animasyonlu bir parlama gösterir.</string>
     <string name="loading_dialog_wait">Lütfen bekleyin…</string>
-    <string name="dst_title">Obsidian</string>
+    <string name="dst_title">Oxydian</string>
     <string name="dst_description">FabricatedOverlay ile vurgu renklerini özelleştirin</string>
     <string name="enabled">Etkin</string>
     <string name="disabled">Devre dışı</string>
@@ -72,7 +72,7 @@
     <string name="section_accent3">Alfa Vurgu</string>
     <string name="dst_section_preset_accent">Vurgu Ön Ayarları</string>
     <string name="dst_section_preset_sfondo">Arka Plan Ön Ayarları</string>
-    <string name="dst_substratum_style_title">Obsidian için Dark Shadow Theme Stili</string>
+    <string name="dst_substratum_style_title">Oxydian için Dark Shadow Theme Stili</string>
     <string name="dst_substratum_style_notice">Kendi Substratum temanızdan çıkarılan kaynak paketini kullanarak Ayarlar, SystemUI, Başlatıcı, sistem Video uygulamasını, Asistan Küresi\'ni, Uygulama Kurtarma\'yı, İçerik Portalı\'nı, Saat\'i, OnePlus Share\'i, Hesap Makinesi\'ni, Oyun Asistanı\'nı, Göz Konforu\'nu, Fotoğraflar\'ı, Kamerayı, İnternet\'i ve Wifi/Bluetooth\'u birlikte (renkler, arka planlar, iletişim kutuları, açılır pencereler, parmak izi animasyonu) tek bir overlay\'de özelleştirir. Uygula\'ya dokunun (on altısının oluşturulması biraz zaman alır). Değişikliği görmek için yeniden başlatın. "Tüm dosyalara erişim" izni gerektirir.</string>
     <string name="dst_substratum_style_card_desc">Ayarlar, SystemUI, Başlatıcı, Video, Asistan Küresi, Uygulama Kurtarma, İçerik Portalı, Saat, OnePlus Share, Hesap Makinesi, Oyun Asistanı, Göz Konforu, Fotoğraflar, Kamera, İnternet, Wifi/Bluetooth</string>
     <string name="dst_substratum_style_status_none">Uygulanmadı</string>
@@ -108,17 +108,17 @@
     <string name="section_pin_num_style">PIN Rakam Rengi</string>
 
     <!-- Bottom navigation tab labels -->
-    <string name="tab_dst">Obsidian Teması </string>
+    <string name="tab_dst">Oxydian Teması </string>
     <string name="tab_mods">Modlar</string>
     <string name="tab_settings">Ayarlar</string>
     <string name="tab_search">Ara</string>
-    <!-- Bottom nav label only — full name ("Obsidian Theme") gets clipped by the screen's
+    <!-- Bottom nav label only — full name ("Oxydian Theme") gets clipped by the screen's
          rounded corner at 4-tab width; the "default tab" picker in Impostazioni still uses
          the full tab_dst string, which has room there. -->
-    <string name="tab_dst_short">Obsidian</string>
+    <string name="tab_dst_short">Oxydian</string>
 
     <!-- Home nav menu -->
-    <string name="nav_dst_colors">Obsidian Teması</string>
+    <string name="nav_dst_colors">Oxydian Teması</string>
     <string name="nav_dst_colors_summary">Vurgu, arka plan renk örnekleri</string>
     <string name="nav_settings_icons">Ayarlar Simge Stili</string>
     <string name="nav_settings_icons_summary">Ayarlar uygulaması için PUI / HOS simge paketleri</string>
@@ -357,7 +357,7 @@
     <string name="advanced_reboot_fast_reboot">Hızlı Yeniden Başlatma</string>
     <string name="advanced_reboot_systemui">SystemUI\'yi Yeniden Başlat</string>
     <string name="nav_misc_settings_entry">Ayarlarda Girişi Göster</string>
-    <string name="nav_misc_settings_entry_summary">Sistem Ayarlarına Obsidian girişini ekler</string>
+    <string name="nav_misc_settings_entry_summary">Sistem Ayarlarına Oxydian girişini ekler</string>
 
     <!-- Launcher (mirrors OC's launcher_mods.xml — pref keys match OC exactly) -->
     <string name="general_off">Kapalı</string>
@@ -420,12 +420,12 @@
     <string name="nav_statusbar">Durum Çubuğu</string>
     <string name="nav_statusbar_summary">Simgeler, Saat, Bildirimler, İletişim Kutusu</string>
 
-    <!-- Obsidian sections and new items -->
+    <!-- Oxydian sections and new items -->
     <string name="dst_section_colors">Renkler</string>
     <string name="dst_section_qs">Hızlı Ayarlar</string>
     <string name="dst_background">Arka Plan</string>
     <string name="dst_qs_solid_bg">Arka Plan Rengi</string>
-    <string name="dst_qs_solid_bg_summary">QS bulanıklığını Obsidian arka plan rengiyle değiştirir</string>
+    <string name="dst_qs_solid_bg_summary">QS bulanıklığını Oxydian arka plan rengiyle değiştirir</string>
     <string name="dst_qs_bg_customize">Özelleştir</string>
     <string name="dst_qs_bg_color">Renk</string>
     <string name="dst_qs_bg_alpha">Opaklık</string>
@@ -778,7 +778,7 @@
     <string name="settings_website_summary">MyThemeDarkAndMore</string>
     <string name="settings_theme_compat">Tema Uyumluluğu</string>
     <string name="settings_theme_compat_summary">Koyu tema tam olarak destekleniyor</string>
-    <string name="settings_theme_compat_body">Obsidian\'ın kendi arayüzü, seçtiğiniz Tema\'yı (Sistem/Açık/Koyu) takip eder.\n\nSistem öğelerini yeniden tasarlayan bazı modlar — Bildirim Stili, Toast Stili ve İletişim Kutusu Stili — yalnızca koyu mod için tasarlanmış ve test edilmiştir. Android sistemi açık moddayken, koyu-özel bir stili zorlamak yerine otomatik olarak devre dışı kalırlar ve OOS\'nin varsayılan açık görünümünü bırakırlar.\n\nDiğer tüm modlar (simgeler, gezinme, Always-On Display vb.) etkilenmez ve sistem temasından bağımsız olarak çalışmaya devam eder.\n\nEn iyi deneyim için cihazınızın sistem temasını koyu olarak tutun.</string>
+    <string name="settings_theme_compat_body">Oxydian\'ın kendi arayüzü, seçtiğiniz Tema\'yı (Sistem/Açık/Koyu) takip eder.\n\nSistem öğelerini yeniden tasarlayan bazı modlar — Bildirim Stili, Toast Stili ve İletişim Kutusu Stili — yalnızca koyu mod için tasarlanmış ve test edilmiştir. Android sistemi açık moddayken, koyu-özel bir stili zorlamak yerine otomatik olarak devre dışı kalırlar ve OOS\'nin varsayılan açık görünümünü bırakırlar.\n\nDiğer tüm modlar (simgeler, gezinme, Always-On Display vb.) etkilenmez ve sistem temasından bağımsız olarak çalışmaya devam eder.\n\nEn iyi deneyim için cihazınızın sistem temasını koyu olarak tutun.</string>
     <string name="settings_credits">Katkıda Bulunanlar</string>
     <string name="settings_credits_summary">Kullanılan yazarlar ve kütüphaneler</string>
     <string name="credits_thanks">Özel Teşekkürler</string>
@@ -799,7 +799,7 @@
     <string name="system_color_info_title">Nasıl çalışır</string>
     <string name="system_color_info_body">OOS "Ön plan renkleri → Özel" paletini ayarlar. Ayarlar → Renkler → Özel\'deki sistem vurgusuyla aynı renk.</string>
 
-    <!-- Obsidian Preset dialogs -->
+    <!-- Oxydian Preset dialogs -->
     <string name="dst_section_colore_preset">Renk Ön Ayarı</string>
     <string name="dst_none">Yok</string>
     <string name="dst_disable">Devre dışı bırak</string>
@@ -814,7 +814,7 @@
     <string name="dst_dlg_s">Koyu</string>
     <string name="dst_dlg_so">Koyu, Dış Çizgili</string>
 
-    <!-- Obsidian CPB + RVD/SVD -->
+    <!-- Oxydian CPB + RVD/SVD -->
     <string name="dark_shadow_preset_cpb">Dairesel İlerleme Çubuğu</string>
     <string name="dark_shadow_preset_rvd">Ses Paneli</string>
     <string name="search_mods_hint">Modları ara…</string>

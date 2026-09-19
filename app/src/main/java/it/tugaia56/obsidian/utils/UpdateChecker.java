@@ -19,7 +19,7 @@ import it.tugaia56.obsidian.BuildConfig;
 public class UpdateChecker {
 
     private static final String API_URL =
-            "https://api.github.com/repos/tugaia56/Obsidian-xposed/releases/latest";
+            "https://api.github.com/repos/tugaia56/Oxydian-xposed/releases/latest";
 
     public static class Result {
         public final boolean newer;

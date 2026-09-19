@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Obsidian</string>
+    <string name="app_name">Oxydian</string>
     <string name="search_no_results">Keine Ergebnisse für \"%s\"</string>
     <string name="search_clear_history">Suchverlauf löschen</string>
     <string name="color_mode_accent">Akzentfarbe</string>
@@ -58,7 +58,7 @@
     <string name="edge_light_stroke_width_summary">Dicke des Randleuchtens</string>
     <string name="edge_light_advice">Zeigt ein animiertes Leuchten an den Bildschirmrändern für Benachrichtigungen, während der Bildschirm aus ist (AOD).</string>
     <string name="loading_dialog_wait">Bitte warten…</string>
-    <string name="dst_title">Obsidian</string>
+    <string name="dst_title">Oxydian</string>
     <string name="dst_description">Akzentfarben über FabricatedOverlay anpassen</string>
     <string name="enabled">Aktiviert</string>
     <string name="disabled">Deaktiviert</string>
@@ -72,7 +72,7 @@
     <string name="section_accent3">Alpha-Akzent</string>
     <string name="dst_section_preset_accent">Akzent-Voreinstellungen</string>
     <string name="dst_section_preset_sfondo">Hintergrund-Voreinstellungen</string>
-    <string name="dst_substratum_style_title">Dark Shadow Theme Stil für Obsidian</string>
+    <string name="dst_substratum_style_title">Dark Shadow Theme Stil für Oxydian</string>
     <string name="dst_substratum_style_notice">Gestaltet Einstellungen, SystemUI, den Launcher, die System-Video-App, die Assistenzkugel, die App-Wiederherstellung, das Content-Portal, die Uhr, OnePlus Share, den Rechner, den Spiele-Assistenten, den Augenkomfort, Fotos, die Kamera, Internet und Wifi/Bluetooth zusammen (Farben, Hintergründe, Dialoge, Popups, Fingerabdruck-Animation) mit dem aus deinem eigenen Substratum-Theme extrahierten Ressourcenpaket, in einem einzigen Overlay. Tippe auf Anwenden (der Aufbau aller sechzehn dauert einen Moment). Starte neu, um die Änderung zu sehen. Erfordert die Berechtigung „Zugriff auf alle Dateien".</string>
     <string name="dst_substratum_style_card_desc">Einstellungen, SystemUI, Launcher, Video, Assistenzkugel, App-Wiederherstellung, Content-Portal, Uhr, OnePlus Share, Rechner, Spiele-Assistent, Augenkomfort, Fotos, Kamera, Internet, Wifi/Bluetooth</string>
     <string name="dst_substratum_style_status_none">Nicht angewendet</string>
@@ -108,17 +108,17 @@
     <string name="section_pin_num_style">PIN-Zahlenfarbe</string>
 
     <!-- Bottom navigation tab labels -->
-    <string name="tab_dst">Obsidian-Theme </string>
+    <string name="tab_dst">Oxydian-Theme </string>
     <string name="tab_mods">Mods</string>
     <string name="tab_settings">Einstellungen</string>
     <string name="tab_search">Suche</string>
-    <!-- Bottom nav label only — full name ("Obsidian Theme") gets clipped by the screen's
+    <!-- Bottom nav label only — full name ("Oxydian Theme") gets clipped by the screen's
          rounded corner at 4-tab width; the "default tab" picker in Impostazioni still uses
          the full tab_dst string, which has room there. -->
-    <string name="tab_dst_short">Obsidian</string>
+    <string name="tab_dst_short">Oxydian</string>
 
     <!-- Home nav menu -->
-    <string name="nav_dst_colors">Obsidian-Theme</string>
+    <string name="nav_dst_colors">Oxydian-Theme</string>
     <string name="nav_dst_colors_summary">Muster für Akzent- und Hintergrundfarbe</string>
     <string name="nav_settings_icons">Einstellungs-Icon-Stil</string>
     <string name="nav_settings_icons_summary">PUI-/HOS-Icon-Pakete für die Einstellungs-App</string>
@@ -357,7 +357,7 @@
     <string name="advanced_reboot_fast_reboot">Schneller Neustart</string>
     <string name="advanced_reboot_systemui">SystemUI neu starten</string>
     <string name="nav_misc_settings_entry">Eintrag in den Einstellungen anzeigen</string>
-    <string name="nav_misc_settings_entry_summary">Fügt den Obsidian-Eintrag zu den Systemeinstellungen hinzu</string>
+    <string name="nav_misc_settings_entry_summary">Fügt den Oxydian-Eintrag zu den Systemeinstellungen hinzu</string>
 
     <!-- Launcher (mirrors OC's launcher_mods.xml — pref keys match OC exactly) -->
     <string name="general_off">Aus</string>
@@ -420,12 +420,12 @@
     <string name="nav_statusbar">Statusleiste</string>
     <string name="nav_statusbar_summary">Icons, Uhr, Benachrichtigungen, Dialog</string>
 
-    <!-- Obsidian sections and new items -->
+    <!-- Oxydian sections and new items -->
     <string name="dst_section_colors">Farben</string>
     <string name="dst_section_qs">Schnelleinstellungen</string>
     <string name="dst_background">Hintergrund</string>
     <string name="dst_qs_solid_bg">Hintergrundfarbe</string>
-    <string name="dst_qs_solid_bg_summary">Ersetzt die QS-Unschärfe durch die Obsidian-Hintergrundfarbe</string>
+    <string name="dst_qs_solid_bg_summary">Ersetzt die QS-Unschärfe durch die Oxydian-Hintergrundfarbe</string>
     <string name="dst_qs_bg_customize">Anpassen</string>
     <string name="dst_qs_bg_color">Farbe</string>
     <string name="dst_qs_bg_alpha">Deckkraft</string>
@@ -778,7 +778,7 @@
     <string name="settings_website_summary">MyThemeDarkAndMore</string>
     <string name="settings_theme_compat">Theme-Kompatibilität</string>
     <string name="settings_theme_compat_summary">Dunkles Theme vollständig unterstützt</string>
-    <string name="settings_theme_compat_body">Die Oberfläche von Obsidian selbst folgt dem von dir gewählten Theme (System/Hell/Dunkel).\n\nEinige Mods, die Systemelemente umgestalten — Benachrichtigungsstil, Toast-Stil und Dialogstil — sind nur für den dunklen Modus konzipiert und getestet. Wenn das Android-System im hellen Modus ist, schalten sie sich automatisch ab und belassen es beim hellen OOS-Standardaussehen, statt einen nur-dunklen Stil zu erzwingen.\n\nAlle anderen Mods (Icons, Navigation, Always-On Display usw.) sind davon nicht betroffen und funktionieren unabhängig vom Systemtheme weiter.\n\nFür die beste Erfahrung solltest du das Systemtheme deines Geräts auf Dunkel gestellt lassen.</string>
+    <string name="settings_theme_compat_body">Die Oberfläche von Oxydian selbst folgt dem von dir gewählten Theme (System/Hell/Dunkel).\n\nEinige Mods, die Systemelemente umgestalten — Benachrichtigungsstil, Toast-Stil und Dialogstil — sind nur für den dunklen Modus konzipiert und getestet. Wenn das Android-System im hellen Modus ist, schalten sie sich automatisch ab und belassen es beim hellen OOS-Standardaussehen, statt einen nur-dunklen Stil zu erzwingen.\n\nAlle anderen Mods (Icons, Navigation, Always-On Display usw.) sind davon nicht betroffen und funktionieren unabhängig vom Systemtheme weiter.\n\nFür die beste Erfahrung solltest du das Systemtheme deines Geräts auf Dunkel gestellt lassen.</string>
     <string name="settings_credits">Danksagungen</string>
     <string name="settings_credits_summary">Verwendete Autoren und Bibliotheken</string>
     <string name="credits_thanks">Besonderer Dank</string>
@@ -799,7 +799,7 @@
     <string name="system_color_info_title">So funktioniert es</string>
     <string name="system_color_info_body">Legt die OOS-Palette „Vordergrundfarben → Eigene" fest. Dieselbe Farbe wie der Systemakzent unter Einstellungen → Farben → Eigene.</string>
 
-    <!-- Obsidian Preset dialogs -->
+    <!-- Oxydian Preset dialogs -->
     <string name="dst_section_colore_preset">Farbvoreinstellung</string>
     <string name="dst_none">Keine</string>
     <string name="dst_disable">Deaktivieren</string>
@@ -814,7 +814,7 @@
     <string name="dst_dlg_s">Dunkel</string>
     <string name="dst_dlg_so">Dunkel, umrandet</string>
 
-    <!-- Obsidian CPB + RVD/SVD -->
+    <!-- Oxydian CPB + RVD/SVD -->
     <string name="dark_shadow_preset_cpb">Kreisförmige Fortschrittsanzeige</string>
     <string name="dark_shadow_preset_rvd">Lautstärke-Panel</string>
     <string name="search_mods_hint">Mods suchen…</string>

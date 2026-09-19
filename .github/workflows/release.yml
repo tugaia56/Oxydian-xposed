@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Source Code Download
-        run: git clone --branch master --single-branch --recurse-submodules https://github.com/tugaia56/Obsidian-xposed.git .
+        run: git clone --branch master --single-branch --recurse-submodules https://github.com/tugaia56/Oxydian-xposed.git .
 
       - name: set up JDK 17
         uses: actions/setup-java@v4.1.0
@@ -55,7 +55,7 @@ jobs:
       - name: Upload Artifact to Actions
         uses: actions/upload-artifact@v4.3.1
         with:
-          name: "Obsidian_${{ env.VTag }}"
+          name: "Oxydian_${{ env.VTag }}"
           path: app/build/outputs/apk/release/${{ env.ApkName }}
 
       - name: Version Bump Commit
@@ -69,7 +69,7 @@ jobs:
           name: GitHub
           email: obsidian@tugaia.it
 
-      - name: Obsidian Binary Release
+      - name: Oxydian Binary Release
         uses: ncipollo/release-action@v1.14.0
         with:
           tag: ${{ env.VTag }}

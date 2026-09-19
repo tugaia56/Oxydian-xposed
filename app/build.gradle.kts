@@ -68,14 +68,14 @@ android {
         jniLibs.useLegacyPackaging = true
     }
 
-    // Rename output APK from app-debug.apk / app-release.apk to Obsidian-debug.apk / Obsidian-release-<version>.apk
+    // Rename output APK from app-debug.apk / app-release.apk to Oxydian-debug.apk / Oxydian-release-<version>.apk
     // (debug stays unversioned — reinstall.bat/the "reinstall" task below reference it by that fixed name)
     applicationVariants.all {
         val variant = this
         val suffix = if (variant.name == "release") "-${variant.versionName}" else ""
         outputs.all {
             val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-            output.outputFileName = "Obsidian-${variant.name}$suffix.apk"
+            output.outputFileName = "Oxydian-${variant.name}$suffix.apk"
         }
     }
 }
@@ -85,14 +85,14 @@ tasks.register("reinstall") {
     description = "Disinstalla l'app e reinstalla l'APK debug via ADB"
     dependsOn("assembleDebug")
     doLast {
-        val apk = "${projectDir}/build/outputs/apk/debug/Obsidian-debug.apk"
+        val apk = "${projectDir}/build/outputs/apk/debug/Oxydian-debug.apk"
         fun adb(vararg args: String) {
             ProcessBuilder(listOf("adb") + args.toList())
                 .inheritIO().start().waitFor()
         }
         adb("uninstall", "it.tugaia56.obsidian") // ignora errore se non installata
         adb("install", "-r", apk)
-        println("Obsidian reinstallata. Premi 'Riavvia SystemUI' nell'app.")
+        println("Oxydian reinstallata. Premi 'Riavvia SystemUI' nell'app.")
     }
 }
 

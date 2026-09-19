@@ -28,7 +28,7 @@
 
         <!-- LSPosed module meta -->
         <meta-data android:name="xposedmodule"       android:value="true" />
-        <meta-data android:name="xposeddescription"  android:value="Obsidian customizer for OOS/ColorOS" />
+        <meta-data android:name="xposeddescription"  android:value="Oxydian customizer for OOS/ColorOS" />
         <meta-data android:name="xposedminversion"   android:value="82" />
         <meta-data android:name="xposedscope"
             android:resource="@array/xposed_scope" />

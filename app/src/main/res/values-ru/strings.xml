@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Obsidian</string>
+    <string name="app_name">Oxydian</string>
     <string name="search_no_results">Нет результатов для \"%s\"</string>
     <string name="search_clear_history">Очистить историю поиска</string>
     <string name="color_mode_accent">Акцентный цвет</string>
@@ -58,7 +58,7 @@
     <string name="edge_light_stroke_width_summary">Толщина свечения по краю</string>
     <string name="edge_light_advice">Показывает анимированное свечение по краям экрана при уведомлениях, пока экран выключен (AOD).</string>
     <string name="loading_dialog_wait">Подождите…</string>
-    <string name="dst_title">Obsidian</string>
+    <string name="dst_title">Oxydian</string>
     <string name="dst_description">Настройка акцентных цветов через FabricatedOverlay</string>
     <string name="enabled">Включено</string>
     <string name="disabled">Отключено</string>
@@ -72,7 +72,7 @@
     <string name="section_accent3">Альфа-акцент</string>
     <string name="dst_section_preset_accent">Пресеты акцента</string>
     <string name="dst_section_preset_sfondo">Пресеты фона</string>
-    <string name="dst_substratum_style_title">Стиль Dark Shadow Theme для Obsidian</string>
+    <string name="dst_substratum_style_title">Стиль Dark Shadow Theme для Oxydian</string>
     <string name="dst_substratum_style_notice">Оформляет Настройки, SystemUI, Лаунчер, системное приложение Видео, плавающего ассистента (шар), Восстановление приложений, Портал контента, Часы, OnePlus Share, Калькулятор, Игровой ассистент, Комфорт для глаз, Фото, Камеру, Интернет и Wifi/Bluetooth вместе (цвета, фоны, диалоги, всплывающие окна, анимация отпечатка) с помощью пакета ресурсов, извлечённого из вашей темы Substratum, в одном оверлее. Нажмите "Применить" (сборка всех шестнадцати займёт немного времени). Перезагрузите устройство, чтобы увидеть изменения. Требуется разрешение "Доступ ко всем файлам".</string>
     <string name="dst_substratum_style_card_desc">Настройки, SystemUI, Лаунчер, Видео, Ассистент-шар, Восстановление приложений, Портал контента, Часы, OnePlus Share, Калькулятор, Игровой ассистент, Комфорт для глаз, Фото, Камера, Интернет, Wifi/Bluetooth</string>
     <string name="dst_substratum_style_status_none">Не применено</string>
@@ -108,17 +108,17 @@
     <string name="section_pin_num_style">Цвет цифр PIN</string>
 
     <!-- Bottom navigation tab labels -->
-    <string name="tab_dst">Тема Obsidian </string>
+    <string name="tab_dst">Тема Oxydian </string>
     <string name="tab_mods">Моды</string>
     <string name="tab_settings">Настройки</string>
     <string name="tab_search">Поиск</string>
-    <!-- Bottom nav label only — full name ("Obsidian Theme") gets clipped by the screen's
+    <!-- Bottom nav label only — full name ("Oxydian Theme") gets clipped by the screen's
          rounded corner at 4-tab width; the "default tab" picker in Impostazioni still uses
          the full tab_dst string, which has room there. -->
-    <string name="tab_dst_short">Obsidian</string>
+    <string name="tab_dst_short">Oxydian</string>
 
     <!-- Home nav menu -->
-    <string name="nav_dst_colors">Тема Obsidian</string>
+    <string name="nav_dst_colors">Тема Oxydian</string>
     <string name="nav_dst_colors_summary">Образцы цвета акцента и фона</string>
     <string name="nav_settings_icons">Стиль иконок Настроек</string>
     <string name="nav_settings_icons_summary">Наборы иконок PUI / HOS для приложения Настроек</string>
@@ -357,7 +357,7 @@
     <string name="advanced_reboot_fast_reboot">Быстрая перезагрузка</string>
     <string name="advanced_reboot_systemui">Перезапустить SystemUI</string>
     <string name="nav_misc_settings_entry">Показать пункт в Настройках</string>
-    <string name="nav_misc_settings_entry_summary">Добавляет пункт Obsidian в системные Настройки</string>
+    <string name="nav_misc_settings_entry_summary">Добавляет пункт Oxydian в системные Настройки</string>
 
     <!-- Launcher (mirrors OC's launcher_mods.xml — pref keys match OC exactly) -->
     <string name="general_off">Выкл</string>
@@ -420,12 +420,12 @@
     <string name="nav_statusbar">Строка состояния</string>
     <string name="nav_statusbar_summary">Иконки, часы, уведомления, диалог</string>
 
-    <!-- Obsidian sections and new items -->
+    <!-- Oxydian sections and new items -->
     <string name="dst_section_colors">Цвета</string>
     <string name="dst_section_qs">Быстрые настройки</string>
     <string name="dst_background">Фон</string>
     <string name="dst_qs_solid_bg">Цвет фона</string>
-    <string name="dst_qs_solid_bg_summary">Заменяет размытие панели быстрых настроек на цвет фона Obsidian</string>
+    <string name="dst_qs_solid_bg_summary">Заменяет размытие панели быстрых настроек на цвет фона Oxydian</string>
     <string name="dst_qs_bg_customize">Настроить</string>
     <string name="dst_qs_bg_color">Цвет</string>
     <string name="dst_qs_bg_alpha">Непрозрачность</string>
@@ -778,7 +778,7 @@
     <string name="settings_website_summary">MyThemeDarkAndMore</string>
     <string name="settings_theme_compat">Совместимость темы</string>
     <string name="settings_theme_compat_summary">Тёмная тема полностью поддерживается</string>
-    <string name="settings_theme_compat_body">Собственный интерфейс Obsidian следует выбранной вами Теме (Системная/Светлая/Тёмная).\n\nНекоторые моды, изменяющие системные элементы — стиль уведомлений, тостов и диалогов — разработаны и протестированы только для тёмного режима. Когда система Android в светлом режиме, они автоматически отключаются, оставляя стандартный светлый вид OOS вместо принудительного тёмного стиля.\n\nВсе остальные моды (иконки, навигация, Always-On Display и т.д.) не затрагиваются и продолжают работать независимо от системной темы.\n\nДля лучшего результата держите системную тему устройства тёмной.</string>
+    <string name="settings_theme_compat_body">Собственный интерфейс Oxydian следует выбранной вами Теме (Системная/Светлая/Тёмная).\n\nНекоторые моды, изменяющие системные элементы — стиль уведомлений, тостов и диалогов — разработаны и протестированы только для тёмного режима. Когда система Android в светлом режиме, они автоматически отключаются, оставляя стандартный светлый вид OOS вместо принудительного тёмного стиля.\n\nВсе остальные моды (иконки, навигация, Always-On Display и т.д.) не затрагиваются и продолжают работать независимо от системной темы.\n\nДля лучшего результата держите системную тему устройства тёмной.</string>
     <string name="settings_credits">Авторы</string>
     <string name="settings_credits_summary">Авторы и используемые библиотеки</string>
     <string name="credits_thanks">Особая благодарность</string>
@@ -799,7 +799,7 @@
     <string name="system_color_info_title">Как это работает</string>
     <string name="system_color_info_body">Задаёт палитру OOS "Основные цвета → Свой". Тот же цвет, что и системный акцент в Настройки → Цвета → Свой.</string>
 
-    <!-- Obsidian Preset dialogs -->
+    <!-- Oxydian Preset dialogs -->
     <string name="dst_section_colore_preset">Цветовой пресет</string>
     <string name="dst_none">Нет</string>
     <string name="dst_disable">Отключить</string>
@@ -814,7 +814,7 @@
     <string name="dst_dlg_s">Тёмный</string>
     <string name="dst_dlg_so">Тёмный с обводкой</string>
 
-    <!-- Obsidian CPB + RVD/SVD -->
+    <!-- Oxydian CPB + RVD/SVD -->
     <string name="dark_shadow_preset_cpb">Круговой индикатор загрузки</string>
     <string name="dark_shadow_preset_rvd">Панель громкости</string>
     <string name="search_mods_hint">Поиск модов…</string>

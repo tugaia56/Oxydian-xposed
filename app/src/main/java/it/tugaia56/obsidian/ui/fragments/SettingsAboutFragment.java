@@ -28,7 +28,7 @@ import it.tugaia56.obsidian.utils.ObsidianTheme;
  */
 public class SettingsAboutFragment extends Fragment {
 
-    private static final String GITHUB_URL = "https://github.com/tugaia56/Obsidian-xposed";
+    private static final String GITHUB_URL = "https://github.com/tugaia56/Oxydian-xposed";
     private static final String SUPPORT_GROUP_URL = "https://t.me/OnePlus_Mods_Theme";
     private static final String WEBSITE_URL = "https://mythemedarkandmore.altervista.org/";
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Obsidian</string>
+    <string name="app_name">Oxydian</string>
     <string name="search_no_results">Tidak ada hasil untuk \"%s\"</string>
     <string name="search_clear_history">Hapus riwayat pencarian</string>
     <string name="color_mode_accent">Warna aksen</string>
@@ -58,7 +58,7 @@
     <string name="edge_light_stroke_width_summary">Ketebalan cahaya tepi</string>
     <string name="edge_light_advice">Menampilkan cahaya animasi di tepi layar untuk notifikasi saat layar mati (AOD).</string>
     <string name="loading_dialog_wait">Mohon tunggu…</string>
-    <string name="dst_title">Obsidian</string>
+    <string name="dst_title">Oxydian</string>
     <string name="dst_description">Sesuaikan warna aksen melalui FabricatedOverlay</string>
     <string name="enabled">Aktif</string>
     <string name="disabled">Nonaktif</string>
@@ -72,7 +72,7 @@
     <string name="section_accent3">Aksen Alfa</string>
     <string name="dst_section_preset_accent">Preset Aksen</string>
     <string name="dst_section_preset_sfondo">Preset Latar Belakang</string>
-    <string name="dst_substratum_style_title">Gaya Dark Shadow Theme untuk Obsidian</string>
+    <string name="dst_substratum_style_title">Gaya Dark Shadow Theme untuk Oxydian</string>
     <string name="dst_substratum_style_notice">Menata Pengaturan, SystemUI, Launcher, aplikasi Video sistem, Bola Asisten, Pemulihan Aplikasi, Portal Konten, Jam, OnePlus Share, Kalkulator, Asisten Game, Kenyamanan Mata, Foto, Kamera, Internet, dan Wifi/Bluetooth sekaligus (warna, latar belakang, dialog, popup, animasi sidik jari) menggunakan paket sumber daya yang diambil dari tema Substratum Anda sendiri, dalam satu overlay. Ketuk Terapkan (perlu waktu sebentar untuk membangun keenam belasnya). Mulai ulang untuk melihat perubahannya. Memerlukan izin "Akses semua file".</string>
     <string name="dst_substratum_style_card_desc">Pengaturan, SystemUI, Launcher, Video, Bola Asisten, Pemulihan Aplikasi, Portal Konten, Jam, OnePlus Share, Kalkulator, Asisten Game, Kenyamanan Mata, Foto, Kamera, Internet, Wifi/Bluetooth</string>
     <string name="dst_substratum_style_status_none">Belum diterapkan</string>
@@ -108,17 +108,17 @@
     <string name="section_pin_num_style">Warna Angka PIN</string>
 
     <!-- Bottom navigation tab labels -->
-    <string name="tab_dst">Tema Obsidian </string>
+    <string name="tab_dst">Tema Oxydian </string>
     <string name="tab_mods">Mods</string>
     <string name="tab_settings">Pengaturan</string>
     <string name="tab_search">Cari</string>
-    <!-- Bottom nav label only — full name ("Obsidian Theme") gets clipped by the screen's
+    <!-- Bottom nav label only — full name ("Oxydian Theme") gets clipped by the screen's
          rounded corner at 4-tab width; the "default tab" picker in Impostazioni still uses
          the full tab_dst string, which has room there. -->
-    <string name="tab_dst_short">Obsidian</string>
+    <string name="tab_dst_short">Oxydian</string>
 
     <!-- Home nav menu -->
-    <string name="nav_dst_colors">Tema Obsidian</string>
+    <string name="nav_dst_colors">Tema Oxydian</string>
     <string name="nav_dst_colors_summary">Contoh warna aksen dan latar belakang</string>
     <string name="nav_settings_icons">Gaya Ikon Pengaturan</string>
     <string name="nav_settings_icons_summary">Paket ikon PUI / HOS untuk aplikasi Pengaturan</string>
@@ -357,7 +357,7 @@
     <string name="advanced_reboot_fast_reboot">Mulai Ulang Cepat</string>
     <string name="advanced_reboot_systemui">Mulai Ulang SystemUI</string>
     <string name="nav_misc_settings_entry">Tampilkan Item di Pengaturan</string>
-    <string name="nav_misc_settings_entry_summary">Menambahkan item Obsidian ke Pengaturan sistem</string>
+    <string name="nav_misc_settings_entry_summary">Menambahkan item Oxydian ke Pengaturan sistem</string>
 
     <!-- Launcher (mirrors OC's launcher_mods.xml — pref keys match OC exactly) -->
     <string name="general_off">Mati</string>
@@ -420,12 +420,12 @@
     <string name="nav_statusbar">Bilah Status</string>
     <string name="nav_statusbar_summary">Ikon, Jam, Notifikasi, Dialog</string>
 
-    <!-- Obsidian sections and new items -->
+    <!-- Oxydian sections and new items -->
     <string name="dst_section_colors">Warna</string>
     <string name="dst_section_qs">Pengaturan Cepat</string>
     <string name="dst_background">Latar Belakang</string>
     <string name="dst_qs_solid_bg">Warna Latar Belakang</string>
-    <string name="dst_qs_solid_bg_summary">Mengganti blur QS dengan warna latar belakang Obsidian</string>
+    <string name="dst_qs_solid_bg_summary">Mengganti blur QS dengan warna latar belakang Oxydian</string>
     <string name="dst_qs_bg_customize">Sesuaikan</string>
     <string name="dst_qs_bg_color">Warna</string>
     <string name="dst_qs_bg_alpha">Opasitas</string>
@@ -778,7 +778,7 @@
     <string name="settings_website_summary">MyThemeDarkAndMore</string>
     <string name="settings_theme_compat">Kompatibilitas Tema</string>
     <string name="settings_theme_compat_summary">Tema gelap sepenuhnya didukung</string>
-    <string name="settings_theme_compat_body">Antarmuka Obsidian sendiri mengikuti Tema yang Anda pilih (Sistem/Terang/Gelap).\n\nBeberapa mod yang mengubah gaya elemen sistem — Gaya Notifikasi, Gaya Toast, dan Gaya Dialog — dirancang dan diuji hanya untuk mode gelap. Saat sistem Android dalam mode terang, mod ini akan mati secara otomatis, membiarkan tampilan terang bawaan OOS alih-alih memaksakan gaya khusus gelap.\n\nSemua mod lainnya (ikon, navigasi, Always-On Display, dll.) tidak terpengaruh dan tetap berfungsi terlepas dari tema sistem.\n\nUntuk pengalaman terbaik, jaga agar tema sistem perangkat Anda tetap diatur ke gelap.</string>
+    <string name="settings_theme_compat_body">Antarmuka Oxydian sendiri mengikuti Tema yang Anda pilih (Sistem/Terang/Gelap).\n\nBeberapa mod yang mengubah gaya elemen sistem — Gaya Notifikasi, Gaya Toast, dan Gaya Dialog — dirancang dan diuji hanya untuk mode gelap. Saat sistem Android dalam mode terang, mod ini akan mati secara otomatis, membiarkan tampilan terang bawaan OOS alih-alih memaksakan gaya khusus gelap.\n\nSemua mod lainnya (ikon, navigasi, Always-On Display, dll.) tidak terpengaruh dan tetap berfungsi terlepas dari tema sistem.\n\nUntuk pengalaman terbaik, jaga agar tema sistem perangkat Anda tetap diatur ke gelap.</string>
     <string name="settings_credits">Kredit</string>
     <string name="settings_credits_summary">Penulis dan pustaka yang digunakan</string>
     <string name="credits_thanks">Ucapan Terima Kasih Khusus</string>
@@ -799,7 +799,7 @@
     <string name="system_color_info_title">Cara kerjanya</string>
     <string name="system_color_info_body">Mengatur palet "Warna latar depan → Kustom" OOS. Warna yang sama dengan aksen sistem di Pengaturan → Warna → Kustom.</string>
 
-    <!-- Obsidian Preset dialogs -->
+    <!-- Oxydian Preset dialogs -->
     <string name="dst_section_colore_preset">Preset Warna</string>
     <string name="dst_none">Tidak Ada</string>
     <string name="dst_disable">Nonaktifkan</string>
@@ -814,7 +814,7 @@
     <string name="dst_dlg_s">Gelap</string>
     <string name="dst_dlg_so">Gelap Bergaris</string>
 
-    <!-- Obsidian CPB + RVD/SVD -->
+    <!-- Oxydian CPB + RVD/SVD -->
     <string name="dark_shadow_preset_cpb">Bilah Progres Sirkular</string>
     <string name="dark_shadow_preset_rvd">Panel Volume</string>
     <string name="search_mods_hint">Cari mod…</string>
