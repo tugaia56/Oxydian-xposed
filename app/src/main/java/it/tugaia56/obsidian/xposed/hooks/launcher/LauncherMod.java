@@ -95,6 +95,8 @@ public class LauncherMod extends XposedMods {
     private boolean mOpenAppDetails       = false;
     private boolean mDisablePrevRecents   = false;
     private boolean mReplaceLock          = false;
+    private boolean mPageIndicatorTapOn   = false;
+    private String  mPageIndicatorTapPkg  = "";
     private boolean mRemoveHomePagination   = false;
     private boolean mRemoveFolderPagination = false;
     private boolean mHideScroller           = false;
@@ -129,6 +131,8 @@ public class LauncherMod extends XposedMods {
     public void updatePrefs(String... key) {
         if (Xprefs == null) return;
         mHideDesktopLabels   = Xprefs.getBoolean(KEY_HIDE_DESKTOP_LABELS, false);
+        mPageIndicatorTapOn  = Xprefs.getBoolean("launcher_page_indicator_tap_on", false);
+        mPageIndicatorTapPkg = Xprefs.getString("launcher_page_indicator_tap_pkg", "");
         mHideDrawerLabels    = Xprefs.getBoolean(KEY_HIDE_DRAWER_LABELS, false);
         mOpenAppDetails      = Xprefs.getBoolean(KEY_OPEN_APP_DETAILS, false);
         mDisablePrevRecents  = Xprefs.getBoolean(KEY_DISABLE_PREV_RECENTS, false);
@@ -167,6 +171,7 @@ public class LauncherMod extends XposedMods {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         hookHideLabels(lpparam);
+        hookPageIndicatorTap(lpparam);
         hookOpenAppDetails(lpparam);
         hookDisablePreviousRecents(lpparam);
         hookReplaceLock(lpparam);
@@ -196,6 +201,32 @@ public class LauncherMod extends XposedMods {
     // tablet) il valore stock è già hardcoded a 5 (vedi ExpandConfig sorgente reale), stesso
     // ordine di grandezza delle colonne home — la condizione non scattava mai. Fix: forzare
     // sempre un valore più alto (colonne+3, minimo 8) quando il toggle è ON, senza confronti.
+    /** Tocco sull'indicatore di pagina (la voce "Cerca sul fondo" / Breeno): il Launcher chiede a
+     *  IndicatorEntry.Companion.getIndicatorAppLaunchIntent(Context) quale intent lanciare — con
+     *  l'opzione attiva lo sostituiamo con l'app scelta. Idea da Oxygen Customizer (2026-09-18),
+     *  classe e metodo verificati nel dex reale di OplusLauncher su questo telefono. */
+    private void hookPageIndicatorTap(XC_LoadPackage.LoadPackageParam lpparam) {
+        try {
+            Class<?> companion = lpparam.classLoader.loadClass(
+                    "com.android.launcher3.search.IndicatorEntry$Companion");
+            hookAllMethods(companion, "getIndicatorAppLaunchIntent", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    if (!mPageIndicatorTapOn || mPageIndicatorTapPkg == null || mPageIndicatorTapPkg.isEmpty()) return;
+                    try {
+                        Context ctx = (Context) param.args[0];
+                        android.content.Intent i = ctx.getPackageManager().getLaunchIntentForPackage(mPageIndicatorTapPkg);
+                        if (i == null) return; // app rimossa: lascia l'azione stock
+                        i.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                | android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        param.setResult(i);
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] LauncherMod hookPageIndicatorTap failed: " + t);
+        }
+    }
+
     private void hookRemoveDockMaxLimit(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
             Class<?> expandConfig = lpparam.classLoader.loadClass(

@@ -32,6 +32,10 @@ import it.tugaia56.obsidian.utils.ObsidianTheme;
  */
 public class FingerprintPresetFragment extends Fragment {
 
+    /** fingerprint_74..89: preset da un pacchetto animazioni impronta PUI, 2026-09-18. */
+    private static final java.util.Set<Integer> FINGERPRINT_CREDIT_RANGE =
+            new java.util.HashSet<>(java.util.Arrays.asList(74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89));
+
     private int mCurrentStyle;
     private Adapter mAdapter;
 
@@ -128,7 +132,13 @@ public class FingerprintPresetFragment extends Fragment {
             Drawable d = ContextCompat.getDrawable(h.itemView.getContext(), resId);
             h.preview.setImageDrawable(d);
 
-            h.label.setText(getString(R.string.lockscreen_fp_style, index));
+            String label = getString(R.string.lockscreen_fp_style, index);
+            // Preset 74-89: estratti da un pacchetto animazioni impronta PUI (2026-09-18, su
+            // richiesta esplicita dell'utente) — credito visibile accanto al nome.
+            if (FINGERPRINT_CREDIT_RANGE.contains(index)) {
+                label += "\nby PUI (天伞桜&PanL)";
+            }
+            h.label.setText(label);
             h.label.setTextColor(active
                     ? ContextCompat.getColor(requireContext(), R.color.obs_primary)
                     : ObsidianTheme.textColor());

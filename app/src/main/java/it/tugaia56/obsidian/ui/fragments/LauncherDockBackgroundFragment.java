@@ -33,7 +33,7 @@ public class LauncherDockBackgroundFragment extends Fragment {
     private static final String KEY_DOCK_BG_RADIUS   = "dockBackgroundRadius";
 
     private RecyclerView mRv;
-    private boolean mMaterialExpanded = ObsidianPrefs.getBoolean(KEY_DOCK_BG_MATERIAL, false);
+    private boolean mMaterialExpanded = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,

@@ -143,7 +143,19 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
         }
 
         applyNavBarColor();
-        showHomeActionBar();   // also makes search container visible
+        // On a fresh start there's no back stack yet, so the home header/logo is correct.
+        // On process recreation (app killed in background then restored) the FragmentManager
+        // already restores whatever sub-screen was on top — the action bar must match that,
+        // not reset to the home logo, or it looks wrong even though the content is right.
+        int restoredBackStackCount = getSupportFragmentManager().getBackStackEntryCount();
+        if (restoredBackStackCount > 0) {
+            String restoredTitle = getSupportFragmentManager()
+                    .getBackStackEntryAt(restoredBackStackCount - 1).getName();
+            hideGlobalSearch();
+            setSubFragmentActionBar(restoredTitle);
+        } else {
+            showHomeActionBar();   // also makes search container visible
+        }
 
         mAllSearchItems = buildSearchItems();
         setupGlobalSearch();

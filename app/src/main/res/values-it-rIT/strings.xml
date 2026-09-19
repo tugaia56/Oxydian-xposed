@@ -72,6 +72,14 @@
     <string name="section_accent3">Accento Alpha</string>
     <string name="dst_section_preset_accent">Preset Accento</string>
     <string name="dst_section_preset_sfondo">Preset Sfondo</string>
+    <string name="dst_substratum_style_title">Stile Dark Shadow Theme per Obsidian</string>
+    <string name="dst_substratum_style_notice">Tema reale completo per Impostazioni, SystemUI, Launcher, Video (sistema), Sfera assistiva, Recupero app, Portale contenuti, Orologio, OnePlus Share, Calcolatrice, Assistente giochi, Comfort visivo, Foto, Fotocamera, Internet e Wifi/Bluetooth insieme (colori, sfondi, dialoghi, popup, animazione impronta) ricostruito dal tuo tema Substratum, in un unico overlay. Tocca Applica (richiede qualche istante per compilare tutti e sedici). Riavvia per vedere il cambiamento. Richiede il permesso "Accesso a tutti i file".</string>
+    <string name="dst_substratum_style_card_desc">Impostazioni, SystemUI, Launcher, Video, Sfera assistiva, Recupero app, Portale contenuti, Orologio, OnePlus Share, Calcolatrice, Assistente giochi, Comfort visivo, Foto, Fotocamera, Internet, Wifi/Bluetooth</string>
+    <string name="dst_substratum_style_status_none">Non applicato</string>
+    <string name="dst_substratum_style_status_active">Tema attivo</string>
+    <string name="dst_substratum_style_howto">IMPORTANTE:\ndopo Applica, riavvia due volte:\nil primo riavvio abilita gli overlay compilati.\nIl secondo riavvio attiva e stabilizza gli overlay.</string>
+    <string name="dst_substratum_style_readme_link">Leggi il readme completo</string>
+    <string name="dst_substratum_style_readme_full">IMPORTANTE: dopo Applica, riavvia due volte: il primo riavvio abilita gli overlay appena compilati e per circa un minuto il telefono può rallentare (si sistema da solo, non serve fare nulla — se sembra bloccato tieni premuto il tasto power per un riavvio forzato). Dal secondo riavvio il tema è attivo e stabile. Da quel momento ogni avvio successivo può restare qualche decina di secondi più lento di prima: è il costo di avere il tema completo attivo.</string>
     <string name="nav_sys_settings">Stile Impostazioni OOS</string>
     <string name="nav_sys_settings_summary">Tema reale completo per Impostazioni, ricostruito dal tuo tema Substratum</string>
     <string name="settings_theme_notice">Tema tutta l\'app Impostazioni (colori, sfondi, animazione impronta) usando il bundle di risorse estratto dal tuo tema Substratum. Tocca Applica (richiede qualche istante per compilarlo). Richiede il permesso "Accesso a tutti i file".</string>
@@ -111,7 +119,7 @@
     <string name="nav_dst_colors_summary">Accento, colori di sfondo</string>
     <string name="nav_settings_icons">Stile Icone Impostazioni</string>
     <string name="nav_settings_icons_summary">Pack icone PUI / HOS per l\'app Impostazioni</string>
-    <string name="settings_icons_preview_notice">Tocca un pack per selezionarlo, poi Applica (richiede qualche istante per compilarlo). Richiede il permesso "Accesso a tutti i file".</string>
+    <string name="settings_icons_preview_notice">Tocca un pack per selezionarlo, poi Applica (richiede qualche istante per compilarlo). Riavvia per vedere il cambiamento. Richiede il permesso "Accesso a tutti i file".</string>
     <string name="settings_icons_apply">Applica</string>
     <string name="settings_icons_disable">Disabilita</string>
     <string name="settings_icons_status_none">Nessun pack applicato</string>
@@ -326,17 +334,22 @@
     <string name="advanced_reboot_auth_failed">Autenticazione fallita</string>
     <string name="power_menu_pill_section">Pillolone</string>
     <string name="power_menu_gradient_color_title">Colore Riavvia/Spegni</string>
-    <string name="power_menu_handler_color_title">Colore Pallino</string>
+    <string name="power_menu_gradient_split_title">Colori separati</string>
+    <string name="power_menu_handler_color_title">Sfondo Pallino</string>
     <string name="power_menu_handler_gallery_title">Scegli da Galleria</string>
     <string name="power_menu_handler_gallery_summary">Scegli una tua foto</string>
     <string name="power_menu_handler_style_section">Stile</string>
     <string name="power_menu_handler_scale_title">Scala Immagine</string>
+    <string name="power_menu_menu_section">Power Menù</string>
     <string name="power_menu_bg_section">Sfondo Menù Power</string>
     <string name="power_menu_bg_color_title">Sfondo Pillolone</string>
     <string name="power_menu_bg_mode_custom">Colore</string>
     <string name="power_menu_border_title">Bordo Pillolone</string>
     <string name="power_menu_border_summary">Disegna un bordo attorno al cursore riavvia/spegni</string>
     <string name="power_menu_border_color_title">Colore Bordo</string>
+    <string name="power_menu_handler_border_title">Bordo Pallino</string>
+    <string name="power_menu_handler_border_summary">Disegna un anello attorno al pallino</string>
+    <string name="power_menu_handler_border_color_title">Colore Bordo Pallino</string>
     <string name="advanced_reboot_recovery">Recovery</string>
     <string name="advanced_reboot_bootloader">Bootloader</string>
     <string name="advanced_reboot_safe_mode">Modalità provvisoria</string>
@@ -447,6 +460,10 @@
     <string name="qs_tiles_icon_colors_title">Personalizza i colori delle icone</string>
     <string name="qs_tiles_icon_active_accent_title">Collega icona all\'Accento</string>
     <string name="qs_tiles_bg_active_accent_title">Collega all\'Accento</string>
+    <string name="qs_tiles_border_title">Bordo Pulsanti</string>
+    <string name="qs_tiles_border_color_title">Colore Bordo</string>
+    <string name="qs_panel_border_title">Bordo Pannello</string>
+    <string name="qs_panel_border_color_title">Colore Bordo</string>
     <string name="qs_tiles_color_active">Attivo</string>
     <string name="qs_tiles_color_inactive">Inattivo</string>
     <string name="qs_tiles_color_disabled">Disabilitato</string>
@@ -682,6 +699,7 @@
     <string name="reboot_device_reminder">Riavvia il telefono (solo la prima volta, poi basta Riavvia SystemUI)</string>
     <string name="obs_restart_ui_hint">Riavvia SystemUI per applicare</string>
     <string name="qs_header_gravity">Posizione verticale</string>
+    <string name="qs_header_zoom">Zoom</string>
 
     <!-- Orologio Intestazione QS -->
     <string name="qs_header_clock_section">Orologio Impostazioni Rapide</string>
@@ -843,10 +861,36 @@
     <string name="vol_panel_disable_warning">Disabilita avviso volume alto</string>
     <string name="vol_panel_timeout">Timeout pannello</string>
     <string name="vol_panel_timeout_fmt">%d s</string>
-    <string name="vol_panel_colors">Colori barra volume</string>
-    <string name="vol_panel_colors_summary">Colore personalizzato barra e sfondo</string>
+    <string name="vol_panel_colors">Personalizza barra volume</string>
+    <string name="vol_panel_colors_summary">Colori, immagine di sfondo, riga di progresso, bordo</string>
     <string name="vol_panel_progress_color">Colore barra progresso</string>
     <string name="vol_panel_bg_color">Colore sfondo</string>
+    <string name="vol_panel_border_title">Bordo barra</string>
+    <string name="vol_panel_progress_line_title">Progresso a riga</string>
+    <string name="vol_panel_progress_line_summary">Una sottile riga bianca invece del riempimento pieno, lo sfondo resta visibile</string>
+    <string name="vol_panel_progress_line_override_summary">Annulla il colore barra progresso quando attiva</string>
+    <string name="vol_panel_progress_line_fill_preset">Preset</string>
+    <string name="vol_panel_progress_line_full_title">Riempimento pieno</string>
+    <string name="vol_panel_progress_line_full_summary">Copre tutta l\'area di progresso invece di una riga sottile</string>
+    <string name="vol_panel_progress_line_wave_title">Ondulata</string>
+    <string name="vol_panel_gradient_custom">Gradiente personalizzato</string>
+    <string name="gradient_stops_section">Gradiente personalizzato</string>
+    <string name="gradient_stops_colors_section">Colori</string>
+    <string name="gradient_stops_direction_title">Direzione</string>
+    <string name="gradient_stops_direction_horizontal">Orizzontale</string>
+    <string name="gradient_stops_direction_vertical">Verticale</string>
+    <string name="gradient_stops_color_label">Colore %d</string>
+    <string name="gradient_stops_position_label">Posizione colore %d</string>
+    <string name="gradient_stops_remove">Rimuovi colore %d</string>
+    <string name="gradient_stops_add">Aggiungi colore</string>
+    <string name="vol_panel_bg_image_title">Immagine sfondo</string>
+    <string name="vol_panel_bg_image_summary">Annulla il colore sfondo quando attiva</string>
+    <string name="vol_panel_bg_image_preset">Preset</string>
+    <string name="vol_panel_bg_image_photo">Foto dal telefono</string>
+    <string name="vol_panel_bg_image_position_x">Posizione orizzontale</string>
+    <string name="vol_panel_bg_image_position_y">Posizione verticale</string>
+    <string name="vol_panel_bg_image_zoom">Zoom</string>
+    <string name="vol_panel_bg_image_size">Zoom</string>
 
     <!-- Temi e Stile -->
     <string name="nav_theme_style">Stili Notifiche e Toast</string>
@@ -1032,4 +1076,8 @@
     <string name="battery_hide_battery_summary">Nasconde completamente l\'icona batteria dalla barra di stato</string>
     <string name="battery_percent_size">Dimensione font % batteria</string>
     <string name="battery_percent_size_summary">Dimensione del testo percentuale — richiede riavvio SystemUI</string>
+    <string name="power_menu_handler_replace_title">Sostituire l’immagine attuale?</string>
+    <string name="power_menu_handler_replace_message">Questo sostituirà l’immagine attuale del Pallino con questo preset.</string>
+    <string name="launcher_page_indicator_tap_title">Azione al tocco sull\u2019indicatore di pagina</string>
+    <string name="launcher_page_indicator_tap_summary">Apre un\u2019app a tua scelta quando tocchi la voce di ricerca sotto l\u2019indicatore di pagina della home (serve \u00abMostra Cerca sul fondo\u00bb attivo). Tocca per scegliere l\u2019app.</string>
 </resources>

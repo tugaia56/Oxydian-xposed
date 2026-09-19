@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="gs_group_chat_bg_color">@*android:color/background_dark</color>
+    <color name="gs_group_chat_input_view_bg_color">@*android:color/background_dark</color>
+</resources>

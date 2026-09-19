@@ -72,6 +72,14 @@
     <string name="section_accent3">Màu nhấn Alpha</string>
     <string name="dst_section_preset_accent">Cài đặt sẵn màu nhấn</string>
     <string name="dst_section_preset_sfondo">Cài đặt sẵn hình nền</string>
+    <string name="dst_substratum_style_title">Kiểu Dark Shadow Theme cho Obsidian</string>
+    <string name="dst_substratum_style_notice">Tạo chủ đề cho Cài đặt, SystemUI, Launcher, ứng dụng Video hệ thống, Quả cầu hỗ trợ, Khôi phục ứng dụng, Cổng nội dung, Đồng hồ, OnePlus Share, Máy tính, Trợ lý trò chơi, Thoải mái cho mắt, Ảnh, Máy ảnh, Internet và Wifi/Bluetooth cùng lúc (màu sắc, hình nền, hộp thoại, cửa sổ bật lên, hoạt ảnh vân tay) bằng gói tài nguyên trích xuất từ chủ đề Substratum của riêng bạn, trong một overlay duy nhất. Nhấn Áp dụng (quá trình tạo cả mười sáu mất một chút thời gian). Khởi động lại để xem thay đổi. Yêu cầu quyền "Truy cập tất cả tệp".</string>
+    <string name="dst_substratum_style_card_desc">Cài đặt, SystemUI, Launcher, Video, Quả cầu hỗ trợ, Khôi phục ứng dụng, Cổng nội dung, Đồng hồ, OnePlus Share, Máy tính, Trợ lý trò chơi, Thoải mái cho mắt, Ảnh, Máy ảnh, Internet, Wifi/Bluetooth</string>
+    <string name="dst_substratum_style_status_none">Chưa áp dụng</string>
+    <string name="dst_substratum_style_status_active">Chủ đề đang hoạt động</string>
+    <string name="dst_substratum_style_howto">QUAN TRỌNG:\nsau khi Áp dụng, khởi động lại hai lần:\nlần khởi động lại đầu tiên kích hoạt các overlay đã tạo.\nLần khởi động lại thứ hai kích hoạt và ổn định các overlay.</string>
+    <string name="dst_substratum_style_readme_link">Đọc readme đầy đủ</string>
+    <string name="dst_substratum_style_readme_full">QUAN TRỌNG: sau khi Áp dụng, khởi động lại hai lần: lần khởi động lại đầu tiên kích hoạt các overlay vừa tạo và điện thoại có thể chậm lại khoảng một phút (tự ổn định, không cần làm gì — nếu có vẻ bị treo, giữ nút nguồn để khởi động lại cưỡng bức). Từ lần khởi động lại thứ hai trở đi, chủ đề đã kích hoạt và ổn định. Từ đó, mỗi lần khởi động có thể chậm hơn vài giây so với trước — đó là cái giá của việc có chủ đề đầy đủ đang hoạt động.</string>
     <string name="nav_sys_settings">Kiểu Cài đặt OOS</string>
     <string name="nav_sys_settings_summary">Chủ đề thực đầy đủ cho ứng dụng Cài đặt, được tạo từ chủ đề Substratum của bạn</string>
     <string name="settings_theme_notice">Tạo chủ đề cho toàn bộ ứng dụng Cài đặt (màu sắc, hình nền, hoạt ảnh vân tay) bằng gói tài nguyên trích xuất từ chủ đề Substratum của riêng bạn. Nhấn Áp dụng (quá trình tạo mất một chút thời gian). Yêu cầu quyền "Truy cập tất cả tệp".</string>
@@ -114,7 +122,7 @@
     <string name="nav_dst_colors_summary">Mẫu màu nhấn, màu nền</string>
     <string name="nav_settings_icons">Kiểu biểu tượng Cài đặt</string>
     <string name="nav_settings_icons_summary">Gói biểu tượng PUI / HOS cho ứng dụng Cài đặt</string>
-    <string name="settings_icons_preview_notice">Nhấn vào một gói để chọn, sau đó nhấn Áp dụng (quá trình tạo mất một chút thời gian). Yêu cầu quyền "Truy cập tất cả tệp".</string>
+    <string name="settings_icons_preview_notice">Nhấn vào một gói để chọn, sau đó nhấn Áp dụng (quá trình tạo mất một chút thời gian). Khởi động lại để xem thay đổi. Yêu cầu quyền "Truy cập tất cả tệp".</string>
     <string name="settings_icons_apply">Áp dụng</string>
     <string name="settings_icons_disable">Tắt</string>
     <string name="settings_icons_status_none">Chưa áp dụng gói nào</string>
@@ -328,7 +336,7 @@
     <string name="advanced_reboot_auth_summary">Xác thực để hiển thị các tùy chọn khởi động lại nâng cao</string>
     <string name="power_menu_pill_section">Thanh trượt</string>
     <string name="power_menu_gradient_color_title">Màu khởi động lại/tắt máy</string>
-    <string name="power_menu_handler_color_title">Màu tay cầm</string>
+    <string name="power_menu_handler_color_title">Nền tay cầm</string>
     <string name="power_menu_handler_gallery_title">Chọn từ thư viện</string>
     <string name="power_menu_handler_gallery_summary">Chọn ảnh của riêng bạn</string>
     <string name="power_menu_handler_style_section">Kiểu</string>
@@ -339,6 +347,9 @@
     <string name="power_menu_border_title">Viền thanh trượt</string>
     <string name="power_menu_border_summary">Vẽ đường viền quanh thanh trượt khởi động lại/tắt máy</string>
     <string name="power_menu_border_color_title">Màu viền</string>
+    <string name="power_menu_handler_border_title">Viền tay cầm</string>
+    <string name="power_menu_handler_border_summary">Vẽ một vòng quanh tay cầm</string>
+    <string name="power_menu_handler_border_color_title">Màu viền tay cầm</string>
     <string name="advanced_reboot_auth_failed">Xác thực thất bại</string>
     <string name="advanced_reboot_recovery">Recovery</string>
     <string name="advanced_reboot_bootloader">Bootloader</string>

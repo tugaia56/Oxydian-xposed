@@ -51,7 +51,10 @@ public class QsHeaderImage extends XposedMods {
     private static final String PREF_PAD_H   = "OBS_QS_HEADER_PAD_H";   // dp, 0-64
     private static final String PREF_PAD_T   = "OBS_QS_HEADER_PAD_T";   // dp, 0-64
     private static final String PREF_SCALE   = "OBS_QS_HEADER_SCALE";    // 0-3
-    private static final String PREF_GRAVITY = "OBS_QS_HEADER_GRAVITY";  // 0-100 (0=top, 50=center, 100=bottom)
+    private static final String PREF_GRAVITY = "OBS_QS_HEADER_GRAVITY";  // 0-100 (0=top, 50=center, 100=bottom) – mode 1 only
+    private static final String PREF_CROP_CX   = "OBS_QS_HEADER_CROP_CX";   // 0-100, mode 0 only
+    private static final String PREF_CROP_CY   = "OBS_QS_HEADER_CROP_CY";   // 0-100, mode 0 only
+    private static final String PREF_CROP_ZOOM = "OBS_QS_HEADER_CROP_ZOOM"; // >=100, 100 = immagine intera, mode 0 only
 
     /** Relative path under external storage where QsHeaderImageFragment saves the image. */
     private static final String IMAGE_SUBPATH = ".obsidian/qs_header_image";
@@ -80,7 +83,10 @@ public class QsHeaderImage extends XposedMods {
     private int     mPadH      = 0;        // dp
     private int     mPadT      = 0;        // dp
     private int     mScale     = 0;        // index into SCALE_TYPES
-    private int     mGravity   = 50;       // 0=top, 50=center, 100=bottom
+    private int     mGravity   = 50;       // 0=top, 50=center, 100=bottom – mode 1 only
+    private int     mCropCx    = 50;       // 0-100, mode 0 only
+    private int     mCropCy    = 50;       // 0-100, mode 0 only
+    private int     mCropZoom  = 100;      // >=100, 100 = immagine intera, mode 0 only
 
     private final List<FrameLayout> mContainers = new ArrayList<>();
     private final List<ImageView>   mImageViews = new ArrayList<>();
@@ -101,6 +107,9 @@ public class QsHeaderImage extends XposedMods {
         mPadT    = Xprefs.getInt(PREF_PAD_T, 0);
         mScale   = Xprefs.getInt(PREF_SCALE, 0);
         mGravity = Xprefs.getInt(PREF_GRAVITY, 50);
+        mCropCx   = Xprefs.getInt(PREF_CROP_CX, 50);
+        mCropCy   = Xprefs.getInt(PREF_CROP_CY, 50);
+        mCropZoom = Xprefs.getInt(PREF_CROP_ZOOM, 100);
         // Fade target: match the QS solid background color if enabled, else black.
         boolean qsBgEnabled = Xprefs.getBoolean("DST_QS_BG_ENABLED", false);
         mFadeColor = qsBgEnabled
@@ -267,20 +276,43 @@ public class QsHeaderImage extends XposedMods {
         iv.setImageBitmap(bmp);
         iv.setImageAlpha(alphaToInt(mAlpha));
 
-        // Scale: modes 0 and 1 both use MATRIX for gravity-aware positioning.
-        //   0 – Riempi (ritaglia): fill both dimensions, crop excess (like CENTER_CROP)
-        //   1 – Adatta larghezza:  fill width only, maintain aspect ratio
-        if (mScale == 0 || mScale == 1) {
-            final Bitmap finalBmp  = bmp;
-            final int    gravity   = mGravity;
-            final int    scaleMode = mScale;
+        // Scale: modes 0 and 1 both use MATRIX for crop-aware positioning.
+        //   0 – Riempi (ritaglia): fixed-box/pannable-photo crop (cx/cy/zoom), same math as
+        //       ImageCropOverlayView's computeCropSizeSrcPx — kept in sync by hand, see there.
+        //   1 – Adatta larghezza:  fill width only, single-axis vertical gravity (legacy)
+        if (mScale == 0) {
+            final Bitmap finalBmp = bmp;
+            final float  cx = mCropCx / 100f, cy = mCropCy / 100f;
+            final int    zoom = mCropZoom;
             iv.post(() -> {
                 float viewW = iv.getWidth();
                 float viewH = iv.getHeight();
                 if (viewW <= 0 || viewH <= 0) return;
-                float scale = (scaleMode == 0)
-                        ? Math.max(viewW / finalBmp.getWidth(), viewH / finalBmp.getHeight())  // fill both
-                        : viewW / finalBmp.getWidth();                                          // fill width
+                float bmpW = finalBmp.getWidth(), bmpH = finalBmp.getHeight();
+                float dstAspect = viewW / viewH;
+                float srcAspect = bmpW / bmpH;
+                float maxCropW, maxCropH;
+                if (srcAspect > dstAspect) { maxCropH = bmpH; maxCropW = bmpH * dstAspect; }
+                else { maxCropW = bmpW; maxCropH = bmpW / dstAspect; }
+                float frac = Math.max(0.05f, Math.min(1f, 100f / Math.max(1, zoom)));
+                float cropW = maxCropW * frac, cropH = maxCropH * frac;
+                float scale = viewW / cropW;
+                float leftSrc = Math.max(0f, Math.min(bmpW - cropW, bmpW * cx - cropW / 2f));
+                float topSrc  = Math.max(0f, Math.min(bmpH - cropH, bmpH * cy - cropH / 2f));
+                Matrix m = new Matrix();
+                m.setScale(scale, scale);
+                m.postTranslate(-leftSrc * scale, -topSrc * scale);
+                iv.setScaleType(ImageView.ScaleType.MATRIX);
+                iv.setImageMatrix(m);
+            });
+        } else if (mScale == 1) {
+            final Bitmap finalBmp = bmp;
+            final int    gravity  = mGravity;
+            iv.post(() -> {
+                float viewW = iv.getWidth();
+                float viewH = iv.getHeight();
+                if (viewW <= 0 || viewH <= 0) return;
+                float scale = viewW / finalBmp.getWidth(); // fill width
                 float tx = (viewW - finalBmp.getWidth()  * scale) / 2f;
                 float ty = (viewH - finalBmp.getHeight() * scale) * (gravity / 100f);
                 Matrix m = new Matrix();

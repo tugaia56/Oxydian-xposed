@@ -125,6 +125,7 @@ public class LockscreenWeather extends XposedMods {
     private LinearLayout mWidgetContainer;
     private CurrentWeatherView mWeatherView;
 
+
     public LockscreenWeather(Context context) {
         super(context);
     }
@@ -302,9 +303,20 @@ public class LockscreenWeather extends XposedMods {
                 int density = (int) mContext.getResources().getDisplayMetrics().density;
                 // Offset di base: "0 dp" nello slider deve partire sotto il blocco orologio+data,
                 // non attaccato al bordo — lo slider aggiunge margine IN PIÙ da questo punto.
-                int baseTopPx = 150 * density;
-                mlp.setMargins(marginsOn ? marginLeft * density : 20 * density,
-                        baseTopPx + (marginsOn ? marginTop * density : 0), 0, 0);
+                // 2026-09-18: stessa tabella-fix di LockscreenWidgetsMod.applyMargin() — se lo
+                // stile ha un valore calibrato SOSTITUISCE l'intero calcolo verticale (base +
+                // slider "Margine superiore"), non si somma — il valore calibrato incorpora già
+                // quello che oggi serve impostare a mano nello slider. Margine orizzontale
+                // (marginLeft) invariato, resta sotto controllo dell'utente in ogni caso.
+                // Base di sicurezza = metà schermo (proposta dall'utente) quando lo stile non ha
+                // una calibrazione specifica — sotto QUALSIASI orologio senza doverli testare
+                // tutti e 61, invece del vecchio 150dp fisso indovinato.
+                Integer calibratedTop = LockscreenClockMod.getCalibratedWeatherMarginDp(LockscreenClockMod.getCurrentStyle());
+                int safeBasePx = mContext.getResources().getDisplayMetrics().heightPixels / 2 - 200 * density;
+                int topPx = calibratedTop != null
+                        ? calibratedTop * density
+                        : safeBasePx + (marginsOn ? marginTop * density : 0);
+                mlp.setMargins(marginsOn ? marginLeft * density : 20 * density, topPx, 0, 0);
                 mWidgetContainer.setLayoutParams(mlp);
             }
         }

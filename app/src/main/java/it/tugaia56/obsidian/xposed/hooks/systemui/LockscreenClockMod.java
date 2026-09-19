@@ -153,7 +153,7 @@ public class LockscreenClockMod extends XposedMods {
         refreshForCurrentState();
     }
 
-    private int parseInt(String s, int def) {
+    private static int parseInt(String s, int def) {
         try { return Integer.parseInt(s); } catch (Throwable t) { return def; }
     }
 
@@ -204,6 +204,44 @@ public class LockscreenClockMod extends XposedMods {
     private View mInjectedClock;
     private int mInjectedStyle = -1;
     private ViewGroup mContainer;
+
+    /** Calibrazioni manuali per stile (2026-09-18) — con stili orologio più alti del previsto i
+     *  widget di LockscreenWidgetsMod/LockscreenWeather finivano sopra al calendario (bug reale,
+     *  confermato live). Leggere l'altezza vera a runtime si è rivelato instabile (cambia durante
+     *  l'animazione d'ingresso dell'orologio, causando ai widget di scivolare fuori schermo) —
+     *  niente calcolo dinamico, solo valori fissi testati a occhio uno stile alla volta, come già
+     *  fatto altrove nel progetto (PILL_ASPECT, HANDLER_BORDER_SCALE, ecc.). Chiave = indice
+     *  0-based dello stile ("Stile orologio N" in UI = index N-1); valore = margine superiore
+     *  totale in dp (SOSTITUISCE base+slider utente per gli stili qui presenti, non si somma).
+     *  Stili non presenti: fallback al comportamento esistente (150dp fisso + slider utente). */
+    private static final java.util.Map<Integer, Integer> STYLE_WIDGET_MARGIN_DP = new java.util.HashMap<>();
+    static {
+        // Stile 7: la riga widget sta più in basso del meteo (come nel caso generale, dove la
+        // differenza di base è 100dp: meteo -200, widget -100) — stesso valore del meteo (260)
+        // li faceva finire alla stessa altezza, sbagliato (segnalato dall'utente 2026-09-18).
+        STYLE_WIDGET_MARGIN_DP.put(6, 360); // Stile 7 — 260 (meteo) + 100 di differenza standard
+    }
+    /** Stessa idea, ma per il widget Meteo (LockscreenWeather) — può stare più vicino
+     *  all'orologio del resto dei widget (LockscreenWidgetsMod), quindi tabella separata. Vuota
+     *  finché l'utente non testa/conferma valori specifici. */
+    private static final java.util.Map<Integer, Integer> STYLE_WEATHER_MARGIN_DP = new java.util.HashMap<>();
+    static {
+        STYLE_WEATHER_MARGIN_DP.put(6, 260); // Stile 7 — 150 base + 110 di slider confermati dall'utente
+    }
+
+    /** Null se non calibrato per questo stile — i chiamanti ricadono sul loro comportamento
+     *  esistente (base fissa + slider utente) in quel caso. */
+    public static Integer getCalibratedWidgetMarginDp(int style) {
+        return STYLE_WIDGET_MARGIN_DP.get(style);
+    }
+
+    public static Integer getCalibratedWeatherMarginDp(int style) {
+        return STYLE_WEATHER_MARGIN_DP.get(style);
+    }
+
+    public static int getCurrentStyle() {
+        return parseInt(Xprefs.getString(KEY_STYLE, "0"), 0);
+    }
 
     private boolean isEnabledForState(int state) {
         return state == UI_STATE_AOD ? mAodEnabled : mEnabled;

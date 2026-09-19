@@ -335,7 +335,11 @@ public class DstDialogStyle {
         String cls = p.thisObject.getClass().getName();
         XposedBridge.log("[ Obsidian ] DstDialog: Dialog.show cls=" + cls);
 
-        // Skip bottom sheets (positioned at screen bottom — inset preset looks wrong)
+        // Skip bottom sheets (positioned at screen bottom — inset preset looks wrong). 2026-09-14:
+        // provato un percorso dedicato per il pannello interno grigio di com.heytap.mydevices
+        // ("G11-S" device detail, design_bottom_sheet/coui_panel_content_layout/panel_content) —
+        // nessun effetto nonostante il colore fosse confermato giusto via log, causa non trovata,
+        // utente ha chiesto di lasciar perdere. Non re-indagare senza che l'utente lo richieda.
         if (cls.contains("BottomSheet")) return;
 
         // Skip system overlay dialogs that should not get our background treatment:
@@ -425,8 +429,15 @@ public class DstDialogStyle {
      *  tra i due strati. Id generico condiviso dalla stessa classe builder di AlertDialog COUI
      *  in molte app — svuotarlo qui (non solo per Settings) lascia mostrare solo lo sfondo della
      *  finestra già tinto sopra, stesso look "invisibile" già usato per le card altrove. */
+    // 2026-09-11: "parentPanel" aggiunto — confermato via uiautomator dump dal vivo su
+    // com.oneplus.account (dialog "Richiesta di autorizzazione") + segnalato anche su
+    // com.oplus.linker/com.oplus.multiapp/com.coloros.smartsidebar. Sono AlertDialog
+    // AndroidX **stock** (non quello COUI su cui gli id sopra erano stati trovati):
+    // parentPanel è il LinearLayout che avvolge rootView/topPanel/contentPanel/buttonPanel
+    // e ha un proprio sfondo (abc_dialog_material_background, più chiaro e con angoli meno
+    // arrotondati) mai svuotato finora — è lui la "cucitura"/copertura del bordo in alto.
     private static final String[] INNER_DIALOG_PANEL_IDS = {
-            "rootView", "topPanel", "contentPanel", "customPanel", "buttonPanel", "custom"
+            "rootView", "parentPanel", "topPanel", "contentPanel", "customPanel", "buttonPanel", "custom"
     };
 
     private static void clearInnerDialogBackground(android.app.Dialog d) {

@@ -1001,14 +1001,24 @@ public class LockscreenWidgetsMod extends XposedMods {
 
     private void applyMargin() {
         if (mWidgetRow == null) return;
+        // 2026-09-18: con stili orologio più alti del previsto i widget finivano sopra al
+        // calendario (bug reale, confermato live) — leggere l'altezza vera a runtime si è
+        // rivelato instabile (vedi LockscreenClockMod.STYLE_WIDGET_MARGIN_DP). Fix a due livelli,
+        // proposto dall'utente: 1) base di sicurezza = metà schermo, sotto QUALSIASI stile senza
+        // bisogno di testarli tutti e 61; 2) tabella di valori calibrati per stile (se presente)
+        // per chi vuole il posizionamento esatto invece del generico "metà schermo".
+        Integer calibrated = LockscreenClockMod.getCalibratedWidgetMarginDp(LockscreenClockMod.getCurrentStyle());
+        int safeBase = mContext.getResources().getDisplayMetrics().heightPixels / 2 - dp(100);
+        int topMargin = calibrated != null ? dp(calibrated) : safeBase + dp(mTopMargin);
+
         ViewGroup.LayoutParams lpRaw = mWidgetRow.getLayoutParams();
         if (lpRaw instanceof ViewGroup.MarginLayoutParams mlp) {
-            mlp.setMargins(0, dp(150) + dp(mTopMargin), 0, 0);
+            mlp.setMargins(0, topMargin, 0, 0);
             mWidgetRow.setLayoutParams(mlp);
         } else {
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            lp.setMargins(0, dp(150) + dp(mTopMargin), 0, 0);
+            lp.setMargins(0, topMargin, 0, 0);
             lp.gravity = Gravity.CENTER_HORIZONTAL;
             mWidgetRow.setLayoutParams(lp);
         }

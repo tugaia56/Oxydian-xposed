@@ -96,7 +96,7 @@ public class LauncherFragment extends Fragment {
     private static final int RECENTS_COLOR_DIALOG_ID = KEY_RECENTS_BTN_COLOR.hashCode();
 
     private RecyclerView mRv;
-    private boolean mRecentsColorExpanded = ObsidianPrefs.getBoolean(KEY_RECENTS_BTN_COLOR + "_on", false);
+    private boolean mRecentsColorExpanded = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -136,9 +136,6 @@ public class LauncherFragment extends Fragment {
                 boolItem(R.string.launcher_disable_recents_previous_page_title, R.string.launcher_disable_recents_previous_page_summary, KEY_DISABLE_PREV_RECENTS),
                 boolItem(R.string.launcher_replace_lock_title, R.string.launcher_replace_lock_summary, KEY_REPLACE_LOCK),
                 recentsButtonColorSwitch()));
-        if (mRecentsColorExpanded) {
-            recentsRows.add(recentsButtonColorPickerItem());
-        }
         GroupUtils.addGroup(chain, recentsRows);
 
         // ── Home Layout ──────────────────────────────────────────────────────
@@ -179,6 +176,7 @@ public class LauncherFragment extends Fragment {
         GroupUtils.addGroup(chain, List.of(
                 boolItem(R.string.remove_home_pagination, null, KEY_REMOVE_HOME_PAGE),
                 boolItem(R.string.hide_scroller, R.string.hide_scroller_summary, KEY_HIDE_SCROLLER),
+                pageIndicatorTapItem(),
                 swipeRightItem()));
 
         android.os.Parcelable scrollState = mRv.getLayoutManager() != null
@@ -203,22 +201,103 @@ public class LauncherFragment extends Fragment {
                 getString(R.string.launcher_recents_color_no_reboot), on, null);
         item.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_RECENTS_BTN_COLOR + "_on", item.checked);
-            mRecentsColorExpanded = item.checked;
             if (item.checked) {
-                new Thread(() -> applyRecentsBtnColor(ObsidianPrefs.getInt(KEY_RECENTS_BTN_COLOR, 0xFF6200EE))).start();
+                new Thread(() -> applyRecentsBtnColor(currentRecentsColor())).start();
+                showRecentsColorModeDialog();
             } else {
                 new Thread(this::disableRecentsBtnColor).start();
             }
-            rebuild();
         };
-        item.onRowClick = () -> { mRecentsColorExpanded = !mRecentsColorExpanded; rebuild(); };
+        item.onRowClick = this::showRecentsColorModeDialog;
         return item;
     }
 
-    private ListWidgetAdapter.ListItem recentsButtonColorPickerItem() {
-        return new ListWidgetAdapter.ListItem(
-                getString(R.string.launcher_recents_button_color_title), recentsColorLabel(),
-                this::showRecentsColorModeDialog);
+    // ── Azione al tocco sull'indicatore di pagina — apre l'app scelta al posto di ricerca/Breeno ──
+    private static final String KEY_PI_TAP_ON  = "launcher_page_indicator_tap_on";
+    private static final String KEY_PI_TAP_PKG = "launcher_page_indicator_tap_pkg";
+
+    private SwitchWidgetAdapter.SwitchItem pageIndicatorTapItem() {
+        String pkg = ObsidianPrefs.getString(KEY_PI_TAP_PKG, "");
+        String summary = getString(R.string.launcher_page_indicator_tap_summary);
+        if (!pkg.isEmpty()) {
+            try {
+                android.content.pm.PackageManager pm = requireContext().getPackageManager();
+                summary = pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)) + "\n" + summary;
+            } catch (Throwable ignored) {}
+        }
+        SwitchWidgetAdapter.SwitchItem item = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.launcher_page_indicator_tap_title), summary,
+                ObsidianPrefs.getBoolean(KEY_PI_TAP_ON, false) && !pkg.isEmpty(), null);
+        item.onChanged = () -> {
+            if (item.checked) {
+                if (pkg.isEmpty()) { showPageIndicatorAppPicker(); return; }
+                ObsidianPrefs.putBoolean(KEY_PI_TAP_ON, true);
+            } else {
+                ObsidianPrefs.putBoolean(KEY_PI_TAP_ON, false);
+            }
+        };
+        item.onRowClick = this::showPageIndicatorAppPicker;
+        return item;
+    }
+
+    private void showPageIndicatorAppPicker() {
+        android.content.pm.PackageManager pm = requireContext().getPackageManager();
+        android.content.Intent launcherIntent = new android.content.Intent(android.content.Intent.ACTION_MAIN)
+                .addCategory(android.content.Intent.CATEGORY_LAUNCHER);
+        List<android.content.pm.ResolveInfo> apps = pm.queryIntentActivities(launcherIntent, 0);
+        apps.sort(java.util.Comparator.comparing(r -> r.loadLabel(pm).toString().toLowerCase()));
+
+        android.widget.LinearLayout list = new android.widget.LinearLayout(requireContext());
+        list.setOrientation(android.widget.LinearLayout.VERTICAL);
+        int pad = Math.round(8 * getResources().getDisplayMetrics().density);
+        list.setPadding(pad, pad, pad, pad);
+
+        androidx.appcompat.app.AlertDialog[] dlgRef = new androidx.appcompat.app.AlertDialog[1];
+        for (android.content.pm.ResolveInfo info : apps) {
+            String packageName = info.activityInfo.applicationInfo.packageName;
+            android.widget.LinearLayout row = new android.widget.LinearLayout(requireContext());
+            row.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+            row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+            int p12 = Math.round(12 * getResources().getDisplayMetrics().density);
+            row.setPadding(p12, p12 - 2, p12, p12 - 2);
+
+            android.widget.ImageView iv = new android.widget.ImageView(requireContext());
+            int s36 = Math.round(36 * getResources().getDisplayMetrics().density);
+            android.widget.LinearLayout.LayoutParams ivLp = new android.widget.LinearLayout.LayoutParams(s36, s36);
+            ivLp.setMarginEnd(p12 + 4);
+            iv.setLayoutParams(ivLp);
+            iv.setImageDrawable(info.loadIcon(pm));
+            row.addView(iv);
+
+            android.widget.TextView tv = new android.widget.TextView(requireContext());
+            tv.setText(info.loadLabel(pm).toString());
+            tv.setTextColor(ObsidianTheme.textColor());
+            tv.setTextSize(15);
+            row.addView(tv);
+
+            row.setOnClickListener(v -> {
+                ObsidianPrefs.putString(KEY_PI_TAP_PKG, packageName);
+                ObsidianPrefs.putBoolean(KEY_PI_TAP_ON, true);
+                rebuild();
+                if (dlgRef[0] != null) dlgRef[0].dismiss();
+            });
+            list.addView(row);
+        }
+        androidx.core.widget.NestedScrollView scroll = new androidx.core.widget.NestedScrollView(requireContext());
+        scroll.addView(list);
+        dlgRef[0] = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.lockscreen_widgets_pick_app_title))
+                .setView(scroll)
+                .setNegativeButton(R.string.cancel, (d, w) -> rebuild())
+                .setOnCancelListener(d -> rebuild())
+                .show();
+        ObsidianTheme.themeDialog(dlgRef[0]);
+    }
+
+    private static int currentRecentsColor() {
+        return ObsidianPrefs.getBoolean(KEY_RECENTS_BTN_COLOR + "_use_accent", false)
+                ? ObsidianTheme.accentColor()
+                : ObsidianPrefs.getInt(KEY_RECENTS_BTN_COLOR, 0xFF6200EE);
     }
 
     private String recentsColorLabel() {
@@ -241,6 +320,7 @@ public class LauncherFragment extends Fragment {
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     boolean useAccent = selected[0] == 0;
                     ObsidianPrefs.putBoolean(KEY_RECENTS_BTN_COLOR + "_use_accent", useAccent);
+                    ObsidianPrefs.putBoolean(KEY_RECENTS_BTN_COLOR + "_on", true);
                     if (useAccent) {
                         int color = ObsidianTheme.accentColor();
                         ObsidianPrefs.putInt(KEY_RECENTS_BTN_COLOR, color);

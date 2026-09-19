@@ -102,12 +102,12 @@ public class QsHeaderClockFragment extends Fragment {
     // apre/chiude l'opzione sottostante — stesso pattern di QsTilesCustomizeFragment. Il
     // toggle principale "Attiva" NON è incluso: seleziona la modalità (Stock/Personalizzato),
     // non nasconde/mostra righe di dettaglio proprie — sempre mostra un set di opzioni.
-    private boolean mStockColorExpanded = ObsidianPrefs.getBoolean(PREF_STOCK_COLOR_ON, false);
-    private boolean mDateColorExpanded  = ObsidianPrefs.getBoolean(PREF_STOCK_DATE_COLOR_ON, false);
-    private boolean mClockChipExpanded  = ObsidianPrefs.getBoolean(PREF_STOCK_CLOCK_CHIP_ON, false);
-    private boolean mDateChipExpanded   = ObsidianPrefs.getBoolean(PREF_STOCK_DATE_CHIP_ON, false);
-    private boolean mFontExpanded       = ObsidianPrefs.getBoolean(PREF_CUSTOM_FONT, false);
-    private boolean mColorAllExpanded   = ObsidianPrefs.getBoolean(PREF_COLOR_ALL_ON, false);
+    private boolean mStockColorExpanded = false;
+    private boolean mDateColorExpanded  = false;
+    private boolean mClockChipExpanded  = false;
+    private boolean mDateChipExpanded   = false;
+    private boolean mFontExpanded       = false;
+    private boolean mColorAllExpanded   = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

@@ -72,6 +72,14 @@
     <string name="section_accent3">Alfa Vurgu</string>
     <string name="dst_section_preset_accent">Vurgu Ön Ayarları</string>
     <string name="dst_section_preset_sfondo">Arka Plan Ön Ayarları</string>
+    <string name="dst_substratum_style_title">Obsidian için Dark Shadow Theme Stili</string>
+    <string name="dst_substratum_style_notice">Kendi Substratum temanızdan çıkarılan kaynak paketini kullanarak Ayarlar, SystemUI, Başlatıcı, sistem Video uygulamasını, Asistan Küresi\'ni, Uygulama Kurtarma\'yı, İçerik Portalı\'nı, Saat\'i, OnePlus Share\'i, Hesap Makinesi\'ni, Oyun Asistanı\'nı, Göz Konforu\'nu, Fotoğraflar\'ı, Kamerayı, İnternet\'i ve Wifi/Bluetooth\'u birlikte (renkler, arka planlar, iletişim kutuları, açılır pencereler, parmak izi animasyonu) tek bir overlay\'de özelleştirir. Uygula\'ya dokunun (on altısının oluşturulması biraz zaman alır). Değişikliği görmek için yeniden başlatın. "Tüm dosyalara erişim" izni gerektirir.</string>
+    <string name="dst_substratum_style_card_desc">Ayarlar, SystemUI, Başlatıcı, Video, Asistan Küresi, Uygulama Kurtarma, İçerik Portalı, Saat, OnePlus Share, Hesap Makinesi, Oyun Asistanı, Göz Konforu, Fotoğraflar, Kamera, İnternet, Wifi/Bluetooth</string>
+    <string name="dst_substratum_style_status_none">Uygulanmadı</string>
+    <string name="dst_substratum_style_status_active">Tema etkin</string>
+    <string name="dst_substratum_style_howto">ÖNEMLİ:\nUygula\'dan sonra iki kez yeniden başlatın:\nilk yeniden başlatma oluşturulan overlay\'leri etkinleştirir.\nİkinci yeniden başlatma overlay\'leri etkinleştirir ve kararlı hale getirir.</string>
+    <string name="dst_substratum_style_readme_link">Tam readme\'yi oku</string>
+    <string name="dst_substratum_style_readme_full">ÖNEMLİ: Uygula\'dan sonra iki kez yeniden başlatın: ilk yeniden başlatma az önce oluşturulan overlay\'leri etkinleştirir ve telefon yaklaşık bir dakika yavaşlayabilir (kendi kendine düzelir, bir şey yapmanıza gerek yok — takılı kalmış gibi görünüyorsa, zorla yeniden başlatmak için güç düğmesini basılı tutun). İkinci yeniden başlatmadan itibaren tema etkin ve kararlıdır. O andan itibaren her açılış öncekinden birkaç saniye daha yavaş olabilir — bu, temanın tamamen etkin olmasının bedelidir.</string>
     <string name="nav_sys_settings">OOS Ayarlar Stili</string>
     <string name="nav_sys_settings_summary">Substratum temanızdan oluşturulan, Ayarlar uygulaması için tam gerçek tema</string>
     <string name="settings_theme_notice">Kendi Substratum temanızdan çıkarılan kaynak paketi kullanarak tüm Ayarlar uygulamasını (renkler, arka planlar, parmak izi animasyonu) özelleştirir. Uygula\'ya dokunun (oluşturma biraz zaman alır). "Tüm dosyalara erişim" izni gerektirir.</string>
@@ -114,7 +122,7 @@
     <string name="nav_dst_colors_summary">Vurgu, arka plan renk örnekleri</string>
     <string name="nav_settings_icons">Ayarlar Simge Stili</string>
     <string name="nav_settings_icons_summary">Ayarlar uygulaması için PUI / HOS simge paketleri</string>
-    <string name="settings_icons_preview_notice">Seçmek için bir pakete dokunun, ardından Uygula\'ya dokunun (oluşturma biraz zaman alır). "Tüm dosyalara erişim" izni gerektirir.</string>
+    <string name="settings_icons_preview_notice">Seçmek için bir pakete dokunun, ardından Uygula\'ya dokunun (oluşturma biraz zaman alır). Değişikliği görmek için yeniden başlatın. "Tüm dosyalara erişim" izni gerektirir.</string>
     <string name="settings_icons_apply">Uygula</string>
     <string name="settings_icons_disable">Devre dışı bırak</string>
     <string name="settings_icons_status_none">Paket uygulanmadı</string>
@@ -328,7 +336,7 @@
     <string name="advanced_reboot_auth_summary">Gelişmiş yeniden başlatma seçeneklerini göstermek için kimlik doğrula</string>
     <string name="power_menu_pill_section">Kaydırıcı</string>
     <string name="power_menu_gradient_color_title">Yeniden Başlatma/Kapatma Rengi</string>
-    <string name="power_menu_handler_color_title">Tutamaç Rengi</string>
+    <string name="power_menu_handler_color_title">Tutamaç Arka Planı</string>
     <string name="power_menu_handler_gallery_title">Galeriden Seç</string>
     <string name="power_menu_handler_gallery_summary">Kendi fotoğrafınızı seçin</string>
     <string name="power_menu_handler_style_section">Stil</string>
@@ -339,6 +347,9 @@
     <string name="power_menu_border_title">Kaydırıcı Kenarlığı</string>
     <string name="power_menu_border_summary">Yeniden başlatma/kapatma kaydırıcısının etrafına bir dış çizgi çiz</string>
     <string name="power_menu_border_color_title">Kenarlık Rengi</string>
+    <string name="power_menu_handler_border_title">Tutamaç Kenarlığı</string>
+    <string name="power_menu_handler_border_summary">Tutamacın etrafına bir halka çiz</string>
+    <string name="power_menu_handler_border_color_title">Tutamaç Kenarlık Rengi</string>
     <string name="advanced_reboot_auth_failed">Kimlik doğrulama başarısız oldu</string>
     <string name="advanced_reboot_recovery">Recovery</string>
     <string name="advanced_reboot_bootloader">Bootloader</string>

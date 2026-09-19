@@ -72,6 +72,14 @@
     <string name="section_accent3">Alpha Accent</string>
     <string name="dst_section_preset_accent">Accent Presets</string>
     <string name="dst_section_preset_sfondo">Background Presets</string>
+    <string name="dst_substratum_style_title">Dark Shadow Theme Style for Obsidian</string>
+    <string name="dst_substratum_style_notice">Full real theme for Settings, SystemUI, the Launcher, the system Video app, the Assistive Ball, App Recovery, Content Portal, Clock, OnePlus Share, Calculator, Game Assistant, Eye Comfort, Photos, Camera, Internet and Wifi/Bluetooth together (colors, backgrounds, dialogs, popups, fingerprint animation) built from your own Substratum theme, in one overlay. Tap Apply (needs a moment to build all sixteen). Reboot to see the change. Requires "All files access" permission.</string>
+    <string name="dst_substratum_style_card_desc">Settings, SystemUI, Launcher, Video, Assistive Ball, App Recovery, Content Portal, Clock, OnePlus Share, Calculator, Game Assistant, Eye Comfort, Photos, Camera, Internet, Wifi/Bluetooth</string>
+    <string name="dst_substratum_style_status_none">Not applied</string>
+    <string name="dst_substratum_style_status_active">Theme active</string>
+    <string name="dst_substratum_style_howto">IMPORTANT:\nafter Apply, reboot twice:\nthe first reboot enables the overlays you built.\nThe second reboot activates and stabilizes the overlays.</string>
+    <string name="dst_substratum_style_readme_link">Read the full readme</string>
+    <string name="dst_substratum_style_readme_full">IMPORTANT: after Apply, reboot twice: the first reboot enables the overlays you just built and the phone may slow down for about a minute (it settles on its own, nothing to do — if it seems stuck, hold the power button for a forced restart). From the second reboot on, the theme is active and stable. From then on, every boot may stay a few tens of seconds slower than before — that\'s the cost of having the full theme active.</string>
     <string name="nav_sys_settings">OOS Settings Style</string>
     <string name="nav_sys_settings_summary">Full real theme for the Settings app, built from your Substratum theme</string>
     <string name="settings_theme_notice">Themes the whole Settings app (colors, backgrounds, fingerprint animation) using the resource bundle extracted from your own Substratum theme. Tap Apply (needs a moment to build). Requires "All files access" permission.</string>
@@ -114,7 +122,7 @@
     <string name="nav_dst_colors_summary">Accent, background color swatches</string>
     <string name="nav_settings_icons">Settings Icon Style</string>
     <string name="nav_settings_icons_summary">PUI / HOS icon packs for the Settings app</string>
-    <string name="settings_icons_preview_notice">Tap a pack to select it, then Apply (needs a moment to build). Requires "All files access" permission.</string>
+    <string name="settings_icons_preview_notice">Tap a pack to select it, then Apply (needs a moment to build). Reboot to see the change. Requires "All files access" permission.</string>
     <string name="settings_icons_apply">Apply</string>
     <string name="settings_icons_disable">Disable</string>
     <string name="settings_icons_status_none">No pack applied</string>
@@ -328,17 +336,22 @@
     <string name="advanced_reboot_auth_summary">Authenticate to show advanced reboot options</string>
     <string name="power_menu_pill_section">Slider</string>
     <string name="power_menu_gradient_color_title">Reboot/Shutdown Color</string>
-    <string name="power_menu_handler_color_title">Handle Color</string>
+    <string name="power_menu_gradient_split_title">Separate colors</string>
+    <string name="power_menu_handler_color_title">Handle Background</string>
     <string name="power_menu_handler_gallery_title">Choose from Gallery</string>
     <string name="power_menu_handler_gallery_summary">Pick your own photo</string>
     <string name="power_menu_handler_style_section">Style</string>
     <string name="power_menu_handler_scale_title">Image Scale</string>
+    <string name="power_menu_menu_section">Power Menu</string>
     <string name="power_menu_bg_section">Power Menu Background</string>
     <string name="power_menu_bg_color_title">Slider Background</string>
     <string name="power_menu_bg_mode_custom">Color</string>
     <string name="power_menu_border_title">Slider Border</string>
     <string name="power_menu_border_summary">Draw an outline around the reboot/shutdown slider</string>
     <string name="power_menu_border_color_title">Border Color</string>
+    <string name="power_menu_handler_border_title">Handle Border</string>
+    <string name="power_menu_handler_border_summary">Draw a ring around the handle</string>
+    <string name="power_menu_handler_border_color_title">Handle Border Color</string>
     <string name="advanced_reboot_auth_failed">Authentication failed</string>
     <string name="advanced_reboot_recovery">Recovery</string>
     <string name="advanced_reboot_bootloader">Bootloader</string>
@@ -450,6 +463,10 @@
     <string name="qs_tiles_icon_colors_title">Custom Icon Colors</string>
     <string name="qs_tiles_icon_active_accent_title">Link icon to accent color</string>
     <string name="qs_tiles_bg_active_accent_title">Link to accent color</string>
+    <string name="qs_tiles_border_title">Tile Border</string>
+    <string name="qs_tiles_border_color_title">Border Color</string>
+    <string name="qs_panel_border_title">Panel Border</string>
+    <string name="qs_panel_border_color_title">Border Color</string>
     <string name="qs_tiles_color_active">Active</string>
     <string name="qs_tiles_color_inactive">Inactive</string>
     <string name="qs_tiles_color_disabled">Disabled</string>
@@ -681,6 +698,7 @@
     <string name="reboot_device_reminder">Reboot the device (only the first time, then a SystemUI restart is enough)</string>
     <string name="obs_restart_ui_hint">Restart SystemUI to apply</string>
     <string name="qs_header_gravity">Vertical position</string>
+    <string name="qs_header_zoom">Zoom</string>
 
     <!-- QS Header Clock -->
     <string name="qs_header_clock_section">QS Header Clock</string>
@@ -973,10 +991,36 @@
     <string name="vol_panel_disable_warning">Disable high volume warning</string>
     <string name="vol_panel_timeout">Panel timeout</string>
     <string name="vol_panel_timeout_fmt">%d s</string>
-    <string name="vol_panel_colors">Volume bar colors</string>
-    <string name="vol_panel_colors_summary">Custom progress bar and background color</string>
+    <string name="vol_panel_colors">Customize volume bar</string>
+    <string name="vol_panel_colors_summary">Colors, background image, progress line, border</string>
     <string name="vol_panel_progress_color">Progress bar color</string>
     <string name="vol_panel_bg_color">Background color</string>
+    <string name="vol_panel_border_title">Bar border</string>
+    <string name="vol_panel_progress_line_title">Progress as a line</string>
+    <string name="vol_panel_progress_line_summary">A thin white line instead of a solid fill, so the background stays visible</string>
+    <string name="vol_panel_progress_line_override_summary">Overrides the progress bar color when active</string>
+    <string name="vol_panel_progress_line_fill_preset">Preset</string>
+    <string name="vol_panel_progress_line_full_title">Full fill</string>
+    <string name="vol_panel_progress_line_full_summary">Covers the whole progress area instead of a thin line</string>
+    <string name="vol_panel_progress_line_wave_title">Wavy</string>
+    <string name="vol_panel_gradient_custom">Custom gradient</string>
+    <string name="gradient_stops_section">Custom gradient</string>
+    <string name="gradient_stops_colors_section">Colors</string>
+    <string name="gradient_stops_direction_title">Direction</string>
+    <string name="gradient_stops_direction_horizontal">Horizontal</string>
+    <string name="gradient_stops_direction_vertical">Vertical</string>
+    <string name="gradient_stops_color_label">Color %d</string>
+    <string name="gradient_stops_position_label">Color %d position</string>
+    <string name="gradient_stops_remove">Remove color %d</string>
+    <string name="gradient_stops_add">Add color</string>
+    <string name="vol_panel_bg_image_title">Background image</string>
+    <string name="vol_panel_bg_image_summary">Overrides the background color when active</string>
+    <string name="vol_panel_bg_image_preset">Preset</string>
+    <string name="vol_panel_bg_image_photo">Photo from device</string>
+    <string name="vol_panel_bg_image_position_x">Horizontal position</string>
+    <string name="vol_panel_bg_image_position_y">Vertical position</string>
+    <string name="vol_panel_bg_image_zoom">Zoom</string>
+    <string name="vol_panel_bg_image_size">Zoom</string>
 
     <!-- Temi e Stile -->
     <string name="nav_theme_style">Notification &amp; Toast Styles</string>
@@ -1060,4 +1104,8 @@
     <string name="lucky_png_screenshot_summary">Use PNG instead of JPEG for regular screenshots (lossless, larger files)</string>
     <string name="lucky_longshot_limit">Remove Scrolling Screenshot Limit</string>
     <string name="lucky_longshot_limit_summary">Removes the maximum page/size cap for scrolling (long) screenshots</string>
+    <string name="power_menu_handler_replace_title">Replace current image?</string>
+    <string name="power_menu_handler_replace_message">This will replace your current Pallino image with this preset.</string>
+    <string name="launcher_page_indicator_tap_title">Page indicator tap action</string>
+    <string name="launcher_page_indicator_tap_summary">Opens a chosen app when you tap the search entry under the home page indicator (needs \u201cShow Search at the bottom\u201d on). Tap to choose the app.</string>
 </resources>

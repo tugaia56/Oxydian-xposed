@@ -37,7 +37,7 @@ public class QsTilesFragment extends Fragment {
     private static final String PREF_COLUMNS     = "quick_settings_tiles_horizontal_columns_seek";
     private static final String PREF_COLUMNS_LS  = "quick_settings_tiles_vertical_columns_seek";
 
-    private boolean mCustomizeExpanded = ObsidianPrefs.getBoolean(PREF_CUSTOMIZE, false);
+    private boolean mCustomizeExpanded = false;
     private RecyclerView mRv;
 
     @Override

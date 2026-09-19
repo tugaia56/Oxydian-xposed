@@ -96,7 +96,7 @@ public class ClockChipStyleFragment extends Fragment {
         if (a != null && a.getString(ARG_PREFIX) != null) {
             mPrefix = a.getString(ARG_PREFIX);
         }
-        mCornerExpanded = ObsidianPrefs.getBoolean(prefRound(), false);
+        mCornerExpanded = false;
         EventBus.getDefault().register(this);
     }
 

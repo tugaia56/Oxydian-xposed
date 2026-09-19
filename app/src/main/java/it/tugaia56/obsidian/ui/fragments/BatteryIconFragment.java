@@ -46,10 +46,10 @@ public class BatteryIconFragment extends Fragment {
     private int[]    mSizeValues;
     private RecyclerView mRv;
 
-    private boolean mBatteryStyleExpanded  = ObsidianPrefs.getBoolean(PREF_ENABLED, false);
-    private boolean mBatteryBarExpanded    = ObsidianPrefs.getBoolean(PREF_BATTERY_BAR, false);
-    private boolean mPercentSizeExpanded   = ObsidianPrefs.getBoolean(PREF_PERCENT_SIZE_ENABLED, false);
-    private boolean mChargingIconExpanded  = ObsidianPrefs.getBoolean(PREF_CHARGING_ICON_ENABLED, false);
+    private boolean mBatteryStyleExpanded  = false;
+    private boolean mBatteryBarExpanded    = false;
+    private boolean mPercentSizeExpanded   = false;
+    private boolean mChargingIconExpanded  = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,

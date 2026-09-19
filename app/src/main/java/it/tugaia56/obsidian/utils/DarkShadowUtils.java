@@ -20,18 +20,40 @@ public class DarkShadowUtils {
 
     // ── Resource lists ────────────────────────────────────────────────────────
 
-    /** ACCENT1 — main dark accent + all system accent shades */
+    /** ACCENT1 — main dark accent, flat (no tonal variation needed for these) */
     private static final List<String> ACCENT1_RES = Arrays.asList(
         "accent_material_dark",
         "holo_blue_light",
-        "system_accent1_100", "system_accent1_200", "system_accent1_300",
-        "system_accent1_400", "system_accent1_500", "system_accent1_600", "system_accent1_700",
-        "system_accent2_100", "system_accent2_200", "system_accent2_300",
-        "system_accent2_400", "system_accent2_500", "system_accent2_600", "system_accent2_700",
-        "system_accent3_100", "system_accent3_200", "system_accent3_300",
-        "system_accent3_400", "system_accent3_500", "system_accent3_600", "system_accent3_700",
         "system_secondary_container"
     );
+
+    /**
+     * Material You tonal palette (system_accentN_100..700) — 2026-09-12: these were
+     * previously flattened to the SAME exact accent color as everything else in
+     * ACCENT1_RES. That broke real UI (Google Dialer's selected tab: light container
+     * fill using _100 + dark text using _700, both landing on the identical color =
+     * invisible text — found live, confirmed via cmd overlay lookup + screenshot pixel
+     * sampling). Stock Android gives each numbered tone a different LIGHTNESS of the
+     * same hue specifically so container/text pairs contrast — _100 is quite light,
+     * _700 quite dark, matching the real system_accent1_* dump values on this device
+     * (_100=0xffe2dfff light lilac ... _700=0xff2d00e5 near-black purple). Re-creates
+     * that same shape around the user's own accent hue via ColorUtils.blendTone()
+     * (real white/black blend, not adjustColor()'s multiplicative scaling — which can't
+     * lighten an already-saturated channel like blue=255 in #908DFF any further).
+     */
+    private static final Map<String, Integer> ACCENT_TONE_ADJUST;
+    static {
+        ACCENT_TONE_ADJUST = new LinkedHashMap<>();
+        for (String family : new String[]{"system_accent1_", "system_accent2_", "system_accent3_"}) {
+            ACCENT_TONE_ADJUST.put(family + "100", 100);
+            ACCENT_TONE_ADJUST.put(family + "200", 0);
+            ACCENT_TONE_ADJUST.put(family + "300", 22);
+            ACCENT_TONE_ADJUST.put(family + "400", 8);
+            ACCENT_TONE_ADJUST.put(family + "500", 0);
+            ACCENT_TONE_ADJUST.put(family + "600", 0);
+            ACCENT_TONE_ADJUST.put(family + "700", 0);
+        }
+    }
 
     /** ACCENT2 — light accent variant */
     private static final List<String> ACCENT2_RES = Arrays.asList(
@@ -86,7 +108,7 @@ public class DarkShadowUtils {
         list.add(new DarkShadowItem(
                 ctx.getString(it.tugaia56.obsidian.R.string.section_accent1),
                 "ACCENT1",
-                List.of(PKG_FRAMEWORK), ACCENT1_RES, null,
+                List.of(PKG_FRAMEWORK), ACCENT1_RES, ACCENT_TONE_ADJUST,
                 c1, on1));
 
         // ── Accent 2: Accento Chiaro ─────────────────────────────────────────

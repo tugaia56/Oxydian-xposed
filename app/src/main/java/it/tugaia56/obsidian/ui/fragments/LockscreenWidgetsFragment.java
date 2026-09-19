@@ -99,10 +99,10 @@ public class LockscreenWidgetsFragment extends Fragment {
     private DarkShadowColorListener mMiniColorAdapter;
     private boolean mBigColorsExpanded;
     private boolean mMiniColorsExpanded;
-    private boolean mWidgetsEnabledExpanded = ObsidianPrefs.getBoolean(KEY_ENABLED, false);
-    private boolean mDeviceWidgetExpanded   = ObsidianPrefs.getBoolean(KEY_DEVICE_WIDGET, false);
-    private boolean mColorSwitchExpanded    = ObsidianPrefs.getBoolean(KEY_COLOR_SWITCH, false);
-    private boolean mBgSwitchExpanded       = ObsidianPrefs.getBoolean(KEY_BG_SWITCH, false);
+    private boolean mWidgetsEnabledExpanded = false;
+    private boolean mDeviceWidgetExpanded   = false;
+    private boolean mColorSwitchExpanded    = false;
+    private boolean mBgSwitchExpanded       = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

@@ -1,5 +1,6 @@
 package it.tugaia56.obsidian.xposed.hooks.settings;
 
+import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
 import static de.robv.android.xposed.XposedBridge.hookAllMethods;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
@@ -159,6 +160,15 @@ public class SettingsCardBackgroundMod extends XposedMods {
     private final List<WeakReference<Activity>> mHomepageActivities = new CopyOnWriteArrayList<>();
     // Stessa corsa, stesso rimedio, per lo sfondo pagina di WirelessSettings/Cast (vedi sotto).
     private final List<WeakReference<Activity>> mPageActivities = new CopyOnWriteArrayList<>();
+    // 2026-09-11: stessa corsa, stesso rimedio, per i pulsanti/bordo dello screenshot flottante
+    // (com.oplus.screenshot) — segnalata dall'utente ("succede spesso che perde l'accento del
+    // bordo ed i pulsanti rimangono stock" dopo essere uscito e rientrato). Costruttori, non
+    // un'Activity: ogni nuovo screenshot crea ISTANZE FRESCHE di questi widget, e se una nasce
+    // prima che updatePrefs() sia arrivato la prima volta restava stock per sempre (nessun
+    // redraw automatico dopo, a differenza delle card/header sopra che avevano già questo
+    // rimedio).
+    private final List<WeakReference<View>> mFloatButtons = new CopyOnWriteArrayList<>();
+    private final List<WeakReference<Object>> mFloatPreviewWidgets = new CopyOnWriteArrayList<>();
     // TypedArray "marchiati" dall'hook Theme.obtainStyledAttributes(int[]) qui sotto — build
     // offuscate (Wallpapers/Battery/Pantanal UMS) risolvono il colore carta passando da qui,
     // non da COUIContextUtil. WeakHashMap: nessuna leak, l'oggetto sparisce da solo con recycle().
@@ -241,7 +251,50 @@ public class SettingsCardBackgroundMod extends XposedMods {
             reapplyCardColors();
             reapplyHeaderColors();
             reapplyPageColors();
+            reapplyFloatButtons();
+            reapplyFloatPreviewWidgets();
         });
+    }
+
+    private void reapplyFloatButtons() {
+        if (!mThemeApplied || !isNight()) return;
+        for (WeakReference<View> ref : mFloatButtons) {
+            View v = ref.get();
+            if (v == null) { mFloatButtons.remove(ref); continue; }
+            tintFloatButton(v);
+        }
+    }
+
+    private void tintFloatButton(View v) {
+        try {
+            float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 999,
+                    v.getResources().getDisplayMetrics());
+            float stroke = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.5f,
+                    v.getResources().getDisplayMetrics());
+            android.graphics.drawable.GradientDrawable bg =
+                    new android.graphics.drawable.GradientDrawable();
+            bg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+            bg.setColor(mCardColor);
+            bg.setCornerRadius(radius);
+            bg.setStroke((int) stroke, mAccentColor);
+            v.setBackground(bg);
+        } catch (Throwable ignored) {}
+    }
+
+    private void reapplyFloatPreviewWidgets() {
+        if (!mThemeApplied || !isNight()) return;
+        for (WeakReference<Object> ref : mFloatPreviewWidgets) {
+            Object w = ref.get();
+            if (w == null) { mFloatPreviewWidgets.remove(ref); continue; }
+            tintFloatPreviewWidget(w);
+        }
+    }
+
+    private void tintFloatPreviewWidget(Object widget) {
+        try {
+            callMethod(widget, "setBorderColor", mAccentColor);
+            if (widget instanceof View v) v.postInvalidate();
+        } catch (Throwable ignored) {}
     }
 
     private void reapplyPageColors() {
@@ -321,6 +374,12 @@ public class SettingsCardBackgroundMod extends XposedMods {
         // sotto appBarLayout in z-order). setBackgroundColor da solo non basta su un ImageView: il
         // suo drawable "src" (probabilmente nero fisso) resta sopra; va anche svuotato.
         tintImageViewByIdInPackage(activity, "bg_view");
+        // 2026-09-13/14: provata la card del dispositivo in "I miei dispositivi" (grigio topo
+        // dietro l'immagine prodotto/nome, "topContainer"/"bottomContainer") — navy+bordo accento
+        // funzionava per il riempimento ma il bordo rendeva sempre più scuro dell'accento vero
+        // (#474DB5 invece di #908DFF, causa non trovata nonostante 2 tentativi: pulizia del
+        // foregroundTintList/Mode + riapplicazione ritardata, nessuno ha avuto effetto) — l'utente
+        // ha chiesto di lasciar perdere. Non re-indagare senza che l'utente lo richieda di nuovo.
         // com.oplus.wallpapers ("Icone"/"Altro" dentro "Sfondi e stile", 2026-09-07): stessa causa,
         // quarta variante — qui il figlio pieno-schermo si chiama "personalRoot" (PersonalActivity),
         // confermato via uiautomator dump dal vivo, diretto figlio di android:id/content.
@@ -604,10 +663,86 @@ public class SettingsCardBackgroundMod extends XposedMods {
                 }
             });
         } catch (Throwable t) {
-            // Build offuscate (Wallpapers/Battery/Pantanal UMS/MyDevices, stessa famiglia
-            // 2026-09-04/05): classe rinominata anche qui, non solo per le card — verificato,
-            // non ancora inseguita per questa feature (menu overflow più raro delle card).
+            // 2026-09-13: MyDevices confermato via jadx reale (MyDevices.apk) — la classe ESISTE,
+            // solo rinominata "com.coui.appcompat.poplist.a" (R8, stessa famiglia offuscata di
+            // Wallpapers/Battery/Pantanal UMS) invece di essere assente come si pensava il 2026-09-05.
+            // Il nome del metodo/dei campi (mMainMenuWrapper/mSubMenuWrapper) è offuscato anche lui
+            // nella classe base "a" — invece di inseguirlo, agganciato PopupWindow.setContentView()
+            // (API di framework, mai offuscata) e tinta ogni RoundFrameLayout trovato nell'albero
+            // della content view per TIPO, non per nome campo — com.coui.appcompat.poplist.
+            // RoundFrameLayout resta un nome di classe reale/non offuscato anche in questa build
+            // (confermato), quindi è un aggancio robusto indipendentemente da come si chiamano i
+            // campi che lo referenziano.
+            installPopupMenuBorderObfuscatedFallback(lp);
         }
+    }
+
+    /** 2026-09-13: il primo tentativo agganciava PopupWindow.setContentView() e cercava un
+     *  RoundFrameLayout nell'albero — log dal vivo (aa.Q7, la vera content view di questa build,
+     *  confermata via jadx come FrameLayout con un campo "g" controllato "instanceof
+     *  RoundFrameLayout" più sotto nello stesso file) ha mostrato SEMPRE "tinted=0": il wrapper
+     *  viene aggiunto come figlio DOPO che setContentView() ritorna, non dentro — niente da
+     *  trovare in quel momento. Fix più diretto: agganciare il COSTRUTTORE di RoundFrameLayout
+     *  stesso (classe reale, non offuscata anche in questa build) — non serve più sapere QUANDO
+     *  o DOVE viene inserito nell'albero, il colore/bordo si applica nell'istante stesso in cui
+     *  l'oggetto nasce. */
+    private void installPopupMenuBorderObfuscatedFallback(XC_LoadPackage.LoadPackageParam lp) {
+        try {
+            final Class<?> roundFrameLayoutCls = findClass(
+                    "com.coui.appcompat.poplist.RoundFrameLayout", lp.classLoader);
+            XC_MethodHook ctorHook = new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    if (!mThemeApplied || !isNight()) return;
+                    try {
+                        if (p.thisObject instanceof View v) applyPopupWrapperBg(v);
+                    } catch (Throwable ignored) {}
+                }
+            };
+            hookAllConstructors(roundFrameLayoutCls, ctorHook);
+            // 2026-09-14: confermato via log che il costruttore SCATTA correttamente (mThemeApplied/
+            // isNight entrambi true) — eppure l'utente vedeva ancora stock. Stesso identico pattern
+            // già risolto altrove in questo file (gridview/uxcolor_setting_tab_layout, 2026-09-07):
+            // qualcosa dopo la costruzione ridipinge lo sfondo stock ad ogni layout pass, vincendo
+            // sempre la corsa contro un setBackground() fatto una volta sola al costruttore.
+            // Aggancio globale su View.setBackground*, filtrato per TIPO (instanceof
+            // RoundFrameLayout, non per id/nome campo) — ogni tentativo successivo di ridipingerlo
+            // viene sostituito con il nostro sfondo invece che bloccato a trasparente (qui non c'è
+            // un genitore già navy sotto come nel caso gridview, serve un riempimento vero).
+            // Guardia di rientranza: applyPopupWrapperBg() chiama v.setBackground(), che è UNO
+            // dei metodi agganciati qui sotto — senza questa guardia si richiamerebbe da solo
+            // all'infinito. ThreadLocal perché il layout/draw può girare su thread diversi.
+            final ThreadLocal<Boolean> inOwnApply = ThreadLocal.withInitial(() -> false);
+            XC_MethodHook blockHook = new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    if (!mThemeApplied || !isNight() || inOwnApply.get()) return;
+                    try {
+                        if (!(p.thisObject instanceof View v) || !roundFrameLayoutCls.isInstance(v)) return;
+                        p.setResult(null); // salta la chiamata originale...
+                        inOwnApply.set(true);
+                        try { applyPopupWrapperBg(v); } finally { inOwnApply.set(false); } // ...e mette la nostra al suo posto
+                    } catch (Throwable ignored) {}
+                }
+            };
+            findAndHookMethod(View.class, "setBackground", android.graphics.drawable.Drawable.class, blockHook);
+            findAndHookMethod(View.class, "setBackgroundDrawable", android.graphics.drawable.Drawable.class, blockHook);
+            findAndHookMethod(View.class, "setBackgroundColor", int.class, blockHook);
+            findAndHookMethod(View.class, "setBackgroundResource", int.class, blockHook);
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] SettingsCardBackgroundMod: installPopupMenuBorderObfuscatedFallback failed: " + t);
+        }
+    }
+
+    private void applyPopupWrapperBg(View v) {
+        float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20,
+                mContext.getResources().getDisplayMetrics());
+        float stroke = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.5f,
+                mContext.getResources().getDisplayMetrics());
+        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+        bg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+        bg.setColor(mCardColor);
+        bg.setCornerRadius(radius);
+        bg.setStroke((int) stroke, mAccentColor);
+        v.setBackground(bg);
     }
 
     /** Barra livello batteria (com.oplus.battery, "Batteria") colorata ad accento invece del
@@ -710,21 +845,10 @@ public class SettingsCardBackgroundMod extends XposedMods {
             findAndHookConstructor("com.oplus.screenshot.ui.drag.FloatButton", lp.classLoader,
                     Context.class, android.util.AttributeSet.class, int.class, new XC_MethodHook() {
                         @Override protected void afterHookedMethod(MethodHookParam p) {
+                            if (!(p.thisObject instanceof View v)) return;
+                            mFloatButtons.add(new WeakReference<>(v));
                             if (!mThemeApplied || !isNight()) return;
-                            try {
-                                if (!(p.thisObject instanceof View v)) return;
-                                float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 999,
-                                        v.getResources().getDisplayMetrics());
-                                float stroke = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.5f,
-                                        v.getResources().getDisplayMetrics());
-                                android.graphics.drawable.GradientDrawable bg =
-                                        new android.graphics.drawable.GradientDrawable();
-                                bg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
-                                bg.setColor(mCardColor);
-                                bg.setCornerRadius(radius);
-                                bg.setStroke((int) stroke, mAccentColor);
-                                v.setBackground(bg);
-                            } catch (Throwable ignored) {}
+                            tintFloatButton(v);
                         }
                     });
         } catch (Throwable t) {
@@ -742,11 +866,9 @@ public class SettingsCardBackgroundMod extends XposedMods {
             findAndHookConstructor("com.oplus.screenshot.ui.widget.floating.FloatPreviewWidget", lp.classLoader,
                     Context.class, android.util.AttributeSet.class, int.class, int.class, new XC_MethodHook() {
                         @Override protected void afterHookedMethod(MethodHookParam p) {
+                            mFloatPreviewWidgets.add(new WeakReference<>(p.thisObject));
                             if (!mThemeApplied || !isNight()) return;
-                            try {
-                                callMethod(p.thisObject, "setBorderColor", mAccentColor);
-                                if (p.thisObject instanceof View v) v.postInvalidate();
-                            } catch (Throwable ignored) {}
+                            tintFloatPreviewWidget(p.thisObject);
                         }
                     });
         } catch (Throwable t) {
@@ -849,6 +971,10 @@ public class SettingsCardBackgroundMod extends XposedMods {
         } catch (Throwable ignored) {}
     }
 
+    /** com.heytap.mydevices ("I miei dispositivi", 2026-09-13): naviga la RecyclerView
+     *  "home_device_list" ed applica navy piatto + bordo accento ad OGNI card dispositivo
+     *  trovata — non un semplice findViewById(topContainer)/(bottomContainer), che prenderebbe
+     *  solo il primo item anche con più dispositivi elencati. */
     private void tintViewByIdInPackage(Activity activity, String idName) {
         try {
             int id = activity.getResources().getIdentifier(idName, "id", activity.getPackageName());
@@ -979,17 +1105,35 @@ public class SettingsCardBackgroundMod extends XposedMods {
                 "couiColorCard", "attr", lp.packageName);
         final int attrIdCardPressed = mContext.getResources().getIdentifier(
                 "couiColorCardPressed", "attr", lp.packageName);
+        // 2026-09-13: tentativo per l'header nero di WirelessSettings (Wifi/Bluetooth) — trovato
+        // via jadx che COUIToolbar/AppBarLayout leggono ?attr/couiColorBackgroundWithCard nel
+        // drawable compilato coui_window_bg_with_card. Aggiunto qui sperando nello stesso
+        // meccanismo di couiColorCardBackground — MA un diagnostico dedicato (log su ogni v passato
+        // a Theme.resolveAttribute per questo processo) ha confermato che l'attr NON passa MAI da
+        // nessuno dei 3 hook qui sotto per questo pacchetto: la risoluzione del colore dentro un
+        // drawable XML compilato (non una chiamata Java esplicita come COUIContextUtil.getAttrColor)
+        // non passa da queste API. Root cause reale: stesso muro già documentato per header/dialog
+        // USB/pannello sfondi in [[project_settings_theme_header_gap]] — il colore Java-level su
+        // "toolbar"/"appBarLayout" (tintViewByIdInPackage) è confermato corretto in ogni istante
+        // anche con un listener che lo riapplica ogni frame, ma la RESA A SCHERMO lo ignora
+        // comunque — il motore di skin OPPO dipinge sopra a un livello più basso di setBackground().
+        // Lasciato qui invariato (innocuo, harmless match su un attr specifico) come possibile aiuto
+        // per altri pacchetti dove questo stesso attr potesse risolvere diversamente — ma NON
+        // aspettarsi che risolva l'header di WirelessSettings/Cast. Non re-indagare senza un
+        // approccio radicalmente diverso (serve capire cosa dipinge dopo la View, non nella View).
+        final int attrIdBgWithCard = mContext.getResources().getIdentifier(
+                "couiColorBackgroundWithCard", "attr", lp.packageName);
 
         try {
             Class<?> couiContextUtilCls = findClass("com.coui.appcompat.contextutil.COUIContextUtil", lp.classLoader);
-            if (attrId != 0 || attrIdCard != 0 || attrIdCardPressed != 0) {
+            if (attrId != 0 || attrIdCard != 0 || attrIdCardPressed != 0 || attrIdBgWithCard != 0) {
                 hookAllMethods(couiContextUtilCls, "getAttrColor", new XC_MethodHook() {
                     @Override protected void beforeHookedMethod(MethodHookParam p) {
                         if (!mThemeApplied || !isNight()) return;
                         try {
                             if (p.args.length < 2 || !(p.args[1] instanceof Integer)) return;
                             int v = (Integer) p.args[1];
-                            if (v == attrId || v == attrIdCard || v == attrIdCardPressed) p.setResult(mCardColor);
+                            if (v == attrId || v == attrIdCard || v == attrIdCardPressed || v == attrIdBgWithCard) p.setResult(mCardColor);
                         } catch (Throwable ignored) {}
                     }
                 });
@@ -1005,7 +1149,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
         // loro copia di COUIContextUtil e' rinominata "com.coui.appcompat.contextutil.a", hook per
         // nome-classe sopra fallisce con ClassNotFoundException. Filtro strettissimo (solo il nostro
         // attrId in questo pacchetto) per non toccare risoluzioni di altri attributi.
-        if (attrId != 0 || attrIdCard != 0 || attrIdCardPressed != 0) {
+        if (attrId != 0 || attrIdCard != 0 || attrIdCardPressed != 0 || attrIdBgWithCard != 0) {
             try {
                 findAndHookMethod(android.content.res.Resources.Theme.class, "resolveAttribute",
                         int.class, TypedValue.class, boolean.class, new XC_MethodHook() {
@@ -1013,7 +1157,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
                         if (!mThemeApplied || !isNight()) return;
                         try {
                             int v = (Integer) p.args[0];
-                            if (v != attrId && v != attrIdCard && v != attrIdCardPressed) return;
+                            if (v != attrId && v != attrIdCard && v != attrIdCardPressed && v != attrIdBgWithCard) return;
                             TypedValue tv = (TypedValue) p.args[1];
                             tv.type = TypedValue.TYPE_INT_COLOR_ARGB8;
                             tv.data = mCardColor;
@@ -1042,7 +1186,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
                             int[] attrs = (int[]) p.args[0];
                             if (attrs == null || attrs.length != 1) return;
                             int v = attrs[0];
-                            if (v != attrId && v != attrIdCard && v != attrIdCardPressed) return;
+                            if (v != attrId && v != attrIdCard && v != attrIdCardPressed && v != attrIdBgWithCard) return;
                             Object result = p.getResult();
                             if (result instanceof android.content.res.TypedArray) {
                                 mFlaggedArrays.put(result, Boolean.TRUE);

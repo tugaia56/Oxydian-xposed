@@ -72,6 +72,14 @@
     <string name="section_accent3">Альфа-акцент</string>
     <string name="dst_section_preset_accent">Пресети акценту</string>
     <string name="dst_section_preset_sfondo">Пресети фону</string>
+    <string name="dst_substratum_style_title">Стиль Dark Shadow Theme для Obsidian</string>
+    <string name="dst_substratum_style_notice">Оформлює Налаштування, SystemUI, Лаунчер, системний застосунок Відео, плаваючого асистента (кулю), Відновлення додатків, Портал контенту, Годинник, OnePlus Share, Калькулятор, Ігровий асистент, Комфорт для очей, Фото, Камеру, Інтернет і Wifi/Bluetooth разом (кольори, фони, діалоги, спливаючі вікна, анімацію відбитка пальця) за допомогою пакету ресурсів, витягнутого з вашої власної теми Substratum, в одному оверлеї. Натисніть Застосувати (збірка всіх шістнадцяти потребує деякого часу). Перезавантажте, щоб побачити зміни. Потрібен дозвіл \"Доступ до всіх файлів\".</string>
+    <string name="dst_substratum_style_card_desc">Налаштування, SystemUI, Лаунчер, Відео, Асистент-куля, Відновлення додатків, Портал контенту, Годинник, OnePlus Share, Калькулятор, Ігровий асистент, Комфорт для очей, Фото, Камера, Інтернет, Wifi/Bluetooth</string>
+    <string name="dst_substratum_style_status_none">Не застосовано</string>
+    <string name="dst_substratum_style_status_active">Тема активна</string>
+    <string name="dst_substratum_style_howto">ВАЖЛИВО:\nпісля Застосувати перезавантажте двічі:\nперше перезавантаження вмикає зібрані оверлеї.\nДруге перезавантаження активує і стабілізує оверлеї.</string>
+    <string name="dst_substratum_style_readme_link">Читати повний readme</string>
+    <string name="dst_substratum_style_readme_full">ВАЖЛИВО: після Застосувати перезавантажте двічі: перше перезавантаження вмикає щойно зібрані оверлеї, і телефон може трохи сповільнитися приблизно на хвилину (усе владнається само, нічого робити не потрібно — якщо здається, що завис, утримуйте кнопку живлення для примусового перезавантаження). Починаючи з другого перезавантаження, тема активна і стабільна. Відтоді кожне увімкнення може бути на кілька секунд повільнішим, ніж раніше — це ціна повністю активної теми.</string>
     <string name="nav_sys_settings">Стиль налаштувань OOS</string>
     <string name="nav_sys_settings_summary">Повна реальна тема для додатку Налаштування, зібрана з вашої теми Substratum</string>
     <string name="settings_theme_notice">Оформлює весь додаток Налаштування (кольори, фони, анімацію відбитка пальця) за допомогою пакету ресурсів, витягнутого з вашої власної теми Substratum. Натисніть Застосувати (потрібен деякий час на збірку). Потрібен дозвіл \"Доступ до всіх файлів\".</string>
@@ -114,7 +122,7 @@
     <string name="nav_dst_colors_summary">Зразки кольорів акценту та фону</string>
     <string name="nav_settings_icons">Стиль іконок Налаштувань</string>
     <string name="nav_settings_icons_summary">Пакети іконок PUI / HOS для додатку Налаштування</string>
-    <string name="settings_icons_preview_notice">Торкніться пакету, щоб вибрати його, потім Застосувати (потрібен деякий час на збірку). Потрібен дозвіл \"Доступ до всіх файлів\".</string>
+    <string name="settings_icons_preview_notice">Торкніться пакету, щоб вибрати його, потім Застосувати (потрібен деякий час на збірку). Перезавантажте, щоб побачити зміни. Потрібен дозвіл \"Доступ до всіх файлів\".</string>
     <string name="settings_icons_apply">Застосувати</string>
     <string name="settings_icons_disable">Вимкнути</string>
     <string name="settings_icons_status_none">Пакет не застосовано</string>
@@ -328,7 +336,7 @@
     <string name="advanced_reboot_auth_summary">Автентифікуватись, щоб показати опції розширеного перезавантаження</string>
     <string name="power_menu_pill_section">Повзунок</string>
     <string name="power_menu_gradient_color_title">Колір перезавантаження/вимкнення</string>
-    <string name="power_menu_handler_color_title">Колір повзунка</string>
+    <string name="power_menu_handler_color_title">Фон держака</string>
     <string name="power_menu_handler_gallery_title">Вибрати з галереї</string>
     <string name="power_menu_handler_gallery_summary">Виберіть власне фото</string>
     <string name="power_menu_handler_style_section">Стиль</string>
@@ -339,6 +347,9 @@
     <string name="power_menu_border_title">Рамка повзунка</string>
     <string name="power_menu_border_summary">Намалювати контур навколо повзунка перезавантаження/вимкнення</string>
     <string name="power_menu_border_color_title">Колір рамки</string>
+    <string name="power_menu_handler_border_title">Рамка повзунка-ручки</string>
+    <string name="power_menu_handler_border_summary">Намалювати кільце навколо повзунка</string>
+    <string name="power_menu_handler_border_color_title">Колір рамки повзунка</string>
     <string name="advanced_reboot_auth_failed">Помилка автентифікації</string>
     <string name="advanced_reboot_recovery">Recovery</string>
     <string name="advanced_reboot_bootloader">Bootloader</string>

@@ -52,7 +52,7 @@ public class DstFabricatedUtil {
         }
         for (Map.Entry<String, Integer> entry : item.getAdjustColors().entrySet()) {
             argsList.add(new Object[]{pkg, item.getOverlayName() + "_" + i++, "color",
-                    entry.getKey(), toHex(ColorUtils.adjustColor(color, entry.getValue()))});
+                    entry.getKey(), toHex(adjustForItem(item, color, entry.getValue()))});
         }
         if (argsList.isEmpty()) return;
 
@@ -138,11 +138,23 @@ public class DstFabricatedUtil {
             i++;
         }
         for (Map.Entry<String, Integer> entry : item.getAdjustColors().entrySet()) {
-            String adjHex = toHex(ColorUtils.adjustColor(color, entry.getValue()));
+            String adjHex = toHex(adjustForItem(item, color, entry.getValue()));
             addFabricateCommands(commands, pkg, item.getOverlayName(), i, entry.getKey(), adjHex);
             i++;
         }
         return commands;
+    }
+
+    /**
+     * ACCENT1's adjust map (system_accentN_100..700) needs a real white/black blend so
+     * light-tone containers and dark-tone text never collapse to the same color — see
+     * DarkShadowUtils.ACCENT_TONE_ADJUST. Every other adjust map (BACKGROUND's lighter
+     * card/button/dialog variants) keeps the original multiplicative scaling, unchanged.
+     */
+    private static int adjustForItem(DarkShadowItem item, int color, int amount) {
+        return "ACCENT1".equals(item.getOverlayName())
+                ? ColorUtils.blendTone(color, amount)
+                : ColorUtils.adjustColor(color, amount);
     }
 
     private static void addFabricateCommands(List<String> out,
@@ -233,6 +245,9 @@ public class DstFabricatedUtil {
             int     pmBorderColor   = ObsidianPrefs.getInt(   "power_menu_border_custom_color", 0xFF908DFF);
             String  pmHandlerMode   = ObsidianPrefs.getString("power_menu_handler_mode", "stock");
             int     pmHandlerColor  = ObsidianPrefs.getInt(   "power_menu_handler_custom_color", 0xFF908DFF);
+            boolean pmHandlerBorderOn     = ObsidianPrefs.getBoolean("power_menu_handler_border_enabled", false);
+            boolean pmHandlerBorderAccent = ObsidianPrefs.getBoolean("power_menu_handler_border_use_accent", true);
+            int     pmHandlerBorderColor  = ObsidianPrefs.getInt(   "power_menu_handler_border_custom_color", 0xFF908DFF);
             String  pmMenuBgMode    = ObsidianPrefs.getString("power_menu_menu_bg_mode", "stock");
             int     pmMenuBgColor   = ObsidianPrefs.getInt(   "power_menu_menu_bg_custom_color", 0xFF908DFF);
 
@@ -285,6 +300,9 @@ public class DstFabricatedUtil {
                 "setprop persist.obsidian.dst.pm_border_color   " + pmBorderColor,
                 "setprop persist.obsidian.dst.pm_handler_mode   \"" + pmHandlerMode + "\"",
                 "setprop persist.obsidian.dst.pm_handler_color  " + pmHandlerColor,
+                "setprop persist.obsidian.dst.pm_handler_border_on     " + (pmHandlerBorderOn ? "1" : "0"),
+                "setprop persist.obsidian.dst.pm_handler_border_accent " + (pmHandlerBorderAccent ? "1" : "0"),
+                "setprop persist.obsidian.dst.pm_handler_border_color  " + pmHandlerBorderColor,
                 "setprop persist.obsidian.dst.pm_menu_bg_mode   \"" + pmMenuBgMode + "\"",
                 "setprop persist.obsidian.dst.pm_menu_bg_color  " + pmMenuBgColor
             ).exec();

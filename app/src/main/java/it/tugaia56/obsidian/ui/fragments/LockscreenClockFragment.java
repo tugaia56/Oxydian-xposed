@@ -60,7 +60,6 @@ public class LockscreenClockFragment extends Fragment {
     private static final String KEY_FORMAT       = "lockscreen_clock_custom_format";
     private static final String KEY_TOP_MARGIN   = "lockscreen_top_margin";               // 0..600 dp
     private static final String KEY_BOTTOM_MARGIN= "lockscreen_bottom_margin";            // -200..600 dp
-    private static final String KEY_BOTTOM_MARGIN_AOD = "lockscreen_bottom_margin_aod";   // -200..600 dp
 
     private static final String COLOR_ACCENT1 = "lockscreen_clock_color_code_accent1";
     private static final String COLOR_ACCENT2 = "lockscreen_clock_color_code_accent2";
@@ -73,8 +72,8 @@ public class LockscreenClockFragment extends Fragment {
     private DarkShadowColorListener mClockColorsAdapter;
     // Stato SOLO visivo (non persistito): lo switch attiva soltanto, il tocco sul nome
     // apre/chiude l'opzione sottostante — stesso pattern di QsTilesCustomizeFragment.
-    private boolean mColorExpanded = ObsidianPrefs.getBoolean(KEY_COLOR_SWITCH, false);
-    private boolean mFontExpanded  = ObsidianPrefs.getBoolean(KEY_CUSTOM_FONT, false);
+    private boolean mColorExpanded = false;
+    private boolean mFontExpanded  = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -149,8 +148,7 @@ public class LockscreenClockFragment extends Fragment {
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.lockscreen_clock_custom_margins))));
         GroupUtils.addGroup(chain, List.of(
                 sliderItem(getString(R.string.lockscreen_clock_top_margin_title), KEY_TOP_MARGIN, 0, 600, 0, "dp", true),
-                sliderItem(getString(R.string.lockscreen_clock_bottom_margin_title), KEY_BOTTOM_MARGIN, -200, 600, 40, "dp", true),
-                sliderItem(getString(R.string.lockscreen_clock_bottom_margin_title), KEY_BOTTOM_MARGIN_AOD, -200, 600, 40, "dp")));
+                sliderItem(getString(R.string.lockscreen_clock_bottom_margin_title), KEY_BOTTOM_MARGIN, -200, 600, 40, "dp", true)));
 
         android.os.Parcelable scrollState = mRv.getLayoutManager() != null
                 ? mRv.getLayoutManager().onSaveInstanceState() : null;

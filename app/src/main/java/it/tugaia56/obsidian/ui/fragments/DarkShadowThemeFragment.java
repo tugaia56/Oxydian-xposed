@@ -75,29 +75,18 @@ public class DarkShadowThemeFragment extends Fragment {
                                 getString(R.string.dst_section_preset_accent)),
                         "accento", "accent", "colore", "color"),
 
-                new NavAdapter.NavItem(
-                        R.drawable.ic_settings,
-                        getString(R.string.nav_sys_settings),
-                        getString(R.string.nav_sys_settings_summary),
-                        () -> navigate(new SettingsThemeFragment(),
-                                getString(R.string.nav_sys_settings)),
-                        "impostazioni", "settings", "tema", "theme", "substratum", "impronte", "fingerprint"),
-
+                // 2026-09-11: le 3 voci separate (Impostazioni/SystemUI/Launcher, ognuna col suo
+                // Applica) sono state unite in una sola — stessi compiler, stesso comportamento,
+                // solo un tasto invece di tre. I fragment vecchi restano nel progetto (non
+                // cancellati) ma non più linkati da qui.
                 new NavAdapter.NavItem(
                         R.drawable.ic_drawing,
-                        getString(R.string.nav_sui_theme),
-                        getString(R.string.nav_sui_theme_summary),
-                        () -> navigate(new SystemUIThemeFragment(),
-                                getString(R.string.nav_sui_theme)),
-                        "systemui", "dialoghi", "dialog", "toast", "popup", "tema", "theme", "substratum"),
-
-                new NavAdapter.NavItem(
-                        R.drawable.ic_drawing,
-                        getString(R.string.nav_launcher_theme),
-                        getString(R.string.nav_launcher_theme_summary),
-                        () -> navigate(new LauncherThemeFragment(),
-                                getString(R.string.nav_launcher_theme)),
-                        "launcher", "dialoghi", "dialog", "toolbar", "popup", "tema", "theme", "substratum"),
+                        getString(R.string.dst_substratum_style_title),
+                        getString(R.string.dst_substratum_style_card_desc),
+                        () -> navigate(new SubstratumStyleFragment(),
+                                getString(R.string.dst_substratum_style_title)),
+                        "impostazioni", "settings", "systemui", "launcher", "dialoghi", "dialog",
+                        "toast", "popup", "toolbar", "tema", "theme", "substratum", "impronte", "fingerprint"),
 
                 new NavAdapter.NavItem(
                         R.drawable.ic_lock,

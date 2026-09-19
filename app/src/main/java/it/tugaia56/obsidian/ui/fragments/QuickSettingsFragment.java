@@ -63,8 +63,8 @@ public class QuickSettingsFragment extends Fragment {
     private RecyclerView mRv;
     // Stato SOLO visivo (non persistito): lo switch attiva soltanto, il tocco sul nome
     // apre/chiude le opzioni sottostanti — stesso pattern di QsTilesCustomizeFragment.
-    private boolean mTranspExpanded   = ObsidianPrefs.getBoolean(PREF_TRANSP_ON, false);
-    private boolean mPulldownExpanded = ObsidianPrefs.getBoolean(PREF_PULLDOWN_ON, false);
+    private boolean mTranspExpanded   = false;
+    private boolean mPulldownExpanded = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -125,7 +125,6 @@ public class QuickSettingsFragment extends Fragment {
         // ── Trasparenza (reale OC) — la Sfocatura si è spostata in Schermata di
         // Blocco → Opzioni SdB, dato che il blur nativo OOS agisce su entrambe le
         // superfici e lì è più visibile/utile ────────────────────────────────────
-        chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_transparency))));
         SwitchWidgetAdapter.SwitchItem transpSwitch = prefSwitch(getString(R.string.qs_transparency_title), null, PREF_TRANSP_ON);
         transpSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(PREF_TRANSP_ON, transpSwitch.checked);
@@ -140,7 +139,6 @@ public class QuickSettingsFragment extends Fragment {
         }
 
         // ── Quick Pulldown (reale OC) ────────────────────────────────────────────
-        chain.add(new SectionTitleAdapter(List.of(getString(R.string.quick_pulldown))));
         SwitchWidgetAdapter.SwitchItem pulldownSwitch = prefSwitch(getString(R.string.quick_pulldown), null, PREF_PULLDOWN_ON);
         pulldownSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(PREF_PULLDOWN_ON, pulldownSwitch.checked);
@@ -158,7 +156,6 @@ public class QuickSettingsFragment extends Fragment {
         }
 
         // ── Il mio dispositivo (reale OC) ────────────────────────────────────────
-        chain.add(new SectionTitleAdapter(List.of(getString(R.string.my_device))));
         chain.add(new SwitchWidgetAdapter(List.of(prefSwitch(
                 getString(R.string.my_device_title), getString(R.string.my_device_summary), PREF_MY_DEVICE))));
 

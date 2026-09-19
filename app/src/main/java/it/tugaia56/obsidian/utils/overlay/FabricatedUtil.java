@@ -97,15 +97,20 @@ public class FabricatedUtil {
      */
     private static void saveToPostExec(String name, String cmd1, String cmd2) {
         ensureModule();
-        // Remove any stale entry for this name, then append the fresh commands.
+        // Remove any stale entry for this name, then append the fresh commands. Uses a
+        // per-name temp file (not a shared one) and runs synchronously: buildAndEnableOverlays
+        // calls this once per resource in a batch (e.g. 3 times for the Recents button's
+        // color+drawable1+drawable2), and a shared temp file + async .submit() let those calls
+        // race and clobber each other's writes to post-exec.sh — some entries silently lost,
+        // so only part of a multi-resource overlay got re-applied on the next boot.
         String pex = MODULE_DIR + "/post-exec.sh";
-        String tmp = MODULE_DIR + "/post-exec.tmp";
+        String tmp = MODULE_DIR + "/post-exec-" + name + ".tmp";
         Shell.cmd(
             "grep -v \"" + COMPONENT + name + "\" " + pex + " > " + tmp
                 + " && mv " + tmp + " " + pex,
             "echo " + shellQuote(cmd1) + " >> " + pex,
             "echo " + shellQuote(cmd2) + " >> " + pex
-        ).submit();
+        ).exec();
     }
 
     /**
@@ -114,11 +119,11 @@ public class FabricatedUtil {
      */
     private static void removeFromPostExec(String name) {
         String pex = MODULE_DIR + "/post-exec.sh";
-        String tmp = MODULE_DIR + "/post-exec.tmp";
+        String tmp = MODULE_DIR + "/post-exec-" + name + ".tmp";
         Shell.cmd(
             "[ -f " + pex + " ] && grep -v \"" + COMPONENT + name + "\" " + pex
                 + " > " + tmp + " && mv " + tmp + " " + pex + " || true"
-        ).submit();
+        ).exec();
     }
 
     /**

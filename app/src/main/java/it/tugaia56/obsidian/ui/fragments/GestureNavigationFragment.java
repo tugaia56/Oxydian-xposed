@@ -58,7 +58,7 @@ public class GestureNavigationFragment extends Fragment {
     private static final String PREF_PILL_WIDTH  = "OBS_NAV_PILL_WIDTH";
 
     private RecyclerView mRv;
-    private boolean mHoldbackExpanded = ObsidianPrefs.getBoolean(PREF_HOLDBACK_ON, false);
+    private boolean mHoldbackExpanded = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,

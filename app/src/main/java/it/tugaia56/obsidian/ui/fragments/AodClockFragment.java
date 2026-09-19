@@ -52,6 +52,7 @@ public class AodClockFragment extends Fragment {
     private static final String KEY_COLOR_SWITCH = "aod_custom_color_switch";
     private static final String KEY_LINE_HEIGHT  = "aod_clock_line_height";   // -120..120 dp
     private static final String KEY_TEXT_SCALING = "aod_text_scaling";       // 50-150 %
+    private static final String KEY_BOTTOM_MARGIN_AOD = "lockscreen_bottom_margin_aod";   // -200..600 dp — stessa chiave di sempre (LockscreenClockFragment)
     private static final String KEY_FORMAT       = "aod_clock_custom_format";
 
     private static final String COLOR_ACCENT1 = "aod_clock_color_code_accent1";
@@ -65,8 +66,8 @@ public class AodClockFragment extends Fragment {
     private DarkShadowColorListener mClockColorsAdapter;
     // Stato SOLO visivo (non persistito): lo switch attiva soltanto, il tocco sul nome
     // apre/chiude l'opzione sottostante — stesso pattern di QsTilesCustomizeFragment.
-    private boolean mColorExpanded = ObsidianPrefs.getBoolean(KEY_COLOR_SWITCH, false);
-    private boolean mFontExpanded  = ObsidianPrefs.getBoolean(KEY_CUSTOM_FONT, false);
+    private boolean mColorExpanded = false;
+    private boolean mFontExpanded  = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -121,6 +122,11 @@ public class AodClockFragment extends Fragment {
         List<Object> restRows = new ArrayList<>();
         restRows.add(sliderItem(getString(R.string.aod_font_line_height_title), KEY_LINE_HEIGHT, -120, 120, 0, "dp", true));
         restRows.add(sliderItem(getString(R.string.aod_clock_text_scaling), KEY_TEXT_SCALING, 50, 150, 100, "%", true));
+        // Spostato qui da LockscreenClockFragment (2026-09-18, su richiesta dell'utente) — era
+        // un margine per l'AOD ma viveva nella schermata Schermata di Blocco, con etichetta
+        // identica alla riga di quella schermata ("Margine Inferiore" duplicato, confuso).
+        // Stessa chiave pref di sempre, solo spostata di schermata.
+        restRows.add(sliderItem(getString(R.string.lockscreen_clock_bottom_margin_title), KEY_BOTTOM_MARGIN_AOD, -200, 600, 40, "dp", true));
 
         SwitchWidgetAdapter.SwitchItem fontSwitch = gatingSwitch(getString(R.string.lockscreen_clock_font_custom_enabled), null, KEY_CUSTOM_FONT);
         fontSwitch.onChanged = () -> {

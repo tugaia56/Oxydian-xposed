@@ -3,8 +3,6 @@ package it.tugaia56.obsidian.ui.fragments;
 import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -36,6 +33,7 @@ import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
+import it.tugaia56.obsidian.ui.widgets.ImageCropOverlayView;
 import it.tugaia56.obsidian.utils.AppUtils;
 import it.tugaia56.obsidian.utils.ObsidianPrefs;
 import it.tugaia56.obsidian.utils.ObsidianTheme;
@@ -51,6 +49,9 @@ public class QsHeaderImageFragment extends Fragment {
     private static final String PREF_HEADER_PAD_T  = "OBS_QS_HEADER_PAD_T";
     private static final String PREF_HEADER_SCALE   = "OBS_QS_HEADER_SCALE";
     private static final String PREF_HEADER_GRAVITY = "OBS_QS_HEADER_GRAVITY";
+    private static final String PREF_HEADER_CROP_CX   = "OBS_QS_HEADER_CROP_CX";
+    private static final String PREF_HEADER_CROP_CY   = "OBS_QS_HEADER_CROP_CY";
+    private static final String PREF_HEADER_CROP_ZOOM = "OBS_QS_HEADER_CROP_ZOOM";
     private static final String IMAGE_FILENAME     = "qs_header_image";
 
     // Must match QsHeaderImage.java SCALE_TYPES order
@@ -65,10 +66,9 @@ public class QsHeaderImageFragment extends Fragment {
     private RecyclerView mRv;
 
     // ── Image preview ─────────────────────────────────────────────────────────
-    private ImageView        mPreviewIv;
     private Bitmap           mPreviewBmp;
     private int              mPreviewScale = 0;   // mirrors PREF_HEADER_SCALE for live preview
-    private ImagePreviewAdapter mPreviewAdapter;  // kept to notify when scale mode changes
+    private ImageCropOverlayView mCropOverlay;    // Riempi (ritaglia) mode only
 
     /** Returns the external storage file where the header image is saved. */
     private File getImageFile() {
@@ -145,8 +145,12 @@ public class QsHeaderImageFragment extends Fragment {
                 50, 800, "dp", 200,
                 value -> {
                     ObsidianPrefs.putInt(PREF_HEADER_HEIGHT, value);
+                    updateCropAspectFromHeight(value);
                     Toast.makeText(requireContext(), R.string.obs_restart_ui_hint, Toast.LENGTH_SHORT).show();
                 });
+        // Live: the crop box's aspect ratio is screenW:headerPx, so it must follow this
+        // slider in real time, otherwise the preview shape lies about what's really cropped.
+        heightItem.onLivePreview = this::updateCropAspectFromHeight;
 
         // ── Opacity slider ────────────────────────────────────────────────────
         SliderWidgetAdapter.SliderItem alphaItem = new SliderWidgetAdapter.SliderItem(
@@ -166,7 +170,7 @@ public class QsHeaderImageFragment extends Fragment {
                 SCALE_NAMES[Math.min(currScale, SCALE_NAMES.length - 1)],
                 this::showScaleDialog);
 
-        // ── Vertical gravity slider (CENTER_CROP only: 0=top, 50=center, 100=bottom) ───
+        // ── Vertical gravity slider (mode 1 "Adatta larghezza" only: 0=top, 50=center, 100=bottom) ──
         SliderWidgetAdapter.SliderItem gravityItem = new SliderWidgetAdapter.SliderItem(
                 getString(R.string.qs_header_gravity),
                 ObsidianPrefs.getInt(PREF_HEADER_GRAVITY, 50),
@@ -175,8 +179,17 @@ public class QsHeaderImageFragment extends Fragment {
                     ObsidianPrefs.putInt(PREF_HEADER_GRAVITY, value);
                     Toast.makeText(requireContext(), R.string.obs_restart_ui_hint, Toast.LENGTH_SHORT).show();
                 });
-        // Live preview: update crop position while dragging
-        gravityItem.onLivePreview = this::applyPreviewMatrix;
+
+        // ── Zoom slider (mode 0 "Riempi" only) — drives the crop-preview overlay ───────
+        SliderWidgetAdapter.SliderItem zoomItem = new SliderWidgetAdapter.SliderItem(
+                getString(R.string.qs_header_zoom),
+                ObsidianPrefs.getInt(PREF_HEADER_CROP_ZOOM, 100),
+                100, 300, "%", 100,
+                value -> {
+                    ObsidianPrefs.putInt(PREF_HEADER_CROP_ZOOM, value);
+                    if (mCropOverlay != null) mCropOverlay.setZoomPercent(value);
+                });
+        zoomItem.onLivePreview = value -> { if (mCropOverlay != null) mCropOverlay.setZoomPercent(value); };
 
         // ── Fade intensity slider (0 = off) ───────────────────────────────────
         SliderWidgetAdapter.SliderItem fadeItem = new SliderWidgetAdapter.SliderItem(
@@ -220,81 +233,54 @@ public class QsHeaderImageFragment extends Fragment {
         // scaleItem is its own group — the live preview card right after it can't
         // participate in GroupUtils (custom adapter type), so it breaks the run.
         GroupUtils.addGroup(chain, List.of(scaleItem));
-        chain.add(mPreviewAdapter = new ImagePreviewAdapter());
-        GroupUtils.addGroup(chain, List.of(gravityItem, fadeItem, padHItem, padTItem));
+        if (currScale == 0) {
+            chain.add(new HeaderCropPreviewAdapter());
+        }
+        List<SliderWidgetAdapter.SliderItem> adjustItems = new java.util.ArrayList<>();
+        if (currScale == 0) adjustItems.add(zoomItem);
+        if (currScale == 1) adjustItems.add(gravityItem);
+        adjustItems.add(fadeItem);
+        adjustItems.add(padHItem);
+        adjustItems.add(padTItem);
+        GroupUtils.addGroup(chain, adjustItems);
 
+        android.os.Parcelable scrollState = mRv.getLayoutManager() != null
+                ? mRv.getLayoutManager().onSaveInstanceState() : null;
         mRv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
+        if (scrollState != null && mRv.getLayoutManager() != null) {
+            mRv.getLayoutManager().onRestoreInstanceState(scrollState);
+        }
     }
 
     // ── Image preview helpers ─────────────────────────────────────────────────
+
+    /** The crop box's aspect ratio is screenW:headerPx — must track the Altezza slider live,
+     *  otherwise the preview shape doesn't match what actually gets cropped on the QS panel. */
+    private void updateCropAspectFromHeight(int heightDp) {
+        if (mCropOverlay == null) return;
+        android.util.DisplayMetrics dm = requireContext().getResources().getDisplayMetrics();
+        float screenW  = dm.widthPixels;
+        float headerPx = ObsidianTheme.dp(requireContext(), heightDp);
+        mCropOverlay.setAspect(headerPx > 0 ? screenW / headerPx : 1f);
+    }
 
     private void reloadPreviewBitmap() {
         File f = getImageFile();
         if (!f.exists()) { mPreviewBmp = null; return; }
         mPreviewBmp = BitmapFactory.decodeFile(f.getAbsolutePath());
-        if (mPreviewIv != null && mPreviewBmp != null) {
-            mPreviewIv.setImageBitmap(mPreviewBmp);
-            mPreviewIv.post(() -> applyPreviewMatrix(ObsidianPrefs.getInt(PREF_HEADER_GRAVITY, 50)));
+        if (mCropOverlay != null && mPreviewBmp != null) {
+            mCropOverlay.setBitmap(mPreviewBmp);
         }
     }
 
-    private void applyPreviewMatrix(int gravity) {
-        if (mPreviewIv == null || mPreviewBmp == null) return;
-        float vw = mPreviewIv.getWidth();
-        float vh = mPreviewIv.getHeight();
-        if (vw <= 0 || vh <= 0) return;
-
-        float bmpW = mPreviewBmp.getWidth();
-        float bmpH = mPreviewBmp.getHeight();
-
-        // Non-crop modes: use standard scale types directly.
-        if (mPreviewScale == 2) { // Intera
-            mPreviewIv.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            return;
-        }
-        if (mPreviewScale == 3) { // Originale
-            mPreviewIv.setScaleType(ImageView.ScaleType.CENTER);
-            return;
-        }
-
-        // Crop modes (0 = Riempi, 1 = Adatta larghezza):
-        // Calculate scale using ACTUAL QS dimensions (screen width × user-set height)
-        // so the preview crop position matches exactly what the QS panel shows.
-        android.util.DisplayMetrics dm = requireContext().getResources().getDisplayMetrics();
-        float screenW  = dm.widthPixels;
-        float headerPx = ObsidianTheme.dp(requireContext(), ObsidianPrefs.getInt(PREF_HEADER_HEIGHT, 200));
-
-        float refScale = (mPreviewScale == 0)
-                ? Math.max(screenW / bmpW, headerPx / bmpH)  // Riempi: fill both dimensions
-                : screenW / bmpW;                              // Adatta larghezza: fill width only
-
-        // Fraction from image top where the QS visible window starts
-        float refTy   = (headerPx - bmpH * refScale) * (gravity / 100f);
-        float fracTop = (bmpH * refScale > 0f) ? (-refTy / (bmpH * refScale)) : 0f;
-
-        // Apply the same fractional crop position to the preview card dimensions
-        float previewScale = (mPreviewScale == 0)
-                ? Math.max(vw / bmpW, vh / bmpH)
-                : vw / bmpW;
-        float tx = (vw - bmpW * previewScale) / 2f;
-        float ty = -fracTop * bmpH * previewScale;
-        // Clamp: never go outside the image bounds
-        float minTy = vh - bmpH * previewScale;
-        ty = Math.max(minTy, Math.min(0f, ty));
-
-        Matrix m = new Matrix();
-        m.setScale(previewScale, previewScale);
-        m.postTranslate(tx, ty);
-        mPreviewIv.setScaleType(ImageView.ScaleType.MATRIX);
-        mPreviewIv.setImageMatrix(m);
-    }
-
-    /** Single-item adapter that shows the header image preview card. */
-    private class ImagePreviewAdapter extends RecyclerView.Adapter<ImagePreviewAdapter.VH> {
+    /** Single-item adapter that shows the fixed-box / pannable-photo crop preview, mode 0 only.
+     *  Same pattern as VolumePanelColorsFragment.CropOverlayView, extracted into
+     *  ImageCropOverlayView for reuse — aspect here is screenW:headerPx (not fixed, unlike the
+     *  volume bar), since that's the real on-screen shape of the QS header in "Riempi" mode. */
+    private class HeaderCropPreviewAdapter extends RecyclerView.Adapter<HeaderCropPreviewAdapter.VH> {
 
         @NonNull @Override
         public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            int ctx = parent.getContext().hashCode(); // unused, just to reference context
             FrameLayout card = new FrameLayout(parent.getContext());
             int hPx = ObsidianTheme.dp(parent.getContext(), 240);
             int mH  = ObsidianTheme.dp(parent.getContext(), 12);
@@ -304,40 +290,46 @@ public class QsHeaderImageFragment extends Fragment {
             lp.setMargins(mH, mV, mH, mV);
             card.setLayoutParams(lp);
 
-            // Rounded card background
             GradientDrawable bg = new GradientDrawable();
             bg.setColor(ObsidianTheme.cardColor());
             bg.setCornerRadius(ObsidianTheme.dp(parent.getContext(), 16));
             card.setBackground(bg);
             card.setClipToOutline(true);
 
-            ImageView iv = new ImageView(parent.getContext());
-            iv.setLayoutParams(new FrameLayout.LayoutParams(
+            ImageCropOverlayView overlay = new ImageCropOverlayView(parent.getContext());
+            overlay.setLayoutParams(new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            card.addView(iv);
+            card.addView(overlay);
 
-            // "Nessuna immagine" placeholder
-            iv.setBackgroundColor(Color.argb(0x40, 0x80, 0x80, 0x80));
-
-            return new VH(card, iv);
+            return new VH(card, overlay);
         }
 
         @Override
         public void onBindViewHolder(@NonNull VH h, int pos) {
-            mPreviewIv = h.iv;
+            mCropOverlay = h.overlay;
+            updateCropAspectFromHeight(ObsidianPrefs.getInt(PREF_HEADER_HEIGHT, 200));
+            mCropOverlay.setCornerRadiusPx(ObsidianTheme.dp(requireContext(), 16));
+            mCropOverlay.setZoomPercent(ObsidianPrefs.getInt(PREF_HEADER_CROP_ZOOM, 100));
+            mCropOverlay.setCropCenter(
+                    ObsidianPrefs.getInt(PREF_HEADER_CROP_CX, 50) / 100f,
+                    ObsidianPrefs.getInt(PREF_HEADER_CROP_CY, 50) / 100f);
+            mCropOverlay.setOnCropChangedListener((cx, cy) -> {
+                ObsidianPrefs.putInt(PREF_HEADER_CROP_CX, Math.round(cx * 100));
+                ObsidianPrefs.putInt(PREF_HEADER_CROP_CY, Math.round(cy * 100));
+            });
             reloadPreviewBitmap();
-            if (mPreviewBmp != null) {
-                h.iv.setImageBitmap(mPreviewBmp);
-                h.iv.post(() -> applyPreviewMatrix(ObsidianPrefs.getInt(PREF_HEADER_GRAVITY, 50)));
-            }
         }
 
-        @Override public int getItemCount() { return mPreviewScale == 0 ? 1 : 0; }
+        @Override public int getItemCount() { return 1; }
 
         class VH extends RecyclerView.ViewHolder {
-            final ImageView iv;
-            VH(FrameLayout card, ImageView iv) { super(card); this.iv = iv; }
+            final FrameLayout card;
+            final ImageCropOverlayView overlay;
+            VH(FrameLayout card, ImageCropOverlayView overlay) {
+                super(card);
+                this.card = card;
+                this.overlay = overlay;
+            }
         }
     }
 

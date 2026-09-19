@@ -72,9 +72,9 @@ public class BatteryBarSettingsFragment extends Fragment {
     private RecyclerView mRv;
     // Stato SOLO visivo (non persistito): lo switch attiva soltanto, il tocco sul nome
     // apre/chiude l'opzione colore sottostante — stesso pattern di QsTilesCustomizeFragment.
-    private boolean mChargingExpanded     = ObsidianPrefs.getBoolean(PREF_INDICATE_CHARGING, true);
-    private boolean mFastChargingExpanded = ObsidianPrefs.getBoolean(PREF_INDICATE_FAST_CHARGING, false);
-    private boolean mPowerSaveExpanded    = ObsidianPrefs.getBoolean(PREF_INDICATE_POWER_SAVE, false);
+    private boolean mChargingExpanded     = false;
+    private boolean mFastChargingExpanded = false;
+    private boolean mPowerSaveExpanded    = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

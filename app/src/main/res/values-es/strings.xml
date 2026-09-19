@@ -72,6 +72,14 @@
     <string name="section_accent3">Acento alfa</string>
     <string name="dst_section_preset_accent">Preajustes de acento</string>
     <string name="dst_section_preset_sfondo">Preajustes de fondo</string>
+    <string name="dst_substratum_style_title">Estilo Dark Shadow Theme para Obsidian</string>
+    <string name="dst_substratum_style_notice">Personaliza Ajustes, SystemUI, el Launcher, la app de Vídeo del sistema, la Esfera asistente, Recuperación de apps, el Portal de contenido, el Reloj, OnePlus Share, la Calculadora, el Asistente de juegos, Comodidad visual, Fotos, la Cámara, Internet y Wifi/Bluetooth juntos (colores, fondos, diálogos, ventanas emergentes, animación de huella digital) usando el paquete de recursos extraído de tu propio tema Substratum, en un solo overlay. Toca Aplicar (la creación de los dieciséis tarda un momento). Reinicia para ver el cambio. Requiere el permiso "Acceso a todos los archivos".</string>
+    <string name="dst_substratum_style_card_desc">Ajustes, SystemUI, Launcher, Vídeo, Esfera asistente, Recuperación de apps, Portal de contenido, Reloj, OnePlus Share, Calculadora, Asistente de juegos, Comodidad visual, Fotos, Cámara, Internet, Wifi/Bluetooth</string>
+    <string name="dst_substratum_style_status_none">No aplicado</string>
+    <string name="dst_substratum_style_status_active">Tema activo</string>
+    <string name="dst_substratum_style_howto">IMPORTANTE:\ndespués de Aplicar, reinicia dos veces:\nel primer reinicio activa los overlays creados.\nEl segundo reinicio activa y estabiliza los overlays.</string>
+    <string name="dst_substratum_style_readme_link">Leer el readme completo</string>
+    <string name="dst_substratum_style_readme_full">IMPORTANTE: después de Aplicar, reinicia dos veces: el primer reinicio activa los overlays recién creados y el teléfono puede ir más lento durante un minuto (se estabiliza solo, no hay que hacer nada — si parece bloqueado, mantén pulsado el botón de encendido para forzar el reinicio). A partir del segundo reinicio, el tema está activo y estable. Desde entonces, cada arranque puede tardar unos segundos más que antes: es el coste de tener el tema completo activo.</string>
     <string name="nav_sys_settings">Estilo de Ajustes OOS</string>
     <string name="nav_sys_settings_summary">Tema real completo para la app Ajustes, creado a partir de tu tema Substratum</string>
     <string name="settings_theme_notice">Personaliza toda la app Ajustes (colores, fondos, animación de huella digital) usando el paquete de recursos extraído de tu propio tema Substratum. Toca Aplicar (la creación tarda un momento). Requiere el permiso "Acceso a todos los archivos".</string>
@@ -114,7 +122,7 @@
     <string name="nav_dst_colors_summary">Muestras de color de acento y fondo</string>
     <string name="nav_settings_icons">Estilo de iconos de Ajustes</string>
     <string name="nav_settings_icons_summary">Paquetes de iconos PUI / HOS para la app Ajustes</string>
-    <string name="settings_icons_preview_notice">Toca un paquete para seleccionarlo, luego Aplicar (la creación tarda un momento). Requiere el permiso "Acceso a todos los archivos".</string>
+    <string name="settings_icons_preview_notice">Toca un paquete para seleccionarlo, luego Aplicar (la creación tarda un momento). Reinicia para ver el cambio. Requiere el permiso "Acceso a todos los archivos".</string>
     <string name="settings_icons_apply">Aplicar</string>
     <string name="settings_icons_disable">Desactivar</string>
     <string name="settings_icons_status_none">Ningún paquete aplicado</string>
@@ -328,7 +336,7 @@
     <string name="advanced_reboot_auth_summary">Autenticar para mostrar las opciones de reinicio avanzado</string>
     <string name="power_menu_pill_section">Control deslizante</string>
     <string name="power_menu_gradient_color_title">Color de reinicio/apagado</string>
-    <string name="power_menu_handler_color_title">Color del asa</string>
+    <string name="power_menu_handler_color_title">Fondo del asa</string>
     <string name="power_menu_handler_gallery_title">Elegir de la galería</string>
     <string name="power_menu_handler_gallery_summary">Elige tu propia foto</string>
     <string name="power_menu_handler_style_section">Estilo</string>
@@ -339,6 +347,9 @@
     <string name="power_menu_border_title">Borde del control deslizante</string>
     <string name="power_menu_border_summary">Dibuja un contorno alrededor del control deslizante de reinicio/apagado</string>
     <string name="power_menu_border_color_title">Color del borde</string>
+    <string name="power_menu_handler_border_title">Borde del asa</string>
+    <string name="power_menu_handler_border_summary">Dibuja un anillo alrededor del asa</string>
+    <string name="power_menu_handler_border_color_title">Color del borde del asa</string>
     <string name="advanced_reboot_auth_failed">Error de autenticación</string>
     <string name="advanced_reboot_recovery">Recovery</string>
     <string name="advanced_reboot_bootloader">Bootloader</string>

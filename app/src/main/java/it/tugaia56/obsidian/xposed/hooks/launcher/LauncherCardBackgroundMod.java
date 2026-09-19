@@ -12,6 +12,7 @@ import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.view.ViewGroup;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -118,7 +119,9 @@ public class LauncherCardBackgroundMod extends XposedMods {
         try {
             View content = activity.findViewById(android.R.id.content);
             if (content != null) content.setBackgroundColor(mPageColor);
-        } catch (Throwable ignored) {}
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] LauncherCardBackgroundMod.tintContent content failed: " + t);
+        }
         // android:id/content da solo non copre l'header: appBarLayout (contiene la toolbar con
         // freccia indietro + titolo) e' un fratello impilato sopra con sfondo proprio opaco
         // nero (bounds [0,160][1440,369], trovato via uiautomator dump — stessa famiglia del
@@ -127,7 +130,57 @@ public class LauncherCardBackgroundMod extends XposedMods {
             int id = activity.getResources().getIdentifier("appBarLayout", "id", LAUNCHER);
             View appBar = (id != 0) ? activity.findViewById(id) : null;
             if (appBar != null) appBar.setBackgroundColor(mPageColor);
-        } catch (Throwable ignored) {}
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] LauncherCardBackgroundMod.tintContent appBar failed: " + t);
+        }
+        // 2026-09-11: content (ContentFrameLayout) prende il colore ma resta invisibile — il suo
+        // figlio diretto "fragment_container" (altro FrameLayout, stessi bounds pieni) ha un
+        // proprio sfondo opaco nero disegnato sopra, stessa famiglia toolbar/appBarLayout.
+        try {
+            int id = activity.getResources().getIdentifier("fragment_container", "id", LAUNCHER);
+            View fragContainer = (id != 0) ? activity.findViewById(id) : null;
+            if (fragContainer != null) fragContainer.setBackgroundColor(mPageColor);
+            // 2026-09-11: content/appBarLayout/fragment_container prendono tutti il colore senza
+            // errori ma restano invisibili — nel dump uiautomator c'e' un ViewGroup SENZA id
+            // subito dentro fragment_container (bounds pieni, stessa famiglia) che con ogni
+            // probabilita' e' il vero strato che disegna nero sopra tutto. Non raggiungibile per
+            // nome (nessun resource-id): tinto per posizione, scendendo di 2 livelli e saltando
+            // la RecyclerView stessa (altrimenti rischio di rompere le righe della lista).
+            if (fragContainer instanceof ViewGroup) tintUnnamedDescendants((ViewGroup) fragContainer, 2);
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] LauncherCardBackgroundMod.tintContent fragment_container failed: " + t);
+        }
+    }
+
+    // 2026-09-11: esteso da "solo LauncherSettingsActivity" a QUALSIASI activity dentro il
+    // processo com.android.launcher, per coprire anche le sotto-schermate con classe diversa
+    // (es. com.oplus.quickstep.locksetting.ui.LockSettingActivity) — segnalata dall'utente come
+    // ancora nera. Serve pero' un'esclusione esplicita per le 2 activity che NON sono schermate
+    // di impostazioni e che andrebbero rotte visibilmente se tinte di navy pieno: la Home vera
+    // (sfondo/icone, sparirebbe sotto il colore) e Recenti/Overview (anteprime app, idem).
+    private static final String[] PAGE_TINT_EXCLUDED = {
+            "com.android.launcher.Launcher",
+            "com.android.quickstep.RecentsActivity",
+    };
+
+    private boolean isExcludedFromPageTint(String activityClassName) {
+        for (String excluded : PAGE_TINT_EXCLUDED) {
+            if (excluded.equals(activityClassName)) return true;
+        }
+        return false;
+    }
+
+    private void tintUnnamedDescendants(ViewGroup parent, int depthLeft) {
+        if (depthLeft <= 0) return;
+        for (int i = 0; i < parent.getChildCount(); i++) {
+            View child = parent.getChildAt(i);
+            String cls = child.getClass().getName();
+            if (cls.contains("RecyclerView")) continue;
+            if (child.getId() == View.NO_ID) {
+                try { child.setBackgroundColor(mPageColor); } catch (Throwable ignored) {}
+            }
+            if (child instanceof ViewGroup) tintUnnamedDescendants((ViewGroup) child, depthLeft - 1);
+        }
     }
 
     @Override
@@ -155,11 +208,22 @@ public class LauncherCardBackgroundMod extends XposedMods {
                 @Override protected void afterHookedMethod(MethodHookParam p) {
                     try {
                         Activity activity = (Activity) p.thisObject;
-                        if (!"com.android.launcher.settings.LauncherSettingsActivity".equals(activity.getClass().getName())) return;
+                        if (isExcludedFromPageTint(activity.getClass().getName())) return;
                         mActivities.add(new WeakReference<>(activity));
                         if (!mThemeApplied || !isNight()) return;
                         tintContent(activity);
-                    } catch (Throwable ignored) {}
+                        // 2026-09-11: il primo giro viene sovrascritto — qualcosa (il Fragment
+                        // che popola la lista, presumibilmente) reimposta lo sfondo subito DOPO
+                        // Activity.onResume. Riapplica con un breve ritardo, dopo che si e'
+                        // sistemato tutto (stesso "debounced retry" gia' usato in
+                        // project_qs_icon_refresh_bug per un problema analogo).
+                        new Handler(Looper.getMainLooper()).postDelayed(
+                                () -> tintContent(activity), 300);
+                        new Handler(Looper.getMainLooper()).postDelayed(
+                                () -> tintContent(activity), 900);
+                    } catch (Throwable t) {
+                        XposedBridge.log("[ Obsidian ] LauncherCardBackgroundMod.onResume failed: " + t);
+                    }
                 }
             });
         } catch (Throwable t) {

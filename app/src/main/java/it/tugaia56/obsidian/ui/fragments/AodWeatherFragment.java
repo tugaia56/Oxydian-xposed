@@ -83,10 +83,10 @@ public class AodWeatherFragment extends Fragment {
     private DarkShadowColorListener mColorAdapter;
     // Stato SOLO visivo (non persistito): lo switch attiva soltanto, il tocco sul nome
     // apre/chiude le opzioni sottostanti — stesso pattern di QsTilesCustomizeFragment.
-    private boolean mWeatherExpanded = ObsidianPrefs.getBoolean(KEY_ENABLED, false);
+    private boolean mWeatherExpanded = false;
     private boolean mLocExpanded;
-    private boolean mMarginsExpanded = ObsidianPrefs.getBoolean(KEY_MARGINS_SWITCH, false);
-    private boolean mFontExpanded    = ObsidianPrefs.getBoolean(KEY_FONT_SWITCH, false);
+    private boolean mMarginsExpanded = false;
+    private boolean mFontExpanded    = false;
     private ActivityResultLauncher<String> mRequestLocationPermission;
 
     @Override

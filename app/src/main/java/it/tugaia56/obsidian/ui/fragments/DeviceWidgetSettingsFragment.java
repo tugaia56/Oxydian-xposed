@@ -65,7 +65,7 @@ public class DeviceWidgetSettingsFragment extends Fragment {
     private static final String[] TYPE_LABELS = {"Nessuno", "Batteria", "RAM", "Volume", "Temperatura", "Wi-Fi", "Bluetooth"};
 
     private RecyclerView mRv;
-    private boolean mColorExpanded = ObsidianPrefs.getBoolean(KEY_COLOR_SWITCH, false);
+    private boolean mColorExpanded = false;
     private final List<DarkShadowItem> mColorItems = new ArrayList<>();
     private DarkShadowColorListener mColorAdapter;
 

@@ -100,19 +100,61 @@ public class CustomShortcut extends XposedMods {
                     }
                     if (category == null) return;
 
-                    // 2026-09-09: era senza tint forzato (per non coprire l'icon_color scelto
-                    // dall'utente quando un pack HOS/OOS è attivo) — ma se il pack/overlay non
-                    // è applicato (es. bug OverlayManagerService su alcuni device, vedi
-                    // project_ksu_next_migration), l'icona restava bianca/neutra invece di
-                    // seguire l'accento come le altre righe — segnalato dall'utente. setTint()
-                    // qui applica l'accento SOLO come fallback visivo: se un pack con la sua
-                    // versione dell'icona (già colorata come vuole l'utente) è davvero attivo,
-                    // l'overlay sostituisce l'intera risorsa ic_obsidian_gem PRIMA che questo
-                    // codice la legga, quindi il tint si applicherebbe comunque su un colore
-                    // già corretto (nessuna regressione pratica).
-                    Drawable icon = ResourcesCompat.getDrawable(ResourceManager.modRes,
-                            R.drawable.ic_obsidian_gem, mContext.getTheme());
-                    if (icon != null) icon.setTint(mAccentColor);
+                    // Layout uguale alle voci OEM vicine: senza, la ImageView dell'icona
+                    // è 72px invece di 108px. NB: prende una voce a RIGA SINGOLA come
+                    // modello — getPreference(0) è "Schermata iniziale…" (2 righe) e usa un
+                    // frame icona più alto (120px), che rendeva la gemma più grande delle
+                    // altre. Scandisce quindi i figli e salta i titoli multi-riga.
+                    try {
+                        int cnt = (int) callMethod(category, "getPreferenceCount");
+                        for (int k = 0; k < cnt; k++) {
+                            Object tmpl = callMethod(category, "getPreference", k);
+                            CharSequence tt = (CharSequence) callMethod(tmpl, "getTitle");
+                            if (tt != null && tt.toString().contains("\n")) continue;
+                            if (tt != null && tt.length() > 24) continue; // probabile a capo
+                            callMethod(pref, "setLayoutResource",
+                                    callMethod(tmpl, "getLayoutResource"));
+                            break;
+                        }
+                    } catch (Throwable ignored) {}
+                    callMethod(pref, "setIconSpaceReserved", true);
+
+                    // Icona: logo Obsidian ufficiale a 4 schegge, bianco. Risorsa DEDICATA
+                    // (ic_obsidian_shard, non ic_obsidian_gem) perché modRes viene da
+                    // createPackageContext e include gli RRO attivi: il pack icone (SIP2)
+                    // sovrascrive ic_obsidian_gem con la sua versione vecchia, questa no.
+                    // L'anello circolare NON è disegnato da OOS per una preferenza iniettata
+                    // (quello delle altre righe è nel drawable del pack SIP1) → lo compongo
+                    // qui: cerchio vuoto bordo accento + scheggia bianca al centro.
+                    float density = mContext.getResources().getDisplayMetrics().density;
+                    // L'anello e la scheggia hanno DIMENSIONI ESPLICITE e sono centrati:
+                    // così il cerchio resta identico alle altre righe (~36dp) anche se il
+                    // frame icona della preferenza iniettata è più largo (misurato 120px
+                    // vs 108px delle voci OEM — evita la gemma "un po' più grande").
+                    int ringPx  = Math.round(density * 36f);
+                    int shardPx = Math.round(density * 21f);
+                    android.graphics.drawable.GradientDrawable ring =
+                            new android.graphics.drawable.GradientDrawable();
+                    ring.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+                    ring.setColor(android.graphics.Color.TRANSPARENT);
+                    ring.setStroke(Math.round(density * 2f), mAccentColor);
+                    ring.setSize(ringPx, ringPx);
+
+                    Drawable shard = ResourcesCompat.getDrawable(ResourceManager.modRes,
+                            R.drawable.ic_obsidian_shard, mContext.getTheme());
+                    Drawable icon;
+                    if (shard != null) {
+                        android.graphics.drawable.LayerDrawable ld =
+                                new android.graphics.drawable.LayerDrawable(
+                                        new Drawable[]{ring, shard});
+                        ld.setLayerGravity(0, android.view.Gravity.CENTER);
+                        ld.setLayerGravity(1, android.view.Gravity.CENTER);
+                        ld.setLayerSize(0, ringPx, ringPx);
+                        ld.setLayerSize(1, shardPx, shardPx);
+                        icon = ld;
+                    } else {
+                        icon = ring;
+                    }
 
                     callMethod(pref, "setIcon", icon);
                     callMethod(pref, "setTitle", ENTRY_TITLE);

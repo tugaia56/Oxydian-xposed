@@ -58,8 +58,8 @@ public class LockScreenOptionsFragment extends Fragment {
     private RecyclerView mRv;
     // Stato SOLO visivo (non persistito): lo switch attiva soltanto, il tocco sul nome
     // apre/chiude le opzioni sottostanti — stesso pattern di QsTilesCustomizeFragment.
-    private boolean mLockBlurExpanded = ObsidianPrefs.getBoolean(PREF_BLUR_ON, false);
-    private boolean mAlbumArtExpanded = ObsidianPrefs.getBoolean(KEY_ALBUM_ART, false);
+    private boolean mLockBlurExpanded = false;
+    private boolean mAlbumArtExpanded = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,

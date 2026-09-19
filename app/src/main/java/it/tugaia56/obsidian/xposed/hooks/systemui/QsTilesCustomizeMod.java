@@ -5,6 +5,7 @@ import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getIntField;
+import static de.robv.android.xposed.XposedHelpers.getFloatField;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
 import static de.robv.android.xposed.XposedHelpers.setObjectField;
 import static de.robv.android.xposed.XposedHelpers.setIntField;
@@ -130,6 +131,18 @@ public class QsTilesCustomizeMod extends XposedMods {
     private static final String KEY_TILE_BG_MEDIA_ON    = "qs_tile_bg_media_enabled";
     private static final String KEY_TILE_BG_MEDIA_COLOR = "qs_tile_bg_media_inactive_color";
 
+    // ── Bordo pulsanti QS (base + in evidenza) — richiesta 2026-09-16: "si può mettere il bordo
+    // ai pulsanti qs - cursori - media ed al pannello", un unico interruttore/colore condiviso
+    // per pulsanti+cursori+media (separato dal bordo del pannello). Qui solo i pulsanti per ora.
+    private static final String KEY_TILE_BORDER_ON     = "qs_tile_border_enabled";
+    private static final String KEY_TILE_BORDER_COLOR  = "qs_tile_border_custom_color"; // "_use_accent" affiancata, stesso pattern di singleColorRow()
+    private static final float TILE_BORDER_WIDTH_DP = 1.5f; // stesso spessore di Bordo barra volume
+
+    // ── Bordo Pannello QS (2026-09-18) — 4a superficie della richiesta 09-16, switch/colore
+    // separati dal bordo pulsanti/cursori/media sopra.
+    private static final String KEY_PANEL_BORDER_ON    = "qs_panel_border_enabled";
+    private static final String KEY_PANEL_BORDER_COLOR = "qs_panel_border_custom_color";
+
     // ── Copertina Album (filtro sulla vera artwork del brano nel riquadro Media) ────
     // Stesse 5 opzioni/tecnica di AlbumArtLockscreenMod (grayscale/accento/blur/grayscale+blur),
     // applicate al coverImg reale del pannello Media invece di iniettare una vista a schermo
@@ -193,12 +206,19 @@ public class QsTilesCustomizeMod extends XposedMods {
     private int mTileBgMediaColor = 0x19FFFFFF;
     private Integer mTileViewFlagActiveAttr;
 
+    private boolean mTileBorderOn;
+    private int mTileBorderColor = 0xFF908DFF;
+
+    private boolean mPanelBorderOn;
+    private int mPanelBorderColor = 0xFF908DFF;
+
     private boolean mMediaCoverFilterOn;
     private int mMediaCoverFilter = COVER_FILTER_NONE;
     private float mMediaCoverBlurRadius = 7.5f;
     /** Un ImageView-sfondo iniettato per istanza di pannello Media — mostra la vera copertina
      *  a grandezza intera invece del piccolo coverImg nativo (richiesta utente 2026-08-20). */
     private final WeakHashMap<Object, ImageView> mMediaCoverBackdrop = new WeakHashMap<>();
+    private final WeakHashMap<Object, View> mMediaBorderView = new WeakHashMap<>();
 
     private int mTileRadiusBaseDp = 20, mTileRadiusHlDp = 20, mTileRadiusMediaDp = 20;
 
@@ -277,6 +297,14 @@ public class QsTilesCustomizeMod extends XposedMods {
         mTileBgMediaColor = Xprefs.getBoolean(KEY_TILE_BG_MEDIA_COLOR + "_use_accent", false)
                 ? appAccentColor() : Xprefs.getInt(KEY_TILE_BG_MEDIA_COLOR, 0x19FFFFFF);
 
+        mTileBorderOn = Xprefs.getBoolean(KEY_TILE_BORDER_ON, false);
+        mTileBorderColor = Xprefs.getBoolean(KEY_TILE_BORDER_COLOR + "_use_accent", false)
+                ? appAccentColor() : Xprefs.getInt(KEY_TILE_BORDER_COLOR, 0xFF908DFF);
+
+        mPanelBorderOn = Xprefs.getBoolean(KEY_PANEL_BORDER_ON, false);
+        mPanelBorderColor = Xprefs.getBoolean(KEY_PANEL_BORDER_COLOR + "_use_accent", false)
+                ? appAccentColor() : Xprefs.getInt(KEY_PANEL_BORDER_COLOR, 0xFF908DFF);
+
         mMediaCoverFilterOn = Xprefs.getBoolean(KEY_MEDIA_COVER_FILTER_ON, false);
         mMediaCoverFilter = parseInt(Xprefs.getString(KEY_MEDIA_COVER_FILTER, "0"), COVER_FILTER_NONE);
         mMediaCoverBlurRadius = (Xprefs.getInt(KEY_MEDIA_COVER_BLUR, 30) / 100f) * 25f;
@@ -319,6 +347,7 @@ public class QsTilesCustomizeMod extends XposedMods {
         hookLabels(lp);
         hookLabelsClassic(lp);
         hookBrightnessSliderColor(lp);
+        hookSliderBorder(lp);
         hookBrightnessIcon(lp);
         hookVolumeSliderIcon(lp);
         hookSliderBlur(lp);
@@ -327,6 +356,8 @@ public class QsTilesCustomizeMod extends XposedMods {
         hookTileTransitions(lp);
         hookTileDrawableOwnership(lp);
         hookMediaPanelOwnership(lp);
+        hookMediaBorder(lp);
+        hookPanelBorder(lp);
         hookMediaCoverFilter(lp);
         hookTileBgBase(lp);
         hookTileBgHighlight(lp);
@@ -368,6 +399,12 @@ public class QsTilesCustomizeMod extends XposedMods {
     private static final String OWNER_MEDIA = "media";
     private final java.util.Map<Object, String> mGradientOwner = new WeakHashMap<>();
     private final java.util.Map<Object, String> mMixColorOwner = new WeakHashMap<>();
+
+    // Costruttore riflesso per kotlin.Triple, popolato da hookTileBgHighlight() e riusato da
+    // hookTileDrawableOwnership() (vedi sotto, 2026-09-17: applichiamo la riscrittura colore anche
+    // subito dopo la costruzione del drawable, non solo alla transizione di stato onStateChange —
+    // quella non scatta mai per i riquadri il cui stato non cambia mai dopo il boot).
+    private java.lang.reflect.Constructor<?> mMixTripleCtor;
 
     // La View "bg" del pannello Media (OplusQsBaseMediaPanelView.getBg()) risulta un
     // android.view.View "nudo", mai davvero aggiunto alla gerarchia reale (probabilmente creato
@@ -422,7 +459,14 @@ public class QsTilesCustomizeMod extends XposedMods {
                     @Override protected void afterHookedMethod(MethodHookParam p) {
                         Object view = p.args.length > 0 ? p.args[0] : null;
                         Object result = p.getResult();
-                        if (view != null && result != null) mMixColorOwner.put(result, ownerOfView(view));
+                        if (view == null || result == null) return;
+                        String owner = ownerOfView(view);
+                        mMixColorOwner.put(result, owner);
+                        // Applica il colore SUBITO alla costruzione, non solo alla prossima
+                        // onStateChange — quella non scatta mai per i riquadri il cui stato non
+                        // cambia mai dopo il boot. Il bordo è gestito a parte (draw() disegnato a
+                        // mano, vedi hookTileBgHighlight) quindi non dipende da questa chiamata.
+                        try { applyMixColorStateOverrides(result, owner, lp); } catch (Throwable ignored) {}
                     }
                 });
             } catch (Throwable t) { dbg("hookTileDrawableOwnership MixColorTileDrawable.Builder failed: " + t); }
@@ -443,6 +487,151 @@ public class QsTilesCustomizeMod extends XposedMods {
         } catch (Throwable t) { dbg("hookMediaPanelOwnership failed: " + t); }
     }
 
+    /** Bordo Media — DUE tentativi via canvas-hook (sul drawable, poi su View.draw()) sono rimasti
+     *  costantemente disallineati di qualche dp nonostante bounds/path nativi risultassero
+     *  perfettamente combacianti via diagnostica — il blur in tempo reale (autoBlurDrawable)
+     *  probabilmente ridisegna offscreen più volte per frame, e il nostro hook generico su
+     *  View.draw() finiva per agganciare la passata sbagliata. Fix definitivo: una vera View
+     *  trasparente aggiunta come ULTIMO figlio della card (stessa tecnica, già affidabile, usata
+     *  per la copertina album qui sotto) — fa parte della gerarchia normale, quindi si allinea
+     *  SEMPRE correttamente, nessun calcolo di bounds/offset da indovinare. */
+    private void hookMediaBorder(XC_LoadPackage.LoadPackageParam lp) {
+        Class<?> mediaCls = tryFindClass(lp, "com.oplus.systemui.qs.media.OplusQsBaseMediaPanelView");
+        if (mediaCls == null) return;
+        try {
+            hookAllMethods(mediaCls, "onDrawableUpdate", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    try { syncMediaBorderView(p.thisObject); } catch (Throwable t) { dbg("syncMediaBorderView failed: " + t); }
+                }
+            });
+        } catch (Throwable t) { dbg("hookMediaBorder install failed: " + t); }
+    }
+
+    private void syncMediaBorderView(Object panel) {
+        if (!(panel instanceof ViewGroup)) return;
+        View border = getOrCreateMediaBorderView(panel);
+        if (border == null) return;
+        border.bringToFront();
+        // Con la copertina attiva il bordo va nascosto (richiesta utente 2026-09-17), il resto del
+        // tempo segue solo lo switch "Bordo Pulsanti".
+        ImageView backdrop = mMediaCoverBackdrop.get(panel);
+        boolean coverActive = backdrop != null && backdrop.getVisibility() == View.VISIBLE;
+        border.setVisibility(mTileBorderOn && !coverActive ? View.VISIBLE : View.GONE);
+        border.invalidate();
+    }
+
+    private View getOrCreateMediaBorderView(Object panel) {
+        View existing = mMediaBorderView.get(panel);
+        if (existing != null) return existing;
+        ViewGroup group = (ViewGroup) panel;
+        View v = new View(mContext) {
+            @Override protected void onDraw(android.graphics.Canvas canvas) {
+                super.onDraw(canvas);
+                float strokeWidth = tileBorderWidthPx();
+                float inset = strokeWidth / 2f;
+                android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+                paint.setStyle(android.graphics.Paint.Style.STROKE);
+                paint.setStrokeWidth(strokeWidth);
+                paint.setColor(mTileBorderColor);
+                canvas.drawRoundRect(inset, inset, getWidth() - inset, getHeight() - inset,
+                        dp(mTileRadiusMediaDp), dp(mTileRadiusMediaDp), paint);
+            }
+        };
+        v.setWillNotDraw(false);
+        group.addView(v, new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        mMediaBorderView.put(panel, v);
+        return v;
+    }
+
+    /** Bordo Pannello QS (2026-09-18) — 4a superficie della richiesta 09-16. Stesso contenitore
+     *  già usato da QsBackground.java per lo sfondo (OplusQSContainerImpl/OplusQSRootView per
+     *  split/landscape), ma qui aggiungiamo una vera View come ULTIMO figlio (non indice 0 come
+     *  il tint di sfondo — deve stare SOPRA il contenuto per non finire coperta dai riquadri),
+     *  stessa tecnica proven-affidabile della View reale già usata per Media sopra. Raggio
+     *  angoli non misurato (nessun tempo per jadx su questo, a differenza degli altri bordi in
+     *  questo file) — valore ragionevole scelto a occhio, da aggiustare se il risultato reale
+     *  non combacia col bordo arrotondato nativo del pannello.
+     */
+    private final java.util.Map<Object, View> mPanelBorderView = new WeakHashMap<>();
+    private static final int PANEL_BORDER_RADIUS_DP = 32;
+
+    private void hookPanelBorder(XC_LoadPackage.LoadPackageParam lp) {
+        Class<?> containerCls = tryFindClass(lp, "com.oplus.systemui.qs.OplusQSContainerImpl");
+        if (containerCls == null) containerCls = tryFindClass(lp, "com.oplusos.systemui.qs.OplusQSContainerImpl");
+        if (containerCls != null) {
+            try {
+                hookAllMethods(containerCls, "onFinishInflate", new XC_MethodHook() {
+                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                        if (p.thisObject instanceof ViewGroup) syncPanelBorderView((ViewGroup) p.thisObject);
+                    }
+                });
+            } catch (Throwable t) { dbg("hookPanelBorder OplusQSContainerImpl failed: " + t); }
+        }
+        Class<?> rootViewCls = tryFindClass(lp, "com.oplus.systemui.plugins.qs.OplusQSRootView");
+        if (rootViewCls != null) {
+            try {
+                hookAllMethods(rootViewCls, "onFinishInflate", new XC_MethodHook() {
+                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                        if (p.thisObject instanceof ViewGroup) syncPanelBorderView((ViewGroup) p.thisObject);
+                    }
+                });
+            } catch (Throwable t) { dbg("hookPanelBorder OplusQSRootView failed: " + t); }
+        }
+        // Con i pannelli "Separati" il pannello notifiche e' una vista a parte (non contiene
+        // OplusQSContainerImpl/RootView): stesso bordo anche li' — 2026-09-19, richiesta utente.
+        Class<?> notifPanelCls = tryFindClass(lp, "com.android.systemui.shade.NotificationPanelView");
+        if (notifPanelCls != null) {
+            try {
+                hookAllConstructors(notifPanelCls, new XC_MethodHook() {
+                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                        if (!(p.thisObject instanceof ViewGroup)) return;
+                        final ViewGroup g = (ViewGroup) p.thisObject;
+                        g.post(() -> { try { syncPanelBorderView(g, true); } catch (Throwable t) { dbg("notif panel border failed: " + t); } });
+                    }
+                });
+            } catch (Throwable t) { dbg("hookPanelBorder NotificationPanelView failed: " + t); }
+        }
+    }
+
+    private void syncPanelBorderView(ViewGroup container) { syncPanelBorderView(container, false); }
+
+    /** hideOnKeyguard=true per il pannello notifiche (NotificationPanelView ospita anche la
+     *  lockscreen: li' il bordo non deve comparire). */
+    private void syncPanelBorderView(ViewGroup container, boolean hideOnKeyguard) {
+        View existing = mPanelBorderView.get(container);
+        if (existing == null) {
+            View v = new View(mContext) {
+                @Override protected void onDraw(android.graphics.Canvas canvas) {
+                    super.onDraw(canvas);
+                    if (!mPanelBorderOn) return;
+                    if (hideOnKeyguard) {
+                        try {
+                            android.app.KeyguardManager km = getContext().getSystemService(android.app.KeyguardManager.class);
+                            if (km != null && km.isKeyguardLocked()) return;
+                        } catch (Throwable ignored) {}
+                    }
+                    float strokeWidth = tileBorderWidthPx();
+                    float inset = strokeWidth / 2f;
+                    android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+                    paint.setStyle(android.graphics.Paint.Style.STROKE);
+                    paint.setStrokeWidth(strokeWidth);
+                    paint.setColor(mPanelBorderColor);
+                    canvas.drawRoundRect(inset, inset, getWidth() - inset, getHeight() - inset,
+                            dp(PANEL_BORDER_RADIUS_DP), dp(PANEL_BORDER_RADIUS_DP), paint);
+                }
+            };
+            v.setWillNotDraw(false);
+            container.addView(v, new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            mPanelBorderView.put(container, v);
+            existing = v;
+        } else {
+            existing.bringToFront();
+        }
+        existing.invalidate();
+    }
+
     // Copertina Album: bindCoverImg(MediaData) è dove OOS imposta l'artwork reale del brano sul
     // piccolo COUIRoundImageView coverImg nativo. L'utente vuole la copertina grande quanto il
     // riquadro Media (non solo ricolorato in piccolo) — iniettiamo un ImageView a piena
@@ -456,6 +645,7 @@ public class QsTilesCustomizeMod extends XposedMods {
                 @Override protected void afterHookedMethod(MethodHookParam p) {
                     try {
                         applyMediaCover(p.thisObject, p.args.length > 0 ? p.args[0] : null);
+                        syncMediaBorderView(p.thisObject);
                     } catch (Throwable t) { dbg("media cover apply failed: " + t); }
                 }
             });
@@ -561,6 +751,10 @@ public class QsTilesCustomizeMod extends XposedMods {
     // finale per lo stato corrente in una mappa "stateListColors" (DrawableState -> Integer) e lo
     // applica a un ColorDrawable interno. Riscriviamo la mappa PRIMA che onStateChange la consumi
     // (non il ColorDrawable dopo — viene risovrascritto ad ogni relayout/animazione del pannello).
+    private int tileBorderWidthPx() {
+        return Math.round(TILE_BORDER_WIDTH_DP * mContext.getResources().getDisplayMetrics().density);
+    }
+
     private void hookTileBgBase(XC_LoadPackage.LoadPackageParam lp) {
         Class<?> gradientTileDrawableCls = tryFindClass(lp, "com.oplus.systemui.qs.base.res.drawable.GradientTileDrawable");
         if (gradientTileDrawableCls == null) return;
@@ -586,6 +780,34 @@ public class QsTilesCustomizeMod extends XposedMods {
                 }
             });
         } catch (Throwable t) { dbg("hookTileBgBase install failed: " + t); }
+        // Bordo "Riquadri base" — GradientTileDrawable non ha un meccanismo di stroke nativo (solo
+        // un campo "paint" per il riempimento, confermato via reflection), quindi lo disegniamo a
+        // mano SOPRA il riempimento nativo (afterHookedMethod su draw(Canvas), stesso Canvas) —
+        // stesso pattern già usato per "Bordo barra" in VolumePanelMod. getCornerRadius() è un
+        // metodo reale della classe base TileDrawableWrapper (confermato via reflection).
+        try {
+            hookAllMethods(gradientTileDrawableCls, "draw", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    // Media NON passa più di qui (vedi hookMediaBorder più sotto: il bordo sullo
+                    // sfondo veniva coperto dalla copertina album, una View sopra) — solo pulsanti.
+                    if (!mTileBorderOn || !OWNER_TILE.equals(mGradientOwner.get(p.thisObject))) return;
+                    try {
+                        android.graphics.Canvas canvas = (android.graphics.Canvas) p.args[0];
+                        android.graphics.Rect bounds = ((Drawable) p.thisObject).getBounds();
+                        float radius = 0f;
+                        try { radius = (float) callMethod(p.thisObject, "getCornerRadius"); } catch (Throwable ignored) {}
+                        float strokeWidth = tileBorderWidthPx();
+                        float inset = strokeWidth / 2f;
+                        android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+                        paint.setStyle(android.graphics.Paint.Style.STROKE);
+                        paint.setStrokeWidth(strokeWidth);
+                        paint.setColor(mTileBorderColor);
+                        canvas.drawRoundRect(bounds.left + inset, bounds.top + inset,
+                                bounds.right - inset, bounds.bottom - inset, radius, radius, paint);
+                    } catch (Throwable t) { dbg("tile border draw failed: " + t); }
+                }
+            });
+        } catch (Throwable t) { dbg("hookTileBgBase border install failed: " + t); }
     }
 
     // Sfondo "Riquadri in evidenza" (circolari — Posizione, Bluetooth, ecc.): usano
@@ -600,32 +822,83 @@ public class QsTilesCustomizeMod extends XposedMods {
         Class<?> tripleCls = tryFindClass(lp, "kotlin.Triple");
         if (tripleCls == null) return;
         try {
-            java.lang.reflect.Constructor<?> tripleCtor = tripleCls.getConstructor(Object.class, Object.class, Object.class);
+            mMixTripleCtor = tripleCls.getConstructor(Object.class, Object.class, Object.class);
             hookAllMethods(mixColorCls, "onStateChange", new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam p) {
-                    String owner = mMixColorOwner.get(p.thisObject);
-                    int active, inactive;
-                    if (OWNER_TILE.equals(owner) && mTileBgHighlightOn) {
-                        active = mTileBgHlAccent ? appAccentColor() : mTileBgHlActive;
-                        inactive = mTileBgHlInactive;
-                    } else if (OWNER_MEDIA.equals(owner) && mTileBgMediaOn) {
-                        active = inactive = mTileBgMediaColor;
-                    } else return;
+                    try { applyMixColorStateOverrides(p.thisObject, mMixColorOwner.get(p.thisObject), lp); }
+                    catch (Throwable t) { dbg("hookTileBgHighlight override failed: " + t); }
+                }
+            });
+            // Bordo "Riquadri in evidenza" — il meccanismo nativo (3° elemento della Triple, un vero
+            // GradientStrokeLineAdapter$StrokeParamsTemplate) è stato provato ma abbandonato 2026-09-17:
+            // diagnostica via reflection ha confermato che il campo strokeParamsTemplate risultava
+            // corretto (colore giusto, lineWidth=5) su TUTTI i riquadri controllati, inclusi quelli
+            // che visivamente non mostravano alcun bordo — draw() nativo lo ignora per un motivo mai
+            // trovato (probabilmente una condizione interna legata al tipo/dimensione del riquadro,
+            // non investigabile senza decompilare, jadx non disponibile su questa macchina). Stessa
+            // soluzione già usata per "Riquadri base" (GradientTileDrawable, vedi hookTileBgBase sopra):
+            // disegnato a mano, SOPRA il draw nativo — niente dipendenza da un meccanismo nascosto.
+            hookAllMethods(mixColorCls, "draw", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    // Media NON passa più di qui (vedi hookMediaBorder più sotto: il bordo sullo
+                    // sfondo veniva coperto dalla copertina album, una View sopra) — solo pulsanti.
+                    if (!mTileBorderOn || !OWNER_TILE.equals(mMixColorOwner.get(p.thisObject))) return;
                     try {
-                        Object stateListConfig = getObjectField(p.thisObject, "stateListConfig");
-                        if (!(stateListConfig instanceof java.util.Map)) return;
-                        java.util.Map<Object, Object> map = (java.util.Map<Object, Object>) stateListConfig;
-                        for (java.util.Map.Entry<Object, Object> e : map.entrySet()) {
-                            Object triple = e.getValue();
-                            Object first = callMethod(triple, "getFirst");
-                            Object third = callMethod(triple, "getThird");
-                            int color = isActiveDrawableState(lp, e.getKey()) ? active : inactive;
-                            e.setValue(tripleCtor.newInstance(first, color, third));
+                        android.graphics.Canvas canvas = (android.graphics.Canvas) p.args[0];
+                        android.graphics.Rect bounds = ((Drawable) p.thisObject).getBounds();
+                        float strokeWidth = tileBorderWidthPx();
+                        float inset = strokeWidth / 2f;
+                        android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+                        paint.setStyle(android.graphics.Paint.Style.STROKE);
+                        paint.setStrokeWidth(strokeWidth);
+                        paint.setColor(mTileBorderColor);
+                        // Le card larghe 2 colonne (Wi-Fi/Torcia/Pixolor/Riavvia) condividono la
+                        // STESSA classe anche per l'intera card (bounds ~414x186, non solo l'icona
+                        // ~186x186), quindi un'ellisse sarebbe schiacciata — lì disegniamo un bordo
+                        // arrotondato (pill) via getCornerRadius() invece, come per GradientTileDrawable.
+                        if (bounds.width() > bounds.height() * 1.3f) {
+                            float radius = 0f;
+                            try { radius = (float) callMethod(p.thisObject, "getCornerRadius"); } catch (Throwable ignored) {}
+                            canvas.drawRoundRect(bounds.left + inset, bounds.top + inset,
+                                    bounds.right - inset, bounds.bottom - inset, radius, radius, paint);
+                        } else {
+                            canvas.drawOval(bounds.left + inset, bounds.top + inset,
+                                    bounds.right - inset, bounds.bottom - inset, paint);
                         }
-                    } catch (Throwable t) { dbg("hookTileBgHighlight override failed: " + t); }
+                    } catch (Throwable t) { dbg("mixcolor tile border draw failed: " + t); }
                 }
             });
         } catch (Throwable t) { dbg("hookTileBgHighlight install failed: " + t); }
+    }
+
+    /** Riscrive stateListConfig (solo colore) per un MixColorTileDrawable — condiviso tra
+     *  onStateChange (transizioni successive) e Builder.build() (subito alla costruzione, per i
+     *  riquadri il cui stato non cambia mai dopo il boot). Il bordo NON passa più di qui, vedi
+     *  commento sopra il draw() hook in hookTileBgHighlight. */
+    private void applyMixColorStateOverrides(Object drawable, String owner, XC_LoadPackage.LoadPackageParam lp) {
+        boolean doColor = false;
+        int active = 0, inactive = 0;
+        if (OWNER_TILE.equals(owner) && mTileBgHighlightOn) {
+            doColor = true;
+            active = mTileBgHlAccent ? appAccentColor() : mTileBgHlActive;
+            inactive = mTileBgHlInactive;
+        } else if (OWNER_MEDIA.equals(owner) && mTileBgMediaOn) {
+            doColor = true;
+            active = inactive = mTileBgMediaColor;
+        }
+        if (!doColor) return;
+        try {
+            Object stateListConfig = getObjectField(drawable, "stateListConfig");
+            if (!(stateListConfig instanceof java.util.Map)) return;
+            java.util.Map<Object, Object> map = (java.util.Map<Object, Object>) stateListConfig;
+            for (java.util.Map.Entry<Object, Object> e : map.entrySet()) {
+                Object triple = e.getValue();
+                Object first = callMethod(triple, "getFirst");
+                Object third = callMethod(triple, "getThird");
+                Object second = isActiveDrawableState(lp, e.getKey()) ? active : inactive;
+                e.setValue(mMixTripleCtor.newInstance(first, second, third));
+            }
+        } catch (Throwable t) { dbg("applyMixColorStateOverrides failed: " + t); }
     }
 
     // Raggio angoli riquadri: SepQSResPool/StdQSResPool.updateTileOutline/updateHighLightTileOutline/
@@ -946,6 +1219,39 @@ public class QsTilesCustomizeMod extends XposedMods {
         }
     }
 
+    /** Bordo "Riquadro Cursori" — condivide switch/colore con "Bordo Pulsanti" (mTileBorderOn/
+     *  mTileBorderColor, richiesta originale 2026-09-16: un unico controllo per pulsanti/cursori/
+     *  media). Stesso pattern già usato per "Bordo barra" in VolumePanelMod: disegnato a mano su
+     *  mBackgroundRect/mCurBackgroundRadius (i campi reali che COUIVerticalSeekBar.onDraw usa per
+     *  il riempimento), scoped via instanceof a OplusQsVerticalSeekBar per non toccare il cursore
+     *  del popup "Volume sistema" (OplusVolumeSeekBar, stessa classe base COUIVerticalSeekBar). */
+    private void hookSliderBorder(XC_LoadPackage.LoadPackageParam lp) {
+        Class<?> qsSeekBarCls = tryFindClass(lp, "com.oplus.systemui.qs.base.seek.OplusQsVerticalSeekBar");
+        Class<?> couiSeekBarCls = tryFindClass(lp, "com.coui.appcompat.seekbar.COUIVerticalSeekBar");
+        if (qsSeekBarCls == null || couiSeekBarCls == null) return;
+        try {
+            hookAllMethods(couiSeekBarCls, "onDraw", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    if (!mTileBorderOn || !qsSeekBarCls.isInstance(p.thisObject)) return;
+                    try {
+                        android.graphics.Canvas canvas = (android.graphics.Canvas) p.args[0];
+                        Object rectObj = getObjectField(p.thisObject, "mBackgroundRect");
+                        if (!(rectObj instanceof android.graphics.Rect rect)) return;
+                        float radius = getFloatField(p.thisObject, "mCurBackgroundRadius");
+                        float strokeWidth = tileBorderWidthPx();
+                        float inset = strokeWidth / 2f;
+                        android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+                        paint.setStyle(android.graphics.Paint.Style.STROKE);
+                        paint.setStrokeWidth(strokeWidth);
+                        paint.setColor(mTileBorderColor);
+                        canvas.drawRoundRect(rect.left + inset, rect.top + inset, rect.right - inset, rect.bottom - inset,
+                                radius, radius, paint);
+                    } catch (Throwable t) { dbg("slider border draw failed: " + t); }
+                }
+            });
+        } catch (Throwable t) { dbg("hookSliderBorder install failed: " + t); }
+    }
+
     // ── Cursore Luminosità: icona scura ──────────────────────────────────────
 
     private void hookBrightnessIcon(XC_LoadPackage.LoadPackageParam lp) {
@@ -986,25 +1292,96 @@ public class QsTilesCustomizeMod extends XposedMods {
     // updateIconColor(boolean,boolean) — QSLottieAnimationView deve avere un override che la
     // instrada davvero a Lottie, esattamente come ClipBrightnessView. Stesso pattern: hook
     // dopo la chiamata nativa, si sovrascrive col colore scelto. ──────────────────────
+    private int volumeSliderIconColor() {
+        return switch (mVolumeIconMode) {
+            case 4 -> mVolumeIconColor;
+            case 3 -> appAccentColor();
+            case 2 -> 0xFFFFFFFF;
+            default -> 0xFF404040; // scura
+        };
+    }
+
+    /** true se applicato via addValueCallback (vero percorso Lottie — la libreria reale
+     *  com.airbnb.lottie ignora silenziosamente Drawable/View.setColorFilter() da API recenti,
+     *  esattamente come già scoperto per il pannello Volume Sistema/VolumePanelMod). */
+    private boolean applyVolumeIconLottieColor(Object iconView, int color) {
+        try {
+            ClassLoader cl = iconView.getClass().getClassLoader();
+            Class<?> keyPathCls = findClass("com.airbnb.lottie.model.KeyPath", cl);
+            Class<?> valueCallbackCls = findClass("com.airbnb.lottie.value.LottieValueCallback", cl);
+            Class<?> propertyCls = findClass("com.airbnb.lottie.LottieProperty", cl);
+            Object keyPath = keyPathCls.getConstructor(String[].class).newInstance((Object) new String[]{"**"});
+            Object colorFilterProperty = de.robv.android.xposed.XposedHelpers.getStaticObjectField(propertyCls, "COLOR_FILTER");
+            android.graphics.PorterDuffColorFilter filter = new android.graphics.PorterDuffColorFilter(
+                    color, android.graphics.PorterDuff.Mode.SRC_ATOP);
+            Object valueCallback = valueCallbackCls.getConstructor(Object.class).newInstance(filter);
+            callMethod(iconView, "addValueCallback", keyPath, colorFilterProperty, valueCallback);
+            return true;
+        } catch (Throwable t) {
+            dbg("volume icon Lottie colorFilter failed: " + t);
+            return false;
+        }
+    }
+
+    // Per la route "normale" (altoparlante, il caso comune) OplusQsVolumeIconView non mostra
+    // un drawable statico: cambia composizione Lottie ad ogni soglia di livello attraversata
+    // durante il trascinamento (normalRouteIconState.updateAnimation$1 -> setImageDrawable(null)
+    // + setAnimation(nuovoAsset)) — ogni volta il colore va riapplicato sulla NUOVA composizione,
+    // motivo per cui l'icona torna al colore stock non appena si regola il volume. Fix: si
+    // riapplica il colore (via KeyPath, non setColorFilter) dopo ogni setImageDrawable/
+    // setImageResource/setAnimation/setComposition/updateIconColor/updateIconState — copre bene
+    // ogni cambio DURANTE l'uso (confermato: il colore cambiava correttamente al tocco).
+    //
+    // 2026-09-16: mancava però lo stato "a riposo" — icona scura alla sola apertura del pannello
+    // QS, prima di qualunque tocco. Investigato a fondo (log diagnostico, più giri): tutti gli
+    // hook sopra SCATTANO anche al boot (non solo durante l'uso) e "applicano" senza eccezioni,
+    // eppure l'icona restava visivamente scura — persino aspettando 300ms per un'eventuale
+    // composizione Lottie caricata in modo asincrono (mai arrivata: getComposition() restava
+    // null). La raffica di updateIconState/setAnimation osservata al boot non è quindi la stessa
+    // composizione poi realmente mostrata nel pannello — probabile inizializzazione interna/
+    // pre-warm non collegata al rendering visibile.
+    // FIX REALE: OplusQsVolumeIconView dichiara anche getMuteIconColor()/getUnMuteIconColor(),
+    // i due getter che il codice nativo stesso legge per sapere quale colore applicare ad ogni
+    // stato — sovrascrivendo solo il valore restituito (non provando più a reimplementare la
+    // colorazione via Lottie) si sfrutta la pipeline nativa, già corretta e già invocata al
+    // momento giusto in OGNI caso (apertura E interazione), risolvendo lo stato a riposo. Il
+    // meccanismo Lottie/addValueCallback sopra resta com'era prima di oggi (funzionava già per
+    // l'interazione), i due approcci convivono senza conflitto.
     private void hookVolumeSliderIcon(XC_LoadPackage.LoadPackageParam lp) {
         Class<?> volumeIconView = tryFindClass(lp, "com.oplus.systemui.qs.base.seek.OplusQsVolumeIconView");
         if (volumeIconView == null) { dbg("OplusQsVolumeIconView not found — volume slider icon color unavailable"); return; }
-        try {
-            hookAllMethods(volumeIconView, "updateIconColor", new XC_MethodHook() {
-                @Override protected void afterHookedMethod(MethodHookParam p) {
-                    if (mVolumeIconMode == 0) return; // predefinito, non toccare
-                    try {
-                        int color = switch (mVolumeIconMode) {
-                            case 4 -> mVolumeIconColor;
-                            case 3 -> appAccentColor();
-                            case 2 -> 0xFFFFFFFF;
-                            default -> 0xFF404040; // scura
-                        };
-                        callMethod(p.thisObject, "setColorFilter", color, android.graphics.PorterDuff.Mode.SRC_IN);
-                    } catch (Throwable t) { dbg("volume slider icon color hook failed: " + t); }
-                }
-            });
-        } catch (Throwable t) { dbg("hookVolumeSliderIcon failed: " + t); }
+        XC_MethodHook reapplyHook = new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam p) {
+                if (mVolumeIconMode == 0) return; // predefinito, non toccare
+                applyVolumeIconLottieColor(p.thisObject, volumeSliderIconColor());
+            }
+        };
+        try { hookAllMethods(volumeIconView, "updateIconColor", reapplyHook); } catch (Throwable t) { dbg("hookVolumeSliderIcon updateIconColor failed: " + t); }
+        try { hookAllMethods(volumeIconView, "updateIconState", reapplyHook); } catch (Throwable t) { dbg("hookVolumeSliderIcon updateIconState failed: " + t); }
+        XC_MethodHook overrideColorGetterHook = new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam p) {
+                if (mVolumeIconMode == 0) return;
+                p.setResult(volumeSliderIconColor());
+            }
+        };
+        try { hookAllMethods(volumeIconView, "getMuteIconColor", overrideColorGetterHook); } catch (Throwable t) { dbg("hookVolumeSliderIcon getMuteIconColor failed: " + t); }
+        try { hookAllMethods(volumeIconView, "getUnMuteIconColor", overrideColorGetterHook); } catch (Throwable t) { dbg("hookVolumeSliderIcon getUnMuteIconColor failed: " + t); }
+        // setImageDrawable/setImageResource/setAnimation/setComposition NON sono ridichiarati in
+        // OplusQsVolumeIconView — vivono nella classe reale com.airbnb.lottie.LottieAnimationView
+        // (2 livelli sopra), hookAllMethods non risale la gerarchia quindi vanno agganciati lì,
+        // filtrando per instanceof (stesso pattern "stubborn repaint" già usato altrove).
+        Class<?> lottieViewCls = tryFindClass(lp, "com.airbnb.lottie.LottieAnimationView");
+        if (lottieViewCls == null) { dbg("LottieAnimationView not found — volume icon reapply-on-recompose unavailable"); return; }
+        XC_MethodHook scopedReapplyHook = new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam p) {
+                if (mVolumeIconMode == 0 || !volumeIconView.isInstance(p.thisObject)) return;
+                applyVolumeIconLottieColor(p.thisObject, volumeSliderIconColor());
+            }
+        };
+        try { hookAllMethods(lottieViewCls, "setImageDrawable", scopedReapplyHook); } catch (Throwable t) { dbg("hookVolumeSliderIcon setImageDrawable failed: " + t); }
+        try { hookAllMethods(lottieViewCls, "setImageResource", scopedReapplyHook); } catch (Throwable t) { dbg("hookVolumeSliderIcon setImageResource failed: " + t); }
+        try { hookAllMethods(lottieViewCls, "setAnimation", scopedReapplyHook); } catch (Throwable t) { dbg("hookVolumeSliderIcon setAnimation failed: " + t); }
+        try { hookAllMethods(lottieViewCls, "setComposition", scopedReapplyHook); } catch (Throwable t) { dbg("hookVolumeSliderIcon setComposition failed: " + t); }
     }
 
     // ── Cursore Luminosità: sfocatura ────────────────────────────────────────

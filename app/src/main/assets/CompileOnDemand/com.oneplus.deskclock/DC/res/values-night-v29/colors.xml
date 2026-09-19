@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="couiGreenTintControlNormal">@*android:color/accent_material_dark</color>
+    <color name="couiGreenTintLightNormal">@*android:color/keyguard_avatar_frame_pressed_color</color>
+    <color name="couiGreenTintLightPressed">@*android:color/accent_material_dark</color>
+</resources>

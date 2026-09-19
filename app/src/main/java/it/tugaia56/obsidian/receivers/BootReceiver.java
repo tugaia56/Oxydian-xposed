@@ -10,6 +10,7 @@ import it.tugaia56.obsidian.utils.Constants;
 import it.tugaia56.obsidian.utils.DstFabricatedUtil;
 import it.tugaia56.obsidian.utils.ModuleConstants;
 import it.tugaia56.obsidian.utils.ObsidianPrefs;
+import it.tugaia56.obsidian.utils.ObsidianTheme;
 import it.tugaia56.obsidian.utils.overlay.FabricatedUtil;
 
 import static it.tugaia56.obsidian.utils.DarkShadowUtils.PREF_PIN;
@@ -47,12 +48,33 @@ public class BootReceiver extends BroadcastReceiver {
             reapplyPinNum();
         }).start();
 
+        // Launcher Recents button color — re-applied from prefs (live accent) after the
+        // launcher/OMS settle, so a boot-time same-target overlay race can't leave it off.
+        new Thread(() -> {
+            try { Thread.sleep(20000); } catch (InterruptedException ignored) {}
+            reapplyRecentsBtn();
+        }).start();
+
         // DST ACCENT/BACKGROUND overlays (target: android) — OOS ThemeManager resets
         // them after boot, so we wait 15s to re-apply after ThemeManager finishes.
         new Thread(() -> {
             try { Thread.sleep(15000); } catch (InterruptedException ignored) {}
             DstFabricatedUtil.reapplyAll(null);
         }).start();
+    }
+
+    private static void reapplyRecentsBtn() {
+        String key = "LAUNCHER_RECENTS_BTN_COLOR";
+        if (!ObsidianPrefs.getBoolean(key + "_on", false)) return;
+        int color = ObsidianPrefs.getBoolean(key + "_use_accent", false)
+                ? ObsidianTheme.accentColor()
+                : ObsidianPrefs.getInt(key, 0xFF6200EE);
+        String hex = fmt(color);
+        FabricatedUtil.buildAndEnableOverlays(
+            new Object[]{Constants.LAUNCHER, "LAUNCHER_RECENTS_0", "color",
+                    "toggle_bar_apply_btn_enabled_color", hex},
+            new Object[]{Constants.LAUNCHER, "LAUNCHER_RECENTS_2", "drawable",
+                    "recent_clear_circle", hex});
     }
 
     // ── PIN background ────────────────────────────────────────────────────────

@@ -85,8 +85,95 @@ public class MonetFreeze extends XposedMods {
         if (a1On) applyPin(xRes, pinPref, a1, pinNumPref);
     }
 
-    @Override public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lp) {}
+    @Override public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lp) {
+        if (SYSTEM_UI.equals(lp.packageName)) installPinFilledDotFix(lp);
+    }
     @Override public boolean listensTo(String packageName) { return SYSTEM_UI.equals(packageName); }
+
+    /** 2026-09-13: i pallini PIN "pieni" (digitati) restano teal appena dopo il boot — l'utente ha
+     *  confermato che quello VUOTO (non ancora digitato) è invece già giusto (accento trasparente)
+     *  fin da subito. Tracciato via jadx reale su SystemUI.apk: i due leggono risorse DIVERSE
+     *  (coui_simple_lock_filled_rectangle_icon_color per il pieno, ..._outlined_... per il vuoto)
+     *  ma entrambe risolte nello STESSO istante, dallo STESSO obtainStyledAttributes() dentro il
+     *  costruttore di com.coui.appcompat.lockview.COUISimpleLock (com.support.lockview library,
+     *  bundled in SystemUI.apk) — quindi non è un timing diverso tra i due, qualcosa di specifico
+     *  al SOLO colore "filled" ignora xRes.setReplacement() la prima volta (probabile cache di
+     *  ConstantState popolata prima che il nostro hook sia attivo — non verificato oltre, vedi
+     *  sotto perché non serve saperlo con certezza). Invece di continuare a inseguire la vera causa
+     *  lato risorsa, aggirata a runtime: sostituito direttamente il campo mFilledRectangleDrawable
+     *  con un GradientDrawable già colorato giusto, appena dopo che COUI lo imposta (costruttore E
+     *  il suo metodo pubblico refresh(), che rifà la stessa obtainStyledAttributes() sui cambi
+     *  tema — se non lo aggancio anche lì, un refresh() successivo lo rimetterebbe sbagliato). Ogni
+     *  disegno lo clona via getConstantState().newDrawable() (drawFilledRectangle* in
+     *  COUISimpleLock, confermato in sorgente: setBounds() arriva sempre dai parametri del
+     *  chiamante, non dalla dimensione intrinseca — il GradientDrawable non ha bisogno di
+     *  width/height espliciti). Il VUOTO non è toccato: è già corretto, toccarlo aggiungerebbe solo
+     *  rischio per niente. */
+    private void installPinFilledDotFix(XC_LoadPackage.LoadPackageParam lp) {
+        try {
+            Class<?> cls = de.robv.android.xposed.XposedHelpers.findClassIfExists(
+                    "com.coui.appcompat.lockview.COUISimpleLock", lp.classLoader);
+            if (cls == null) return;
+            de.robv.android.xposed.XC_MethodHook hook = new de.robv.android.xposed.XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    try {
+                        Integer color = filledDotColor();
+                        if (color == null) return;
+                        // 2026-09-13: 2dp (il valore reale del drawable originale, 10dp di lato)
+                        // rendeva un quadratino appena smussato — confermato dall'utente
+                        // ("quadratini"). I bound reali passati da drawFilledRectangle() sono
+                        // quasi certamente più grandi dei 10dp intrinseci del drawable originale
+                        // (setBounds() li ignora comunque), quindi un raggio fisso in dp non
+                        // combacia più. Raggio enorme = sempre completamente arrotondato
+                        // (cerchio/pillola) indipendentemente dalle dimensioni reali, stesso trucco
+                        // già usato altrove in questo progetto per bottoni "pillola".
+                        float radius = android.util.TypedValue.applyDimension(
+                                android.util.TypedValue.COMPLEX_UNIT_DIP, 999,
+                                android.content.res.Resources.getSystem().getDisplayMetrics());
+                        android.graphics.drawable.GradientDrawable gd = new android.graphics.drawable.GradientDrawable();
+                        gd.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+                        gd.setColor(color);
+                        gd.setCornerRadius(radius);
+                        de.robv.android.xposed.XposedHelpers.setObjectField(p.thisObject, "mFilledRectangleDrawable", gd);
+                    } catch (Throwable ignored) {}
+                }
+            };
+            de.robv.android.xposed.XposedBridge.hookAllConstructors(cls, hook);
+            de.robv.android.xposed.XposedHelpers.findAndHookMethod(cls, "refresh", hook);
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] MonetFreeze installPinFilledDotFix failed: " + t);
+        }
+    }
+
+    /** Stessa logica di branching di applyPin()/applyPinBgColors() (Accento/AccentoShade/
+     *  Personalizzato), ma legge sempre al momento — niente cache statica per questo, il costruttore
+     *  di COUISimpleLock scatta quando l'utente apre davvero lo schermo PIN, ben oltre la finestra
+     *  critica di preload, quindi Xprefs è quasi certamente già pronto; il fallback sui campi
+     *  sPreload* resta comunque per coprire il caso limite di un boot lentissimo. Null = lascia
+     *  stock (PIN coloring spento o in modalità non gestita da questo fix). */
+    private static Integer filledDotColor() {
+        boolean a1On; int accent; String pinPref;
+        if (Xprefs != null) {
+            a1On = Xprefs.getBoolean(PREF_ACCENT1_ON, false);
+            accent = Xprefs.getInt(PREF_ACCENT1, Color.RED);
+            pinPref = Xprefs.getString(PREF_PIN, null);
+        } else {
+            a1On = sPreloadA1Enabled;
+            accent = sPreloadA1;
+            pinPref = sPreloadPin;
+        }
+        if (!a1On || pinPref == null) return null;
+        switch (pinPref) {
+            case "DSTPINAccent":
+            case "DSTPINAccentShade":
+                return 0xFF000000 | (accent & 0x00FFFFFF);
+            case "DSTPINCustom":
+                int c = Xprefs != null ? Xprefs.getInt(PREF_PIN_CUSTOM_COLOR, Color.WHITE) : sPreloadPinCustomColor;
+                return c != 0 ? (0xFF000000 | (c & 0x00FFFFFF)) : null;
+            default:
+                return null;
+        }
+    }
 
     // ── Boot-time preload (before Xprefs available) ──────────────────────────
 
@@ -118,6 +205,8 @@ public class MonetFreeze extends XposedMods {
             sPreloaded = true;
 
             XposedBridge.log("[ Obsidian ] MonetFreeze.preload(file): a1=" + sPreloadA1Enabled
+                    + " a1color=#" + Integer.toHexString(sPreloadA1)
+                    + " pin=" + sPreloadPin + " pinNum=" + sPreloadPinNum
                     + " a2=" + sPreloadA2Enabled + " bg=" + sPreloadBgEnabled);
         } catch (Throwable t) {
             XposedBridge.log("[ Obsidian ] MonetFreeze.preload(file) ERROR: " + t + " — trying props");
@@ -163,6 +252,8 @@ public class MonetFreeze extends XposedMods {
             sPreloaded = true;
 
             XposedBridge.log("[ Obsidian ] MonetFreeze.preload(props): a1=" + sPreloadA1Enabled
+                    + " a1color=#" + Integer.toHexString(sPreloadA1)
+                    + " pin=" + sPreloadPin + " pinNum=" + sPreloadPinNum
                     + " a2=" + sPreloadA2Enabled + " bg=" + sPreloadBgEnabled);
         } catch (Throwable t) {
             XposedBridge.log("[ Obsidian ] MonetFreeze.preload(props) ERROR: " + t);
@@ -177,7 +268,15 @@ public class MonetFreeze extends XposedMods {
 
         if (sPreloadA1Enabled && sPreloadA1 != 0) {
             applyAccent1(xRes, sPreloadA1);
+            // 2026-09-13: pallini PIN teal appena dopo il boot, poi si autocorreggono — log per
+            // vedere se il colore/pin-mode usato QUI (il primissimo apply, a resource-init time,
+            // prima ancora che Xprefs sia raggiungibile) è già quello giusto o no.
+            XposedBridge.log("[ Obsidian ] MonetFreeze.applyPreloaded: applying pin a1color=#"
+                    + Integer.toHexString(sPreloadA1) + " pinMode=" + sPreloadPin + " pinNumMode=" + sPreloadPinNum);
             applyPin(xRes, sPreloadPin, sPreloadA1, sPreloadPinNum);
+        } else {
+            XposedBridge.log("[ Obsidian ] MonetFreeze.applyPreloaded: SKIPPED pin apply, a1Enabled="
+                    + sPreloadA1Enabled + " a1color=#" + Integer.toHexString(sPreloadA1));
         }
         if (sPreloadA2Enabled && sPreloadA2 != 0) applyAccent2(xRes, sPreloadA2);
         if (sPreloadA3Enabled && sPreloadA3 != 0) applyAccent3(xRes, sPreloadA3);

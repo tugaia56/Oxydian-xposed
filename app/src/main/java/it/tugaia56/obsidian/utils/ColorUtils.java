@@ -24,6 +24,25 @@ public class ColorUtils {
         return Color.argb(Color.alpha(color), r, g, b);
     }
 
+    /**
+     * Blend a color towards white (amount &gt; 0) or black (amount &lt; 0) by |amount|%,
+     * keeping the same hue/alpha. Unlike adjustColor()'s multiplicative scaling — which
+     * can't push an already-saturated channel (e.g. blue=255) any higher — this linearly
+     * interpolates each channel towards 255 or 0, so it reaches genuinely light/dark
+     * tones at the extremes. Used for the Material You tonal palette (system_accentN_*):
+     * light tones (100/200/300) need a real near-white background, dark tones (600/700)
+     * a real near-black one, so text and container never collapse to the same flat color.
+     */
+    public static int blendTone(int color, int amount) {
+        float fraction = Math.max(-100, Math.min(100, amount)) / 100f;
+        int target = fraction >= 0 ? 255 : 0;
+        float f = Math.abs(fraction);
+        int r = Math.round(Color.red(color)   + (target - Color.red(color))   * f);
+        int g = Math.round(Color.green(color) + (target - Color.green(color)) * f);
+        int b = Math.round(Color.blue(color)  + (target - Color.blue(color))  * f);
+        return Color.argb(Color.alpha(color), r, g, b);
+    }
+
     /** Multiply the alpha channel by factor (0..1). */
     public static int adjustAlpha(int color, float factor) {
         int alpha = Math.min(255, (int) (Color.alpha(color) * factor));

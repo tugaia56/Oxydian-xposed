@@ -118,6 +118,13 @@ public class QsTilesCustomizeFragment extends Fragment {
     };
     private static final String KEY_TILE_BG_MEDIA_ON = "qs_tile_bg_media_enabled";
     private static final String KEY_TILE_BG_MEDIA_COLOR = "qs_tile_bg_media_inactive_color";
+    // Bordo pulsanti QS (2026-09-16) — un unico switch+colore, pulsanti+cursori+media (2026-09-17).
+    private static final String KEY_TILE_BORDER_ON    = "qs_tile_border_enabled";
+    private static final String KEY_TILE_BORDER_COLOR = "qs_tile_border_custom_color";
+    // Bordo Pannello QS (2026-09-18) — 4° e ultima superficie della richiesta originale del
+    // 09-16, switch/colore SEPARATO dal bordo pulsanti (il pannello è tutt'altra vista).
+    private static final String KEY_PANEL_BORDER_ON    = "qs_panel_border_enabled";
+    private static final String KEY_PANEL_BORDER_COLOR = "qs_panel_border_custom_color";
     // Copertina Album (filtro sulla vera artwork del brano, stessa tecnica/opzioni di
     // AlbumArtLockscreenMod — grayscale/accento/blur/grayscale+blur, riuso stringhe esistenti.
     private static final String KEY_MEDIA_COVER_FILTER_ON = "qs_tile_media_cover_filter_enabled";
@@ -143,16 +150,18 @@ public class QsTilesCustomizeFragment extends Fragment {
     private DarkShadowColorListener mTileBgHlColorAdapter;
     // Stato SOLO visivo (non persistito) — vedi nota in QsSeparateModsFragment: lo switch
     // attiva soltanto, il tocco sul nome apre/chiude le opzioni sottostanti.
-    private boolean mIconExpanded    = ObsidianPrefs.getBoolean(KEY_ICON_COLORS_ON, false);
-    private boolean mBgBaseExpanded  = ObsidianPrefs.getBoolean(KEY_TILE_BG_BASE_ON, false);
-    private boolean mBgHlExpanded    = ObsidianPrefs.getBoolean(KEY_TILE_BG_HL_ON, false);
-    private boolean mBgMediaExpanded = ObsidianPrefs.getBoolean(KEY_TILE_BG_MEDIA_ON, false);
-    private boolean mSlidersExpanded = ObsidianPrefs.getBoolean(KEY_SLIDERS_ON, true);
+    private boolean mIconExpanded    = false;
+    private boolean mBgBaseExpanded  = false;
+    private boolean mBgHlExpanded    = false;
+    private boolean mBgMediaExpanded = false;
+    private boolean mBorderExpanded  = false;
+    private boolean mPanelBorderExpanded = false;
+    private boolean mSlidersExpanded = false;
     // Stato SOLO visivo — header senza switch, tocco sul nome apre/chiude, stesso pattern
     // di collapsibleHeader in LockscreenWidgetsFragment.
     private boolean mSliderIconColorsExpanded;
-    private boolean mSepExpanded     = ObsidianPrefs.getBoolean(KEY_SEP_ON, true);
-    private boolean mSepBtnBgExpanded = ObsidianPrefs.getBoolean(QsSeparateMod.PREF_BTN_BG_ON, false);
+    private boolean mSepExpanded     = false;
+    private boolean mSepBtnBgExpanded = false;
     /** dialogId -> pref key, per i due swatch singoli del Cursore Luminosità (non passano
      *  per DarkShadowItem/onColorSelected sopra, servono qui per sapere dove salvare). */
     private final java.util.Map<Integer, String> mSingleColorKeys = new java.util.HashMap<>();
@@ -215,6 +224,20 @@ public class QsTilesCustomizeFragment extends Fragment {
             rebuild();
         };
         bgHlSwitch.onRowClick = () -> { mBgHlExpanded = !mBgHlExpanded; rebuild(); };
+        SwitchWidgetAdapter.SwitchItem borderSwitch = prefSwitch(getString(R.string.qs_tiles_border_title), null, KEY_TILE_BORDER_ON);
+        borderSwitch.onChanged = () -> {
+            ObsidianPrefs.putBoolean(KEY_TILE_BORDER_ON, borderSwitch.checked);
+            mBorderExpanded = borderSwitch.checked;
+            rebuild();
+        };
+        borderSwitch.onRowClick = () -> { mBorderExpanded = !mBorderExpanded; rebuild(); };
+        SwitchWidgetAdapter.SwitchItem panelBorderSwitch = prefSwitch(getString(R.string.qs_panel_border_title), null, KEY_PANEL_BORDER_ON);
+        panelBorderSwitch.onChanged = () -> {
+            ObsidianPrefs.putBoolean(KEY_PANEL_BORDER_ON, panelBorderSwitch.checked);
+            mPanelBorderExpanded = panelBorderSwitch.checked;
+            rebuild();
+        };
+        panelBorderSwitch.onRowClick = () -> { mPanelBorderExpanded = !mPanelBorderExpanded; rebuild(); };
         SwitchWidgetAdapter.SwitchItem bgMediaSwitch = prefSwitch(getString(R.string.qs_tiles_jump_media), null, KEY_TILE_BG_MEDIA_ON);
         bgMediaSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_TILE_BG_MEDIA_ON, bgMediaSwitch.checked);
@@ -330,6 +353,21 @@ public class QsTilesCustomizeFragment extends Fragment {
                 sliderRows.add(sliderRow(getString(R.string.qs_tiles_radius_value_title), KEY_RADIUS, 0, 40, 20, "dp"));
             }
             GroupUtils.addGroup(chain, sliderRows, true);
+        }
+
+        // ── Bordo Pulsanti (spostato sotto Riquadro Cursori su richiesta esplicita 2026-09-16) ──
+        GroupUtils.addGroup(chain, List.of(borderSwitch));
+        if (mBorderExpanded) {
+            GroupUtils.addGroup(chain, List.of(
+                    singleColorRow(getString(R.string.qs_tiles_border_color_title), KEY_TILE_BORDER_COLOR, 211)), true);
+        }
+
+        // ── Bordo Pannello (2026-09-18) — 4a superficie, switch/colore separati dal bordo
+        // pulsanti/cursori/media sopra: il pannello è tutt'altra vista (QsBackground.java).
+        GroupUtils.addGroup(chain, List.of(panelBorderSwitch));
+        if (mPanelBorderExpanded) {
+            GroupUtils.addGroup(chain, List.of(
+                    singleColorRow(getString(R.string.qs_panel_border_color_title), KEY_PANEL_BORDER_COLOR, 212)), true);
         }
 
         // ── Colori Icone (spostata sotto Sfondo Riquadri su richiesta esplicita) ────

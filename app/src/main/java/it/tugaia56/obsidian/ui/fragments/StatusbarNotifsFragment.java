@@ -63,8 +63,8 @@ public class StatusbarNotifsFragment extends Fragment {
     private RecyclerView mRv;
     // Stato SOLO visivo (non persistito): lo switch attiva soltanto, il tocco sul nome
     // apre/chiude le opzioni sottostanti — stesso pattern di QsTilesCustomizeFragment.
-    private boolean mAppIconExpanded  = ObsidianPrefs.getBoolean(PREF_APP_ICON, false);
-    private boolean mClearBtnExpanded = ObsidianPrefs.getBoolean(PREF_CUSTOMIZE_CLEAR, false);
+    private boolean mAppIconExpanded  = false;
+    private boolean mClearBtnExpanded = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

@@ -180,7 +180,15 @@ public class XPLauncher {
             }
         };
 
-        if (isDeferredPackage(lpparam.packageName)) {
+        // 2026-09-12: il ritardo serve SOLO nella finestra di boot vera e propria (CPU
+        // contesa da ~70 processi che partono insieme) — ma finora scattava ad OGNI primo
+        // avvio di queste app, pure ore dopo l'accensione, quando non c'è alcuna
+        // competizione per la CPU. L'utente ha notato l'attesa inutile su app aperte a
+        // telefono già acceso da un pezzo ("tante app vanno subito"). Fix: applicare il
+        // ritardo solo se siamo ancora dentro la finestra di boot (elapsedRealtime, che
+        // conta dal boot e non dall'orologio di sistema) — altrimenti si parte subito.
+        boolean nearBoot = android.os.SystemClock.elapsedRealtime() < BOOT_WINDOW_MS;
+        if (isDeferredPackage(lpparam.packageName) && nearBoot) {
             new Thread(() -> {
                 try { Thread.sleep(DEFERRED_STARTUP_DELAY_MS); } catch (InterruptedException ignored) {}
                 startMods.run();
@@ -191,6 +199,7 @@ public class XPLauncher {
     }
 
     private static final long DEFERRED_STARTUP_DELAY_MS = 20000;
+    private static final long BOOT_WINDOW_MS = 90000;
 
     private static boolean isDeferredPackage(String packageName) {
         for (String p : it.tugaia56.obsidian.xposed.hooks.settings.SettingsCardBackgroundMod.EXTRA_OEM_PACKAGES) {

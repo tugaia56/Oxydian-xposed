@@ -72,6 +72,14 @@
     <string name="section_accent3">Aksen Alfa</string>
     <string name="dst_section_preset_accent">Preset Aksen</string>
     <string name="dst_section_preset_sfondo">Preset Latar Belakang</string>
+    <string name="dst_substratum_style_title">Gaya Dark Shadow Theme untuk Obsidian</string>
+    <string name="dst_substratum_style_notice">Menata Pengaturan, SystemUI, Launcher, aplikasi Video sistem, Bola Asisten, Pemulihan Aplikasi, Portal Konten, Jam, OnePlus Share, Kalkulator, Asisten Game, Kenyamanan Mata, Foto, Kamera, Internet, dan Wifi/Bluetooth sekaligus (warna, latar belakang, dialog, popup, animasi sidik jari) menggunakan paket sumber daya yang diambil dari tema Substratum Anda sendiri, dalam satu overlay. Ketuk Terapkan (perlu waktu sebentar untuk membangun keenam belasnya). Mulai ulang untuk melihat perubahannya. Memerlukan izin "Akses semua file".</string>
+    <string name="dst_substratum_style_card_desc">Pengaturan, SystemUI, Launcher, Video, Bola Asisten, Pemulihan Aplikasi, Portal Konten, Jam, OnePlus Share, Kalkulator, Asisten Game, Kenyamanan Mata, Foto, Kamera, Internet, Wifi/Bluetooth</string>
+    <string name="dst_substratum_style_status_none">Belum diterapkan</string>
+    <string name="dst_substratum_style_status_active">Tema aktif</string>
+    <string name="dst_substratum_style_howto">PENTING:\nsetelah Terapkan, mulai ulang dua kali:\nmulai ulang pertama mengaktifkan overlay yang dibangun.\nMulai ulang kedua mengaktifkan dan menstabilkan overlay.</string>
+    <string name="dst_substratum_style_readme_link">Baca readme lengkap</string>
+    <string name="dst_substratum_style_readme_full">PENTING: setelah Terapkan, mulai ulang dua kali: mulai ulang pertama mengaktifkan overlay yang baru dibangun dan ponsel mungkin melambat sekitar satu menit (akan pulih sendiri, tidak perlu melakukan apa pun — jika tampak macet, tahan tombol daya untuk memulai ulang paksa). Mulai dari mulai ulang kedua, tema sudah aktif dan stabil. Sejak itu, setiap booting mungkin sedikit lebih lambat dari sebelumnya — itu adalah biaya untuk memiliki tema lengkap yang aktif.</string>
     <string name="nav_sys_settings">Gaya Pengaturan OOS</string>
     <string name="nav_sys_settings_summary">Tema nyata lengkap untuk aplikasi Pengaturan, dibuat dari tema Substratum Anda</string>
     <string name="settings_theme_notice">Menata seluruh aplikasi Pengaturan (warna, latar belakang, animasi sidik jari) menggunakan paket sumber daya yang diambil dari tema Substratum Anda sendiri. Ketuk Terapkan (perlu waktu sebentar untuk membangun). Memerlukan izin "Akses semua file".</string>
@@ -114,7 +122,7 @@
     <string name="nav_dst_colors_summary">Contoh warna aksen dan latar belakang</string>
     <string name="nav_settings_icons">Gaya Ikon Pengaturan</string>
     <string name="nav_settings_icons_summary">Paket ikon PUI / HOS untuk aplikasi Pengaturan</string>
-    <string name="settings_icons_preview_notice">Ketuk paket untuk memilihnya, lalu Terapkan (perlu waktu sebentar untuk membangun). Memerlukan izin "Akses semua file".</string>
+    <string name="settings_icons_preview_notice">Ketuk paket untuk memilihnya, lalu Terapkan (perlu waktu sebentar untuk membangun). Mulai ulang untuk melihat perubahannya. Memerlukan izin "Akses semua file".</string>
     <string name="settings_icons_apply">Terapkan</string>
     <string name="settings_icons_disable">Nonaktifkan</string>
     <string name="settings_icons_status_none">Tidak ada paket diterapkan</string>
@@ -328,7 +336,7 @@
     <string name="advanced_reboot_auth_summary">Autentikasi untuk menampilkan opsi mulai ulang lanjutan</string>
     <string name="power_menu_pill_section">Penggeser</string>
     <string name="power_menu_gradient_color_title">Warna Mulai Ulang/Matikan</string>
-    <string name="power_menu_handler_color_title">Warna Pegangan</string>
+    <string name="power_menu_handler_color_title">Latar Belakang Pegangan</string>
     <string name="power_menu_handler_gallery_title">Pilih dari Galeri</string>
     <string name="power_menu_handler_gallery_summary">Pilih foto Anda sendiri</string>
     <string name="power_menu_handler_style_section">Gaya</string>
@@ -339,6 +347,9 @@
     <string name="power_menu_border_title">Batas Penggeser</string>
     <string name="power_menu_border_summary">Gambar garis luar di sekitar penggeser mulai ulang/matikan</string>
     <string name="power_menu_border_color_title">Warna Batas</string>
+    <string name="power_menu_handler_border_title">Batas Pegangan</string>
+    <string name="power_menu_handler_border_summary">Gambar cincin di sekitar pegangan</string>
+    <string name="power_menu_handler_border_color_title">Warna Batas Pegangan</string>
     <string name="advanced_reboot_auth_failed">Autentikasi gagal</string>
     <string name="advanced_reboot_recovery">Recovery</string>
     <string name="advanced_reboot_bootloader">Bootloader</string>

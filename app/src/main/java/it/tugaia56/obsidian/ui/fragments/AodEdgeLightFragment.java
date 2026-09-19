@@ -1,8 +1,9 @@
 package it.tugaia56.obsidian.ui.fragments;
 
 import android.app.AlertDialog;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,7 @@ import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
 import it.tugaia56.obsidian.ui.events.ColorSelectedEvent;
+import it.tugaia56.obsidian.ui.views.edgelight.EdgeLightView;
 import it.tugaia56.obsidian.utils.ObsidianPrefs;
 import it.tugaia56.obsidian.utils.ObsidianTheme;
 
@@ -61,6 +63,19 @@ public class AodEdgeLightFragment extends Fragment {
     private RecyclerView mRv;
     private PreviewAdapter mPreviewAdapter;
 
+    /** Anteprima animata reale (portata da OC). Istanza unica, ri-parentata a ogni rebuild. */
+    private EdgeLightView mPreviewView;
+    private final Handler mReplayHandler = new Handler(Looper.getMainLooper());
+    private final Runnable mReplay = new Runnable() {
+        @Override public void run() {
+            if (mPreviewView != null && isResumed()) {
+                mPreviewView.stopAnimation();
+                mPreviewView.setPulsing(true, mPreviewView.PULSE_REASON_NOTIFICATION);
+            }
+            mReplayHandler.postDelayed(this, 3500L);
+        }
+    };
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,8 +104,6 @@ public class AodEdgeLightFragment extends Fragment {
     private void rebuild() {
         List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
 
-        mPreviewAdapter = new PreviewAdapter();
-        chain.add(mPreviewAdapter);
         chain.add(new TextRowAdapter(getString(R.string.edge_light_advice)));
 
         GroupUtils.addGroup(chain, List.of(
@@ -100,12 +113,17 @@ public class AodEdgeLightFragment extends Fragment {
                 prefSwitch(getString(R.string.edge_light_retick_title), getString(R.string.edge_light_retick_summary), KEY_RETICK),
                 singleChoiceItem(getString(R.string.edge_light_retick_time), KEY_RETICK_DURATION, R.array.edge_light_retick_entries)));
 
+        // Anteprima subito sopra la card "Stile": è lì che si regolano stile/blur/
+        // larghezza a cui l'anteprima reagisce, così stanno insieme.
+        mPreviewAdapter = new PreviewAdapter();
+        chain.add(mPreviewAdapter);
+
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.edge_light_style_title))));
         GroupUtils.addGroup(chain, List.of(
                 singleChoiceItem(getString(R.string.edge_light_style_title), KEY_STYLE, R.array.edge_light_style_entries, true),
-                prefSwitch(getString(R.string.edge_light_show_blur), null, KEY_SHOW_BLUR),
-                singleChoiceItem(getString(R.string.edge_light_blur_mode_title), KEY_BLUR_MODE, R.array.edge_light_blur_mode_entries),
-                singleChoiceItem(getString(R.string.edge_light_blur_type_title), KEY_BLUR_TYPE, R.array.edge_light_blur_type_entries),
+                prefSwitchRefresh(getString(R.string.edge_light_show_blur), null, KEY_SHOW_BLUR),
+                singleChoiceItem(getString(R.string.edge_light_blur_mode_title), KEY_BLUR_MODE, R.array.edge_light_blur_mode_entries, true),
+                singleChoiceItem(getString(R.string.edge_light_blur_type_title), KEY_BLUR_TYPE, R.array.edge_light_blur_type_entries, true),
                 colorModeItem(),
                 sliderItem(getString(R.string.edge_light_stroke_width_title), KEY_WIDTH, 8, 20, 12, "dp")));
 
@@ -145,80 +163,87 @@ public class AodEdgeLightFragment extends Fragment {
                 .show());
     }
 
-    // ── Live preview: static glowing border, colour follows current color-mode choice ──
+    // ── Anteprima animata reale (EdgeLightView portato da OC) ─────────────────────
 
     private class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.VH> {
         class VH extends RecyclerView.ViewHolder { FrameLayout glow; VH(View v) { super(v); } }
 
         @NonNull @Override public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             FrameLayout outer = new FrameLayout(requireContext());
-            int h = dp(140);
-            outer.setLayoutParams(marginLp(h));
+            outer.setLayoutParams(marginLp(dp(150)));
             outer.setBackgroundColor(0xFF000000);
 
             FrameLayout glow = new FrameLayout(requireContext());
             glow.setLayoutParams(new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            glow.setClipChildren(false);
             outer.addView(glow);
 
             VH holder = new VH(outer);
             holder.glow = glow;
             return holder;
         }
-        @Override public void onBindViewHolder(@NonNull VH h, int pos) {
-            h.glow.removeAllViews();
-            int style = 0;
-            try { style = Integer.parseInt(ObsidianPrefs.getString(KEY_STYLE, "0")); } catch (NumberFormatException ignored) {}
 
-            if (style == 2) { // Linee Laterali — two vertical bars, not a full border
-                h.glow.setBackground(null);
-                int width = ObsidianPrefs.getInt(KEY_WIDTH, 12);
-                int color = previewColor();
-                for (int side = 0; side < 2; side++) {
-                    View bar = new View(requireContext());
-                    bar.setBackgroundColor(color);
-                    FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(dp(width), ViewGroup.LayoutParams.MATCH_PARENT);
-                    lp.gravity = side == 0 ? Gravity.START : Gravity.END;
-                    bar.setLayoutParams(lp);
-                    h.glow.addView(bar);
-                }
-            } else {
-                // Draw Line / Blink / Snake / Echo all animate a full-perimeter glow in OC —
-                // indistinguishable in a static preview, so they share this border illustration.
-                h.glow.setBackground(buildGlowDrawable());
+        @Override public void onBindViewHolder(@NonNull VH h, int pos) {
+            if (mPreviewView == null) {
+                mPreviewView = new EdgeLightView(requireContext(), true);
+                mPreviewView.setScreenRadius(dp(22));
+                mPreviewView.setDurations(2600, 1300, 2600);
             }
+            if (mPreviewView.getParent() instanceof ViewGroup vg) vg.removeView(mPreviewView);
+            h.glow.removeAllViews();
+            h.glow.addView(mPreviewView, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            applyPreviewOptions();
+            startReplayLoop();
         }
+
         @Override public int getItemCount() { return 1; }
     }
 
+    /** Legge le prefs correnti e le applica alla EdgeLightView, poi fa ripartire l'animazione. */
+    private void applyPreviewOptions() {
+        if (mPreviewView == null) return;
+        int style = parseInt(ObsidianPrefs.getString(KEY_STYLE, "0"), 0);
+        int width = ObsidianPrefs.getInt(KEY_WIDTH, 12);
+        int modeIdx = parseInt(ObsidianPrefs.getString(KEY_COLOR_MODE, "0"), 0);
+        boolean drawBlur = ObsidianPrefs.getBoolean(KEY_SHOW_BLUR, false);
+        int blurMode = parseInt(ObsidianPrefs.getString(KEY_BLUR_MODE, "0"), 0);
+        int blurType = parseInt(ObsidianPrefs.getString(KEY_BLUR_TYPE, "0"), 0);
+        int customColor = ObsidianPrefs.getInt(KEY_CUSTOM_COLOR, 0xFFFF3B30);
+
+        EdgeLightView.ColorMode mode;
+        EdgeLightView.ColorMode[] all = EdgeLightView.ColorMode.values();
+        mode = (modeIdx >= 0 && modeIdx < all.length) ? all[modeIdx] : EdgeLightView.ColorMode.ACCENT;
+
+        // fallback usato per ACCENT e per NOTIFICATION/WALLPAPER quando non risolvibili in-app
+        mPreviewView.setFallbackColor(ObsidianTheme.accentColor());
+        mPreviewView.setOptions(style, dp(width), mode, customColor, drawBlur, blurMode, blurType);
+        mPreviewView.stopAnimation();
+        mPreviewView.setPulsing(true, mPreviewView.PULSE_REASON_NOTIFICATION);
+    }
+
+    private void startReplayLoop() {
+        mReplayHandler.removeCallbacks(mReplay);
+        mReplayHandler.postDelayed(mReplay, 3500L);
+    }
+
     private void refreshGlow() {
-        if (mPreviewAdapter == null) return;
-        mPreviewAdapter.notifyItemChanged(0);
+        if (mPreviewView != null) {
+            applyPreviewOptions();
+        } else if (mPreviewAdapter != null) {
+            mPreviewAdapter.notifyItemChanged(0);
+        }
+    }
+
+    private static int parseInt(String s, int def) {
+        try { return Integer.parseInt(s); } catch (NumberFormatException e) { return def; }
     }
 
     private FrameLayout.LayoutParams marginLp(int height) {
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height);
         lp.setMargins(dp(16), dp(12), dp(16), dp(12));
         return lp;
-    }
-
-    private int previewColor() {
-        int mode = 0;
-        try { mode = Integer.parseInt(ObsidianPrefs.getString(KEY_COLOR_MODE, "0")); } catch (NumberFormatException ignored) {}
-        return switch (mode) {
-            case 4 -> ObsidianPrefs.getInt(KEY_CUSTOM_COLOR, 0xFFFF3B30);
-            case 3 -> 0xFF00E5FF; // rainbow placeholder swatch
-            default -> ObsidianTheme.accentColor();
-        };
-    }
-
-    private GradientDrawable buildGlowDrawable() {
-        int width = ObsidianPrefs.getInt(KEY_WIDTH, 12);
-        GradientDrawable gd = new GradientDrawable();
-        gd.setColor(0xFF000000);
-        gd.setStroke(dp(width), previewColor());
-        gd.setCornerRadius(dp(24));
-        return gd;
     }
 
     // ── Simple advice text row ──────────────────────────────────────────────────
@@ -254,6 +279,33 @@ public class AodEdgeLightFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (mPreviewView != null) {
+            applyPreviewOptions();
+            startReplayLoop();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mReplayHandler.removeCallbacks(mReplay);
+        if (mPreviewView != null) mPreviewView.stopAnimation();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mReplayHandler.removeCallbacks(mReplay);
+        if (mPreviewView != null) {
+            mPreviewView.stopAnimation();
+            if (mPreviewView.getParent() instanceof ViewGroup vg) vg.removeView(mPreviewView);
+            mPreviewView = null;
+        }
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
@@ -265,6 +317,14 @@ public class AodEdgeLightFragment extends Fragment {
         SwitchWidgetAdapter.SwitchItem item = new SwitchWidgetAdapter.SwitchItem(
                 title, summary, ObsidianPrefs.getBoolean(key, false), null);
         item.onChanged = () -> ObsidianPrefs.putBoolean(key, item.checked);
+        return item;
+    }
+
+    /** Come prefSwitch ma aggiorna anche l'anteprima (per lo switch "sfocatura"). */
+    private SwitchWidgetAdapter.SwitchItem prefSwitchRefresh(String title, String summary, String key) {
+        SwitchWidgetAdapter.SwitchItem item = new SwitchWidgetAdapter.SwitchItem(
+                title, summary, ObsidianPrefs.getBoolean(key, false), null);
+        item.onChanged = () -> { ObsidianPrefs.putBoolean(key, item.checked); refreshGlow(); };
         return item;
     }
 

@@ -42,7 +42,7 @@ public class ClockStyleFragment extends Fragment {
     private static final String PREF_CHIP_STYLE = PREF_CHIP_PREFIX + "_style";
 
     private RecyclerView mRv;
-    private boolean mChipExpanded = ObsidianPrefs.getBoolean(PREF_BG_CHIP_ON, false);
+    private boolean mChipExpanded = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
