@@ -316,6 +316,29 @@ public class LockscreenClockMod extends XposedMods {
             mInjectedStyle = -1;
         }
 
+        // 2026-09-20: il plugin orologio puo' consegnarci un container NUOVO a ogni getView() (a
+        // raffica durante sblocco/schermo acceso). Prima ri-gonfiavamo e aggiungevamo un orologio
+        // nuovo ogni volta, senza mai rimuovere il precedente: centinaia di TextClock agganciati,
+        // ognuno con i suoi receiver (TIME_TICK/TIME_SET/...) -> "Too many receivers, total of
+        // 1000" in SystemUI, crash a ripetizione e ANR "NotificationShade is not responding" allo
+        // sblocco. Ora riusiamo l'orologio gia' costruito, spostandolo nel nuovo container.
+        if (mInjectedClock != null && mInjectedStyle == style) {
+            ViewGroup oldParent = (ViewGroup) mInjectedClock.getParent();
+            if (oldParent != container) {
+                if (oldParent != null) oldParent.removeView(mInjectedClock);
+                container.addView(mInjectedClock);
+                applyStyling(mInjectedClock, state);
+                applyMargins(mInjectedClock, state);
+            }
+            return;
+        }
+        if (mInjectedClock != null) {
+            ViewGroup oldParent = (ViewGroup) mInjectedClock.getParent();
+            if (oldParent != null) oldParent.removeView(mInjectedClock);
+            mInjectedClock = null;
+            mInjectedStyle = -1;
+        }
+
         View clockView = buildClockView(state);
         if (clockView == null) return;
 

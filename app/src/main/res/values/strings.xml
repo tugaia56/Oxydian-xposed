@@ -463,10 +463,8 @@
     <string name="qs_tiles_icon_colors_title">Custom Icon Colors</string>
     <string name="qs_tiles_icon_active_accent_title">Link icon to accent color</string>
     <string name="qs_tiles_bg_active_accent_title">Link to accent color</string>
-    <string name="qs_tiles_border_title">Tile Border</string>
+    <string name="qs_tiles_border_title">Tile border</string>
     <string name="qs_tiles_border_color_title">Border Color</string>
-    <string name="qs_panel_border_title">Panel Border</string>
-    <string name="qs_panel_border_color_title">Border Color</string>
     <string name="qs_tiles_color_active">Active</string>
     <string name="qs_tiles_color_inactive">Inactive</string>
     <string name="qs_tiles_color_disabled">Disabled</string>
@@ -1108,4 +1106,5 @@
     <string name="power_menu_handler_replace_message">This will replace your current Pallino image with this preset.</string>
     <string name="launcher_page_indicator_tap_title">Page indicator tap action</string>
     <string name="launcher_page_indicator_tap_summary">Opens a chosen app when you tap the search entry under the home page indicator (needs \u201cShow Search at the bottom\u201d on). Tap to choose the app.</string>
+    <string name="qs_big_icon_border_title">Icon border</string>
 </resources>

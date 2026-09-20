@@ -460,10 +460,8 @@
     <string name="qs_tiles_icon_colors_title">Personalizza i colori delle icone</string>
     <string name="qs_tiles_icon_active_accent_title">Collega icona all\'Accento</string>
     <string name="qs_tiles_bg_active_accent_title">Collega all\'Accento</string>
-    <string name="qs_tiles_border_title">Bordo Pulsanti</string>
+    <string name="qs_tiles_border_title">Bordo riquadri</string>
     <string name="qs_tiles_border_color_title">Colore Bordo</string>
-    <string name="qs_panel_border_title">Bordo Pannello</string>
-    <string name="qs_panel_border_color_title">Colore Bordo</string>
     <string name="qs_tiles_color_active">Attivo</string>
     <string name="qs_tiles_color_inactive">Inattivo</string>
     <string name="qs_tiles_color_disabled">Disabilitato</string>
@@ -1080,4 +1078,5 @@
     <string name="power_menu_handler_replace_message">Questo sostituirà l’immagine attuale del Pallino con questo preset.</string>
     <string name="launcher_page_indicator_tap_title">Azione al tocco sull\u2019indicatore di pagina</string>
     <string name="launcher_page_indicator_tap_summary">Apre un\u2019app a tua scelta quando tocchi la voce di ricerca sotto l\u2019indicatore di pagina della home (serve \u00abMostra Cerca sul fondo\u00bb attivo). Tocca per scegliere l\u2019app.</string>
+    <string name="qs_big_icon_border_title">Bordo icone</string>
 </resources>

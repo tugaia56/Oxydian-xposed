@@ -121,10 +121,11 @@ public class QsTilesCustomizeFragment extends Fragment {
     // Bordo pulsanti QS (2026-09-16) — un unico switch+colore, pulsanti+cursori+media (2026-09-17).
     private static final String KEY_TILE_BORDER_ON    = "qs_tile_border_enabled";
     private static final String KEY_TILE_BORDER_COLOR = "qs_tile_border_custom_color";
-    // Bordo Pannello QS (2026-09-18) — 4° e ultima superficie della richiesta originale del
-    // 09-16, switch/colore SEPARATO dal bordo pulsanti (il pannello è tutt'altra vista).
-    private static final String KEY_PANEL_BORDER_ON    = "qs_panel_border_enabled";
-    private static final String KEY_PANEL_BORDER_COLOR = "qs_panel_border_custom_color";
+    // Bordo icone dei riquadri grandi 2x1 (Wi-Fi/Torcia/Pixolor/Riavvia), 2026-09-20: switch/colore
+    // separati dal "Bordo riquadri", stanno dentro "Riquadri grandi": coprono i 4 pulsanti in alto,
+    // le icone e le card dei riquadri grandi ("Bordo riquadri" resta per i riquadri piccoli).
+    private static final String KEY_ICON_BORDER_ON    = "qs_icon_border_enabled";
+    private static final String KEY_ICON_BORDER_COLOR = "qs_icon_border_custom_color";
     // Copertina Album (filtro sulla vera artwork del brano, stessa tecnica/opzioni di
     // AlbumArtLockscreenMod — grayscale/accento/blur/grayscale+blur, riuso stringhe esistenti.
     private static final String KEY_MEDIA_COVER_FILTER_ON = "qs_tile_media_cover_filter_enabled";
@@ -155,7 +156,6 @@ public class QsTilesCustomizeFragment extends Fragment {
     private boolean mBgHlExpanded    = false;
     private boolean mBgMediaExpanded = false;
     private boolean mBorderExpanded  = false;
-    private boolean mPanelBorderExpanded = false;
     private boolean mSlidersExpanded = false;
     // Stato SOLO visivo — header senza switch, tocco sul nome apre/chiude, stesso pattern
     // di collapsibleHeader in LockscreenWidgetsFragment.
@@ -231,13 +231,6 @@ public class QsTilesCustomizeFragment extends Fragment {
             rebuild();
         };
         borderSwitch.onRowClick = () -> { mBorderExpanded = !mBorderExpanded; rebuild(); };
-        SwitchWidgetAdapter.SwitchItem panelBorderSwitch = prefSwitch(getString(R.string.qs_panel_border_title), null, KEY_PANEL_BORDER_ON);
-        panelBorderSwitch.onChanged = () -> {
-            ObsidianPrefs.putBoolean(KEY_PANEL_BORDER_ON, panelBorderSwitch.checked);
-            mPanelBorderExpanded = panelBorderSwitch.checked;
-            rebuild();
-        };
-        panelBorderSwitch.onRowClick = () -> { mPanelBorderExpanded = !mPanelBorderExpanded; rebuild(); };
         SwitchWidgetAdapter.SwitchItem bgMediaSwitch = prefSwitch(getString(R.string.qs_tiles_jump_media), null, KEY_TILE_BG_MEDIA_ON);
         bgMediaSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_TILE_BG_MEDIA_ON, bgMediaSwitch.checked);
@@ -270,6 +263,12 @@ public class QsTilesCustomizeFragment extends Fragment {
             addNestedEdge(chain, gatingSwitch(getString(R.string.qs_tiles_bg_active_accent_title), null, KEY_TILE_BG_BASE_ACCENT), GroupPos.TOP);
             chain.add(tileBgBaseColorsRow());
             addNestedEdge(chain, sliderRow(getString(R.string.qs_tiles_radius_value_title), KEY_TILE_RADIUS_BASE, 0, 40, 20, "dp"), GroupPos.BOTTOM);
+            List<Object> iconBorderRows = new ArrayList<>();
+            iconBorderRows.add(gatingSwitch(getString(R.string.qs_big_icon_border_title), null, KEY_ICON_BORDER_ON));
+            if (ObsidianPrefs.getBoolean(KEY_ICON_BORDER_ON, false)) {
+                iconBorderRows.add(singleColorRow(getString(R.string.qs_tiles_border_color_title), KEY_ICON_BORDER_COLOR, 213));
+            }
+            GroupUtils.addGroup(chain, iconBorderRows, true);
         }
         pending.add(bgHlSwitch);
         if (mBgHlExpanded) {
@@ -360,14 +359,6 @@ public class QsTilesCustomizeFragment extends Fragment {
         if (mBorderExpanded) {
             GroupUtils.addGroup(chain, List.of(
                     singleColorRow(getString(R.string.qs_tiles_border_color_title), KEY_TILE_BORDER_COLOR, 211)), true);
-        }
-
-        // ── Bordo Pannello (2026-09-18) — 4a superficie, switch/colore separati dal bordo
-        // pulsanti/cursori/media sopra: il pannello è tutt'altra vista (QsBackground.java).
-        GroupUtils.addGroup(chain, List.of(panelBorderSwitch));
-        if (mPanelBorderExpanded) {
-            GroupUtils.addGroup(chain, List.of(
-                    singleColorRow(getString(R.string.qs_panel_border_color_title), KEY_PANEL_BORDER_COLOR, 212)), true);
         }
 
         // ── Colori Icone (spostata sotto Sfondo Riquadri su richiesta esplicita) ────

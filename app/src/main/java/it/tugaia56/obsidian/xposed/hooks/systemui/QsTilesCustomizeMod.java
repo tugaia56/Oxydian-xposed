@@ -136,12 +136,12 @@ public class QsTilesCustomizeMod extends XposedMods {
     // per pulsanti+cursori+media (separato dal bordo del pannello). Qui solo i pulsanti per ora.
     private static final String KEY_TILE_BORDER_ON     = "qs_tile_border_enabled";
     private static final String KEY_TILE_BORDER_COLOR  = "qs_tile_border_custom_color"; // "_use_accent" affiancata, stesso pattern di singleColorRow()
+    private static final String KEY_ICON_BORDER_ON     = "qs_icon_border_enabled";
+    private static final String KEY_ICON_BORDER_COLOR  = "qs_icon_border_custom_color";
     private static final float TILE_BORDER_WIDTH_DP = 1.5f; // stesso spessore di Bordo barra volume
 
     // ── Bordo Pannello QS (2026-09-18) — 4a superficie della richiesta 09-16, switch/colore
     // separati dal bordo pulsanti/cursori/media sopra.
-    private static final String KEY_PANEL_BORDER_ON    = "qs_panel_border_enabled";
-    private static final String KEY_PANEL_BORDER_COLOR = "qs_panel_border_custom_color";
 
     // ── Copertina Album (filtro sulla vera artwork del brano nel riquadro Media) ────
     // Stesse 5 opzioni/tecnica di AlbumArtLockscreenMod (grayscale/accento/blur/grayscale+blur),
@@ -208,9 +208,9 @@ public class QsTilesCustomizeMod extends XposedMods {
 
     private boolean mTileBorderOn;
     private int mTileBorderColor = 0xFF908DFF;
+    private boolean mIconBorderOn;
+    private int mIconBorderColor = 0xFF908DFF;
 
-    private boolean mPanelBorderOn;
-    private int mPanelBorderColor = 0xFF908DFF;
 
     private boolean mMediaCoverFilterOn;
     private int mMediaCoverFilter = COVER_FILTER_NONE;
@@ -301,9 +301,9 @@ public class QsTilesCustomizeMod extends XposedMods {
         mTileBorderColor = Xprefs.getBoolean(KEY_TILE_BORDER_COLOR + "_use_accent", false)
                 ? appAccentColor() : Xprefs.getInt(KEY_TILE_BORDER_COLOR, 0xFF908DFF);
 
-        mPanelBorderOn = Xprefs.getBoolean(KEY_PANEL_BORDER_ON, false);
-        mPanelBorderColor = Xprefs.getBoolean(KEY_PANEL_BORDER_COLOR + "_use_accent", false)
-                ? appAccentColor() : Xprefs.getInt(KEY_PANEL_BORDER_COLOR, 0xFF908DFF);
+        mIconBorderOn = Xprefs.getBoolean(KEY_ICON_BORDER_ON, false);
+        mIconBorderColor = Xprefs.getBoolean(KEY_ICON_BORDER_COLOR + "_use_accent", false)
+                ? appAccentColor() : Xprefs.getInt(KEY_ICON_BORDER_COLOR, 0xFF908DFF);
 
         mMediaCoverFilterOn = Xprefs.getBoolean(KEY_MEDIA_COVER_FILTER_ON, false);
         mMediaCoverFilter = parseInt(Xprefs.getString(KEY_MEDIA_COVER_FILTER, "0"), COVER_FILTER_NONE);
@@ -357,7 +357,6 @@ public class QsTilesCustomizeMod extends XposedMods {
         hookTileDrawableOwnership(lp);
         hookMediaPanelOwnership(lp);
         hookMediaBorder(lp);
-        hookPanelBorder(lp);
         hookMediaCoverFilter(lp);
         hookTileBgBase(lp);
         hookTileBgHighlight(lp);
@@ -399,6 +398,32 @@ public class QsTilesCustomizeMod extends XposedMods {
     private static final String OWNER_MEDIA = "media";
     private final java.util.Map<Object, String> mGradientOwner = new WeakHashMap<>();
     private final java.util.Map<Object, String> mMixColorOwner = new WeakHashMap<>();
+    /** MixColorTileDrawable costruiti per un riquadro grande 2x1 (Wi-Fi/Torcia/Pixolor/Riavvia):
+     *  card intera (bounds larghi) E icona (bounds quasi quadrati) usano la stessa classe. */
+    private final java.util.Map<Object, Boolean> mBigCardDrawable = new WeakHashMap<>();
+
+    /** Le 4 icone/pulsanti in alto nel pannello (Wi-Fi/Torcia/Pixolor/Riavvia) NON sono riquadri
+     *  ma la riga "quick entrance" (OplusQSQuickEntranceContainerView) — confermato dal log
+     *  diagnostico 2026-09-20: owner=null, catena view ImageButton/ImageView < ... < QuickEntrance. */
+    private final java.util.Map<Object, Boolean> mQuickEntranceDrawable = new WeakHashMap<>();
+
+    private boolean isQuickEntranceView(Object view) {
+        Object v = view;
+        for (int i = 0; i < 8 && v != null; i++) {
+            if (v.getClass().getSimpleName().equals("OplusQSQuickEntranceContainerView")) return true;
+            try { v = callMethod(v, "getParent"); } catch (Throwable t) { break; }
+        }
+        return false;
+    }
+
+    private boolean isBigCardView(Object view) {
+        Object v = view;
+        for (int i = 0; i < 12 && v != null; i++) {
+            if (v.getClass().getName().equals("com.oplus.systemui.plugins.qs.customize.view.tile.OplusQSResizeableTileViewTwoXOne")) return true;
+            try { v = callMethod(v, "getParent"); } catch (Throwable t) { break; }
+        }
+        return false;
+    }
 
     // Costruttore riflesso per kotlin.Triple, popolato da hookTileBgHighlight() e riusato da
     // hookTileDrawableOwnership() (vedi sotto, 2026-09-17: applichiamo la riscrittura colore anche
@@ -447,7 +472,11 @@ public class QsTilesCustomizeMod extends XposedMods {
                     @Override protected void afterHookedMethod(MethodHookParam p) {
                         Object view = p.args.length > 0 ? p.args[0] : null;
                         Object result = p.getResult();
-                        if (view != null && result != null) mGradientOwner.put(result, ownerOfView(view));
+                        if (view != null && result != null) {
+                            mGradientOwner.put(result, ownerOfView(view));
+                            if (isBigCardView(view)) mBigCardDrawable.put(result, Boolean.TRUE);
+                            if (isQuickEntranceView(view)) mQuickEntranceDrawable.put(result, Boolean.TRUE);
+                        }
                     }
                 });
             } catch (Throwable t) { dbg("hookTileDrawableOwnership GradientTileDrawable.Builder failed: " + t); }
@@ -462,6 +491,8 @@ public class QsTilesCustomizeMod extends XposedMods {
                         if (view == null || result == null) return;
                         String owner = ownerOfView(view);
                         mMixColorOwner.put(result, owner);
+                        if (isBigCardView(view)) mBigCardDrawable.put(result, Boolean.TRUE);
+                        if (isQuickEntranceView(view)) mQuickEntranceDrawable.put(result, Boolean.TRUE);
                         // Applica il colore SUBITO alla costruzione, non solo alla prossima
                         // onStateChange — quella non scatta mai per i riquadri il cui stato non
                         // cambia mai dopo il boot. Il bordo è gestito a parte (draw() disegnato a
@@ -542,94 +573,6 @@ public class QsTilesCustomizeMod extends XposedMods {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         mMediaBorderView.put(panel, v);
         return v;
-    }
-
-    /** Bordo Pannello QS (2026-09-18) — 4a superficie della richiesta 09-16. Stesso contenitore
-     *  già usato da QsBackground.java per lo sfondo (OplusQSContainerImpl/OplusQSRootView per
-     *  split/landscape), ma qui aggiungiamo una vera View come ULTIMO figlio (non indice 0 come
-     *  il tint di sfondo — deve stare SOPRA il contenuto per non finire coperta dai riquadri),
-     *  stessa tecnica proven-affidabile della View reale già usata per Media sopra. Raggio
-     *  angoli non misurato (nessun tempo per jadx su questo, a differenza degli altri bordi in
-     *  questo file) — valore ragionevole scelto a occhio, da aggiustare se il risultato reale
-     *  non combacia col bordo arrotondato nativo del pannello.
-     */
-    private final java.util.Map<Object, View> mPanelBorderView = new WeakHashMap<>();
-    private static final int PANEL_BORDER_RADIUS_DP = 32;
-
-    private void hookPanelBorder(XC_LoadPackage.LoadPackageParam lp) {
-        Class<?> containerCls = tryFindClass(lp, "com.oplus.systemui.qs.OplusQSContainerImpl");
-        if (containerCls == null) containerCls = tryFindClass(lp, "com.oplusos.systemui.qs.OplusQSContainerImpl");
-        if (containerCls != null) {
-            try {
-                hookAllMethods(containerCls, "onFinishInflate", new XC_MethodHook() {
-                    @Override protected void afterHookedMethod(MethodHookParam p) {
-                        if (p.thisObject instanceof ViewGroup) syncPanelBorderView((ViewGroup) p.thisObject);
-                    }
-                });
-            } catch (Throwable t) { dbg("hookPanelBorder OplusQSContainerImpl failed: " + t); }
-        }
-        Class<?> rootViewCls = tryFindClass(lp, "com.oplus.systemui.plugins.qs.OplusQSRootView");
-        if (rootViewCls != null) {
-            try {
-                hookAllMethods(rootViewCls, "onFinishInflate", new XC_MethodHook() {
-                    @Override protected void afterHookedMethod(MethodHookParam p) {
-                        if (p.thisObject instanceof ViewGroup) syncPanelBorderView((ViewGroup) p.thisObject);
-                    }
-                });
-            } catch (Throwable t) { dbg("hookPanelBorder OplusQSRootView failed: " + t); }
-        }
-        // Con i pannelli "Separati" il pannello notifiche e' una vista a parte (non contiene
-        // OplusQSContainerImpl/RootView): stesso bordo anche li' — 2026-09-19, richiesta utente.
-        Class<?> notifPanelCls = tryFindClass(lp, "com.android.systemui.shade.NotificationPanelView");
-        if (notifPanelCls != null) {
-            try {
-                hookAllConstructors(notifPanelCls, new XC_MethodHook() {
-                    @Override protected void afterHookedMethod(MethodHookParam p) {
-                        if (!(p.thisObject instanceof ViewGroup)) return;
-                        final ViewGroup g = (ViewGroup) p.thisObject;
-                        g.post(() -> { try { syncPanelBorderView(g, true); } catch (Throwable t) { dbg("notif panel border failed: " + t); } });
-                    }
-                });
-            } catch (Throwable t) { dbg("hookPanelBorder NotificationPanelView failed: " + t); }
-        }
-    }
-
-    private void syncPanelBorderView(ViewGroup container) { syncPanelBorderView(container, false); }
-
-    /** hideOnKeyguard=true per il pannello notifiche (NotificationPanelView ospita anche la
-     *  lockscreen: li' il bordo non deve comparire). */
-    private void syncPanelBorderView(ViewGroup container, boolean hideOnKeyguard) {
-        View existing = mPanelBorderView.get(container);
-        if (existing == null) {
-            View v = new View(mContext) {
-                @Override protected void onDraw(android.graphics.Canvas canvas) {
-                    super.onDraw(canvas);
-                    if (!mPanelBorderOn) return;
-                    if (hideOnKeyguard) {
-                        try {
-                            android.app.KeyguardManager km = getContext().getSystemService(android.app.KeyguardManager.class);
-                            if (km != null && km.isKeyguardLocked()) return;
-                        } catch (Throwable ignored) {}
-                    }
-                    float strokeWidth = tileBorderWidthPx();
-                    float inset = strokeWidth / 2f;
-                    android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-                    paint.setStyle(android.graphics.Paint.Style.STROKE);
-                    paint.setStrokeWidth(strokeWidth);
-                    paint.setColor(mPanelBorderColor);
-                    canvas.drawRoundRect(inset, inset, getWidth() - inset, getHeight() - inset,
-                            dp(PANEL_BORDER_RADIUS_DP), dp(PANEL_BORDER_RADIUS_DP), paint);
-                }
-            };
-            v.setWillNotDraw(false);
-            container.addView(v, new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            mPanelBorderView.put(container, v);
-            existing = v;
-        } else {
-            existing.bringToFront();
-        }
-        existing.invalidate();
     }
 
     // Copertina Album: bindCoverImg(MediaData) è dove OOS imposta l'artwork reale del brano sul
@@ -790,10 +733,15 @@ public class QsTilesCustomizeMod extends XposedMods {
                 @Override protected void afterHookedMethod(MethodHookParam p) {
                     // Media NON passa più di qui (vedi hookMediaBorder più sotto: il bordo sullo
                     // sfondo veniva coperto dalla copertina album, una View sopra) — solo pulsanti.
-                    if (!mTileBorderOn || !OWNER_TILE.equals(mGradientOwner.get(p.thisObject))) return;
+                    android.graphics.Rect gb = ((Drawable) p.thisObject).getBounds();
+                    boolean gWide = gb.width() > gb.height() * 1.3f;
+                    boolean gIcon = mQuickEntranceDrawable.containsKey(p.thisObject)
+                            || (!gWide && mBigCardDrawable.containsKey(p.thisObject));
+                    if (gIcon) { if (!mIconBorderOn) return; }
+                    else if (!mTileBorderOn || !OWNER_TILE.equals(mGradientOwner.get(p.thisObject))) return;
                     try {
                         android.graphics.Canvas canvas = (android.graphics.Canvas) p.args[0];
-                        android.graphics.Rect bounds = ((Drawable) p.thisObject).getBounds();
+                        android.graphics.Rect bounds = gb;
                         float radius = 0f;
                         try { radius = (float) callMethod(p.thisObject, "getCornerRadius"); } catch (Throwable ignored) {}
                         float strokeWidth = tileBorderWidthPx();
@@ -801,7 +749,7 @@ public class QsTilesCustomizeMod extends XposedMods {
                         android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
                         paint.setStyle(android.graphics.Paint.Style.STROKE);
                         paint.setStrokeWidth(strokeWidth);
-                        paint.setColor(mTileBorderColor);
+                        paint.setColor(gIcon ? mIconBorderColor : mTileBorderColor);
                         canvas.drawRoundRect(bounds.left + inset, bounds.top + inset,
                                 bounds.right - inset, bounds.bottom - inset, radius, radius, paint);
                     } catch (Throwable t) { dbg("tile border draw failed: " + t); }
@@ -842,16 +790,28 @@ public class QsTilesCustomizeMod extends XposedMods {
                 @Override protected void afterHookedMethod(MethodHookParam p) {
                     // Media NON passa più di qui (vedi hookMediaBorder più sotto: il bordo sullo
                     // sfondo veniva coperto dalla copertina album, una View sopra) — solo pulsanti.
-                    if (!mTileBorderOn || !OWNER_TILE.equals(mMixColorOwner.get(p.thisObject))) return;
+                    boolean quickIcon = mQuickEntranceDrawable.containsKey(p.thisObject);
+                    if (!quickIcon && !OWNER_TILE.equals(mMixColorOwner.get(p.thisObject))) return;
+                    android.graphics.Rect boundsProbe = ((Drawable) p.thisObject).getBounds();
+                    boolean wideCard = boundsProbe.width() > boundsProbe.height() * 1.3f;
+                    // Icona di un riquadro grande (bounds quasi quadrati, drawable di un 2x1):
+                    // ha un interruttore suo ("Bordo icone" in Riquadri grandi), separato dal
+                    // "Bordo riquadri" che disegna la card intera e i riquadri piccoli.
+                    // "Bordo icone" (dentro Riquadri grandi) = solo i bordi ROTONDI: icone dei riquadri
+                    // grandi 2x1 e pulsanti rotondi in alto (quick entrance). Le card rettangolari
+                    // (larghe) e i riquadri piccoli restano sotto "Bordo riquadri" (richiesta 2026-09-20).
+                    boolean bigCardIcon = quickIcon || (!wideCard && mBigCardDrawable.containsKey(p.thisObject));
+                    if (bigCardIcon) { if (!mIconBorderOn) return; }
+                    else if (!mTileBorderOn) return;
                     try {
                         android.graphics.Canvas canvas = (android.graphics.Canvas) p.args[0];
-                        android.graphics.Rect bounds = ((Drawable) p.thisObject).getBounds();
+                        android.graphics.Rect bounds = boundsProbe;
                         float strokeWidth = tileBorderWidthPx();
                         float inset = strokeWidth / 2f;
                         android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
                         paint.setStyle(android.graphics.Paint.Style.STROKE);
                         paint.setStrokeWidth(strokeWidth);
-                        paint.setColor(mTileBorderColor);
+                        paint.setColor(bigCardIcon ? mIconBorderColor : mTileBorderColor);
                         // Le card larghe 2 colonne (Wi-Fi/Torcia/Pixolor/Riavvia) condividono la
                         // STESSA classe anche per l'intera card (bounds ~414x186, non solo l'icona
                         // ~186x186), quindi un'ellisse sarebbe schiacciata — lì disegniamo un bordo

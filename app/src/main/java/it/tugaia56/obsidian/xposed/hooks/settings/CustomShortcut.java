@@ -132,7 +132,7 @@ public class CustomShortcut extends XposedMods {
                     // frame icona della preferenza iniettata è più largo (misurato 120px
                     // vs 108px delle voci OEM — evita la gemma "un po' più grande").
                     int ringPx  = Math.round(density * 36f);
-                    int shardPx = Math.round(density * 21f);
+                    int shardPx = Math.round(density * 28f);
                     android.graphics.drawable.GradientDrawable ring =
                             new android.graphics.drawable.GradientDrawable();
                     ring.setShape(android.graphics.drawable.GradientDrawable.OVAL);
