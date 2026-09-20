@@ -1,40 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Logo Oxydian per la riga nelle Impostazioni di sistema (versione C: lettere OYT + orbita
-     spessa), disegnato da zero — 2026-09-19. Sostituisce il vecchio cristallo di Obsidian.
-     Bianco fisso: e' il FALLBACK grafico; l'eventuale colore/anello lo mette CustomShortcut.java
-     a runtime. L'orbita e' un po' piu' trasparente cosi' le lettere restano leggibili quando
-     il tutto viene tinto di un solo colore. -->
+<!-- Logo Oxydian per la riga nelle Impostazioni di sistema (tavolozza), disegnato da zero.
+     Bianco fisso: FALLBACK grafico; colore/anello li mette CustomShortcut.java a runtime. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="100"
     android:viewportHeight="100">
-    <group android:pivotX="50" android:pivotY="52" android:rotation="-28">
         <path
-            android:pathData="M12,52 A38,16 0 0 1 88,52"
-            android:strokeColor="#FFFFFFFF"
-            android:strokeAlpha="0.55"
-            android:strokeWidth="7"
-            android:strokeLineCap="round" />
-    </group>
-    <path
-        android:pathData="M13,54 a11,11 0 1,0 22,0 a11,11 0 1,0 -22,0"
-        android:strokeColor="#FFFFFFFF"
-        android:strokeWidth="8" />
-    <path
-        android:pathData="M45,40 L54,56 L63,40 M54,56 L54,70"
-        android:strokeColor="#FFFFFFFF"
-        android:strokeWidth="8" />
-    <path
-        android:pathData="M70,40 L92,40 M81,40 L81,70"
-        android:strokeColor="#FFFFFFFF"
-        android:strokeWidth="8" />
-    <group android:pivotX="50" android:pivotY="52" android:rotation="-28">
+            android:pathData="M18,42 C22,20 46,12 66,16 C88,20 98,42 88,60 C80,74 62,66 54,72 C46,80 40,88 28,84 C10,78 14,58 18,42 Z"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="6"
+            android:strokeLineJoin="round" />
         <path
-            android:pathData="M12,52 A38,16 0 0 0 88,52"
-            android:strokeColor="#FFFFFFFF"
-            android:strokeAlpha="0.55"
-            android:strokeWidth="7"
-            android:strokeLineCap="round" />
-    </group>
+            android:pathData="M22,68 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="4.199999999999999" />
+        <path
+            android:pathData="M28,34 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0"
+            android:fillColor="#FFFFFF" />
+        <path
+            android:pathData="M44,24 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0"
+            android:fillColor="#FFFFFF" />
+        <path
+            android:pathData="M62,26 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0"
+            android:fillColor="#FFFFFF" />
+        <path
+            android:pathData="M76,41 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0"
+            android:fillColor="#FFFFFF" />
+        <path
+            android:pathData="M73,57 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0"
+            android:fillColor="#FFFFFF" />
+        <path
+            android:pathData="M38.73 56.42Q37.34 55.71 36.25 54.46Q35.17 53.21 34.56 51.63Q33.95 50.04 34 48.3Q34.06 46.56 34.93 44.86Q35.75 43.26 37.06 42.18Q38.37 41.1 39.97 40.58Q41.57 40.07 43.25 40.17Q44.94 40.27 46.51 41.07Q48.65 42.16 49.86 44.07Q51.07 45.97 51.21 48.24Q51.36 50.5 50.26 52.66Q49.35 54.44 47.96 55.51Q46.57 56.58 44.95 57.02Q43.33 57.45 41.71 57.28Q40.09 57.12 38.73 56.42ZM40.95 51.93Q41.67 52.29 42.59 52.32Q43.51 52.34 44.38 51.88Q45.25 51.41 45.8 50.33Q46.29 49.38 46.24 48.46Q46.2 47.54 45.67 46.77Q45.14 46 44.2 45.52Q43.32 45.07 42.4 45.12Q41.49 45.18 40.69 45.68Q39.9 46.18 39.43 47.11Q38.88 48.17 39.01 49.14Q39.13 50.11 39.68 50.84Q40.24 51.56 40.95 51.93ZM49.44 69.12Q48.52 67.98 48.65 67.23Q48.79 66.47 49.86 65.67L65.76 52.85Q66.87 51.95 67.58 52.03Q68.3 52.1 69.27 53.22Q70.17 54.36 70.05 55.09Q69.94 55.82 68.93 56.62L52.91 69.53Q51.82 70.44 51.11 70.36Q50.39 70.28 49.44 69.12ZM55.54 63.55 54 49.42Q53.86 48.09 54.32 47.5Q54.78 46.91 56.17 46.79Q57.68 46.67 58.24 47.15Q58.79 47.64 58.94 48.99L60.04 59.45Z"
+            android:fillColor="#FFFFFF" />
 </vector>
