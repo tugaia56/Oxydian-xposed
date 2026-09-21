@@ -122,7 +122,7 @@
     <string name="nav_dst_colors_summary">Зразки кольорів акценту та фону</string>
     <string name="nav_settings_icons">Стиль іконок Налаштувань</string>
     <string name="nav_settings_icons_summary">Пакети іконок PUI / HOS для додатку Налаштування</string>
-    <string name="settings_icons_preview_notice">Торкніться пакету, щоб вибрати його, потім Застосувати (потрібен деякий час на збірку). Перезавантажте, щоб побачити зміни. Потрібен дозвіл \"Доступ до всіх файлів\".</string>
+    <string name="settings_icons_preview_notice">Торкніться пакету, щоб вибрати його, потім Застосувати (потрібен деякий час на збірку). Потрібен дозвіл \"Доступ до всіх файлів\".</string>
     <string name="settings_icons_apply">Застосувати</string>
     <string name="settings_icons_disable">Вимкнути</string>
     <string name="settings_icons_status_none">Пакет не застосовано</string>

@@ -122,7 +122,7 @@
     <string name="nav_dst_colors_summary">Muestras de color de acento y fondo</string>
     <string name="nav_settings_icons">Estilo de iconos de Ajustes</string>
     <string name="nav_settings_icons_summary">Paquetes de iconos PUI / HOS para la app Ajustes</string>
-    <string name="settings_icons_preview_notice">Toca un paquete para seleccionarlo, luego Aplicar (la creación tarda un momento). Reinicia para ver el cambio. Requiere el permiso "Acceso a todos los archivos".</string>
+    <string name="settings_icons_preview_notice">Toca un paquete para seleccionarlo, luego Aplicar (la creación tarda un momento). Requiere el permiso "Acceso a todos los archivos".</string>
     <string name="settings_icons_apply">Aplicar</string>
     <string name="settings_icons_disable">Desactivar</string>
     <string name="settings_icons_status_none">Ningún paquete aplicado</string>

@@ -122,7 +122,7 @@
     <string name="nav_dst_colors_summary">Amostras de cor de destaque e fundo</string>
     <string name="nav_settings_icons">Estilo dos ícones de Configurações</string>
     <string name="nav_settings_icons_summary">Pacotes de ícones PUI / HOS para o app Configurações</string>
-    <string name="settings_icons_preview_notice">Toque num pacote para selecioná-lo, depois em Aplicar (a criação leva um instante). Reinicie para ver a mudança. Requer permissão "Acesso a todos os arquivos".</string>
+    <string name="settings_icons_preview_notice">Toque num pacote para selecioná-lo, depois em Aplicar (a criação leva um instante). Requer permissão "Acesso a todos os arquivos".</string>
     <string name="settings_icons_apply">Aplicar</string>
     <string name="settings_icons_disable">Desativar</string>
     <string name="settings_icons_status_none">Nenhum pacote aplicado</string>

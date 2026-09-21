@@ -122,7 +122,7 @@
     <string name="nav_dst_colors_summary">Accent, background color swatches</string>
     <string name="nav_settings_icons">Settings Icon Style</string>
     <string name="nav_settings_icons_summary">PUI / HOS icon packs for the Settings app</string>
-    <string name="settings_icons_preview_notice">Tap a pack to select it, then Apply (needs a moment to build). Reboot to see the change. Requires "All files access" permission.</string>
+    <string name="settings_icons_preview_notice">Tap a pack to select it, then Apply (needs a moment to build). Requires "All files access" permission.</string>
     <string name="settings_icons_apply">Apply</string>
     <string name="settings_icons_disable">Disable</string>
     <string name="settings_icons_status_none">No pack applied</string>

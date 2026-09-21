@@ -122,7 +122,7 @@
     <string name="nav_dst_colors_summary">Vurgu, arka plan renk örnekleri</string>
     <string name="nav_settings_icons">Ayarlar Simge Stili</string>
     <string name="nav_settings_icons_summary">Ayarlar uygulaması için PUI / HOS simge paketleri</string>
-    <string name="settings_icons_preview_notice">Seçmek için bir pakete dokunun, ardından Uygula\'ya dokunun (oluşturma biraz zaman alır). Değişikliği görmek için yeniden başlatın. "Tüm dosyalara erişim" izni gerektirir.</string>
+    <string name="settings_icons_preview_notice">Seçmek için bir pakete dokunun, ardından Uygula\'ya dokunun (oluşturma biraz zaman alır). "Tüm dosyalara erişim" izni gerektirir.</string>
     <string name="settings_icons_apply">Uygula</string>
     <string name="settings_icons_disable">Devre dışı bırak</string>
     <string name="settings_icons_status_none">Paket uygulanmadı</string>

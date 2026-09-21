@@ -119,7 +119,7 @@
     <string name="nav_dst_colors_summary">Accento, colori di sfondo</string>
     <string name="nav_settings_icons">Stile Icone Impostazioni</string>
     <string name="nav_settings_icons_summary">Pack icone PUI / HOS per l\'app Impostazioni</string>
-    <string name="settings_icons_preview_notice">Tocca un pack per selezionarlo, poi Applica (richiede qualche istante per compilarlo). Riavvia per vedere il cambiamento. Richiede il permesso "Accesso a tutti i file".</string>
+    <string name="settings_icons_preview_notice">Tocca un pack per selezionarlo, poi Applica (richiede qualche istante per compilarlo). Richiede il permesso "Accesso a tutti i file".</string>
     <string name="settings_icons_apply">Applica</string>
     <string name="settings_icons_disable">Disabilita</string>
     <string name="settings_icons_status_none">Nessun pack applicato</string>

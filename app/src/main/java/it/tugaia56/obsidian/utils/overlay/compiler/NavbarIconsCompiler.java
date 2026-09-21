@@ -68,12 +68,12 @@ public class NavbarIconsCompiler {
     private static void preExecute(String assetDir) throws IOException {
         symLinkBinaries();
 
-        Shell.cmd("rm -rf " + ModuleConstants.TEMP_DIR).exec();
+        Shell.cmd("rm -rf " + ModuleConstants.TEMP_OVERLAY_DIR).exec();
         Shell.cmd("rm -rf " + ModuleConstants.DATA_DIR + "/CompileOnDemand").exec();
 
         copyAssets("CompileOnDemand/" + SYSTEM_UI + "/" + assetDir);
 
-        Shell.cmd("rm -rf " + ModuleConstants.TEMP_DIR + "; mkdir -p " + ModuleConstants.TEMP_DIR).exec();
+        Shell.cmd("rm -rf " + ModuleConstants.TEMP_OVERLAY_DIR + "; mkdir -p " + ModuleConstants.TEMP_OVERLAY_DIR).exec();
         Shell.cmd("mkdir -p " + ModuleConstants.TEMP_OVERLAY_DIR).exec();
         Shell.cmd("mkdir -p " + ModuleConstants.TEMP_CACHE_DIR).exec();
         Shell.cmd("mkdir -p " + ModuleConstants.UNSIGNED_UNALIGNED_DIR).exec();

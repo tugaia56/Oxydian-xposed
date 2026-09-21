@@ -122,7 +122,7 @@
     <string name="nav_dst_colors_summary">Contoh warna aksen dan latar belakang</string>
     <string name="nav_settings_icons">Gaya Ikon Pengaturan</string>
     <string name="nav_settings_icons_summary">Paket ikon PUI / HOS untuk aplikasi Pengaturan</string>
-    <string name="settings_icons_preview_notice">Ketuk paket untuk memilihnya, lalu Terapkan (perlu waktu sebentar untuk membangun). Mulai ulang untuk melihat perubahannya. Memerlukan izin "Akses semua file".</string>
+    <string name="settings_icons_preview_notice">Ketuk paket untuk memilihnya, lalu Terapkan (perlu waktu sebentar untuk membangun). Memerlukan izin "Akses semua file".</string>
     <string name="settings_icons_apply">Terapkan</string>
     <string name="settings_icons_disable">Nonaktifkan</string>
     <string name="settings_icons_status_none">Tidak ada paket diterapkan</string>

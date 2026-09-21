@@ -122,7 +122,7 @@
     <string name="nav_dst_colors_summary">Образцы цвета акцента и фона</string>
     <string name="nav_settings_icons">Стиль иконок Настроек</string>
     <string name="nav_settings_icons_summary">Наборы иконок PUI / HOS для приложения Настроек</string>
-    <string name="settings_icons_preview_notice">Нажмите на набор, чтобы выбрать его, затем "Применить" (сборка займёт немного времени). Перезагрузите устройство, чтобы увидеть изменения. Требуется разрешение "Доступ ко всем файлам".</string>
+    <string name="settings_icons_preview_notice">Нажмите на набор, чтобы выбрать его, затем "Применить" (сборка займёт немного времени). Требуется разрешение "Доступ ко всем файлам".</string>
     <string name="settings_icons_apply">Применить</string>
     <string name="settings_icons_disable">Отключить</string>
     <string name="settings_icons_status_none">Набор не применён</string>

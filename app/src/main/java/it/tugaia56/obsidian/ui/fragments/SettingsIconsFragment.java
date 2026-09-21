@@ -281,12 +281,24 @@ public class SettingsIconsFragment extends Fragment {
             // precedente, "Applica" per un pack diverso lo attiva subito, senza bisogno di
             // un altro riavvio.
             boolean nowActive = success && OverlayUtil.isOverlayEnabled(PREFIX + "SIP1.overlay");
+            // La copia live in /product/overlay puo' non riuscire (partizione in sola lettura): in tal
+            // caso il contenuto nuovo arriva solo dal modulo al prossimo avvio. Se il file attivo
+            // differisce da quello appena compilato, serve un riavvio anche se l'overlay risulta attivo.
+            boolean liveStale = false;
+            if (success) {
+                for (int n = 1; n <= 2; n++) {
+                    String apk = PREFIX + "SIP" + n + ".apk";
+                    liveStale |= !com.topjohnwu.superuser.Shell.cmd("cmp -s "
+                            + it.tugaia56.obsidian.utils.ModuleConstants.SIGNED_DIR + "/" + apk + " /product/overlay/" + apk)
+                            .exec().isSuccess();
+                }
+            }
             if (success) {
                 ObsidianPrefs.putInt(KEY_SELECTED_SET, pack.iconSet());
-                ObsidianPrefs.putBoolean(KEY_PENDING_REBOOT, !nowActive);
+                ObsidianPrefs.putBoolean(KEY_PENDING_REBOOT, !(nowActive && !liveStale));
             }
             boolean finalSuccess = success;
-            boolean finalActive = nowActive;
+            boolean finalActive = nowActive && !liveStale;
             new Handler(Looper.getMainLooper()).post(() -> {
                 if (!isAdded()) return;
                 setBusy(false);
@@ -295,9 +307,17 @@ public class SettingsIconsFragment extends Fragment {
                     mActive = finalActive;
                     mPendingReboot = !finalActive;
                     rebuild();
-                    Toast.makeText(requireContext(),
-                            finalActive ? R.string.toast_applied : R.string.settings_icons_build_ok,
-                            finalActive ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
+                    if (finalActive) {
+                        Toast.makeText(requireContext(), R.string.toast_applied, Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Popup una tantum: l'avviso "riavvia" non sta piu' nel testo fisso della schermata
+                        // (restava anche dopo il riavvio). Lo stato "compilato, riavvia" resta sulla riga del
+                        // pack finche' l'overlay non diventa attivo.
+                        it.tugaia56.obsidian.utils.ObsidianTheme.themeDialog(
+                                new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                                        .setMessage(R.string.settings_icons_build_ok)
+                                        .setPositiveButton(android.R.string.ok, null).show());
+                    }
                 } else {
                     Toast.makeText(requireContext(), R.string.toast_error, Toast.LENGTH_SHORT).show();
                 }

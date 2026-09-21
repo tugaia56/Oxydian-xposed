@@ -122,7 +122,7 @@
     <string name="nav_dst_colors_summary">Muster für Akzent- und Hintergrundfarbe</string>
     <string name="nav_settings_icons">Einstellungs-Icon-Stil</string>
     <string name="nav_settings_icons_summary">PUI-/HOS-Icon-Pakete für die Einstellungs-App</string>
-    <string name="settings_icons_preview_notice">Tippe auf ein Paket, um es auszuwählen, dann auf Anwenden (der Aufbau dauert einen Moment). Starte neu, um die Änderung zu sehen. Erfordert die Berechtigung „Zugriff auf alle Dateien".</string>
+    <string name="settings_icons_preview_notice">Tippe auf ein Paket, um es auszuwählen, dann auf Anwenden (der Aufbau dauert einen Moment). Erfordert die Berechtigung „Zugriff auf alle Dateien".</string>
     <string name="settings_icons_apply">Anwenden</string>
     <string name="settings_icons_disable">Deaktivieren</string>
     <string name="settings_icons_status_none">Kein Paket angewendet</string>

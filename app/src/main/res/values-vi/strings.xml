@@ -122,7 +122,7 @@
     <string name="nav_dst_colors_summary">Mẫu màu nhấn, màu nền</string>
     <string name="nav_settings_icons">Kiểu biểu tượng Cài đặt</string>
     <string name="nav_settings_icons_summary">Gói biểu tượng PUI / HOS cho ứng dụng Cài đặt</string>
-    <string name="settings_icons_preview_notice">Nhấn vào một gói để chọn, sau đó nhấn Áp dụng (quá trình tạo mất một chút thời gian). Khởi động lại để xem thay đổi. Yêu cầu quyền "Truy cập tất cả tệp".</string>
+    <string name="settings_icons_preview_notice">Nhấn vào một gói để chọn, sau đó nhấn Áp dụng (quá trình tạo mất một chút thời gian). Yêu cầu quyền "Truy cập tất cả tệp".</string>
     <string name="settings_icons_apply">Áp dụng</string>
     <string name="settings_icons_disable">Tắt</string>
     <string name="settings_icons_status_none">Chưa áp dụng gói nào</string>

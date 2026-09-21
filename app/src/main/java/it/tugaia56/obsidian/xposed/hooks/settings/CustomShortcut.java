@@ -33,6 +33,7 @@ public class CustomShortcut extends XposedMods {
 
     private boolean mShowInSettings = true;
     private int     mAccentColor    = 0xFF6200EE;
+    private int     mIconSet        = 0;
     private Context mSettingsContext;
 
     public CustomShortcut(Context context) { super(context); }
@@ -42,6 +43,7 @@ public class CustomShortcut extends XposedMods {
         if (Xprefs == null) return;
         mShowInSettings = Xprefs.getBoolean("show_entry_settings", true);
         mAccentColor    = Xprefs.getInt("DST_ACCENT1", 0xFF6200EE);
+        mIconSet        = Xprefs.getInt("settings_icons_selected_set", 0);
     }
 
     @Override
@@ -86,6 +88,7 @@ public class CustomShortcut extends XposedMods {
             @Override protected void beforeHookedMethod(MethodHookParam p) {
                 if (!mShowInSettings || mSettingsContext == null) return;
                 try {
+                    updatePrefs(); // colore accento aggiornato: dopo un force-stop il default (viola scuro) arrivava prima dei prefs
                     Object pref = jumpPrefClass.getConstructor(Context.class).newInstance(mSettingsContext);
 
                     Object category = null;
@@ -132,7 +135,7 @@ public class CustomShortcut extends XposedMods {
                     // frame icona della preferenza iniettata è più largo (misurato 120px
                     // vs 108px delle voci OEM — evita la gemma "un po' più grande").
                     int ringPx  = Math.round(density * 36f);
-                    int shardPx = Math.round(density * 28f);
+                    int shardPx = Math.round(density * 24f);
                     android.graphics.drawable.GradientDrawable ring =
                             new android.graphics.drawable.GradientDrawable();
                     ring.setShape(android.graphics.drawable.GradientDrawable.OVAL);
@@ -143,7 +146,20 @@ public class CustomShortcut extends XposedMods {
                     Drawable shard = ResourcesCompat.getDrawable(ResourceManager.modRes,
                             R.drawable.ic_obsidian_shard, mContext.getTheme());
                     Drawable icon;
-                    if (shard != null) {
+                    // Icona completa per-pack (ic_obsidian_row): i pack icone la sovrascrivono
+                    // (PUI pieno/contorno/ombra, HOS/OOS anello, OOS Stock rosso senza bordo).
+                    // Il default ha dimensioni 0 -> nessun pack: anello + logo da codice.
+                    Drawable packIcon = ResourcesCompat.getDrawable(ResourceManager.modRes,
+                            R.drawable.ic_obsidian_row, mContext.getTheme());
+                    if (packIcon != null && packIcon.getIntrinsicWidth() > 0) {
+                        icon = packIcon;
+                        // Pack PUI (1/2/4): glifo a contorno colorato con l'accento reale di Obsidian
+                        // (monet_color del pack e ?attr/colorAccent danno un'altra tonalita').
+                        if (mIconSet == 1 || mIconSet == 2 || mIconSet == 4) {
+                            icon = packIcon.mutate();
+                            icon.setTint(mAccentColor);
+                        }
+                    } else if (shard != null) {
                         android.graphics.drawable.LayerDrawable ld =
                                 new android.graphics.drawable.LayerDrawable(
                                         new Drawable[]{ring, shard});

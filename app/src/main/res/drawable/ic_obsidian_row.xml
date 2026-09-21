@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Segnaposto vuoto: i pack icone (CompileOnDemand/it.tugaia56.obsidian/ICSn) lo sovrascrivono con l'icona completa della riga Oxydian in Impostazioni; se e' ancora questo, CustomShortcut compone anello + logo da codice. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#00000000" />
+</shape>

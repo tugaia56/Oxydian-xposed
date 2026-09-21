@@ -88,14 +88,14 @@ public class SettingsIconsCompiler {
     private static void preExecute() throws IOException {
         symLinkBinaries();
 
-        Shell.cmd("rm -rf " + ModuleConstants.TEMP_DIR).exec();
+        Shell.cmd("rm -rf " + ModuleConstants.TEMP_OVERLAY_DIR).exec();
         Shell.cmd("rm -rf " + ModuleConstants.DATA_DIR + "/CompileOnDemand").exec();
 
         for (String packageName : mPackages) {
             copyAssets("CompileOnDemand/" + packageName + "/ICS" + mIconSet);
         }
 
-        Shell.cmd("rm -rf " + ModuleConstants.TEMP_DIR + "; mkdir -p " + ModuleConstants.TEMP_DIR).exec();
+        Shell.cmd("rm -rf " + ModuleConstants.TEMP_OVERLAY_DIR + "; mkdir -p " + ModuleConstants.TEMP_OVERLAY_DIR).exec();
         Shell.cmd("mkdir -p " + ModuleConstants.TEMP_OVERLAY_DIR).exec();
         Shell.cmd("mkdir -p " + ModuleConstants.TEMP_CACHE_DIR).exec();
         Shell.cmd("mkdir -p " + ModuleConstants.UNSIGNED_UNALIGNED_DIR).exec();
@@ -158,6 +158,19 @@ public class SettingsIconsCompiler {
         }
         mountRO();
 
+        // Aggiornamento LIVE: il modulo obsidian_overlayfs monta /product/overlay come overlay con un
+        // "upper" su tmpfs (/mnt/obsidian_overlay/upper) e dal boot i file ObsidianComponent*.apk sono
+        // bind-mount di quell'upper. La partizione e' in sola lettura (il cp qui sopra spesso fallisce),
+        // ma l'upper e' scrivibile: copiandoci l'APK il contenuto nuovo diventa visibile subito,
+        // senza riavvio. Se l'upper non esiste (modulo assente) non fa nulla.
+        for (int i = 1; i <= mPackages.size(); i++) {
+            String apkName = PREFIX + "SIP" + i + ".apk";
+            String up = "/mnt/obsidian_overlay/upper/" + apkName;
+            Shell.cmd("[ -d /mnt/obsidian_overlay/upper ] && cp -f " + ModuleConstants.SIGNED_DIR + "/" + apkName + " " + up
+                    + " && chown 0:0 " + up + " && chmod 0644 " + up
+                    + " && (chcon u:object_r:vendor_overlay_file:s0 " + up + " 2>/dev/null || chcon u:object_r:system_file:s0 " + up + " 2>/dev/null)").exec();
+        }
+
         String[] overlayNames = new String[mPackages.size()];
         for (int i = 1; i <= mPackages.size(); i++) overlayNames[i - 1] = PREFIX + "SIP" + i + ".overlay";
         // Se l'overlay era già abilitato da una build precedente, un semplice "enable" può
@@ -166,5 +179,7 @@ public class SettingsIconsCompiler {
         // Disabilita e riabilita sempre per forzare la rigenerazione dell'idmap dal file attuale.
         disableOverlays(overlayNames);
         enableOverlays(overlayNames);
+        // Impostazioni tiene in cache le risorse dell'overlay: chiuderlo forza il ricaricamento.
+        Shell.cmd("am force-stop com.android.settings").exec();
     }
 }

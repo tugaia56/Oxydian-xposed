@@ -34,10 +34,10 @@ public class WirelessSettingsThemeCompiler {
     }
     private static void preExecute() throws IOException {
         symLinkBinaries();
-        Shell.cmd("rm -rf " + ModuleConstants.TEMP_DIR).exec();
+        Shell.cmd("rm -rf " + ModuleConstants.TEMP_OVERLAY_DIR).exec();
         Shell.cmd("rm -rf " + ModuleConstants.DATA_DIR + "/CompileOnDemand").exec();
         copyAssets("CompileOnDemand/" + WIRELESS_SETTINGS + "/" + ASSET_DIR);
-        Shell.cmd("rm -rf " + ModuleConstants.TEMP_DIR + "; mkdir -p " + ModuleConstants.TEMP_DIR).exec();
+        Shell.cmd("rm -rf " + ModuleConstants.TEMP_OVERLAY_DIR + "; mkdir -p " + ModuleConstants.TEMP_OVERLAY_DIR).exec();
         Shell.cmd("mkdir -p " + ModuleConstants.TEMP_OVERLAY_DIR).exec();
         Shell.cmd("mkdir -p " + ModuleConstants.TEMP_CACHE_DIR).exec();
         Shell.cmd("mkdir -p " + ModuleConstants.UNSIGNED_UNALIGNED_DIR).exec();
