@@ -758,6 +758,15 @@
     </string-array>
 
     <!-- Stile Icone Impostazioni (pack HOS): sfondo solido on/off -->
+    <string-array name="qs_tiles_shape_entries">
+        <item>Ventana</item>
+        <item>Gota</item>
+        <item>Octágono</item>
+        <item>Cuadrado</item>
+        <item>Rombo</item>
+        <item>Supercírculo 1</item>
+        <item>Supercírculo 2</item>
+    </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Desactivado</item>
         <item>Activado</item>

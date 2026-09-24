@@ -543,6 +543,17 @@
         <item>Goccia</item>
         <item>Rombo</item>
     </string-array>
+    <!-- Ordine alfabetico — deve corrispondere a TILE_SHAPE_KIND/TILE_SHAPE_UNIFORM_DP/
+         TILE_SHAPE_CORNERS_DP in QsTilesCustomizeMod.java. -->
+    <string-array name="qs_tiles_shape_entries">
+        <item>Finestra</item>
+        <item>Goccia</item>
+        <item>Ottagono</item>
+        <item>Quadrato</item>
+        <item>Rombo</item>
+        <item>Supercerchio 1</item>
+        <item>Supercerchio 2</item>
+    </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Off</item>
         <item>On</item>

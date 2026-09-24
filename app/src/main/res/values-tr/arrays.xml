@@ -758,6 +758,15 @@
     </string-array>
 
     <!-- Stile Icone Impostazioni (pack HOS): sfondo solido on/off -->
+    <string-array name="qs_tiles_shape_entries">
+        <item>Pencere</item>
+        <item>Damla</item>
+        <item>Sekizgen</item>
+        <item>Kare</item>
+        <item>Elmas</item>
+        <item>Süper daire 1</item>
+        <item>Süper daire 2</item>
+    </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Kapalı</item>
         <item>Açık</item>

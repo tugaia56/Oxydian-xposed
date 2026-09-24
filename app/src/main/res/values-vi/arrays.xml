@@ -758,6 +758,15 @@
     </string-array>
 
     <!-- Stile Icone Impostazioni (pack HOS): sfondo solido on/off -->
+    <string-array name="qs_tiles_shape_entries">
+        <item>Cửa sổ</item>
+        <item>Giọt nước</item>
+        <item>Bát giác</item>
+        <item>Hình vuông</item>
+        <item>Hình thoi</item>
+        <item>Siêu tròn 1</item>
+        <item>Siêu tròn 2</item>
+    </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Tắt</item>
         <item>Bật</item>

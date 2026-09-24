@@ -758,6 +758,15 @@
     </string-array>
 
     <!-- Stile Icone Impostazioni (pack HOS): sfondo solido on/off -->
+    <string-array name="qs_tiles_shape_entries">
+        <item>Janela</item>
+        <item>Gota</item>
+        <item>Octógono</item>
+        <item>Quadrado</item>
+        <item>Losango</item>
+        <item>Supercírculo 1</item>
+        <item>Supercírculo 2</item>
+    </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Desligado</item>
         <item>Ligado</item>

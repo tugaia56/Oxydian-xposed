@@ -462,6 +462,9 @@
     <string name="qs_tiles_bg_active_accent_title">Collega all\'Accento</string>
     <string name="qs_tiles_border_title">Bordo riquadri</string>
     <string name="qs_tiles_border_color_title">Colore Bordo</string>
+    <string name="qs_tiles_shape_title">Forma riquadri</string>
+    <string name="qs_tiles_shape_summary">Controllo nostro — funziona in Classico e Separati. I riquadri tondi servono anche «Sfondo (in evidenza)» attivo, per sapere il colore vero da ridisegnare</string>
+    <string name="qs_tiles_shape_preset_title">Forma</string>
     <string name="qs_tiles_color_active">Attivo</string>
     <string name="qs_tiles_color_inactive">Inattivo</string>
     <string name="qs_tiles_color_disabled">Disabilitato</string>

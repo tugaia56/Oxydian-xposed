@@ -758,6 +758,20 @@
         <item>Diamond</item>
     </string-array>
 
+    <!-- Forma riquadri QS (nostra, indipendente dalla "Forma tessere" nativa OOS) -->
+    <!-- Ordine alfabetico (italiano) — deve corrispondere a TILE_SHAPE_KIND/TILE_SHAPE_UNIFORM_DP/
+         TILE_SHAPE_CORNERS_DP in QsTilesCustomizeMod.java: Cerchio, Finestra, Goccia, Quadrato,
+         Rombo, Supercerchio 1, Supercerchio 2. -->
+    <string-array name="qs_tiles_shape_entries">
+        <item>Window</item>
+        <item>Teardrop</item>
+        <item>Octagon</item>
+        <item>Square</item>
+        <item>Rhombus</item>
+        <item>Supercircle 1</item>
+        <item>Supercircle 2</item>
+    </string-array>
+
     <!-- Stile Icone Impostazioni (pack HOS): sfondo solido on/off -->
     <string-array name="settings_icons_solid_entries">
         <item>Off</item>

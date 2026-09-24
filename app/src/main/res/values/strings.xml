@@ -465,6 +465,9 @@
     <string name="qs_tiles_bg_active_accent_title">Link to accent color</string>
     <string name="qs_tiles_border_title">Tile border</string>
     <string name="qs_tiles_border_color_title">Border Color</string>
+    <string name="qs_tiles_shape_title">Tile shape</string>
+    <string name="qs_tiles_shape_summary">Own shape control — works with Classic and Separate. Round tiles need \"Background (highlighted)\" on too, to know the real color to redraw</string>
+    <string name="qs_tiles_shape_preset_title">Shape</string>
     <string name="qs_tiles_color_active">Active</string>
     <string name="qs_tiles_color_inactive">Inactive</string>
     <string name="qs_tiles_color_disabled">Disabled</string>

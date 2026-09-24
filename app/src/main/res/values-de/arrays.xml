@@ -758,6 +758,15 @@
     </string-array>
 
     <!-- Stile Icone Impostazioni (pack HOS): sfondo solido on/off -->
+    <string-array name="qs_tiles_shape_entries">
+        <item>Fenster</item>
+        <item>Tropfen</item>
+        <item>Achteck</item>
+        <item>Quadrat</item>
+        <item>Raute</item>
+        <item>Superkreis 1</item>
+        <item>Superkreis 2</item>
+    </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Aus</item>
         <item>Ein</item>

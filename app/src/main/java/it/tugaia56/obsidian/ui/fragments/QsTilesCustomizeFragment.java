@@ -141,6 +141,16 @@ public class QsTilesCustomizeFragment extends Fragment {
     private static final String KEY_TILE_RADIUS_BASE  = "qs_tile_radius_base_dp";
     private static final String KEY_TILE_RADIUS_HL    = "qs_tile_radius_highlight_dp";
     private static final String KEY_TILE_RADIUS_MEDIA = "qs_tile_radius_media_dp";
+    // Forma riquadri (2026-09-22): indipendente da "Forma tessere" nativa OOS, che nello stile
+    // Separati non si applica affatto ai riquadri (restano sempre tondi) e nei riquadri della
+    // versione Classico è comunque inaffidabile (Predefinito e Quadrato letti come identici, le
+    // altre 3 forme mai applicate — vedi QsTilesCustomizeMod). Riusa il meccanismo GIA' nostro e
+    // funzionante di "Raggio angoli riquadri" (RoundRectOutlineProvider), che vale per entrambi
+    // gli stili — tre preset invece di un valore dp libero, stessa idea della scelta nativa ma
+    // affidabile. Copre solo le forme rappresentabili con un raggio d'angolo (Cerchio/Quadrato/
+    // Supercerchio) — Finestra e Rombo no, richiederebbero un contorno personalizzato.
+    private static final String KEY_TILE_SHAPE_ON = "qs_tile_shape_enabled";
+    private static final String KEY_TILE_SHAPE    = "qs_tile_shape_preset"; // "0" Cerchio, "1" Quadrato, "2" Supercerchio
 
     private RecyclerView mRv;
     private final List<DarkShadowItem> mIconColorItems = new ArrayList<>();
@@ -156,6 +166,7 @@ public class QsTilesCustomizeFragment extends Fragment {
     private boolean mBgHlExpanded    = false;
     private boolean mBgMediaExpanded = false;
     private boolean mBorderExpanded  = false;
+    private boolean mShapeExpanded   = false;
     private boolean mSlidersExpanded = false;
     // Stato SOLO visivo — header senza switch, tocco sul nome apre/chiude, stesso pattern
     // di collapsibleHeader in LockscreenWidgetsFragment.
@@ -359,6 +370,23 @@ public class QsTilesCustomizeFragment extends Fragment {
         if (mBorderExpanded) {
             GroupUtils.addGroup(chain, List.of(
                     singleColorRow(getString(R.string.qs_tiles_border_color_title), KEY_TILE_BORDER_COLOR, 211)), true);
+        }
+
+        // ── Forma riquadri (2026-09-22) — indipendente dalla "Forma tessere" nativa, vedi nota
+        // sulla chiave sopra. Cerchio/Quadrato/Supercerchio, funziona sia in Classico che Separati.
+        SwitchWidgetAdapter.SwitchItem shapeSwitch = prefSwitch(getString(R.string.qs_tiles_shape_title),
+                getString(R.string.qs_tiles_shape_summary), KEY_TILE_SHAPE_ON);
+        shapeSwitch.onChanged = () -> {
+            ObsidianPrefs.putBoolean(KEY_TILE_SHAPE_ON, shapeSwitch.checked);
+            mShapeExpanded = shapeSwitch.checked;
+            rebuild();
+        };
+        shapeSwitch.onRowClick = () -> { mShapeExpanded = !mShapeExpanded; rebuild(); };
+        GroupUtils.addGroup(chain, List.of(shapeSwitch));
+        if (mShapeExpanded) {
+            GroupUtils.addGroup(chain, List.of(
+                    singleChoiceRow(getString(R.string.qs_tiles_shape_preset_title), KEY_TILE_SHAPE,
+                            R.array.qs_tiles_shape_entries)), true);
         }
 
         // ── Colori Icone (spostata sotto Sfondo Riquadri su richiesta esplicita) ────

@@ -757,6 +757,15 @@
     </string-array>
 
     <!-- Stile Icone Impostazioni (pack HOS): sfondo solido on/off -->
+    <string-array name="qs_tiles_shape_entries">
+        <item>Окно</item>
+        <item>Капля</item>
+        <item>Восьмиугольник</item>
+        <item>Квадрат</item>
+        <item>Ромб</item>
+        <item>Суперкруг 1</item>
+        <item>Суперкруг 2</item>
+    </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Выкл</item>
         <item>Вкл</item>

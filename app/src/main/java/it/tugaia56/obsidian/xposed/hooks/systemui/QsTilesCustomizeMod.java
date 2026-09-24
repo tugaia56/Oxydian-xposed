@@ -139,6 +139,14 @@ public class QsTilesCustomizeMod extends XposedMods {
     private static final String KEY_ICON_BORDER_ON     = "qs_icon_border_enabled";
     private static final String KEY_ICON_BORDER_COLOR  = "qs_icon_border_custom_color";
     private static final float TILE_BORDER_WIDTH_DP = 1.5f; // stesso spessore di Bordo barra volume
+    // Tono scuro nativo delle card larghe MAI attive (Torcia/Riavvia) — misurato via pixel-pick su
+    // screenshot reale 2026-09-23 (RGB ~42,45,58) — usato per neutralizzare l'accento nativo sulle
+    // card ATTIVE (Wi-Fi/Pixolor), vedi hookTileBgHighlight "neutralizeWideFill".
+    private static final int WIDE_CARD_NEUTRAL_FILL = 0xFF2A2D3A;
+    // Default sensato per lo sfondo/traccia dei cursori quando forziamo il ramo a colore piatto
+    // (vedi updateColor in hookBrightnessSliderColor) senza che l'utente abbia personalizzato
+    // "Colore cursore" — stesso tono neutro di WIDE_CARD_NEUTRAL_FILL.
+    private static final int TILE_SHAPE_SLIDER_BG_FALLBACK = 0xFF2A2D3A;
 
     // ── Bordo Pannello QS (2026-09-18) — 4a superficie della richiesta 09-16, switch/colore
     // separati dal bordo pulsanti/cursori/media sopra.
@@ -168,6 +176,157 @@ public class QsTilesCustomizeMod extends XposedMods {
     private static final String KEY_TILE_RADIUS_BASE  = "qs_tile_radius_base_dp";
     private static final String KEY_TILE_RADIUS_HL    = "qs_tile_radius_highlight_dp";
     private static final String KEY_TILE_RADIUS_MEDIA = "qs_tile_radius_media_dp";
+
+    // Forma riquadri (2026-09-22) — vedi nota gemella nel Fragment. Quando attiva, sovrascrive
+    // il raggio di "Riquadri base"/"in evidenza" con un preset fisso invece del valore manuale/
+    // dello sfondo colore, e non richiede che quelle sezioni sfondo siano attive: un pref
+    // indipendente aggiunto alla condizione (onSupplier) di hookOutlineUpdater. Media escluso
+    // (fuori scope, il pannello non ha davvero "angoli" percepibili da forma).
+    private static final String KEY_TILE_SHAPE_ON = "qs_tile_shape_enabled";
+    private static final String KEY_TILE_SHAPE    = "qs_tile_shape_preset";
+    // dp misurati/stimati per riquadro piccolo tipico (~44-48dp): Quadrato usa lo stesso valore
+    // calibrato sui pixel del bordo (vedi hookTileBgHighlight); Supercerchio è una scelta estetica
+    // (un vero "supercerchio"/squircle non è riproducibile con un solo raggio d'angolo).
+    // Ordine alfabetico su richiesta 2026-09-23: Finestra, Goccia, Ottagono, Quadrato, Rombo,
+    // Supercerchio 1, Supercerchio 2 ("Cerchio" rimosso 2026-09-23: doppione del "Predefinito"
+    // nativo di OOS, che già fa i QS tondi). KIND per indice: 0=raggio uniforme, 1=ottagono
+    // (angoli tagliati dritti, non un arco), 2=4 angoli diversi (Rombo/Goccia, stesso trucco di
+    // SettingsIconsResourceManager per il pack icone Settings — un vero rombo/goccia non è un
+    // round-rect).
+    private static final int SHAPE_KIND_UNIFORM = 0, SHAPE_KIND_OCTAGON = 1, SHAPE_KIND_CORNERS = 2;
+    private static final int[] TILE_SHAPE_KIND = {
+            SHAPE_KIND_OCTAGON, SHAPE_KIND_CORNERS, SHAPE_KIND_OCTAGON,
+            SHAPE_KIND_UNIFORM, SHAPE_KIND_CORNERS, SHAPE_KIND_UNIFORM, SHAPE_KIND_UNIFORM,
+    };
+    // Supercerchio 2 era 40dp ma segnalato "sono cerchi" (saturava) — abbassato a 26dp.
+    private static final int[] TILE_SHAPE_UNIFORM_DP = {0, 0, 0, 10, 0, 16, 26}; // solo indici UNIFORM
+    // {TL, TR, BR, BL} in dp — solo indici CORNERS. Goccia: angolo stretto uguagliato a Rombo (4dp,
+    // era 22 — segnalato "fallo della stessa misura di rombo"). Angoli larghi 80dp->30dp (2026-09-23,
+    // "media da correggere, angolo più stretto fai uguale a rombo"): 80dp si affidava al clamp
+    // automatico di addRoundRect (radius > metà lato -> scala) per apparire "massimamente arrotondato"
+    // sui riquadri piccoli (~62dp, clampato a ~31dp) — su Media (pannello molto più grande, nessun
+    // clamp) restava un letterale 80dp, sproporzionatamente più tondo di quanto visto sui riquadri.
+    // Stesso dp fisso di Rombo ovunque, mai clampato, stessa resa su qualunque superficie (stesso
+    // principio già applicato a Finestra/Ottagono, vedi TILE_SHAPE_CHAMFER_*_DP).
+    private static final float[][] TILE_SHAPE_CORNERS_DP = {
+            null,
+            {30f, 30f, 4f, 30f},         // Goccia
+            null, null,
+            {4f, 30f, 4f, 30f},          // Rombo (confermato via screenshot anteprima nativa 2026-09-23)
+            null, null,
+    };
+    // Finestra/Ottagono: angolo tagliato dritto, nessun arco (confermato via screenshot 2026-09-23).
+    // Taglio in dp FISSO (non più una frazione di bounds — vedi buildShapedPath, "Media accorcia i
+    // lati degli angoli": su un pannello molto più largo che alto una frazione dava un taglio molto
+    // più corto che sui riquadri/cursori). Calibrati sui valori già confermati corretti sui riquadri
+    // piccoli (bounds ~186px, densità 3px/dp): Finestra 0.24*186≈44.6px≈15dp, Ottagono 0.30*186≈
+    // 55.8px≈19dp.
+    private static final int TILE_SHAPE_CHAMFER_FINESTRA_DP = 15;
+    private static final int TILE_SHAPE_CHAMFER_OTTAGONO_DP = 19;
+
+    /** Raggio "medio" per preset — usato per l'ombra/outline nativa (hookTileRadius, un solo
+     *  float, invisibile comunque per i riquadri tondi/grandi disegnati a mano) e come log. Per
+     *  Rombo/Goccia/Finestra/Ottagono (angoli diversi) è solo una stima, il vero disegno usa
+     *  drawShaped(). */
+    private int tileShapePresetRadiusDp() {
+        switch (TILE_SHAPE_KIND[mTileShapePreset]) {
+            case SHAPE_KIND_UNIFORM: return TILE_SHAPE_UNIFORM_DP[mTileShapePreset];
+            case SHAPE_KIND_CORNERS:
+                float[] c = TILE_SHAPE_CORNERS_DP[mTileShapePreset];
+                return Math.round((c[0] + c[1] + c[2] + c[3]) / 4f);
+            default: return 10; // Finestra/Ottagono
+        }
+    }
+
+    /** Costruisce il Path della forma scelta in "Forma riquadri" dentro bounds — un solo punto sia
+     *  per disegnarla (drawShaped) sia per ritagliare il contenuto nativo sulla stessa sagoma
+     *  (clipShaped, cursori/media — 2026-09-23 "lo sfondo esce dal bordo"). */
+    private android.graphics.Path buildShapedPath(android.graphics.Rect bounds) {
+        android.graphics.Path p = new android.graphics.Path();
+        switch (TILE_SHAPE_KIND[mTileShapePreset]) {
+            case SHAPE_KIND_OCTAGON: {
+                // Taglio d'angolo in dp FISSO (non più proporzionale a bounds) — segnalato
+                // 2026-09-23 "Media accorcia i lati degli angoli" (il Media panel è molto più largo
+                // che alto, quindi un taglio calcolato come frazione delle sue dimensioni risultava
+                // molto più corto rispetto a quello sui riquadri/cursori — stesso taglio in dp ovunque
+                // (riquadri piccoli, cursori, riquadri grandi, media), calibrato sul valore già
+                // confermato corretto sui riquadri piccoli (Finestra ~44.6px/0.24, Ottagono
+                // ~55.8px/0.30 con bounds 186px, densità 3px/dp). Cap a metà del lato più corto per
+                // bounds molto piccoli (icone).
+                int chamferDp = mTileShapePreset == 0 ? TILE_SHAPE_CHAMFER_FINESTRA_DP : TILE_SHAPE_CHAMFER_OTTAGONO_DP;
+                float base = Math.min(dp(chamferDp), Math.min(bounds.width(), bounds.height()) / 2f);
+                float chX = base, chY = base;
+                p.moveTo(bounds.left + chX, bounds.top);
+                p.lineTo(bounds.right - chX, bounds.top);
+                p.lineTo(bounds.right, bounds.top + chY);
+                p.lineTo(bounds.right, bounds.bottom - chY);
+                p.lineTo(bounds.right - chX, bounds.bottom);
+                p.lineTo(bounds.left + chX, bounds.bottom);
+                p.lineTo(bounds.left, bounds.bottom - chY);
+                p.lineTo(bounds.left, bounds.top + chY);
+                p.close();
+                break;
+            }
+            case SHAPE_KIND_CORNERS: {
+                float[] c = TILE_SHAPE_CORNERS_DP[mTileShapePreset];
+                float[] radii = new float[8];
+                for (int i = 0; i < 4; i++) { radii[i * 2] = dp((int) c[i]); radii[i * 2 + 1] = dp((int) c[i]); }
+                p.addRoundRect(new android.graphics.RectF(bounds), radii, android.graphics.Path.Direction.CW);
+                break;
+            }
+            default: {
+                float r = dp(TILE_SHAPE_UNIFORM_DP[mTileShapePreset]);
+                p.addRoundRect(new android.graphics.RectF(bounds), r, r, android.graphics.Path.Direction.CW);
+            }
+        }
+        return p;
+    }
+
+    /** Disegna (riempimento o contorno, secondo lo stile del Paint passato) la forma scelta in
+     *  "Forma riquadri" dentro bounds — un solo punto per tutti gli usi (riquadri tondi, cursori,
+     *  media), niente logica duplicata. */
+    private void drawShaped(android.graphics.Canvas canvas, android.graphics.Rect bounds, android.graphics.Paint paint) {
+        canvas.drawPath(buildShapedPath(bounds), paint);
+    }
+
+    // Riquadri grandi (Wi-Fi/Torcia/Pixolor/Riavvia), Finestra/Ottagono/Rombo: mostrano un alone
+    // nativo intorno alla card (blur del drawable stesso, NON l'ombra di elevazione della View —
+    // confermato 2026-09-24 dopo 5 tentativi falliti su Outline/setPath/setAlpha/elevation, sempre
+    // riprodotto identico anche con bordo/ombra/riempimento matematicamente identici) che non
+    // possiamo sopprimere da qui senza decompilare — stessa famiglia del limite già accettato per
+    // il riempimento Media. Fallback (richiesto dall'utente): SOLO su questa superficie, per
+    // queste 3 forme, bordo/riempimento/ombra usano tutti lo stesso rettangolo arrotondato
+    // "sicuro" (raggio di Supercerchio 2, mai mostrato l'alone su nessun riavvio/apertura reale)
+    // invece della Path precisa — combaciano sempre perché sono la STESSA identica forma semplice.
+    // Riquadri piccoli, cursori, media e riquadri grandi per Goccia/Quadrato/Supercerchio restano
+    // precisi (mai mostrato il problema).
+    private static final int WIDE_CARD_SAFE_RADIUS_DP = 26;
+    private boolean wideCardNeedsSafeShape() {
+        return mTileShapePreset == 0 || mTileShapePreset == 2 || mTileShapePreset == 4; // Finestra, Ottagono, Rombo
+    }
+    private android.graphics.Path buildWideCardShapePath(android.graphics.Rect bounds) {
+        if (!wideCardNeedsSafeShape()) return buildShapedPath(bounds);
+        android.graphics.Path p = new android.graphics.Path();
+        float r = dp(WIDE_CARD_SAFE_RADIUS_DP);
+        p.addRoundRect(new android.graphics.RectF(bounds), r, r, android.graphics.Path.Direction.CW);
+        return p;
+    }
+    private void drawWideCardShape(android.graphics.Canvas canvas, android.graphics.Rect bounds, android.graphics.Paint paint) {
+        canvas.drawPath(buildWideCardShapePath(bounds), paint);
+    }
+
+    /** Ritaglia il canvas sulla forma scelta PRIMA che il contenuto nativo (riempimento/blur/
+     *  progress bar) venga disegnato — l'unico modo per far combaciare un riempimento che non
+     *  conosciamo/non possiamo ridisegnare a mano (cursori, media) con un bordo angolare come
+     *  Finestra/Ottagono, invece di lasciarlo uscire dagli angoli tagliati. Va sempre accoppiato a
+     *  canvas.restore() dopo che il contenuto nativo ha disegnato. Ritorna true se il clip è stato
+     *  applicato (quindi serve il restore corrispondente). */
+    private boolean clipShapedIfEnabled(android.graphics.Canvas canvas, android.graphics.Rect bounds) {
+        if (!mTileShapeOn) return false;
+        canvas.save();
+        canvas.clipPath(buildShapedPath(bounds));
+        return true;
+    }
 
     private static final int STATE_ACTIVE = 2;
     private static final int STATE_INACTIVE = 1;
@@ -221,6 +380,8 @@ public class QsTilesCustomizeMod extends XposedMods {
     private final WeakHashMap<Object, View> mMediaBorderView = new WeakHashMap<>();
 
     private int mTileRadiusBaseDp = 20, mTileRadiusHlDp = 20, mTileRadiusMediaDp = 20;
+    private boolean mTileShapeOn;
+    private int mTileShapePreset;
 
     private Object mPersonalityManager;
     private Class<?> mForegroundBlurParamClass;
@@ -237,6 +398,16 @@ public class QsTilesCustomizeMod extends XposedMods {
     private final Handler mMainHandler = new Handler(Looper.getMainLooper());
     private final Runnable mDelayedRefresh1 = this::refreshCachedIconColors;
     private final Runnable mDelayedRefresh2 = this::refreshCachedIconColors;
+    // BUG 2026-09-24 ("dopo un riavvio device serve 2 volte Riavvia SystemUI perché i riquadri
+    // grandi tornino giusti"): stessa famiglia già risolta per i colori icone sopra —
+    // notifyQsUpdate() (vedi sotto) dipende da mPersonalityManager, non garantito pronto appena
+    // dopo il boot (race tra il suo hook costruttore e il caricamento di Xprefs) — se il primo
+    // tentativo (dentro updatePrefs) lo trova null, il redraw forzato non parte mai e i riquadri
+    // grandi (disegnati una sola volta al bind, non riguardati finché qualcosa non forza un vero
+    // redraw) restano sull'aspetto stock finché non arriva un riavvio SystemUI vero e proprio a
+    // reinflazionare tutto da capo. Stessa mitigazione: un paio di retry ritardati.
+    private final Runnable mDelayedQsUpdate1 = this::notifyQsUpdate;
+    private final Runnable mDelayedQsUpdate2 = this::notifyQsUpdate;
 
     public QsTilesCustomizeMod(Context context) { super(context); }
 
@@ -313,8 +484,15 @@ public class QsTilesCustomizeMod extends XposedMods {
         mTileRadiusHlDp = Xprefs.getInt(KEY_TILE_RADIUS_HL, 20);
         mTileRadiusMediaDp = Xprefs.getInt(KEY_TILE_RADIUS_MEDIA, 20);
 
+        mTileShapeOn = Xprefs.getBoolean(KEY_TILE_SHAPE_ON, false);
+        mTileShapePreset = parseInt(Xprefs.getString(KEY_TILE_SHAPE, "0"), 0);
+
         notifyQsUpdate();
         refreshCachedIconColors();
+        mMainHandler.removeCallbacks(mDelayedQsUpdate1);
+        mMainHandler.removeCallbacks(mDelayedQsUpdate2);
+        mMainHandler.postDelayed(mDelayedQsUpdate1, 1000);
+        mMainHandler.postDelayed(mDelayedQsUpdate2, 3000);
     }
 
     private int parseInt(String s, int def) {
@@ -357,6 +535,7 @@ public class QsTilesCustomizeMod extends XposedMods {
         hookTileDrawableOwnership(lp);
         hookMediaPanelOwnership(lp);
         hookMediaBorder(lp);
+        hookMediaShapeFill(lp);
         hookMediaCoverFilter(lp);
         hookTileBgBase(lp);
         hookTileBgHighlight(lp);
@@ -407,6 +586,21 @@ public class QsTilesCustomizeMod extends XposedMods {
      *  diagnostico 2026-09-20: owner=null, catena view ImageButton/ImageView < ... < QuickEntrance. */
     private final java.util.Map<Object, Boolean> mQuickEntranceDrawable = new WeakHashMap<>();
 
+    /** Drawable (MixColorTileDrawable) -> View proprietaria, popolata da hookTileDrawableOwnership —
+     *  serve a hookTileBgHighlight per far seguire alla NOSTRA forma l'ombra di elevazione nativa
+     *  della card larga quando "Forma riquadri" è attiva (Rombo, richiesta 2026-09-24 "angoli
+     *  larghi hanno un pezzo di ombra rettangolare che sporge" — l'ombra nativa segue il profilo
+     *  rettangolare/nativo, non la forma disegnata a mano sul Canvas). Un primo tentativo
+     *  (azzerare l'elevazione via View.setElevation) si perdeva in modo incoerente tra un riavvio
+     *  e l'altro — un VALORE può sempre essere riscritto da qualcos'altro dopo di noi; un
+     *  ViewOutlineProvider è una funzione consultata ogni volta che serve, non un valore one-shot,
+     *  vedi mWideCardOutlineSet sotto. */
+    /** Views già dotate del nostro ViewOutlineProvider per l'ombra (vedi hookTileBgHighlight) —
+     *  setOutlineProvider() va chiamato una sola volta per View, invalidateOutline() invece ad
+     *  ogni draw per riflettere un eventuale cambio di preset. */
+    private final java.util.Set<View> mWideCardOutlineSet = java.util.Collections.newSetFromMap(new WeakHashMap<>());
+    private final java.util.Map<Object, View> mWideCardOwnerView = new WeakHashMap<>();
+
     private boolean isQuickEntranceView(Object view) {
         Object v = view;
         for (int i = 0; i < 8 && v != null; i++) {
@@ -453,7 +647,14 @@ public class QsTilesCustomizeMod extends XposedMods {
                     // invece di SepQSResPool (OplusQSTileBaseView/OplusQSHighlightTileView,
                     // onDrawableUpdate reale confermato nel sorgente decompilato, 2026-08-20).
                     || cn.equals("com.oplus.systemui.qs.tileimpl.OplusQSTileViewImpl")
-                    || cn.equals("com.oplus.systemui.qs.tileimpl.OplusQSHighlightTileViewImpl")) {
+                    || cn.equals("com.oplus.systemui.qs.tileimpl.OplusQSHighlightTileViewImpl")
+                    // I 5 riquadri del pannello COMPRESSO (visibili insieme alle notifiche, prima di
+                    // espandere le Impostazioni rapide — com.android.systemui.qs.QuickQSPanel, classe
+                    // AOSP stock) usano una terza variante, mai vista prima: OplusQSTileBaseViewImpl
+                    // ("Base", non "Highlight"). Senza questa riga ownerOfView() tornava null per loro
+                    // e il bordo non veniva mai disegnato, con nessuna forma (bug segnalato 2026-09-22,
+                    // trovato via il log diagnostico in logViewChainOnce()).
+                    || cn.equals("com.oplus.systemui.qs.tileimpl.OplusQSTileBaseViewImpl")) {
                 return OWNER_TILE;
             }
             if (cn.equals("com.oplus.systemui.qs.media.OplusQsBaseMediaPanelView")) {
@@ -462,6 +663,54 @@ public class QsTilesCustomizeMod extends XposedMods {
             try { v = callMethod(v, "getParent"); } catch (Throwable t) { break; }
         }
         return null;
+    }
+
+    // Diagnostica temporanea 2026-09-22: sui 5 riquadri visibili insieme alle notifiche (pannello
+    // ridotto, prima di espandere le Impostazioni rapide complete) il bordo non compare mai, con
+    // nessuna forma — segno che ownerOfView() torna null per quella riga, cioè usano una classe
+    // View diversa da tutte quelle già riconosciute (Separati/Classico). Logga la catena di parent
+    // una volta per ogni classe mai vista, per trovare il nome vero senza decompilare (jadx non
+    // disponibile su questa macchina). Da rimuovere una volta trovata la classe giusta.
+    private static final java.util.Set<String> sLoggedChains = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
+
+    // Diagnostica temporanea 2026-09-22 (seconda parte): per costruire una tabella forma->raggio
+    // corretta serve sapere quale intero restituisce getLastShapeType() per ciascuna delle 6 forme
+    // di "Forma tessere", e quale raggio (px) leggiamo per quella forma sia per i riquadri (tile,
+    // MixColorTileDrawable.getCornerRadius) sia per i cursori (slider, mCurBackgroundRadius) — il
+    // bordo dei cursori risultava "troppo squadrato" con Quadrato selezionato, stesso sospetto
+    // meccanismo rotto dei riquadri. Logga una volta per ogni (contesto, forma, raggio, lato) mai
+    // visto. Da rimuovere una volta costruita la tabella.
+    private static final java.util.Set<String> sLoggedShapeRadius = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
+
+    private void logProviderClassOnce(String callerClass, String methodName, Object provider) {
+        String providerClass = provider == null ? "null" : provider.getClass().getName();
+        String key = callerClass + "|" + methodName + "|" + providerClass;
+        if (sLoggedShapeRadius.add("provider|" + key)) {
+            dbg("DIAG outlineProvider caller=" + callerClass + " method=" + methodName + " providerClass=" + providerClass);
+        }
+    }
+
+    private void logShapeRadiusOnce(String context, float radius, int side) {
+        int shape = -999;
+        try { if (mPersonalityManager != null) shape = (int) callMethod(mPersonalityManager, "getLastShapeType"); }
+        catch (Throwable ignored) {}
+        String key = context + "|" + shape + "|" + Math.round(radius) + "|" + side;
+        if (sLoggedShapeRadius.add(key)) {
+            dbg("DIAG shapeRadius " + context + " shapeType=" + shape + " radius=" + radius + " side=" + side);
+        }
+    }
+
+    private void logViewChainOnce(String tag, Object view) {
+        StringBuilder sb = new StringBuilder();
+        Object v = view;
+        for (int i = 0; i < 14 && v != null; i++) {
+            sb.append(v.getClass().getName()).append(" > ");
+            try { v = callMethod(v, "getParent"); } catch (Throwable t) { break; }
+        }
+        String chain = sb.toString();
+        if (sLoggedChains.add(chain)) {
+            dbg("DIAG owner=null (" + tag + "): " + chain);
+        }
     }
 
     private void hookTileDrawableOwnership(XC_LoadPackage.LoadPackageParam lp) {
@@ -473,9 +722,11 @@ public class QsTilesCustomizeMod extends XposedMods {
                         Object view = p.args.length > 0 ? p.args[0] : null;
                         Object result = p.getResult();
                         if (view != null && result != null) {
-                            mGradientOwner.put(result, ownerOfView(view));
+                            String owner = ownerOfView(view);
+                            mGradientOwner.put(result, owner);
                             if (isBigCardView(view)) mBigCardDrawable.put(result, Boolean.TRUE);
                             if (isQuickEntranceView(view)) mQuickEntranceDrawable.put(result, Boolean.TRUE);
+                            if (owner == null) logViewChainOnce("Gradient", view);
                         }
                     }
                 });
@@ -493,6 +744,8 @@ public class QsTilesCustomizeMod extends XposedMods {
                         mMixColorOwner.put(result, owner);
                         if (isBigCardView(view)) mBigCardDrawable.put(result, Boolean.TRUE);
                         if (isQuickEntranceView(view)) mQuickEntranceDrawable.put(result, Boolean.TRUE);
+                        if (view instanceof View realView) mWideCardOwnerView.put(result, realView);
+                        if (owner == null) logViewChainOnce("MixColor", view);
                         // Applica il colore SUBITO alla costruzione, non solo alla prossima
                         // onStateChange — quella non scatta mai per i riquadri il cui stato non
                         // cambia mai dopo il boot. Il bordo è gestito a parte (draw() disegnato a
@@ -538,6 +791,36 @@ public class QsTilesCustomizeMod extends XposedMods {
         } catch (Throwable t) { dbg("hookMediaBorder install failed: " + t); }
     }
 
+    /** Riempimento Media che segue "Forma riquadri" — tentato 2026-09-23 via hook diretto su
+     *  TileTransitionDrawable.draw() (la classe trovata dietro getBg() via dump della gerarchia)
+     *  e via l'esistente GradientTileDrawable.draw() con owner=media: NESSUNO dei due fira mai
+     *  (diagnostica loggata zero volte nonostante il pannello Media venga aperto e ridisegnato
+     *  più volte) — il vero riempimento visibile non passa da lì, ancora non trovato. ABBANDONATO
+     *  per ora: resta solo il ritaglio via Outline (syncMediaShapeClip sotto), che copre bene
+     *  Finestra/Ottagono (conferma utente "perfetto") ma lascia un residuo visibile sull'angolo
+     *  stretto+arrotondato di Goccia/Rombo ("manca sfondo nell'angolo più stretto") — limite noto,
+     *  non risolto, da riprendere con più tempo/eventualmente jadx se mai disponibile. */
+    private void hookMediaShapeFill(XC_LoadPackage.LoadPackageParam lp) {
+        Class<?> transitionCls = tryFindClass(lp, "com.oplus.systemui.qs.base.res.drawable.TileTransitionDrawable");
+        if (transitionCls == null) return;
+        try {
+            hookAllMethods(transitionCls, "draw", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    if (!mTileShapeOn || !mTileBgMediaOn) return;
+                    try {
+                        android.graphics.Rect bounds = ((Drawable) p.thisObject).getBounds();
+                        if (bounds.width() < dp(150) || bounds.height() < dp(150)) return;
+                        android.graphics.Canvas canvas = (android.graphics.Canvas) p.args[0];
+                        android.graphics.Paint fillPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+                        fillPaint.setStyle(android.graphics.Paint.Style.FILL);
+                        fillPaint.setColor(mTileBgMediaColor);
+                        drawShaped(canvas, bounds, fillPaint);
+                    } catch (Throwable t) { dbg("media shape fill failed: " + t); }
+                }
+            });
+        } catch (Throwable t) { dbg("hookMediaShapeFill install failed: " + t); }
+    }
+
     private void syncMediaBorderView(Object panel) {
         if (!(panel instanceof ViewGroup)) return;
         View border = getOrCreateMediaBorderView(panel);
@@ -549,6 +832,64 @@ public class QsTilesCustomizeMod extends XposedMods {
         boolean coverActive = backdrop != null && backdrop.getVisibility() == View.VISIBLE;
         border.setVisibility(mTileBorderOn && !coverActive ? View.VISIBLE : View.GONE);
         border.invalidate();
+        syncMediaShapeClip(panel, backdrop);
+    }
+
+    /** "Forma riquadri" sul riempimento Media (richiesta 2026-09-23 "lo sfondo esce dal bordo"):
+     *  il layer "bg" nativo (GradientTileDrawable, via View.getBg()) è disegnato prima del bordo e
+     *  ridisegnarlo a mano via canvas-hook era già stato provato e abbandonato per Media (vedi
+     *  javadoc di hookMediaBorder, il blur ridisegna offscreen più volte e disallinea qualunque
+     *  cosa disegnata a mano) — qui usiamo invece il ritaglio nativo via Outline/clipToOutline
+     *  (View API reale, non canvas), che l'engine di rendering applica da solo al momento giusto,
+     *  niente allineamento da indovinare. setConvexPath() (usato inizialmente) approssima il Path
+     *  con un poligono a bassa precisione — segnalato 2026-09-23 su Goccia "manca sfondo
+     *  nell'angolo più stretto, media non segue il bordo" (angolo 4dp accanto a uno 30dp: il
+     *  bordo, disegnato col Path esatto, tagliava netto, ma il clip approssimato arrotondava
+     *  ancora quell'angolo, lasciando una mezzaluna di sfondo nativo scoperta). setPath() (API 30+,
+     *  minSdk di questo modulo è 31) usa il Path esatto, nessuna approssimazione — combacia sempre
+     *  col bordo. Copre sia il layer "bg" sia la copertina album (già con un suo outline fisso, qui
+     *  reso dinamico). */
+
+    private void syncMediaShapeClip(Object panel, ImageView backdrop) {
+        try {
+            Object bgObj = callMethod(panel, "getBg");
+            if (bgObj instanceof View bg) applyShapeClip(bg);
+        } catch (Throwable t) { dbg("media bg clip failed: " + t); }
+        if (backdrop != null) applyShapeClip(backdrop);
+    }
+
+    private void applyShapeClip(View v) {
+        // Goccia/Rombo (SHAPE_KIND_CORNERS) esclusi 2026-09-23: il clip lasciava comunque scoperto
+        // l'angolo stretto ("manca sfondo nell'angolo più stretto") E in più assottigliava il
+        // bordo (il riempimento sotto, ritagliato esattamente sullo stesso Path, si sovrapponeva
+        // metà dello stroke — "il bordo mi sembra più sottile degli altri qs") senza risolvere
+        // nulla. Poi scoperto che il problema non era solo CORNERS: anche Quadrato/Supercerchio
+        // (UNIFORM) mostravano lo stesso scarto (misurato via pixel: bordo ~10dp corretto, ma il
+        // riempimento restava clippato a un raggio più grande, ~20dp, indipendentemente da 3
+        // tentativi diversi di fix — precisione Outline, invalidate posticipato, vero
+        // OnLayoutChangeListener — nessuno ha cambiato il risultato di un solo pixel). Conclusione:
+        // il vero riempimento di Media (TileTransitionDrawable dietro getBg(), confermato via
+        // reflection) non risponde in modo affidabile a NESSUN controllo di clip/outline per
+        // qualunque forma con un raggio diverso da quello nativo di default — SOLO Finestra/Ottagono
+        // (dove il taglio è un angolo dritto, non un raggio) restano affidabili, confermato "Media
+        // perfetto". Per tutto il resto rinunciamo a ritagliare il riempimento: bordo e sfondo
+        // restano entrambi sul raggio nativo di default, coerenti tra loro (nessuno sporge).
+        if (mTileShapeOn && TILE_SHAPE_KIND[mTileShapePreset] == SHAPE_KIND_OCTAGON) {
+            v.setOutlineProvider(new ViewOutlineProvider() {
+                @Override public void getOutline(View view, Outline outline) {
+                    if (view.getWidth() <= 0 || view.getHeight() <= 0) return;
+                    outline.setPath(buildShapedPath(new android.graphics.Rect(0, 0, view.getWidth(), view.getHeight())));
+                }
+            });
+        } else {
+            v.setOutlineProvider(new ViewOutlineProvider() {
+                @Override public void getOutline(View view, Outline outline) {
+                    outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp(mTileRadiusMediaDp));
+                }
+            });
+        }
+        v.setClipToOutline(true);
+        v.invalidateOutline();
     }
 
     private View getOrCreateMediaBorderView(Object panel) {
@@ -564,8 +905,19 @@ public class QsTilesCustomizeMod extends XposedMods {
                 paint.setStyle(android.graphics.Paint.Style.STROKE);
                 paint.setStrokeWidth(strokeWidth);
                 paint.setColor(mTileBorderColor);
-                canvas.drawRoundRect(inset, inset, getWidth() - inset, getHeight() - inset,
-                        dp(mTileRadiusMediaDp), dp(mTileRadiusMediaDp), paint);
+                // "Forma riquadri" anche sul riquadro Media (richiesta 2026-09-23 "stesso angolo") —
+                // SOLO per Finestra/Ottagono (taglio ad angolo dritto, non un raggio): per ogni altra
+                // forma il riempimento nativo (TileTransitionDrawable dietro getBg()) non risponde in
+                // modo affidabile a nessun tentativo di ritaglio (vedi commento in applyShapeClip, 3
+                // tentativi diversi falliti), quindi bordo e sfondo qui usano LO STESSO raggio nativo
+                // di default — nessuno "sporge", ma "Forma riquadri" non personalizza Media in quei
+                // casi (limite noto, accettato su richiesta 2026-09-23 "lascia così").
+                if (mTileShapeOn && TILE_SHAPE_KIND[mTileShapePreset] == SHAPE_KIND_OCTAGON) {
+                    drawShaped(canvas, new android.graphics.Rect(0, 0, getWidth(), getHeight()), paint);
+                } else {
+                    canvas.drawRoundRect(inset, inset, getWidth() - inset, getHeight() - inset,
+                            dp(mTileRadiusMediaDp), dp(mTileRadiusMediaDp), paint);
+                }
             }
         };
         v.setWillNotDraw(false);
@@ -688,6 +1040,22 @@ public class QsTilesCustomizeMod extends XposedMods {
         return false;
     }
 
+    /** Come isActiveDrawableState(), ma legge lo stato CORRENTE del Drawable (getState(), la
+     *  stessa API standard Android che alimenta onStateChange) invece dello stateSpec di una
+     *  singola voce della mappa colori — serve in draw(), dove non abbiamo una DrawableState
+     *  key sottomano, solo il Drawable stesso. Usato per "Forma riquadri" (riempimento a mano). */
+    private boolean isDrawableStateActive(Drawable d, XC_LoadPackage.LoadPackageParam lp) {
+        try {
+            if (mTileViewFlagActiveAttr == null) {
+                Class<?> tileViewFlagCls = tryFindClass(lp, "com.oplus.systemui.qs.base.res.model.TileViewFlag");
+                Object activeFlag = getStaticObjectField(tileViewFlagCls, "Active");
+                mTileViewFlagActiveAttr = (int) callMethod(activeFlag, "getAttr");
+            }
+            for (int s : d.getState()) if (s == mTileViewFlagActiveAttr) return true;
+        } catch (Throwable ignored) {}
+        return false;
+    }
+
     // Sfondo "Riquadri base" (rettangolari — Wi-Fi, Torcia, media, ecc.): OplusQSResizeableTileView
     // OneXOne/TwoXOne.onDrawableUpdate() chiama SepQSResPool.getTileViewDrawable().getValue()
     // .build(getBg(), true) → GradientTileDrawable, il cui onStateChange(int[]) calcola il colore
@@ -737,21 +1105,25 @@ public class QsTilesCustomizeMod extends XposedMods {
                     boolean gWide = gb.width() > gb.height() * 1.3f;
                     boolean gIcon = mQuickEntranceDrawable.containsKey(p.thisObject)
                             || (!gWide && mBigCardDrawable.containsKey(p.thisObject));
-                    if (gIcon) { if (!mIconBorderOn) return; }
-                    else if (!mTileBorderOn || !OWNER_TILE.equals(mGradientOwner.get(p.thisObject))) return;
+                    // "Forma riquadri" sui riquadri grandi ABBANDONATA 2026-09-23 (vedi commento
+                    // gemello in hookTileBgHighlight): restano 100% stock, pillola/ovale nativa.
+                    boolean gBorderOn = gIcon ? mIconBorderOn : (mTileBorderOn && OWNER_TILE.equals(mGradientOwner.get(p.thisObject)));
+                    if (!gBorderOn) return;
                     try {
                         android.graphics.Canvas canvas = (android.graphics.Canvas) p.args[0];
                         android.graphics.Rect bounds = gb;
                         float radius = 0f;
                         try { radius = (float) callMethod(p.thisObject, "getCornerRadius"); } catch (Throwable ignored) {}
-                        float strokeWidth = tileBorderWidthPx();
-                        float inset = strokeWidth / 2f;
-                        android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-                        paint.setStyle(android.graphics.Paint.Style.STROKE);
-                        paint.setStrokeWidth(strokeWidth);
-                        paint.setColor(gIcon ? mIconBorderColor : mTileBorderColor);
-                        canvas.drawRoundRect(bounds.left + inset, bounds.top + inset,
-                                bounds.right - inset, bounds.bottom - inset, radius, radius, paint);
+                        if (gBorderOn) {
+                            float strokeWidth = tileBorderWidthPx();
+                            float inset = strokeWidth / 2f;
+                            android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+                            paint.setStyle(android.graphics.Paint.Style.STROKE);
+                            paint.setStrokeWidth(strokeWidth);
+                            paint.setColor(gIcon ? mIconBorderColor : mTileBorderColor);
+                            canvas.drawRoundRect(bounds.left + inset, bounds.top + inset,
+                                    bounds.right - inset, bounds.bottom - inset, radius, radius, paint);
+                        }
                     } catch (Throwable t) { dbg("tile border draw failed: " + t); }
                 }
             });
@@ -801,29 +1173,143 @@ public class QsTilesCustomizeMod extends XposedMods {
                     // grandi 2x1 e pulsanti rotondi in alto (quick entrance). Le card rettangolari
                     // (larghe) e i riquadri piccoli restano sotto "Bordo riquadri" (richiesta 2026-09-20).
                     boolean bigCardIcon = quickIcon || (!wideCard && mBigCardDrawable.containsKey(p.thisObject));
-                    if (bigCardIcon) { if (!mIconBorderOn) return; }
-                    else if (!mTileBorderOn) return;
+                    boolean smallRoundTile = !bigCardIcon && !wideCard;
+                    // "Forma riquadri" (2026-09-22, riquadri piccoli tondi soltanto): tentare di
+                    // leggere/scrivere il raggio nativo (getCornerRadius(), RoundRectOutlineProvider)
+                    // per QUESTI riquadri è stato abbandonato — diagnostica via log ha confermato che
+                    // il loro riempimento è un drawOval FISSO nel codice nativo, che non consulta
+                    // nessun raggio: cambiarlo non ha mai avuto alcun effetto visibile. Fix reale:
+                    // disegniamo NOI il riempimento sopra (stesso trucco già usato per il bordo),
+                    // nel colore che "Sfondo riquadri" ha già impostato per lo stato corrente — per
+                    // questo richiede che "Sfondo riquadri (in evidenza)" sia attivo: è l'unico modo
+                    // per conoscere il colore vero senza reimplementare anche il blur nativo.
+                    // "Riquadri grandi" (CARD larga ~414x186 e relativa ICONA ~186x186, stessa classe):
+                    // "Forma riquadri" sulla card intera RIPRISTINATA 2026-09-23 ora che il
+                    // riempimento è disegnato a mano NOI (vedi neutralizeWideFill sotto, confermato
+                    // funzionante via test rosso acceso) — il problema originale ("lo sfondo esce dal
+                    // bordo") era il riempimento NATIVO non tagliato, non più un limite qui: la nostra
+                    // forma è la stessa Path sia per riempimento che per bordo, combaciano sempre.
+                    boolean useOwnShape = mTileShapeOn && (smallRoundTile || wideCard);
+                    boolean shapeFillOn = useOwnShape && smallRoundTile && mTileBgHighlightOn;
+                    boolean borderOn = bigCardIcon ? mIconBorderOn : mTileBorderOn;
+                    // Riquadri grandi (riga in alto Wi-Fi/Torcia/Pixolor/Riavvia): quando un riquadro
+                    // è "attivo" (es. Wi-Fi connesso) OOS riempie l'INTERA card di accento — 100%
+                    // nativo, il nostro "Sfondo riquadri" non la tocca affatto per questa riga
+                    // (ownerOfView non la riconosce, torna null: non è un tile normale né Media, vedi
+                    // isQuickEntranceView). Richiesto 2026-09-23 "solo icona ad avere sfondo accento,
+                    // non tutto il pulsante" — qui SEMPRE (indipendente da switch/Forma riquadri):
+                    // ridisegniamo la card intera nel tono scuro neutro nativo (misurato via pixel su
+                    // una card mai attiva, es. Torcia), coprendo l'accento nativo; l'icona (drawable
+                    // separato, disegnato dopo) resta colorata normalmente. Segue "Forma riquadri"
+                    // quando attiva (stessa Path del bordo sotto), altrimenti pillola/ovale nativa.
+                    boolean neutralizeWideFill = wideCard;
+                    if (!shapeFillOn && !borderOn && !neutralizeWideFill) return;
+                    // Segnalato 2026-09-24 su Finestra/Ottagono/Rombo ("angoli/bordo con alone che
+                    // sporge"): NON è l'ombra di elevazione della View (verificato — setElevation(0)
+                    // reattivo, hook globale su setElevation, Outline esatta via setPath, e
+                    // outline.setAlpha(0) hanno tutti fallito allo stesso modo su un'apertura REALE
+                    // del pannello). È un alone del blur nativo del drawable stesso, indipendente da
+                    // qualunque cosa disegniamo — visibile solo dove la NOSTRA forma taglia via più
+                    // area di quanta ne copra quel blur. Vedi buildWideCardShapePath/
+                    // wideCardNeedsSafeShape sopra: per queste 3 forme bordo+riempimento+ombra usano
+                    // tutti lo stesso rettangolo arrotondato "sicuro", abbastanza vicino al blur
+                    // nativo da coprirlo sempre. L'OutlineProvider (sotto) resta comunque il modo
+                    // giusto per far seguire all'ombra la forma scelta, a prescindere dal resto.
+                    if (wideCard && mTileShapeOn) {
+                        View ownerView = mWideCardOwnerView.get(p.thisObject);
+                        if (ownerView != null) {
+                            // setOutlineProvider() una sola volta (il lambda legge i campi
+                            // mTileShapeOn/mTileShapePreset dal vivo ad ogni chiamata, non serve
+                            // un nuovo Provider ad ogni cambio forma) — invalidateOutline() invece
+                            // SEMPRE, per forzare il ricalcolo con la forma/preset CORRENTE ogni
+                            // volta che questa card ridisegna (es. dopo un cambio preset).
+                            if (mWideCardOutlineSet.add(ownerView)) {
+                                ownerView.setOutlineProvider(new ViewOutlineProvider() {
+                                    @Override public void getOutline(View view, Outline outline) {
+                                        if (view.getWidth() <= 0 || view.getHeight() <= 0) return;
+                                        outline.setPath(buildWideCardShapePath(new android.graphics.Rect(0, 0, view.getWidth(), view.getHeight())));
+                                    }
+                                });
+                            }
+                            ownerView.invalidateOutline();
+                        }
+                    } else if (wideCard) {
+                        // "Forma riquadri" spenta dopo essere stata accesa: il Provider a forma
+                        // resterebbe agganciato per sempre altrimenti (questo ramo del draw() non
+                        // passa più di qui una volta spento, quindi nessuno lo toglierebbe da solo).
+                        View ownerView = mWideCardOwnerView.get(p.thisObject);
+                        if (ownerView != null && mWideCardOutlineSet.remove(ownerView)) {
+                            ownerView.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
+                            ownerView.invalidateOutline();
+                        }
+                    }
+                    try {
+                        if (neutralizeWideFill) {
+                            android.graphics.Canvas nc = (android.graphics.Canvas) p.args[0];
+                            android.graphics.Paint nPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+                            nPaint.setStyle(android.graphics.Paint.Style.FILL);
+                            nPaint.setColor(WIDE_CARD_NEUTRAL_FILL);
+                            if (mTileShapeOn) {
+                                drawWideCardShape(nc, boundsProbe, nPaint);
+                            } else {
+                                float nRadius = boundsProbe.height() / 2f;
+                                try { nRadius = (float) callMethod(p.thisObject, "getCornerRadius"); } catch (Throwable ignored) {}
+                                nc.drawRoundRect(boundsProbe.left, boundsProbe.top, boundsProbe.right, boundsProbe.bottom,
+                                        nRadius, nRadius, nPaint);
+                            }
+                        }
+                    } catch (Throwable t) { dbg("wide card neutral fill failed: " + t); }
                     try {
                         android.graphics.Canvas canvas = (android.graphics.Canvas) p.args[0];
                         android.graphics.Rect bounds = boundsProbe;
-                        float strokeWidth = tileBorderWidthPx();
-                        float inset = strokeWidth / 2f;
-                        android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-                        paint.setStyle(android.graphics.Paint.Style.STROKE);
-                        paint.setStrokeWidth(strokeWidth);
-                        paint.setColor(bigCardIcon ? mIconBorderColor : mTileBorderColor);
-                        // Le card larghe 2 colonne (Wi-Fi/Torcia/Pixolor/Riavvia) condividono la
-                        // STESSA classe anche per l'intera card (bounds ~414x186, non solo l'icona
-                        // ~186x186), quindi un'ellisse sarebbe schiacciata — lì disegniamo un bordo
-                        // arrotondato (pill) via getCornerRadius() invece, come per GradientTileDrawable.
-                        if (bounds.width() > bounds.height() * 1.3f) {
-                            float radius = 0f;
-                            try { radius = (float) callMethod(p.thisObject, "getCornerRadius"); } catch (Throwable ignored) {}
-                            canvas.drawRoundRect(bounds.left + inset, bounds.top + inset,
-                                    bounds.right - inset, bounds.bottom - inset, radius, radius, paint);
+                        float radius;
+                        if (useOwnShape) {
+                            // Raggio NOSTRO diretto (dp fisso per preset), non letto dal sistema —
+                            // getCornerRadius()/RoundRectOutlineProvider si sono rivelati inaffidabili
+                            // per questi riquadri, quindi non li consultiamo più qui. Rombo/Goccia/
+                            // Finestra usano drawShaped() (Path dedicato), non un raggio semplice.
+                            radius = dp(tileShapePresetRadiusDp());
                         } else {
-                            canvas.drawOval(bounds.left + inset, bounds.top + inset,
-                                    bounds.right - inset, bounds.bottom - inset, paint);
+                            // Le card larghe 2 colonne (Wi-Fi/Torcia/Pixolor/Riavvia) condividono la
+                            // STESSA classe anche per l'intera card (bounds ~414x186, non solo l'icona
+                            // ~186x186), quindi un'ellisse sarebbe schiacciata — lì disegniamo un bordo
+                            // arrotondato (pill) via getCornerRadius() invece, come per GradientTileDrawable.
+                            radius = bounds.height() / 2f; // fallback: cerchio, uguale al comportamento precedente
+                            try { radius = (float) callMethod(p.thisObject, "getCornerRadius"); } catch (Throwable ignored) {}
+                            // Toppa 2026-09-22 per il solo caso nativo Quadrato (Impostazioni > Notifiche
+                            // e Impostazioni rapide > Impostazioni rapide > Modalità classica), quando
+                            // "Forma riquadri" nostra non è attiva: getCornerRadius() legge lo STESSO
+                            // valore per Predefinito e Quadrato (non li distingue), qui corretto col
+                            // valore misurato a schermo (~23% del lato). Le altre 4 forme native restano
+                            // fuori portata (leggono sempre 0 o non cambiano mai).
+                            if (smallRoundTile) {
+                                int shapeType = -999;
+                                try { if (mPersonalityManager != null) shapeType = (int) callMethod(mPersonalityManager, "getLastShapeType"); }
+                                catch (Throwable ignored) {}
+                                if (shapeType == 1) radius = bounds.height() * 0.226f;
+                            }
+                        }
+                        logShapeRadiusOnce("tile", radius, bounds.height());
+                        if (shapeFillOn) {
+                            boolean fillActive = isDrawableStateActive((Drawable) p.thisObject, lp);
+                            int fillColor = fillActive ? (mTileBgHlAccent ? appAccentColor() : mTileBgHlActive) : mTileBgHlInactive;
+                            android.graphics.Paint fillPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+                            fillPaint.setStyle(android.graphics.Paint.Style.FILL);
+                            fillPaint.setColor(fillColor);
+                            if (useOwnShape) drawShaped(canvas, bounds, fillPaint);
+                            else canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom, radius, radius, fillPaint);
+                        }
+                        if (borderOn) {
+                            float strokeWidth = tileBorderWidthPx();
+                            float inset = strokeWidth / 2f;
+                            android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+                            paint.setStyle(android.graphics.Paint.Style.STROKE);
+                            paint.setStrokeWidth(strokeWidth);
+                            paint.setColor(bigCardIcon ? mIconBorderColor : mTileBorderColor);
+                            // inset non applicato: trascurabile per un bordo sottile
+                            if (useOwnShape) { if (wideCard) drawWideCardShape(canvas, bounds, paint); else drawShaped(canvas, bounds, paint); }
+                            else canvas.drawRoundRect(bounds.left + inset, bounds.top + inset,
+                                    bounds.right - inset, bounds.bottom - inset, radius, radius, paint);
                         }
                     } catch (Throwable t) { dbg("mixcolor tile border draw failed: " + t); }
                 }
@@ -874,8 +1360,16 @@ public class QsTilesCustomizeMod extends XposedMods {
         try {
             hookAllMethods(cls, methodName, new XC_MethodHook() {
                 @Override protected void afterHookedMethod(MethodHookParam p) {
-                    if (!onSupplier.getAsBoolean()) return;
                     Object provider = p.args.length > 0 ? p.args[0] : null;
+                    // Diagnostica temporanea 2026-09-22: "Forma riquadri" cambia i riquadri grandi in
+                    // Separati ma non i piccoli tondi, e niente affatto in Classico — sospetto che
+                    // quei casi ricevano un provider di classe diversa da RoundRectOutlineProvider
+                    // (quindi il controllo sotto scarta la chiamata in silenzio). Logga la classe
+                    // vera una volta per ogni (classe chiamante, metodo, classe provider) mai vista —
+                    // PRIMA del controllo mTileShapeOn/mTileBgXxxOn, per vedere anche se il metodo
+                    // nativo viene proprio chiamato quando l'interruttore nostro è spento.
+                    logProviderClassOnce(className, methodName, provider);
+                    if (!onSupplier.getAsBoolean()) return;
                     if (provider == null || !provider.getClass().getName()
                             .equals("com.oplusos.systemui.common.outline.RoundRectOutlineProvider")) return;
                     try {
@@ -891,8 +1385,12 @@ public class QsTilesCustomizeMod extends XposedMods {
                 "com.oplus.systemui.qs.base.res.SepQSResPool", "com.oplus.systemui.qs.base.res.StdQSResPool"}) {
             // Un solo interruttore per categoria (lo stesso dello sfondo) — niente doppia voce
             // "Riquadri base"/"in evidenza"/"Media" ripetuta anche per il raggio, su richiesta utente.
-            hookOutlineUpdater(lp, cls, "updateTileOutline", () -> mTileBgBaseOn, () -> mTileRadiusBaseDp);
-            hookOutlineUpdater(lp, cls, "updateHighLightTileOutline", () -> mTileBgHighlightOn, () -> mTileRadiusHlDp);
+            hookOutlineUpdater(lp, cls, "updateTileOutline",
+                    () -> mTileBgBaseOn || mTileShapeOn,
+                    () -> mTileShapeOn ? tileShapePresetRadiusDp() : mTileRadiusBaseDp);
+            hookOutlineUpdater(lp, cls, "updateHighLightTileOutline",
+                    () -> mTileBgHighlightOn || mTileShapeOn,
+                    () -> mTileShapeOn ? tileShapePresetRadiusDp() : mTileRadiusHlDp);
             hookOutlineUpdater(lp, cls, "updateMediaPanelOutline", () -> mTileBgMediaOn, () -> mTileRadiusMediaDp);
         }
     }
@@ -1132,10 +1630,18 @@ public class QsTilesCustomizeMod extends XposedMods {
                     // COUIVerticalSeekBar è condivisa anche dal cursore del volume
                     // (OplusVolumeSeekBar) — senza questo filtro l'hook lo corromperebbe.
                     if (!p.thisObject.getClass().getName().contains("OplusQsVerticalSeekBar")) return;
-                    dbg("DIAG setProgressColor fired on " + p.thisObject.getClass().getName()
-                            + " mBrightnessCustomOn=" + mBrightnessCustomOn + " mBrightnessMode=" + mBrightnessMode);
-                    if (!mBrightnessCustomOn || mBrightnessMode == 0 || p.args.length == 0) return;
-                    int color = mBrightnessMode == 1 ? appAccentColor() : mBrightnessColor;
+                    if (p.args.length == 0) return;
+                    int color;
+                    if (mBrightnessCustomOn && mBrightnessMode != 0) {
+                        color = mBrightnessMode == 1 ? appAccentColor() : mBrightnessColor;
+                    } else if (mTileShapeOn) {
+                        // "Forma riquadri" sui cursori (2026-09-23): forzare isSupportMixColor=false
+                        // (vedi updateColor sotto) fa passare al ramo a colore piatto, ma senza
+                        // customizzazione esplicita il valore nativo di mProgressColorStateList non
+                        // è mai stato inizializzato per QUESTO ramo (su questo device è sempre stato
+                        // mix-color) — un default sensato qui evita un colore sbagliato/trasparente.
+                        color = appAccentColor();
+                    } else return;
                     p.args[0] = ColorStateList.valueOf(color);
                 }
             });
@@ -1145,8 +1651,14 @@ public class QsTilesCustomizeMod extends XposedMods {
             hookAllMethods(seekBar, "setSeekBarBackgroundColor", new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam p) {
                     if (!p.thisObject.getClass().getName().contains("OplusQsVerticalSeekBar")) return;
-                    if (!mBrightnessBgOn || p.args.length == 0) return;
-                    p.args[0] = ColorStateList.valueOf(mBrightnessBgColor);
+                    if (p.args.length == 0) return;
+                    int color;
+                    if (mBrightnessBgOn) {
+                        color = mBrightnessBgColor;
+                    } else if (mTileShapeOn) {
+                        color = TILE_SHAPE_SLIDER_BG_FALLBACK; // stesso motivo del default sopra
+                    } else return;
+                    p.args[0] = ColorStateList.valueOf(color);
                 }
             });
         } catch (Throwable t) { dbg("setSeekBarBackgroundColor hook failed: " + t); }
@@ -1168,7 +1680,17 @@ public class QsTilesCustomizeMod extends XposedMods {
             try {
                 hookAllMethods(qsVerticalSeekBar, "updateColor", new XC_MethodHook() {
                     @Override protected void beforeHookedMethod(MethodHookParam p) {
-                        if (!mBrightnessCustomOn && !mBrightnessBgOn) return;
+                        // "Forma riquadri" sui cursori (2026-09-23, round 3): confermato via
+                        // reflection ("DIAG slider fields") che il riempimento passa da
+                        // activeMixColorDrawable/baseMixColorDrawable quando isDrawingWithMixColor è
+                        // true — stessa famiglia "MixColor" dei riquadri tondi, blur in tempo reale
+                        // che ridisegna offscreen e ignora sia canvas-clip sia View clipToOutline
+                        // (stesso motivo per cui Media va in overlay View invece che canvas-hook).
+                        // Forzare qui isSupportMixColor=false (stesso trucco già usato per
+                        // "Colore cursore" custom) fa passare il cursore al ramo a colore piatto
+                        // (drawActiveTrack/mProgressPaint/mBackgroundPaint, radius reale) — quello
+                        // che il nostro clipToOutline (hookSliderBorder sopra) può davvero tagliare.
+                        if (!mBrightnessCustomOn && !mBrightnessBgOn && !mTileShapeOn) return;
                         if (p.args.length == 0 || !(p.args[0] instanceof Boolean)) return;
                         p.args[0] = Boolean.FALSE;
                     }
@@ -1191,21 +1713,103 @@ public class QsTilesCustomizeMod extends XposedMods {
         if (qsSeekBarCls == null || couiSeekBarCls == null) return;
         try {
             hookAllMethods(couiSeekBarCls, "onDraw", new XC_MethodHook() {
+                // "Forma riquadri" sui cursori: il riempimento (sfondo + barra progresso) NON è
+                // disegnato da questo onDraw — è il background Drawable della View, dipinto PRIMA
+                // (View.draw(): drawBackground() gira prima di onDraw()), quindi un clipPath sul
+                // Canvas qui dentro non ha mai effetto su di lui (tentativo 2026-09-23, "i cursori
+                // sono uguali allo screen di prima" — stesso riempimento che esce dagli angoli).
+                // Fix reale: come per Media, ritaglio via Outline/clipToOutline (applicato
+                // dall'engine PRIMA di qualunque fase di disegno della View, background incluso),
+                // non un canvas-hook. Il nostro bordo (disegnato sotto, ancora in questo stesso
+                // onDraw) resta comunque leggermente rifilato sul bordo esterno dallo stesso
+                // outline — trascurabile per uno stroke da 1.5dp.
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    if (!(p.thisObject instanceof View sb) || !qsSeekBarCls.isInstance(p.thisObject)) return;
+                    try {
+                        if (mTileShapeOn) {
+                            Object rectObj = getObjectField(p.thisObject, "mBackgroundRect");
+                            if (rectObj instanceof android.graphics.Rect rect) {
+                                sb.setOutlineProvider(new ViewOutlineProvider() {
+                                    @Override public void getOutline(View view, Outline outline) {
+                                        outline.setPath(buildShapedPath(rect));
+                                    }
+                                });
+                                sb.setClipToOutline(true);
+                                sb.invalidateOutline();
+                            }
+                        } else if (sb.getClipToOutline()) {
+                            sb.setClipToOutline(false);
+                        }
+                    } catch (Throwable t) { dbg("slider clip failed: " + t); }
+                }
+
                 @Override protected void afterHookedMethod(MethodHookParam p) {
                     if (!mTileBorderOn || !qsSeekBarCls.isInstance(p.thisObject)) return;
                     try {
                         android.graphics.Canvas canvas = (android.graphics.Canvas) p.args[0];
                         Object rectObj = getObjectField(p.thisObject, "mBackgroundRect");
                         if (!(rectObj instanceof android.graphics.Rect rect)) return;
-                        float radius = getFloatField(p.thisObject, "mCurBackgroundRadius");
+                        if (mTileShapeOn) {
+                            // Riempimento (sfondo + barra progresso) — il clipToOutline sopra taglia
+                            // solo il layer di sfondo, non la barra progresso: campo dedicato
+                            // mClipProgressPath/mProgressRect confermato via reflection, disegnata a
+                            // parte con un proprio raggio (mCurProgressRadius) che ignora il nostro
+                            // outline — segnalato 2026-09-23 "il fondo è ok ma la barra esce ancora
+                            // dal bordo in basso". Fix: ridisegniamo NOI le due metà (stessa tecnica
+                            // dei riquadri tondi), intersecando la forma scelta con un rettangolo
+                            // superiore/inferiore via Path.op — gestisce da solo angoli/chamfer
+                            // qualunque sia la forma, niente geometria duplicata a mano.
+                            try {
+                                int progress = (int) callMethod(p.thisObject, "getProgress");
+                                int max = (int) callMethod(p.thisObject, "getMax");
+                                float frac = max > 0 ? Math.max(0f, Math.min(1f, progress / (float) max)) : 0f;
+                                float splitY = rect.top + rect.height() * (1f - frac);
+
+                                int bgColor = mBrightnessBgOn ? mBrightnessBgColor : TILE_SHAPE_SLIDER_BG_FALLBACK;
+                                int progressColor = (mBrightnessCustomOn && mBrightnessMode != 0)
+                                        ? (mBrightnessMode == 1 ? appAccentColor() : mBrightnessColor)
+                                        : appAccentColor();
+
+                                android.graphics.Path shape = buildShapedPath(rect);
+                                android.graphics.RectF upper = new android.graphics.RectF(rect.left, rect.top, rect.right, splitY);
+                                android.graphics.RectF lower = new android.graphics.RectF(rect.left, splitY, rect.right, rect.bottom);
+                                android.graphics.Paint fillPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+                                fillPaint.setStyle(android.graphics.Paint.Style.FILL);
+
+                                if (upper.height() > 0) {
+                                    android.graphics.Path upperRectPath = new android.graphics.Path();
+                                    upperRectPath.addRect(upper, android.graphics.Path.Direction.CW);
+                                    android.graphics.Path bgPath = new android.graphics.Path();
+                                    bgPath.op(shape, upperRectPath, android.graphics.Path.Op.INTERSECT);
+                                    fillPaint.setColor(bgColor);
+                                    canvas.drawPath(bgPath, fillPaint);
+                                }
+                                if (lower.height() > 0) {
+                                    android.graphics.Path lowerRectPath = new android.graphics.Path();
+                                    lowerRectPath.addRect(lower, android.graphics.Path.Direction.CW);
+                                    android.graphics.Path progPath = new android.graphics.Path();
+                                    progPath.op(shape, lowerRectPath, android.graphics.Path.Op.INTERSECT);
+                                    fillPaint.setColor(progressColor);
+                                    canvas.drawPath(progPath, fillPaint);
+                                }
+                            } catch (Throwable t) { dbg("slider shaped fill failed: " + t); }
+                        }
                         float strokeWidth = tileBorderWidthPx();
                         float inset = strokeWidth / 2f;
                         android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
                         paint.setStyle(android.graphics.Paint.Style.STROKE);
                         paint.setStrokeWidth(strokeWidth);
                         paint.setColor(mTileBorderColor);
-                        canvas.drawRoundRect(rect.left + inset, rect.top + inset, rect.right - inset, rect.bottom - inset,
-                                radius, radius, paint);
+                        if (mTileShapeOn) {
+                            // Bordo disegnato SOPRA (fuori dal clip, già ripristinato sopra, e sopra
+                            // il riempimento appena ridisegnato) — stesso Path del clip/riempimento,
+                            // quindi combacia esattamente.
+                            drawShaped(canvas, rect, paint);
+                        } else {
+                            float radius = getFloatField(p.thisObject, "mCurBackgroundRadius");
+                            canvas.drawRoundRect(rect.left + inset, rect.top + inset, rect.right - inset, rect.bottom - inset,
+                                    radius, radius, paint);
+                        }
                     } catch (Throwable t) { dbg("slider border draw failed: " + t); }
                 }
             });

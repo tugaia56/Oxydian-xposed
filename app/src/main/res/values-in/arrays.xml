@@ -758,6 +758,15 @@
     </string-array>
 
     <!-- Stile Icone Impostazioni (pack HOS): sfondo solido on/off -->
+    <string-array name="qs_tiles_shape_entries">
+        <item>Jendela</item>
+        <item>Tetesan</item>
+        <item>Segi Delapan</item>
+        <item>Persegi</item>
+        <item>Belah Ketupat</item>
+        <item>Superlingkaran 1</item>
+        <item>Superlingkaran 2</item>
+    </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Mati</item>
         <item>Hidup</item>

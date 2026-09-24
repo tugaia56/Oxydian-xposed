@@ -758,6 +758,15 @@
     </string-array>
 
     <!-- Stile Icone Impostazioni (pack HOS): sfondo solido on/off -->
+    <string-array name="qs_tiles_shape_entries">
+        <item>窗形</item>
+        <item>水滴形</item>
+        <item>八边形</item>
+        <item>方形</item>
+        <item>菱形</item>
+        <item>超椭圆1</item>
+        <item>超椭圆2</item>
+    </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>关</item>
         <item>开</item>
