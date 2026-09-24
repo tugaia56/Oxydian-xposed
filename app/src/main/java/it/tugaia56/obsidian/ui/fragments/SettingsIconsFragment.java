@@ -266,6 +266,15 @@ public class SettingsIconsFragment extends Fragment {
 
         setBusy(true);
         Pack pack = mPacks.get(mSelected);
+        // Scritto SUBITO, non solo a successo avvenuto: compilare l'overlay abilita anche SIP2
+        // (l'overlay di QUESTA app, per l'anteprima interna), e quel cambio fa RILANCIARE
+        // MainActivity a metà del lavoro in background (vedi nota in onViewCreated). La nuova
+        // istanza del Fragment rilegge questo pref subito: se non fosse già aggiornato, mostra
+        // ancora il pack precedente e sembra che "Applica" non abbia funzionato (bug segnalato
+        // 2026-09-22: serviva un secondo Applica, premuto sul pack sbagliato, per attivare quello
+        // giusto). KEY_PENDING_REBOOT resta gestito solo a fine lavoro, sotto.
+        int prevAppliedSet = mAppliedSet;
+        ObsidianPrefs.putInt(KEY_SELECTED_SET, pack.iconSet());
         new Thread(() -> {
             boolean erroredOut;
             try {
@@ -275,12 +284,26 @@ public class SettingsIconsFragment extends Fragment {
                 Log.e(TAG, e.toString());
                 erroredOut = true;
             }
+            // Se la build fallisce, il pref "scritto subito" sopra va rimesso a com'era, altrimenti
+            // resterebbe segnato come selezionato un pack mai davvero applicato.
+            if (erroredOut) {
+                ObsidianPrefs.putInt(KEY_SELECTED_SET, prevAppliedSet);
+            }
             boolean success = !erroredOut;
-            // enableOverlays (dentro buildOverlay) è ora bloccante, quindi qui lo stato reale
-            // è già consultabile: se il pacchetto overlay era già noto a PMS da un riavvio
-            // precedente, "Applica" per un pack diverso lo attiva subito, senza bisogno di
-            // un altro riavvio.
-            boolean nowActive = success && OverlayUtil.isOverlayEnabled(PREFIX + "SIP1.overlay");
+            // enableOverlays (dentro buildOverlay) è bloccante lato comando "cmd overlay enable",
+            // ma OMS applica lo stato in modo asincrono: un controllo immediato può ancora leggere
+            // "disabilitato" per qualche centinaio di ms (bug segnalato 2026-09-22: serviva un
+            // secondo "Applica" per attivare — il primo giro di retry, 6x200ms, non è bastato
+            // sempre, es. per PUI v2). Riprova fino a 3s prima di arrendersi.
+            boolean nowActive = false;
+            if (success) {
+                for (int attempt = 0; attempt < 15 && !nowActive; attempt++) {
+                    nowActive = OverlayUtil.isOverlayEnabled(PREFIX + "SIP1.overlay");
+                    if (!nowActive) {
+                        try { Thread.sleep(200); } catch (InterruptedException ignored) {}
+                    }
+                }
+            }
             // La copia live in /product/overlay puo' non riuscire (partizione in sola lettura): in tal
             // caso il contenuto nuovo arriva solo dal modulo al prossimo avvio. Se il file attivo
             // differisce da quello appena compilato, serve un riavvio anche se l'overlay risulta attivo.

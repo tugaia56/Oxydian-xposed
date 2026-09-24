@@ -10,6 +10,7 @@ import static it.tugaia56.obsidian.utils.helper.Logger.writeLog;
 import static it.tugaia56.obsidian.utils.overlay.OverlayUtil.disableOverlay;
 import static it.tugaia56.obsidian.utils.overlay.OverlayUtil.disableOverlays;
 import static it.tugaia56.obsidian.utils.overlay.OverlayUtil.enableOverlays;
+import static it.tugaia56.obsidian.utils.overlay.OverlayUtil.isOverlayEnabled;
 
 import android.util.Log;
 
@@ -178,6 +179,16 @@ public class SettingsIconsCompiler {
         // cache anche se il file APK sotto è stato appena sovrascritto con contenuto nuovo.
         // Disabilita e riabilita sempre per forzare la rigenerazione dell'idmap dal file attuale.
         disableOverlays(overlayNames);
+        // "cmd overlay disable" ritorna appena il comando shell finisce, ma OMS applica lo
+        // stato in modo asincrono: chiamare subito "enable" può quindi trovare OMS ancora sullo
+        // stato "abilitato" precedente e non fare nulla (bug segnalato 2026-09-22: cambiare
+        // pack mentre un altro è già attivo richiedeva sempre due "Applica"). Aspetta la
+        // conferma reale del disable prima di riabilitare.
+        for (String name : overlayNames) {
+            for (int i = 0; i < 10 && isOverlayEnabled(name); i++) {
+                try { Thread.sleep(150); } catch (InterruptedException ignored) {}
+            }
+        }
         enableOverlays(overlayNames);
         // Impostazioni tiene in cache le risorse dell'overlay: chiuderlo forza il ricaricamento.
         Shell.cmd("am force-stop com.android.settings").exec();
