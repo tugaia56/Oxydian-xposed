@@ -40,6 +40,10 @@ public class ClockStyleFragment extends Fragment {
     private static final String PREF_CHIP_PREFIX = "status_bar_clock_background_chip";
     private static final String PREF_BG_CHIP_ON = PREF_CHIP_PREFIX + "_switch";
     private static final String PREF_CHIP_STYLE = PREF_CHIP_PREFIX + "_style";
+    // 2026-09-25: switch diagnostico richiesto dall'utente dopo il troncamento "09:..." mai
+    // risolto del tutto (vedi 09-20) — spegne rapidamente TUTTO questo hook (posizione,
+    // dimensione, padding, chip) senza dover disattivare l'intero modulo Oxydian.
+    private static final String PREF_STYLE_ON = "status_bar_clock_style_enabled";
 
     private RecyclerView mRv;
     private boolean mChipExpanded = false;
@@ -66,6 +70,15 @@ public class ClockStyleFragment extends Fragment {
     private void rebuild() {
         List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.nav_clock_style))));
+
+        boolean styleOn = ObsidianPrefs.getBoolean(PREF_STYLE_ON, true);
+        SwitchWidgetAdapter.SwitchItem styleSwitch = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.status_bar_clock_style_on_title),
+                getString(R.string.status_bar_clock_style_on_summary),
+                styleOn, null);
+        styleSwitch.onChanged = () -> ObsidianPrefs.putBoolean(PREF_STYLE_ON, styleSwitch.checked);
+        chain.add(new SwitchWidgetAdapter(List.of(styleSwitch)));
+
         GroupUtils.addGroup(chain, List.of(
                 new ListWidgetAdapter.ListItem(
                         getString(R.string.clock_position_title),

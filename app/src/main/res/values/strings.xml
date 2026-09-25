@@ -602,6 +602,10 @@
     <string name="nav_clock_style_summary">Clock position, size, and margin</string>
     <string name="nav_clock_date">Date Style</string>
     <string name="nav_clock_date_summary">Clock format and date style</string>
+    <string name="status_bar_clock_style_on_title">Enable Clock Style</string>
+    <string name="status_bar_clock_style_on_summary">Turn off to quickly test with stock position/size/padding/chip, without disabling the whole module</string>
+    <string name="status_bar_clock_date_style_on_title">Enable Date Style</string>
+    <string name="status_bar_clock_date_style_on_summary">Turn off to quickly test with stock seconds/AM-PM/before-after text/date, without disabling the whole module</string>
 
     <!-- Clock & Date options -->
     <string name="clock_position_title">Clock Position</string>

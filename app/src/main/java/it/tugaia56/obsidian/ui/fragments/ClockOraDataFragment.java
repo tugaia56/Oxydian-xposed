@@ -49,6 +49,9 @@ public class ClockOraDataFragment extends Fragment {
     private static final String PREF_BEFORE_SMALL       = "sbc_before_small";
     private static final String PREF_AFTER_TEXT         = "sbc_after_clock_format";
     private static final String PREF_AFTER_SMALL        = "sbc_after_small";
+    // 2026-09-25: switch diagnostico gemello di quello in ClockStyleFragment (Stile Orologio) —
+    // spegne secondi/AM-PM/testo prima-dopo/data senza toccare il resto del modulo.
+    private static final String PREF_STYLE_ON = "status_bar_clock_date_style_enabled";
 
     private RecyclerView rv;
 
@@ -140,6 +143,14 @@ public class ClockOraDataFragment extends Fragment {
         boolean dateActive = !"0".equals(dateVal);
 
         List<RecyclerView.Adapter<?>> chain = new java.util.ArrayList<>();
+
+        SwitchItem styleSwitch = new SwitchItem(
+                getString(R.string.status_bar_clock_date_style_on_title),
+                getString(R.string.status_bar_clock_date_style_on_summary),
+                ObsidianPrefs.getBoolean(PREF_STYLE_ON, true), null);
+        styleSwitch.onChanged = () -> ObsidianPrefs.putBoolean(PREF_STYLE_ON, styleSwitch.checked);
+        chain.add(new SwitchWidgetAdapter(List.of(styleSwitch)));
+
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.clock_section_hide))));
         GroupUtils.addGroup(chain, List.of(hideLauncherItem, hideAutoItem));
 

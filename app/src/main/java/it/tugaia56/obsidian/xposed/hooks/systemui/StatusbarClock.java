@@ -10,6 +10,7 @@ import static it.tugaia56.obsidian.utils.Constants.Packages.SYSTEM_UI;
 import static it.tugaia56.obsidian.xposed.XPrefs.Xprefs;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -118,6 +119,12 @@ public class StatusbarClock extends XposedMods {
     private String  mAfterClock  = "";
     private boolean mAfterSmall  = false;
 
+    // Switch diagnostici 2026-09-25 (troncamento "09:..." mai risolto del tutto, vedi 09-20):
+    // spengono posizione/dimensione/padding/chip (Stile Orologio) o secondi/AM-PM/testo
+    // prima-dopo/data (Stile Data) senza dover disattivare l'intero modulo per testare.
+    private boolean mClockStyleOn = true;
+    private boolean mDateStyleOn  = true;
+
     private boolean mAutoHideLauncher = false;
     private boolean mAutoHide         = false;
     private int     mHideDuration     = DEFAULT_HIDE_DURATION;
@@ -194,6 +201,9 @@ public class StatusbarClock extends XposedMods {
     public void updatePrefs(String... Key) {
         if (Xprefs == null) return;
 
+        mClockStyleOn = Xprefs.getBoolean("status_bar_clock_style_enabled", true);
+        mDateStyleOn  = Xprefs.getBoolean("status_bar_clock_date_style_enabled", true);
+
         mPosition    = Integer.parseInt(Xprefs.getString("status_bar_clock", String.valueOf(POS_LEFT)));
         mSize        = Xprefs.getInt("status_bar_clock_size",    12);
         mPadding     = Xprefs.getInt("status_bar_clock_padding", 0);
@@ -240,6 +250,18 @@ public class StatusbarClock extends XposedMods {
 
         if (Key.length > 0) {
             switch (Key[0]) {
+                case "status_bar_clock_style_enabled":
+                case "status_bar_clock_date_style_enabled":
+                    // Riapplica tutto — i metodi sotto controllano già i due switch
+                    // internamente, quindi questo copre sia l'accensione che lo spegnimento.
+                    // Spegnere non "ripristina" retroattivamente un layout già modificato
+                    // (es. altezza/minWidth della View già impostati) — potrebbe servire un
+                    // riavvio di SystemUI per tornare 100% allo stock, come altre opzioni qui.
+                    placeClock();
+                    setClockSize();
+                    updateChip();
+                    refreshClock();
+                    break;
                 case "status_bar_clock":
                     placeClock();
                     break;
@@ -293,6 +315,7 @@ public class StatusbarClock extends XposedMods {
 
     /** Reads clock font size live from Xprefs, falls back to cached mSize. */
     private int liveClockSize() {
+        if (!mClockStyleOn) return 0; // spegne anche i 3 hook StatClock (onMeasure/config/minWidth) sotto
         try {
             return (Xprefs != null) ? Xprefs.getInt("status_bar_clock_size", mSize) : mSize;
         } catch (Throwable t) {
@@ -431,6 +454,30 @@ public class StatusbarClock extends XposedMods {
             log("[ Obsidian ] StatusbarClock: updateClockVisibility hook failed: " + t);
         }
 
+        // ── 2b. TextView.setTextSize: dirottiamo OGNI chiamata sull'orologio ──
+        //    Confermato funzionante 2026-09-25 (poi tolto per errore durante il porting da OC,
+        //    rimesso): qualcosa di nativo continua a reimporre una dimensione diversa dalla
+        //    nostra in punti che i soli hook su StatClock non coprono — dirottare il setter
+        //    stesso garantisce che nessuno possa più imporne una diversa.
+        try {
+            hookAllMethods(TextView.class, "setTextSize", new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam p) {
+                    if (p.thisObject != mClockView || !mClockStyleOn) return;
+                    int sz = liveClockSize();
+                    if (sz <= 0) return;
+                    if (p.args.length == 2 && p.args[0] instanceof Integer && p.args[1] instanceof Float) {
+                        p.args[0] = TypedValue.COMPLEX_UNIT_SP;
+                        p.args[1] = (float) sz;
+                    } else if (p.args.length == 1 && p.args[0] instanceof Float) {
+                        p.args[0] = (float) sz;
+                    }
+                }
+            });
+        } catch (Throwable t) {
+            log("[ Obsidian ] StatusbarClock: setTextSize hijack hook failed: " + t);
+        }
+
         // ── 3a. Clock.getSmallTime BEFORE: toggle seconds field ───────────────
 
         try {
@@ -440,7 +487,7 @@ public class StatusbarClock extends XposedMods {
             hookAllMethods(ClockClass, "getSmallTime", new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam p) {
-                    if (p.thisObject != mClockView) return;
+                    if (p.thisObject != mClockView || !mDateStyleOn) return;
                     try {
                         setObjectField(p.thisObject, "mShowSeconds", mShowSeconds);
                     } catch (Throwable ignored) {}
@@ -462,14 +509,14 @@ public class StatusbarClock extends XposedMods {
                     if (p.thisObject != mClockView) return;
 
                     TextView tv = (TextView) p.thisObject;
-                    tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, mSize);
+                    if (mClockStyleOn) tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, mSize);
 
                     CharSequence original = (CharSequence) p.getResult();
                     if (original == null) return;
 
                     boolean hasBefore = !mComputedBefore.isEmpty();
                     boolean hasAfter  = !mComputedAfter.isEmpty();
-                    boolean hasAmPm   = (mAmPmStyle != AM_PM_GONE);
+                    boolean hasAmPm   = mDateStyleOn && (mAmPmStyle != AM_PM_GONE);
                     if (!mCustomColor && !hasBefore && !hasAfter && !hasAmPm) return;
 
                     SpannableStringBuilder result = new SpannableStringBuilder();
@@ -535,10 +582,9 @@ public class StatusbarClock extends XposedMods {
                     if (sz <= 0) return;
                     TextView tv = (TextView) p.thisObject;
                     tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, sz);
-                    // Recalculate measured width with the new text size
-                    String text = tv.getText() != null ? tv.getText().toString() : "";
-                    float textWidth = tv.getPaint().measureText(text);
+                    float textWidth = measureExpectedClockWidth(sz);
                     int w = (int)(textWidth + 0.5f) + tv.getPaddingLeft() + tv.getPaddingRight();
+                    if (tv.getMinimumWidth() != w) tv.setMinimumWidth(w);
                     try { callMethod(p.thisObject, "setMeasuredDimension", w, p.args[1]); }
                     catch (Throwable ignored) {}
                 }
@@ -566,8 +612,8 @@ public class StatusbarClock extends XposedMods {
                     if (sz <= 0) return;
                     TextView tv = (TextView) p.thisObject;
                     tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, sz);
-                    String text = tv.getText() != null ? tv.getText().toString() : "";
-                    float textWidth = tv.getPaint().measureText(text);
+                    // Stessa logica di onMeasure sopra: TextPaint fresco, non tv.getText().
+                    float textWidth = measureExpectedClockWidth(sz);
                     int w = (int)(textWidth + 0.5f) + tv.getPaddingLeft() + tv.getPaddingRight();
                     tv.setMinimumWidth(w);
                 }
@@ -576,6 +622,39 @@ public class StatusbarClock extends XposedMods {
             log("[ Obsidian ] StatusbarClock: StatClock onMeasure/configChanged/minWidth hooked");
         } catch (Throwable t) {
             log("[ Obsidian ] StatusbarClock: StatClock hooks failed: " + t);
+        }
+
+        // ── 4b. StartSideExceptHeadsUpLayout.onLayout: il vero blocco ─────────
+        //    2026-09-25: confermato via dump nativo (View.toString(), non un log nostro) che i
+        //    bounds REALI assegnati all'orologio restano stretti (es. "0,0-117,91") a
+        //    prescindere da qualunque larghezza chiediamo in onMeasure/setMinimumWidth — il
+        //    genitore (questa classe custom Oplus, il contenitore "start_side_except_heads_up")
+        //    decide i bounds finali nel proprio onLayout con una logica sua che non consulta più
+        //    la nostra larghezza dopo la fase di misura. Fix: dopo che il nativo ha fatto il suo
+        //    onLayout, ri-posizioniamo NOI il solo orologio con la larghezza vera che ci serve —
+        //    è il primo figlio (index 1), quindi allargarlo a destra non sposta nulla a sinistra.
+        try {
+            Class<?> StartSide = findClass(
+                    "com.oplus.systemui.statusbar.widget.StartSideExceptHeadsUpLayout", lp.classLoader);
+            hookAllMethods(StartSide, "onLayout", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam p) {
+                    if (mClockView == null || !mClockStyleOn) return;
+                    if (mClockView.getParent() != p.thisObject) return;
+                    int sz = liveClockSize();
+                    if (sz <= 0) return;
+                    float textWidth = measureExpectedClockWidth(sz);
+                    int desired = (int) (textWidth + 0.5f)
+                            + mClockView.getPaddingLeft() + mClockView.getPaddingRight();
+                    int l = mClockView.getLeft(), t = mClockView.getTop(), b = mClockView.getBottom();
+                    if (mClockView.getWidth() < desired) {
+                        mClockView.layout(l, t, l + desired, b);
+                    }
+                }
+            });
+            log("[ Obsidian ] StatusbarClock: StartSideExceptHeadsUpLayout.onLayout hooked");
+        } catch (Throwable t) {
+            log("[ Obsidian ] StatusbarClock: StartSideExceptHeadsUpLayout hook failed: " + t);
         }
 
         // ── 5. Auto-hide launcher: TaskStackListenerImpl ──────────────────────
@@ -607,6 +686,39 @@ public class StatusbarClock extends XposedMods {
         } catch (Throwable ignored) {}
     }
 
+    /** Misura la larghezza del testo COMPLETO atteso (prima + ora + am/pm + dopo), ricostruito
+     *  da zero con la stessa logica dell'hook 3b su getSmallTime() — non legge tv.getText()
+     *  (poteva riflettere un frame precedente, non ancora aggiornato con "prima"/"dopo"/data).
+     *  Usa un TextPaint NUOVO dimensionato via TypedValue.applyDimension (stesso approccio di
+     *  OC), non tv.getPaint(). 2026-09-25: root-causa vera del troncamento "09:..." trovata
+     *  DOPO: il genitore (StartSideExceptHeadsUpLayout) assegna bounds finali fissi nel proprio
+     *  onLayout ignorando qualunque larghezza chiesta qui — vedi l'hook su onLayout più sotto,
+     *  quello risolve davvero. Questo metodo resta comunque corretto/necessario: gli serve un
+     *  numero preciso da passare a quell'hook. */
+    private float measureExpectedClockWidth(int sizeSp) {
+        android.text.TextPaint textPaint = new android.text.TextPaint();
+        float textSizePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sizeSp,
+                mContext.getResources().getDisplayMetrics());
+        textPaint.setTextSize(textSizePx);
+        textPaint.setTypeface(mClockView.getTypeface());
+
+        StringBuilder sb = new StringBuilder();
+        boolean hasBefore = mDateStyleOn && !mComputedBefore.isEmpty();
+        boolean hasAfter  = mDateStyleOn && !mComputedAfter.isEmpty();
+        boolean hasAmPm   = mDateStyleOn && (mAmPmStyle != AM_PM_GONE);
+        if (hasBefore) { sb.append(formatText(mComputedBefore)); sb.append(" "); }
+        String pattern = mShowSeconds ? "HH:mm:ss" : "HH:mm";
+        sb.append(new SimpleDateFormat(pattern, Locale.getDefault()).format(new Date()));
+        if (hasAmPm) sb.append(new SimpleDateFormat("a", Locale.getDefault()).format(new Date()));
+        if (hasAfter) { sb.append(" "); sb.append(formatText(mComputedAfter)); }
+
+        float maxWidth = 0f;
+        for (String line : sb.toString().split("\n")) {
+            maxWidth = Math.max(maxWidth, textPaint.measureText(line));
+        }
+        return maxWidth;
+    }
+
     // ── Helpers ────────────────────────────────────────────────────────────────
 
     /**
@@ -614,6 +726,11 @@ public class StatusbarClock extends XposedMods {
      * Custom text overrides date display when non-empty.
      */
     private void buildComputedTexts() {
+        if (!mDateStyleOn) {
+            mComputedBefore = ""; mComputedBeforeSmall = false;
+            mComputedAfter  = ""; mComputedAfterSmall  = false;
+            return;
+        }
         boolean hasCustom = !mBeforeClock.isEmpty() || !mAfterClock.isEmpty();
         if (hasCustom) {
             mComputedBefore      = mBeforeClock;
@@ -690,7 +807,7 @@ public class StatusbarClock extends XposedMods {
     /** Move the clock to the requested position area. */
     @SuppressLint("RtlHardcoded")
     private void placeClock() {
-        if (mClockView == null) return;
+        if (mClockView == null || !mClockStyleOn) return;
         ViewGroup parent = (ViewGroup) mClockView.getParent();
         ViewGroup target = null;
         Integer   index  = null;
@@ -742,16 +859,32 @@ public class StatusbarClock extends XposedMods {
     }
 
     /** Apply font size and trigger layout. */
+    @SuppressLint("RtlHardcoded")
     private void setClockSize() {
-        if (mClockView == null) return;
-        mClockView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mSize);
+        if (mClockView == null || !mClockStyleOn) return;
         if (mSize > 12) {
             ViewGroup.LayoutParams p = mClockView.getLayoutParams();
             if (p != null) {
                 p.height = ViewGroup.LayoutParams.MATCH_PARENT;
                 mClockView.setLayoutParams(p);
             }
+            switch (mPosition) {
+                case POS_LEFT:
+                    mClockView.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+                    mClockView.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                    break;
+                case POS_CENTER:
+                    mClockView.setGravity(Gravity.CENTER);
+                    mClockView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                    break;
+                case POS_RIGHT:
+                    mClockView.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+                    mClockView.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
+                    break;
+            }
+            mClockView.setIncludeFontPadding(false);
         }
+        mClockView.setTextSize(TypedValue.COMPLEX_UNIT_SP, mSize);
         mClockView.post(mClockView::requestLayout);
         refreshClock();
     }
@@ -766,6 +899,11 @@ public class StatusbarClock extends XposedMods {
                 callMethod(mClockView, "updateClock");
             } catch (Throwable ignored) {}
             if (mCustomColor) mClockView.setTextColor(mColor);
+            // 2026-09-25: garantisce un passaggio di misura FRESCO con il testo vero appena
+            // impostato — la guardia in onMeasure/updateMinWidth sopra salta il calcolo della
+            // larghezza quando il testo non è ancora pronto (View appena creata), quindi senza
+            // questo requestLayout esplicito quel passaggio corretto potrebbe non arrivare mai.
+            mClockView.requestLayout();
         });
     }
 
@@ -774,7 +912,7 @@ public class StatusbarClock extends XposedMods {
      *  e colore del bordo indipendenti (accento o personalizzati), angoli, margini, padding. */
     private void updateChip() {
         if (mClockView == null) return;
-        if (!mChipOn) {
+        if (!mChipOn || !mClockStyleOn) {
             mClockView.setBackground(null);
             placeClock();
             return;

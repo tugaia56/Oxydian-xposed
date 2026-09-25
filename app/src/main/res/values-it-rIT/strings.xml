@@ -603,6 +603,10 @@
     <string name="nav_clock_style_summary">Posizione, dimensione e margine orologio</string>
     <string name="nav_clock_date">Stile Data</string>
     <string name="nav_clock_date_summary">Formato orologio e stile data</string>
+    <string name="status_bar_clock_style_on_title">Attiva Stile Orologio</string>
+    <string name="status_bar_clock_style_on_summary">Disattiva per testare rapidamente con posizione/dimensione/padding/chip stock, senza disattivare tutto il modulo</string>
+    <string name="status_bar_clock_date_style_on_title">Attiva Stile Data</string>
+    <string name="status_bar_clock_date_style_on_summary">Disattiva per testare rapidamente con secondi/AM-PM/testo prima-dopo/data stock, senza disattivare tutto il modulo</string>
 
     <!-- Ora & Data options (ClockDateFragment) -->
     <string name="clock_position_title">Posizione orologio</string>
