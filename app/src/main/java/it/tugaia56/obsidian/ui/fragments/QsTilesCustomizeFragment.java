@@ -739,7 +739,10 @@ public class QsTilesCustomizeFragment extends Fragment {
                 label.setText(sortedLabels[position]);
                 label.setTextColor(color);
                 label.setTextSize(16); // stessa dimensione delle liste a scelta singola native
-                int iconSize = (int) label.getTextSize(); // "della stessa dimensione del nome"
+                // 2026-09-27: ingrandita 1.5x rispetto al testo (prima "della stessa dimensione
+                // del nome") — richiesto esplicito, le icone erano troppo piccole per distinguere
+                // le forme nuove (Ettagono/Decagono/Croce/Cuore/Quadrifoglio/Stella).
+                int iconSize = (int) (label.getTextSize() * 1.5f);
                 android.widget.ImageView icon = new android.widget.ImageView(requireContext());
                 icon.setImageDrawable(shapeIconDrawable(order[position], iconSize, color));
                 android.widget.LinearLayout.LayoutParams iconLp = new android.widget.LinearLayout.LayoutParams(iconSize, iconSize);
@@ -846,11 +849,53 @@ public class QsTilesCustomizeFragment extends Fragment {
                 p.addOval(r, android.graphics.Path.Direction.CW);
                 break;
             }
-            case 8: case 9: { // Esagono, Pentagono
-                int sides = shapeIndex == 8 ? 6 : 5;
+            case 8: case 9: case 10: case 11: { // Esagono, Pentagono, Ettagono, Decagono
+                int sides = shapeIndex == 8 ? 6 : shapeIndex == 9 ? 5 : shapeIndex == 10 ? 7 : 10;
                 float cx = b.centerX(), cy = b.centerY(), r = Math.min(b.width(), b.height()) / 2f;
                 for (int i = 0; i < sides; i++) {
                     double angle = -Math.PI / 2 + i * (2 * Math.PI / sides);
+                    float x = cx + r * (float) Math.cos(angle), y = cy + r * (float) Math.sin(angle);
+                    if (i == 0) p.moveTo(x, y); else p.lineTo(x, y);
+                }
+                p.close();
+                break;
+            }
+            case 12: { // Croce — icona approssimata, geometria reale del riquadro non ancora scritta
+                float cx = b.centerX(), cy = b.centerY(), armPad = b.width() * 0.30f;
+                p.addRect(cx - armPad, b.top, cx + armPad, b.bottom, android.graphics.Path.Direction.CW);
+                android.graphics.Path h = new android.graphics.Path();
+                h.addRect(b.left, cy - armPad, b.right, cy + armPad, android.graphics.Path.Direction.CW);
+                p.op(h, android.graphics.Path.Op.UNION);
+                break;
+            }
+            case 13: { // Cuore — icona approssimata
+                float w = b.width(), h2 = b.height();
+                float cx = b.centerX(), top = b.top + h2 * 0.22f;
+                p.moveTo(cx, b.bottom);
+                p.cubicTo(b.left - w * 0.05f, top + h2 * 0.35f, b.left + w * 0.05f, top - h2 * 0.1f, cx, top + h2 * 0.18f);
+                p.cubicTo(b.right - w * 0.05f, top - h2 * 0.1f, b.right + w * 0.05f, top + h2 * 0.35f, cx, b.bottom);
+                p.close();
+                break;
+            }
+            case 14: { // Quadrifoglio — icona approssimata, 4 petali circolari
+                float cx = b.centerX(), cy = b.centerY(), petalR = b.width() * 0.28f, offset = b.width() * 0.26f;
+                p.addCircle(cx, cy - offset, petalR, android.graphics.Path.Direction.CW);
+                android.graphics.Path petal = new android.graphics.Path();
+                petal.addCircle(cx, cy + offset, petalR, android.graphics.Path.Direction.CW);
+                p.op(petal, android.graphics.Path.Op.UNION);
+                petal.reset(); petal.addCircle(cx - offset, cy, petalR, android.graphics.Path.Direction.CW);
+                p.op(petal, android.graphics.Path.Op.UNION);
+                petal.reset(); petal.addCircle(cx + offset, cy, petalR, android.graphics.Path.Direction.CW);
+                p.op(petal, android.graphics.Path.Op.UNION);
+                break;
+            }
+            case 15: { // Stella — icona approssimata, 5 punte
+                int points = 5;
+                float cx = b.centerX(), cy = b.centerY();
+                float rOuter = Math.min(b.width(), b.height()) / 2f, rInner = rOuter * 0.42f;
+                for (int i = 0; i < points * 2; i++) {
+                    double angle = -Math.PI / 2 + i * (Math.PI / points);
+                    float r = (i % 2 == 0) ? rOuter : rInner;
                     float x = cx + r * (float) Math.cos(angle), y = cy + r * (float) Math.sin(angle);
                     if (i == 0) p.moveTo(x, y); else p.lineTo(x, y);
                 }

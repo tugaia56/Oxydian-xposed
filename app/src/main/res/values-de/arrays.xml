@@ -769,6 +769,12 @@
         <item>Ellipse</item>
         <item>Sechseck</item>
         <item>Fünfeck</item>
+        <item>Siebeneck</item>
+        <item>Zehneck</item>
+        <item>Kreuz</item>
+        <item>Herz</item>
+        <item>Kleeblatt</item>
+        <item>Stern</item>
     </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Aus</item>

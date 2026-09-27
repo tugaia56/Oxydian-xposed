@@ -769,6 +769,12 @@
         <item>Elips</item>
         <item>Altıgen</item>
         <item>Beşgen</item>
+        <item>Yedigen</item>
+        <item>Ongen</item>
+        <item>Artı</item>
+        <item>Kalp</item>
+        <item>Yonca</item>
+        <item>Yıldız</item>
     </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Kapalı</item>

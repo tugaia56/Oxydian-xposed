@@ -768,6 +768,12 @@
         <item>Эллипс</item>
         <item>Шестиугольник</item>
         <item>Пятиугольник</item>
+        <item>Семиугольник</item>
+        <item>Десятиугольник</item>
+        <item>Крест</item>
+        <item>Сердце</item>
+        <item>Клевер</item>
+        <item>Звезда</item>
     </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Выкл</item>

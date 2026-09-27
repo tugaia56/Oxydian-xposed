@@ -769,6 +769,12 @@
         <item>Hình elip</item>
         <item>Hình lục giác</item>
         <item>Hình ngũ giác</item>
+        <item>Hình thất giác</item>
+        <item>Hình thập giác</item>
+        <item>Hình chữ thập</item>
+        <item>Hình trái tim</item>
+        <item>Hình cỏ ba lá</item>
+        <item>Hình ngôi sao</item>
     </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Tắt</item>

@@ -769,6 +769,12 @@
         <item>Elips</item>
         <item>Segi Enam</item>
         <item>Segi Lima</item>
+        <item>Segi Tujuh</item>
+        <item>Segi Sepuluh</item>
+        <item>Silang</item>
+        <item>Hati</item>
+        <item>Semanggi</item>
+        <item>Bintang</item>
     </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Mati</item>

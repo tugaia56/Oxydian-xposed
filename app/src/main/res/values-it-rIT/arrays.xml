@@ -556,6 +556,12 @@
         <item>Ellisse</item>
         <item>Esagono</item>
         <item>Pentagono</item>
+        <item>Ettagono</item>
+        <item>Decagono</item>
+        <item>Croce</item>
+        <item>Cuore</item>
+        <item>Quadrifoglio</item>
+        <item>Stella</item>
     </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Off</item>

@@ -222,13 +222,21 @@ public class QsTilesCustomizeMod extends XposedMods {
             SHAPE_KIND_UNIFORM, SHAPE_KIND_CORNERS, SHAPE_KIND_UNIFORM, SHAPE_KIND_UNIFORM,
             SHAPE_KIND_ELLIPSE,
             SHAPE_KIND_POLYGON, SHAPE_KIND_POLYGON,
+            SHAPE_KIND_POLYGON, SHAPE_KIND_POLYGON, // Ettagono(10), Decagono(11) — 2026-09-27
+            // Croce/Cuore/Quadrifoglio/Stella (12-15) — 2026-09-27: solo UI/picker per ora,
+            // geometria reale non ancora scritta (placeholder UNIFORM così non crashano se
+            // selezionate — vedi buildShapedPath, SHAPE_KIND_UNIFORM è il fallback sicuro).
+            SHAPE_KIND_UNIFORM, SHAPE_KIND_UNIFORM, SHAPE_KIND_UNIFORM, SHAPE_KIND_UNIFORM,
     };
-    // Numero di lati — solo indici POLYGON (Esagono=6, Pentagono=5).
+    // Numero di lati — solo indici POLYGON (Esagono=6, Pentagono=5, Ettagono=7, Decagono=10).
     private static final int[] TILE_SHAPE_POLYGON_SIDES = {
-            0, 0, 0, 0, 0, 0, 0, 0, 6, 5,
+            0, 0, 0, 0, 0, 0, 0, 0, 6, 5, 7, 10,
     };
     // Supercerchio 2 era 40dp ma segnalato "sono cerchi" (saturava) — abbassato a 26dp.
-    private static final int[] TILE_SHAPE_UNIFORM_DP = {0, 0, 0, 10, 0, 16, 26}; // solo indici UNIFORM
+    // 12-15: placeholder Croce/Cuore/Quadrifoglio/Stella, stesso raggio di Supercerchio 1 finché
+    // non hanno una geometria propria.
+    private static final int[] TILE_SHAPE_UNIFORM_DP =
+            {0, 0, 0, 10, 0, 16, 26, 0, 0, 0, 0, 0, 16, 16, 16, 16}; // solo indici UNIFORM
     // {TL, TR, BR, BL} in dp — solo indici CORNERS. Goccia: angolo stretto uguagliato a Rombo (4dp,
     // era 22 — segnalato "fallo della stessa misura di rombo"). Angoli larghi 80dp->30dp (2026-09-23,
     // "media da correggere, angolo più stretto fai uguale a rombo"): 80dp si affidava al clamp

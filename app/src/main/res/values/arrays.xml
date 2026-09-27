@@ -773,6 +773,12 @@
         <item>Ellipse</item>
         <item>Hexagon</item>
         <item>Pentagon</item>
+        <item>Heptagon</item>
+        <item>Decagon</item>
+        <item>Cross</item>
+        <item>Heart</item>
+        <item>Clover</item>
+        <item>Star</item>
     </string-array>
 
     <!-- Stile Icone Impostazioni (pack HOS): sfondo solido on/off -->

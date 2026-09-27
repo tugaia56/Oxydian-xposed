@@ -770,6 +770,12 @@
         <item>Еліпс</item>
         <item>Шестикутник</item>
         <item>П\'ятикутник</item>
+        <item>Семикутник</item>
+        <item>Десятикутник</item>
+        <item>Хрест</item>
+        <item>Серце</item>
+        <item>Конюшина</item>
+        <item>Зірка</item>
     </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Вимк.</item>

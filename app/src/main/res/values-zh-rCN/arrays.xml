@@ -769,6 +769,12 @@
         <item>椭圆</item>
         <item>六边形</item>
         <item>五边形</item>
+        <item>七边形</item>
+        <item>十边形</item>
+        <item>十字形</item>
+        <item>心形</item>
+        <item>四叶草形</item>
+        <item>星形</item>
     </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>关</item>

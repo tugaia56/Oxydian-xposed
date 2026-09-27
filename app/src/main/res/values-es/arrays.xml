@@ -769,6 +769,12 @@
         <item>Elipse</item>
         <item>Hexágono</item>
         <item>Pentágono</item>
+        <item>Heptágono</item>
+        <item>Decágono</item>
+        <item>Cruz</item>
+        <item>Corazón</item>
+        <item>Trébol</item>
+        <item>Estrella</item>
     </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Desactivado</item>
