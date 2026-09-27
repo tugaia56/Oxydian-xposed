@@ -38,7 +38,7 @@ public class CorePatchMod {
     private static final String PREF_BYPASS_BLOCK   = "DST_COREPATCH_BYPASS_BLOCK";
     private static final String PREF_DISABLE_VERIFY = "DST_COREPATCH_DISABLE_VERIFY";
     private static final String PREFS_FILE =
-        "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml";
+        "/data/user_de/0/it.tugaia56.oxydian/shared_prefs/it.tugaia56.oxydian_preferences.xml";
 
     // Screenshot da cui l'utente ha chiesto il porting: tutti e 3 partono ON di default,
     // come nell'app Core Patch originale.

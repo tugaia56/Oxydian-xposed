@@ -47,7 +47,7 @@ public class DstRvdStyle {
     private static final String PREF_ACCENT1 = "DST_ACCENT1";
     private static final String PREF_BG      = "DST_BACKGROUND";
     private static final String PREFS_FILE   =
-        "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml";
+        "/data/user_de/0/it.tugaia56.oxydian/shared_prefs/it.tugaia56.oxydian_preferences.xml";
 
     private static volatile String  sRvdPreset = null;
     private static volatile String  sSvdPreset = null;
@@ -140,7 +140,7 @@ public class DstRvdStyle {
             final String modName    = pair[0];
             final String targetName = pair[1];
             try {
-                final int resId = modRes.getIdentifier(modName, "drawable", "it.tugaia56.obsidian");
+                final int resId = modRes.getIdentifier(modName, "drawable", "it.tugaia56.oxydian");
                 if (resId == 0) continue;
                 rp.res.setReplacement(PKG_SYSTEMUI, "drawable", targetName,
                     new XResources.DrawableLoader() {

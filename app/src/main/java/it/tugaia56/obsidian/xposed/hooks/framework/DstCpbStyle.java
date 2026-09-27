@@ -40,11 +40,11 @@ import it.tugaia56.obsidian.xposed.ResourceManager;
 public class DstCpbStyle {
 
     private static final String PKG_ANDROID  = "android";
-    private static final String PKG_OBS      = "it.tugaia56.obsidian";
+    private static final String PKG_OBS      = "it.tugaia56.oxydian";
     private static final String PREF_PRESET  = "DST_PRESET_CPB";
     private static final String PREF_ACCENT1 = "DST_ACCENT1";
     private static final String PREFS_FILE   =
-        "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml";
+        "/data/user_de/0/it.tugaia56.oxydian/shared_prefs/it.tugaia56.oxydian_preferences.xml";
 
     private static volatile boolean sPreloaded = false;
     private static volatile String  sCpbPreset = null;   // "DSTCPB1" .. "DSTCPB5"

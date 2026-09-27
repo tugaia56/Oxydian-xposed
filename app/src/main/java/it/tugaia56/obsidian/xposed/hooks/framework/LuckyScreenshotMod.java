@@ -26,7 +26,7 @@ public class LuckyScreenshotMod {
     private static final String PREF_PNG_FORMAT     = "DST_LUCKY_PNG_SCREENSHOT";
     private static final String PREF_LONGSHOT_LIMIT  = "DST_LUCKY_LONGSHOT_NO_LIMIT";
     private static final String PREFS_FILE =
-        "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml";
+        "/data/user_de/0/it.tugaia56.oxydian/shared_prefs/it.tugaia56.oxydian_preferences.xml";
 
     private static volatile boolean sPngFormat      = false;
     private static volatile boolean sLongshotNoLimit = false;

@@ -2,6 +2,7 @@ package it.tugaia56.obsidian.xposed.hooks.systemui;
 
 import static de.robv.android.xposed.XposedBridge.hookAllMethods;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getBooleanField;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
@@ -110,7 +111,7 @@ public class QsHeaderClock extends XposedMods {
     private boolean mAccentOn   = false;
     private boolean mAccent2On  = false;
     private boolean mAccent3On  = false;
-    private int     mScalePct   = 100;
+    private int     mScalePct   = 75;
     private int     mTopMargin  = 0;
     private int     mLeftMargin = 8;
     private String  mDateFormat = "";
@@ -163,7 +164,7 @@ public class QsHeaderClock extends XposedMods {
         mAccentOn   = Xprefs.getBoolean(PREF_ACCENT + "_on", false);
         mAccent2On  = Xprefs.getBoolean(PREF_ACCENT2 + "_on", false);
         mAccent3On  = Xprefs.getBoolean(PREF_ACCENT3 + "_on", false);
-        mScalePct   = Xprefs.getInt(PREF_SCALE, 100);
+        mScalePct   = Xprefs.getInt(PREF_SCALE, 75);
         mTopMargin  = Xprefs.getInt(PREF_TOP_MARGIN, 0);
         mLeftMargin = Xprefs.getInt(PREF_LEFT_MARGIN, 8);
         mDateFormat = Xprefs.getString(PREF_FORMAT, "");
@@ -305,19 +306,27 @@ public class QsHeaderClock extends XposedMods {
 
     @SuppressLint("DiscouragedApi")
     private void hookPluginController(XC_LoadPackage.LoadPackageParam lp) {
+        // Rinominata da OOS in un update SystemUI: ContainerViewController -> Component
+        // (osservato 2026-09-27, ClassNotFoundException sul nome vecchio). Prova entrambi.
+        Class<?> cls = tryFindClass(lp,
+                "com.oplus.systemui.plugins.qs.quickentrance.OplusQSQuickEntranceComponent",
+                "com.oplus.systemui.plugins.qs.quickentrance.OplusQSQuickEntranceContainerViewController");
+        if (cls == null) {
+            XposedBridge.log("[ Obsidian QsHeaderClock ] OplusQSQuickEntranceComponent/ContainerViewController: not found");
+            return;
+        }
         try {
-            Class<?> cls = findClass(
-                    "com.oplus.systemui.plugins.qs.quickentrance.OplusQSQuickEntranceContainerViewController",
-                    lp.classLoader);
-            hookAllMethods(cls, "onInit", new XC_MethodHook() {
+            // 2026-09-27: rewrite Kotlin — non esiste più un onInit(View)/campo "view": la
+            // classe espone getter diretti (getClockContainer/getClockView/getDateView/
+            // getCarrierView). Agganciamo getClockContainer(), che restituisce già il
+            // ViewGroup giusto come risultato — niente più findViewById per id/nome.
+            hookAllMethods(cls, "getClockContainer", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
                     try {
-                        View rootView = (View) getObjectField(param.thisObject, "view");
-                        int containerId = mContext.getResources().getIdentifier(
-                                "qs_clock_and_date_container", "id", SYSTEM_UI);
-                        if (containerId == 0) return;
-                        ViewGroup clockDateContainer = rootView.requireViewById(containerId);
+                        Object result = param.getResult();
+                        if (!(result instanceof ViewGroup)) return;
+                        ViewGroup clockDateContainer = (ViewGroup) result;
 
                         if (clockDateContainer.findViewWithTag("obs_qs_clock_container") != null) {
                             updateClockView();
@@ -328,7 +337,8 @@ public class QsHeaderClock extends XposedMods {
                             View child = clockDateContainer.getChildAt(i);
                             if (!mStockViews.contains(child)) mStockViews.add(child);
                         }
-                        grabStockViewsFromFields(param.thisObject, (ViewGroup) rootView);
+                        grabStockViewsFromFields(param.thisObject, clockDateContainer);
+                        grabStockViewsFromGetters(param.thisObject);
 
                         LinearLayout container = buildContainer();
                         clockDateContainer.addView(container, 0);
@@ -336,7 +346,7 @@ public class QsHeaderClock extends XposedMods {
                         updateClockView();
                         applyStockPrefs();
                     } catch (Throwable t) {
-                        XposedBridge.log("[ Obsidian QsHeaderClock ] PluginController.onInit: " + t);
+                        XposedBridge.log("[ Obsidian QsHeaderClock ] PluginController.getClockContainer: " + t);
                     }
                 }
             });
@@ -346,9 +356,32 @@ public class QsHeaderClock extends XposedMods {
                     else applyStockPrefs();
                 }
             });
-            XposedBridge.log("[ Obsidian QsHeaderClock ] hooked OplusQSQuickEntranceContainerViewController");
+            XposedBridge.log("[ Obsidian QsHeaderClock ] hooked " + cls.getSimpleName());
         } catch (Throwable t) {
-            XposedBridge.log("[ Obsidian QsHeaderClock ] OplusQSQuickEntranceContainerViewController: " + t.getMessage());
+            XposedBridge.log("[ Obsidian QsHeaderClock ] " + cls.getSimpleName() + ": " + t.getMessage());
+        }
+    }
+
+    /** Getter diretti della nuova OplusQSQuickEntranceComponent — più affidabili dei nomi
+     *  di campo indovinati in grabStockViewsFromFields (Kotlin non li espone uguali). */
+    private void grabStockViewsFromGetters(Object component) {
+        if (mStockClocks.isEmpty()) {
+            try {
+                Object v = callMethod(component, "getClockView");
+                if (v instanceof TextView) mStockClocks.add((TextView) v);
+            } catch (Throwable ignored) {}
+        }
+        if (mStockDates.isEmpty()) {
+            try {
+                Object v = callMethod(component, "getDateView");
+                if (v instanceof TextView) mStockDates.add((TextView) v);
+            } catch (Throwable ignored) {}
+        }
+        if (mStockCarriers.isEmpty()) {
+            try {
+                Object v = callMethod(component, "getCarrierView");
+                if (v instanceof TextView) mStockCarriers.add((TextView) v);
+            } catch (Throwable ignored) {}
         }
     }
 

@@ -36,7 +36,7 @@ public class ScreenshotEnablerMod {
 
     private static final String PREF_ON = "DST_SCREENSHOT_ENABLER_ON";
     private static final String PREFS_FILE =
-        "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml";
+        "/data/user_de/0/it.tugaia56.oxydian/shared_prefs/it.tugaia56.oxydian_preferences.xml";
 
     // Nuova funzionalità opt-in — parte OFF di default, come le altre funzioni che toccano
     // comportamenti di sicurezza/privacy in questa app (es. Blocca popup appunti).

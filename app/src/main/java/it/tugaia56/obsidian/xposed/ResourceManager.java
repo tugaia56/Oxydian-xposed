@@ -32,9 +32,9 @@ public class ResourceManager implements IXposedHookInitPackageResources, IXposed
         // Se initZygote ha i permessi (root), i file diventano leggibili subito
         // e preloadFromFile() riesce gia in questo boot.
         try {
-            boolean dirOk = new File("/data/user_de/0/it.tugaia56.obsidian")
+            boolean dirOk = new File("/data/user_de/0/it.tugaia56.oxydian")
                     .setExecutable(true, false);  // 700 -> 711
-            boolean fileOk = new File("/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml")
+            boolean fileOk = new File("/data/user_de/0/it.tugaia56.oxydian/shared_prefs/it.tugaia56.oxydian_preferences.xml")
                     .setReadable(true, false);    // 660 -> 664
             XposedBridge.log("[ Obsidian ] initZygote: chmod dir=" + dirOk + " file=" + fileOk);
         } catch (Throwable t) {

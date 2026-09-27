@@ -21,11 +21,11 @@ public class MainHook implements IXposedHookLoadPackage, IXposedHookInitPackageR
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lp) throws Throwable {
-        if ("it.tugaia56.obsidian".equals(lp.packageName)) {
+        if ("it.tugaia56.oxydian".equals(lp.packageName)) {
             // Chmod: run as owner UID (10629) — always succeeds
             try {
-                boolean dirOk  = new File("/data/user_de/0/it.tugaia56.obsidian").setExecutable(true, false);
-                boolean fileOk = new File("/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml").setReadable(true, false);
+                boolean dirOk  = new File("/data/user_de/0/it.tugaia56.oxydian").setExecutable(true, false);
+                boolean fileOk = new File("/data/user_de/0/it.tugaia56.oxydian/shared_prefs/it.tugaia56.oxydian_preferences.xml").setReadable(true, false);
                 XposedBridge.log("[ Obsidian ] handleLoadPackage(obsidian): chmod dir=" + dirOk + " file=" + fileOk);
             } catch (Throwable t) {
                 XposedBridge.log("[ Obsidian ] handleLoadPackage(obsidian): chmod FAILED: " + t);

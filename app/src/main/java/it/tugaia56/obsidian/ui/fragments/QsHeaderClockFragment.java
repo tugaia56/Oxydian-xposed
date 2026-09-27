@@ -256,7 +256,7 @@ public class QsHeaderClockFragment extends Fragment {
             GroupUtils.addGroup(chain, List.of(colorAllSwitch));
             if (mColorAllExpanded) chain.add(clockColorsRow());
             GroupUtils.addGroup(chain, List.of(
-                    sliderItem(getString(R.string.qs_header_clock_scale), PREF_SCALE, 50, 200, 100, "%"),
+                    sliderItem(getString(R.string.qs_header_clock_scale), PREF_SCALE, 50, 200, 75, "%"),
                     editTextItem(getString(R.string.lockscreen_clock_custom_format_title),
                             getString(R.string.lockscreen_clock_custom_format_summary), PREF_FORMAT)));
 

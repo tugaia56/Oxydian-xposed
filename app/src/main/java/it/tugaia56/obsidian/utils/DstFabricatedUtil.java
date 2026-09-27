@@ -312,8 +312,8 @@ public class DstFabricatedUtil {
                         + " err=" + propsResult.getErr());
             }
 
-            Shell.Result chmodResult = Shell.cmd("chmod 644 /data/user_de/0/it.tugaia56.obsidian/shared_prefs/"
-                    + "it.tugaia56.obsidian_preferences.xml").exec();
+            Shell.Result chmodResult = Shell.cmd("chmod 644 /data/user_de/0/it.tugaia56.oxydian/shared_prefs/"
+                    + "it.tugaia56.oxydian_preferences.xml").exec();
             if (!chmodResult.isSuccess()) {
                 android.util.Log.e("Obsidian", "DstFabricatedUtil.saveBootProps: chmod FAILED code="
                         + chmodResult.getCode() + " err=" + chmodResult.getErr());

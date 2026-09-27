@@ -33,10 +33,10 @@ import it.tugaia56.obsidian.xposed.ResourceManager;
 public class DstWifiIconStyle {
 
     private static final String PKG_SYSTEMUI = "com.android.systemui";
-    private static final String PKG_OBS      = "it.tugaia56.obsidian";
+    private static final String PKG_OBS      = "it.tugaia56.oxydian";
     private static final String PREF_PRESET  = "DST_PRESET_WIFI_ICON";
     private static final String PREFS_FILE   =
-        "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml";
+        "/data/user_de/0/it.tugaia56.oxydian/shared_prefs/it.tugaia56.oxydian_preferences.xml";
 
     /** Continuous icon scale, 1.0–1.5 (100%–150%). Below 1.0 is stock/original size. */
     public static final String PREF_ICON_SCALE = "wifi_icon_scale";

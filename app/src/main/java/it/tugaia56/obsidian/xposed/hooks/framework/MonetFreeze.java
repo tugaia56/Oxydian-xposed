@@ -178,8 +178,8 @@ public class MonetFreeze extends XposedMods {
     // ── Boot-time preload (before Xprefs available) ──────────────────────────
 
     public static void preloadFromFile() {
-        final String xmlPath = "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/"
-                             + "it.tugaia56.obsidian_preferences.xml";
+        final String xmlPath = "/data/user_de/0/it.tugaia56.oxydian/shared_prefs/"
+                             + "it.tugaia56.oxydian_preferences.xml";
         try {
             java.io.File f = new java.io.File(xmlPath);
             if (!f.exists()) { preloadFromProps(); return; }

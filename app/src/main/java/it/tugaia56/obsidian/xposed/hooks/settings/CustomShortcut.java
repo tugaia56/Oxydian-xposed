@@ -24,7 +24,7 @@ import it.tugaia56.obsidian.xposed.ResourceManager;
 import it.tugaia56.obsidian.xposed.XposedMods;
 
 /**
- * Adds an "Obsidian" entry to the system Settings homepage that launches the app
+ * Adds an "Oxydian" entry to the system Settings homepage that launches the app
  * (mirrors OC's CustomShortcut). Runs in com.android.settings, not SystemUI.
  */
 public class CustomShortcut extends XposedMods {

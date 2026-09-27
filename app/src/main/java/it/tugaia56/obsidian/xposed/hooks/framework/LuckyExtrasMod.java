@@ -31,7 +31,7 @@ public class LuckyExtrasMod {
     private static final String PREF_VOLUME_FLASHLIGHT  = "DST_LUCKY_VOLUME_FLASHLIGHT";
     private static final String PREF_MULTIAPP_NO_BLACK  = "DST_LUCKY_MULTIAPP_NO_BLACKLIST";
     private static final String PREFS_FILE =
-        "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml";
+        "/data/user_de/0/it.tugaia56.oxydian/shared_prefs/it.tugaia56.oxydian_preferences.xml";
 
     // Tutti opt-in, default OFF — a differenza di Core Patch questi non sono "patch di sicurezza
     // già attive nell'app originale", sono extra facoltativi.

@@ -46,6 +46,13 @@ public class CompilerUtil {
             rootElement.setAttribute("xmlns:android", "http://schemas.android.com/apk/res/android");
             rootElement.setAttribute("package", overlayName);
             rootElement.setAttribute("android:versionName", "v" + BuildConfig.VERSION_NAME);
+            // Senza versionCode, PackageManager considera due build successive con lo stesso
+            // nome/versionName/firma "la stessa versione" e può riusare il PackageSetting
+            // cache (incluso il targetPackage) invece di ri-parsare il manifest — osservato
+            // 2026-09-27 dopo il rename applicationId: la SIP2 ricompilata con target nuovo
+            // restava STATE_MISSING_TARGET (target vecchio in cache) anche dopo reboot.
+            // Un valore che cresce sempre forza PMS a trattarla come un aggiornamento reale.
+            rootElement.setAttribute("android:versionCode", String.valueOf(System.currentTimeMillis() / 1000));
 
             Element usesSdkElement = document.createElement("uses-sdk");
             usesSdkElement.setAttribute("android:minSdkVersion", String.valueOf(BuildConfig.MIN_SDK_VERSION));

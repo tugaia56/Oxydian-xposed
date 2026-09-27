@@ -417,8 +417,8 @@ public class StatusbarIcons extends XposedMods {
     // activity arrow drawables — avoiding the Xprefs-not-yet-loaded timing gap.
 
     private static final String PREFS_FILE =
-        "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml";
-    private static final String PKG_OBS = "it.tugaia56.obsidian";
+        "/data/user_de/0/it.tugaia56.oxydian/shared_prefs/it.tugaia56.oxydian_preferences.xml";
+    private static final String PKG_OBS = "it.tugaia56.oxydian";
 
     private static volatile boolean sHideWifiActivity   = false;
     private static volatile boolean sHideMobileActivity = false;

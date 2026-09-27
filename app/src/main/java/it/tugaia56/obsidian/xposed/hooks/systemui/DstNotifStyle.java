@@ -98,7 +98,7 @@ public class DstNotifStyle {
     private static final String PREF_TEX_BORDER_CUSTOM = "DST_NOTIF_TEXTURE_BORDER_CUSTOM";
     private static final String PREF_IMG_OFFSET_Y = "DST_NOTIF_IMG_OFFSET_Y"; // 0=alto..100=basso, solo Immagine
     private static final String PREFS_FILE   =
-        "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml";
+        "/data/user_de/0/it.tugaia56.oxydian/shared_prefs/it.tugaia56.oxydian_preferences.xml";
 
     private static final int DEFAULT_CORNER_DP = 24;
     private static final int DEFAULT_TEX_SIZE_PCT  = 100;

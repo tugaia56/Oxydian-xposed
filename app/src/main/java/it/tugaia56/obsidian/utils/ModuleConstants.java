@@ -41,7 +41,7 @@ public final class ModuleConstants {
     public static final String METADATA_OVERLAY_TARGET  = "OVERLAY_TARGET";
     public static final String METADATA_THEME_VERSION   = "THEME_VERSION";
     public static final String METADATA_THEME_CATEGORY  = "THEME_CATEGORY";
-    public static final String OVERLAY_CATEGORY_PREFIX  = "it.tugaia56.obsidian.category.";
+    public static final String OVERLAY_CATEGORY_PREFIX  = "it.tugaia56.oxydian.category.";
 
     public static final String FRAMEWORK_DIR = "/system/framework/framework-res.apk";
 

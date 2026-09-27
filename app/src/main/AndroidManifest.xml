@@ -66,7 +66,7 @@
 
         <provider
             android:name=".ObsidianPreferenceProvider"
-            android:authorities="it.tugaia56.obsidian"
+            android:authorities="it.tugaia56.oxydian"
             android:directBootAware="true"
             android:exported="true"
             android:multiprocess="false" />

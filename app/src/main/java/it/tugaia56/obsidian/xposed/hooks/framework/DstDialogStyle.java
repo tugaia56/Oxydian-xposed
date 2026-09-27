@@ -43,7 +43,7 @@ public class DstDialogStyle {
     private static final String PREF_BG       = "DST_BACKGROUND";
     private static final String PREF_CORNER   = "DST_DLG_CORNER";
     private static final String PREFS_FILE    =
-        "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml";
+        "/data/user_de/0/it.tugaia56.oxydian/shared_prefs/it.tugaia56.oxydian_preferences.xml";
     private static final int DEFAULT_CORNER_DP = 14;
 
     // ── Preloaded statics — refreshed on every applyPreloaded() call ─────────

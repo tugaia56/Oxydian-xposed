@@ -135,9 +135,9 @@ public class FabricatedUtil {
         sModuleReady = true;
         String d = MODULE_DIR;
         // Module prop
-        String prop = "id=Obsidian\\nname=Obsidian\\nversion=1.0\\n"
+        String prop = "id=Obsidian\\nname=Oxydian\\nversion=1.0\\n"
                     + "versionCode=1\\nauthor=tugaia56\\n"
-                    + "description=Obsidian DST fabricated overlay persistence";
+                    + "description=Oxydian DST fabricated overlay persistence";
         // service.sh waits for boot_completed then runs post-exec.sh
         // Written via printf to avoid shell expansion of $() inside the script
         String svcCmd =

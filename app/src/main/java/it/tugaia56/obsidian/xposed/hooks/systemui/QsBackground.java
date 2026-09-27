@@ -53,8 +53,8 @@ public class QsBackground extends XposedMods {
     private static final String PREF_BG_COLOR = "OBS_QS_BG_COLOR";
     private static final String PREF_BG_ALPHA = "OBS_QS_BG_ALPHA";  // 0-100 %
     private static final String PREFS_FILE    =
-        "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/" +
-        "it.tugaia56.obsidian_preferences.xml";
+        "/data/user_de/0/it.tugaia56.oxydian/shared_prefs/" +
+        "it.tugaia56.oxydian_preferences.xml";
 
     // ── Preloaded statics ─────────────────────────────────────────────────────
     private static volatile boolean sPreloadEnabled = false;

@@ -14,7 +14,7 @@ android {
     namespace   = "it.tugaia56.obsidian"
     compileSdk  = 34
     defaultConfig {
-        applicationId  = "it.tugaia56.obsidian"
+        applicationId  = "it.tugaia56.oxydian"
         minSdk         = 31
         targetSdk      = 34
         versionCode    = 103

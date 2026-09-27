@@ -17,7 +17,7 @@ public class MetNorwayClient {
 
     private static final String URL_FMT =
         "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=%f&lon=%f";
-    private static final String USER_AGENT = "Obsidian-Xposed-Module github.com/tugaia56";
+    private static final String USER_AGENT = "Oxydian-Xposed-Module github.com/tugaia56/Oxydian-xposed";
 
     public static WeatherInfo fetchCurrent(double lat, double lon, String cityName) {
         try {

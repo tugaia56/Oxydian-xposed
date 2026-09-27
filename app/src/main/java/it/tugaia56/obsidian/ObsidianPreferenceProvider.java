@@ -15,10 +15,10 @@ import java.util.HashSet;
 public class ObsidianPreferenceProvider extends RemotePreferenceProvider {
 
     private static final String TAG       = "ObsidianCP";
-    private static final String PREFS_NAME = "it.tugaia56.obsidian_preferences";
+    private static final String PREFS_NAME = "it.tugaia56.oxydian_preferences";
 
     public ObsidianPreferenceProvider() {
-        super("it.tugaia56.obsidian", new RemotePreferenceFile[]{
+        super("it.tugaia56.oxydian", new RemotePreferenceFile[]{
             new RemotePreferenceFile(PREFS_NAME, true)  // worldReadable=true: consente a SystemUI di leggere
         });
     }
