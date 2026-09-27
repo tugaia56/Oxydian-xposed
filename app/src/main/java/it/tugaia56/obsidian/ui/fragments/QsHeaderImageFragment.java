@@ -309,6 +309,7 @@ public class QsHeaderImageFragment extends Fragment {
             mCropOverlay = h.overlay;
             updateCropAspectFromHeight(ObsidianPrefs.getInt(PREF_HEADER_HEIGHT, 200));
             mCropOverlay.setCornerRadiusPx(ObsidianTheme.dp(requireContext(), 16));
+            mCropOverlay.setLockDragAtDefaultZoom(true);
             mCropOverlay.setZoomPercent(ObsidianPrefs.getInt(PREF_HEADER_CROP_ZOOM, 100));
             mCropOverlay.setCropCenter(
                     ObsidianPrefs.getInt(PREF_HEADER_CROP_CX, 50) / 100f,

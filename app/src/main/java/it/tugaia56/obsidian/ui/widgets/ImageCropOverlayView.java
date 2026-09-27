@@ -48,6 +48,13 @@ public class ImageCropOverlayView extends View {
     // parte dell'img" — con zoom>100 (ritaglio volontario) l'asse "senza senso" può comunque avere
     // margine da sfruttare (es. foto più larga del riquadro), va lasciato libero. Vedi onTouchEvent.
     private boolean mLockDragX = false, mLockDragY = false;
+    // 2026-09-27: richiesta esplicita per l'Immagine intestazione QS — a zoom 100% (nessun
+    // ritaglio) trascinare per sbaglio sposta comunque il crop entro il margine residuo
+    // (quando l'aspect della foto non combacia esattamente col riquadro), risultato
+    // inaspettato senza che l'utente volesse davvero ritagliare. Se attivo, blocca OGNI
+    // trascinamento (entrambi gli assi) finché lo zoom resta a 100 o sotto — sopra 100
+    // l'utente ha scelto di ritagliare volutamente, il trascinamento torna libero.
+    private boolean mLockDragAtDefaultZoom = false;
     // 2026-09-17: modalità "mai ritaglia" per il Pallino — richiesta esplicita ("mai tagliare,
     // mostra tutta l'immagine"), diversa dal comportamento normale (100%=riempi/ritaglia) usato
     // da Pillolone/Sfondo Menù/Header QS/barra volume, che resta invariato per chi non la attiva.
@@ -119,6 +126,9 @@ public class ImageCropOverlayView extends View {
 
     /** Blocca il trascinamento su un asse (l'altro resta libero) — vedi commento sui campi. */
     public void setLockDrag(boolean lockX, boolean lockY) { mLockDragX = lockX; mLockDragY = lockY; }
+
+    /** Vedi commento sul campo mLockDragAtDefaultZoom. */
+    public void setLockDragAtDefaultZoom(boolean lock) { mLockDragAtDefaultZoom = lock; }
 
     /** Notificato su un tocco semplice (nessun trascinamento reale, sotto la soglia normale di
      *  touch-slop di Android) — distinto da OnCropChanged, che scatta ad OGNI ACTION_UP anche
@@ -236,8 +246,8 @@ public class ImageCropOverlayView extends View {
                 mDragStartX = event.getX(); mDragStartY = event.getY();
                 mDownX = event.getX(); mDownY = event.getY();
                 mDragStartCx = mCx; mDragStartCy = mCy;
-                mDragging = true;
-                if (getParent() != null) getParent().requestDisallowInterceptTouchEvent(true);
+                mDragging = !(mLockDragAtDefaultZoom && mZoomPercent <= 100);
+                if (mDragging && getParent() != null) getParent().requestDisallowInterceptTouchEvent(true);
                 return true;
             case MotionEvent.ACTION_MOVE: {
                 if (!mDragging) return false;
