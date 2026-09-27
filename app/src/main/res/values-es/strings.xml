@@ -445,11 +445,14 @@
     <string name="qs_tiles_customize_summary">Colores de iconos, animación, etiquetas, control deslizante de brillo, radio de esquina</string>
     <string name="qs_tiles_icon_colors_section">Color de icono personalizado</string>
     <string name="qs_tiles_icon_colors_title">Colores de iconos personalizados</string>
+    <string name="qs_tiles_icon_colors_summary">Color de los iconos en los mosaicos, según el estado activo/inactivo/deshabilitado</string>
     <string name="qs_tiles_icon_active_accent_title">Vincular icono al color de acento</string>
     <string name="qs_tiles_bg_active_accent_title">Vincular al color de acento</string>
     <string name="qs_tiles_color_active">Activo</string>
     <string name="qs_tiles_color_inactive">Inactivo</string>
     <string name="qs_tiles_color_disabled">Desactivado</string>
+    <string name="qs_tiles_misc_section">Otros ajustes de mosaicos</string>
+    <string name="qs_tiles_misc_section_summary">Animación, etiquetas, Ajustes rápidos separados</string>
     <string name="qs_tiles_animation_section">Animación y transiciones de mosaicos</string>
     <string name="qs_tiles_animation_style_title">Estilo de animación</string>
     <string name="qs_tiles_animation_duration_title">Velocidad de animación</string>
@@ -462,6 +465,7 @@
     <string name="qs_tiles_label_color_title">Color de texto QS personalizado</string>
     <string name="qs_tiles_brightness_section">Controles deslizantes QS</string>
     <string name="qs_tiles_sliders_master_title">Mosaico control deslizante</string>
+    <string name="qs_tiles_sliders_master_summary">Color, icono y borde de los controles de Brillo y Volumen</string>
     <string name="qs_tiles_brightness_icon_title">Cambiar color del icono de brillo automático</string>
     <string name="qs_tiles_brightness_icon_color_title">Color personalizado</string>
     <string name="qs_tiles_brightness_icon_title_volume">Cambiar color del icono de volumen</string>
@@ -476,9 +480,11 @@
     <string name="qs_tiles_bg_section">Fondo del mosaico</string>
     <string name="qs_tiles_radius_section">Radio de esquina del mosaico</string>
     <string name="qs_tiles_jump_highlight">Mosaicos pequeños</string>
+    <string name="qs_tiles_jump_highlight_summary">Color de fondo de los mosaicos pequeños (interruptores rápidos)</string>
     <string name="qs_tiles_jump_base">Mosaicos grandes</string>
-    <string name="qs_tiles_jump_base_summary">Solo con el estilo Separado</string>
+    <string name="qs_tiles_jump_base_summary">Color de fondo de los mosaicos grandes</string>
     <string name="qs_tiles_jump_media">Mosaico de medios</string>
+    <string name="qs_tiles_jump_media_summary">Color de fondo del mosaico de medios</string>
     <string name="qs_tiles_jump_blocked_title">No disponible en este dispositivo</string>
     <string name="qs_widgets_nav_summary">Foto, clima, apps rápidas en el panel de Ajustes Rápidos</string>
     <string name="qs_widgets_section">Widgets de Ajustes Rápidos</string>

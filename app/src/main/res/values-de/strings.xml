@@ -445,11 +445,14 @@
     <string name="qs_tiles_customize_summary">Icon-Farben, Animation, Beschriftungen, Helligkeitsregler, Eckenradius</string>
     <string name="qs_tiles_icon_colors_section">Eigene Icon-Farbe</string>
     <string name="qs_tiles_icon_colors_title">Eigene Icon-Farben</string>
+    <string name="qs_tiles_icon_colors_summary">Symbolfarbe in den Kacheln, je nach Status aktiv/inaktiv/deaktiviert</string>
     <string name="qs_tiles_icon_active_accent_title">Icon mit Akzentfarbe verknüpfen</string>
     <string name="qs_tiles_bg_active_accent_title">Mit Akzentfarbe verknüpfen</string>
     <string name="qs_tiles_color_active">Aktiv</string>
     <string name="qs_tiles_color_inactive">Inaktiv</string>
     <string name="qs_tiles_color_disabled">Deaktiviert</string>
+    <string name="qs_tiles_misc_section">Weitere Kacheleinstellungen</string>
+    <string name="qs_tiles_misc_section_summary">Animation, Beschriftungen, Getrennte Schnelleinstellungen</string>
     <string name="qs_tiles_animation_section">Kachelanimation und Übergänge</string>
     <string name="qs_tiles_animation_style_title">Animationsstil</string>
     <string name="qs_tiles_animation_duration_title">Animationsgeschwindigkeit</string>
@@ -462,6 +465,7 @@
     <string name="qs_tiles_label_color_title">Eigene QS-Textfarbe</string>
     <string name="qs_tiles_brightness_section">QS-Regler</string>
     <string name="qs_tiles_sliders_master_title">Reglerkachel</string>
+    <string name="qs_tiles_sliders_master_summary">Farbe, Symbol und Rahmen der Helligkeits- und Lautstärkeregler</string>
     <string name="qs_tiles_brightness_icon_title">Farbe des Icons für automatische Helligkeit ändern</string>
     <string name="qs_tiles_brightness_icon_color_title">Eigene Farbe</string>
     <string name="qs_tiles_brightness_icon_title_volume">Farbe des Lautstärke-Icons ändern</string>
@@ -476,9 +480,11 @@
     <string name="qs_tiles_bg_section">Kachelhintergrund</string>
     <string name="qs_tiles_radius_section">Kachel-Eckenradius</string>
     <string name="qs_tiles_jump_highlight">Kleine Kacheln</string>
+    <string name="qs_tiles_jump_highlight_summary">Hintergrundfarbe der kleinen Kacheln (Schnellumschalter)</string>
     <string name="qs_tiles_jump_base">Große Kacheln</string>
-    <string name="qs_tiles_jump_base_summary">Nur mit dem Stil „Getrennt"</string>
+    <string name="qs_tiles_jump_base_summary">Hintergrundfarbe der großen Kacheln</string>
     <string name="qs_tiles_jump_media">Medienkachel</string>
+    <string name="qs_tiles_jump_media_summary">Hintergrundfarbe der Medienkachel</string>
     <string name="qs_tiles_jump_blocked_title">Auf diesem Gerät nicht verfügbar</string>
     <string name="qs_widgets_nav_summary">Foto, Wetter, schnelle Apps im Schnelleinstellungs-Panel</string>
     <string name="qs_widgets_section">Schnelleinstellungs-Widgets</string>

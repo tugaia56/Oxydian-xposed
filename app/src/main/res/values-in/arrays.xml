@@ -766,6 +766,9 @@
         <item>Belah Ketupat</item>
         <item>Superlingkaran 1</item>
         <item>Superlingkaran 2</item>
+        <item>Elips</item>
+        <item>Segi Enam</item>
+        <item>Segi Lima</item>
     </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Mati</item>

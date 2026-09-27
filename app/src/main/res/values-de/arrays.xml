@@ -766,6 +766,9 @@
         <item>Raute</item>
         <item>Superkreis 1</item>
         <item>Superkreis 2</item>
+        <item>Ellipse</item>
+        <item>Sechseck</item>
+        <item>Fünfeck</item>
     </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Aus</item>

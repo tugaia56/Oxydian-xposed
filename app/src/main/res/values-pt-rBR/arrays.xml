@@ -766,6 +766,9 @@
         <item>Losango</item>
         <item>Supercírculo 1</item>
         <item>Supercírculo 2</item>
+        <item>Elipse</item>
+        <item>Hexágono</item>
+        <item>Pentágono</item>
     </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Desligado</item>

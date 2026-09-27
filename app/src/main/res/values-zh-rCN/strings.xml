@@ -445,11 +445,14 @@
     <string name="qs_tiles_customize_summary">图标颜色、动画、标签、亮度滑块、圆角半径</string>
     <string name="qs_tiles_icon_colors_section">自定义图标颜色</string>
     <string name="qs_tiles_icon_colors_title">自定义图标颜色</string>
+    <string name="qs_tiles_icon_colors_summary">磁贴图标颜色，按激活/未激活/禁用状态区分</string>
     <string name="qs_tiles_icon_active_accent_title">将图标关联到强调色</string>
     <string name="qs_tiles_bg_active_accent_title">关联到强调色</string>
     <string name="qs_tiles_color_active">已激活</string>
     <string name="qs_tiles_color_inactive">未激活</string>
     <string name="qs_tiles_color_disabled">已禁用</string>
+    <string name="qs_tiles_misc_section">其他磁贴设置</string>
+    <string name="qs_tiles_misc_section_summary">动画、标签、分离式快捷设置</string>
     <string name="qs_tiles_animation_section">磁贴动画与过渡效果</string>
     <string name="qs_tiles_animation_style_title">动画样式</string>
     <string name="qs_tiles_animation_duration_title">动画速度</string>
@@ -462,6 +465,7 @@
     <string name="qs_tiles_label_color_title">自定义 QS 文字颜色</string>
     <string name="qs_tiles_brightness_section">QS 滑块</string>
     <string name="qs_tiles_sliders_master_title">滑块磁贴</string>
+    <string name="qs_tiles_sliders_master_summary">亮度和音量滑块的颜色、图标和边框</string>
     <string name="qs_tiles_brightness_icon_title">更改自动亮度图标颜色</string>
     <string name="qs_tiles_brightness_icon_color_title">自定义颜色</string>
     <string name="qs_tiles_brightness_icon_title_volume">更改音量图标颜色</string>
@@ -476,9 +480,11 @@
     <string name="qs_tiles_bg_section">磁贴背景</string>
     <string name="qs_tiles_radius_section">磁贴圆角半径</string>
     <string name="qs_tiles_jump_highlight">小磁贴</string>
+    <string name="qs_tiles_jump_highlight_summary">小磁贴（快速开关）的背景颜色</string>
     <string name="qs_tiles_jump_base">大磁贴</string>
-    <string name="qs_tiles_jump_base_summary">仅适用于分离式样式</string>
+    <string name="qs_tiles_jump_base_summary">大磁贴的背景颜色</string>
     <string name="qs_tiles_jump_media">媒体磁贴</string>
+    <string name="qs_tiles_jump_media_summary">媒体磁贴的背景颜色</string>
     <string name="qs_tiles_jump_blocked_title">此设备不支持</string>
     <string name="qs_widgets_nav_summary">快捷设置面板中的照片、天气、快速应用</string>
     <string name="qs_widgets_section">快捷设置小组件</string>

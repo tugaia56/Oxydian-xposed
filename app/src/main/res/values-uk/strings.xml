@@ -455,11 +455,14 @@
     <string name="qs_tiles_customize_summary">Кольори іконок, анімація, підписи, повзунок яскравості, радіус кутів</string>
     <string name="qs_tiles_icon_colors_section">Власний колір іконки</string>
     <string name="qs_tiles_icon_colors_title">Власні кольори іконок</string>
+    <string name="qs_tiles_icon_colors_summary">Колір іконок у плитках, за станом активна/неактивна/вимкнена</string>
     <string name="qs_tiles_icon_active_accent_title">Прив\'язати іконку до кольору акценту</string>
     <string name="qs_tiles_bg_active_accent_title">Прив\'язати до кольору акценту</string>
     <string name="qs_tiles_color_active">Активний</string>
     <string name="qs_tiles_color_inactive">Неактивний</string>
     <string name="qs_tiles_color_disabled">Вимкнений</string>
+    <string name="qs_tiles_misc_section">Інші налаштування плиток</string>
+    <string name="qs_tiles_misc_section_summary">Анімація, підписи, Роздільні швидкі налаштування</string>
     <string name="qs_tiles_animation_section">Анімація та переходи плиток</string>
     <string name="qs_tiles_animation_style_title">Стиль анімації</string>
     <string name="qs_tiles_animation_duration_title">Швидкість анімації</string>
@@ -472,6 +475,7 @@
     <string name="qs_tiles_label_color_title">Власний колір тексту QS</string>
     <string name="qs_tiles_brightness_section">Повзунки QS</string>
     <string name="qs_tiles_sliders_master_title">Плитка-повзунок</string>
+    <string name="qs_tiles_sliders_master_summary">Колір, іконка та рамка повзунків Яскравості та Гучності</string>
     <string name="qs_tiles_brightness_icon_title">Змінити колір іконки авто-яскравості</string>
     <string name="qs_tiles_brightness_icon_color_title">Власний колір</string>
     <string name="qs_tiles_brightness_icon_title_volume">Змінити колір іконки гучності</string>
@@ -486,9 +490,11 @@
     <string name="qs_tiles_bg_section">Фон плитки</string>
     <string name="qs_tiles_radius_section">Радіус кутів плитки</string>
     <string name="qs_tiles_jump_highlight">Малі плитки</string>
+    <string name="qs_tiles_jump_highlight_summary">Колір фону малих плиток (швидкі перемикачі)</string>
     <string name="qs_tiles_jump_base">Великі плитки</string>
-    <string name="qs_tiles_jump_base_summary">Тільки з роздільним стилем</string>
+    <string name="qs_tiles_jump_base_summary">Колір фону великих плиток</string>
     <string name="qs_tiles_jump_media">Плитка медіа</string>
+    <string name="qs_tiles_jump_media_summary">Колір фону плитки медіа</string>
     <string name="qs_tiles_jump_blocked_title">Недоступно на цьому пристрої</string>
     <string name="qs_widgets_nav_summary">Фото, погода, швидкі додатки на панелі швидких налаштувань</string>
     <string name="qs_widgets_section">Віджети швидких налаштувань</string>

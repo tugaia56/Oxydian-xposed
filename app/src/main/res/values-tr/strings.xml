@@ -445,11 +445,14 @@
     <string name="qs_tiles_customize_summary">Simge renkleri, animasyon, etiketler, parlaklık kaydırıcısı, köşe yarıçapı</string>
     <string name="qs_tiles_icon_colors_section">Özel Simge Rengi</string>
     <string name="qs_tiles_icon_colors_title">Özel Simge Renkleri</string>
+    <string name="qs_tiles_icon_colors_summary">Karolardaki simge rengi, etkin/etkin değil/devre dışı duruma göre</string>
     <string name="qs_tiles_icon_active_accent_title">Simgeyi vurgu rengine bağla</string>
     <string name="qs_tiles_bg_active_accent_title">Vurgu rengine bağla</string>
     <string name="qs_tiles_color_active">Etkin</string>
     <string name="qs_tiles_color_inactive">Etkin Değil</string>
     <string name="qs_tiles_color_disabled">Devre Dışı</string>
+    <string name="qs_tiles_misc_section">Diğer Karo Ayarları</string>
+    <string name="qs_tiles_misc_section_summary">Animasyon, etiketler, Ayrık Hızlı Ayarlar</string>
     <string name="qs_tiles_animation_section">Karo Animasyonu ve Geçişleri</string>
     <string name="qs_tiles_animation_style_title">Animasyon Stili</string>
     <string name="qs_tiles_animation_duration_title">Animasyon Hızı</string>
@@ -462,6 +465,7 @@
     <string name="qs_tiles_label_color_title">Özel QS Metin Rengi</string>
     <string name="qs_tiles_brightness_section">QS Kaydırıcıları</string>
     <string name="qs_tiles_sliders_master_title">Kaydırıcı karosu</string>
+    <string name="qs_tiles_sliders_master_summary">Parlaklık ve Ses kaydırıcılarının rengi, simgesi ve kenarlığı</string>
     <string name="qs_tiles_brightness_icon_title">Otomatik parlaklık simgesi rengini değiştir</string>
     <string name="qs_tiles_brightness_icon_color_title">Özel Renk</string>
     <string name="qs_tiles_brightness_icon_title_volume">Ses simgesi rengini değiştir</string>
@@ -476,9 +480,11 @@
     <string name="qs_tiles_bg_section">Karo Arka Planı</string>
     <string name="qs_tiles_radius_section">Karo Köşe Yarıçapı</string>
     <string name="qs_tiles_jump_highlight">Küçük Karolar</string>
+    <string name="qs_tiles_jump_highlight_summary">Küçük karoların (hızlı anahtarların) arka plan rengi</string>
     <string name="qs_tiles_jump_base">Büyük Karolar</string>
-    <string name="qs_tiles_jump_base_summary">Yalnızca Ayrık stille</string>
+    <string name="qs_tiles_jump_base_summary">Büyük karoların arka plan rengi</string>
     <string name="qs_tiles_jump_media">Medya Karosu</string>
+    <string name="qs_tiles_jump_media_summary">Medya karosunun arka plan rengi</string>
     <string name="qs_tiles_jump_blocked_title">Bu cihazda kullanılamaz</string>
     <string name="qs_widgets_nav_summary">Hızlı Ayarlar panelinde fotoğraf, hava durumu, hızlı uygulamalar</string>
     <string name="qs_widgets_section">Hızlı Ayarlar Widget\'ları</string>

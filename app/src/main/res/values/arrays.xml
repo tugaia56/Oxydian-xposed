@@ -770,6 +770,9 @@
         <item>Rhombus</item>
         <item>Supercircle 1</item>
         <item>Supercircle 2</item>
+        <item>Ellipse</item>
+        <item>Hexagon</item>
+        <item>Pentagon</item>
     </string-array>
 
     <!-- Stile Icone Impostazioni (pack HOS): sfondo solido on/off -->

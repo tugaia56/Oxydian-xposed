@@ -327,7 +327,7 @@ public class StatusbarClock extends XposedMods {
     private static int readIntFromPrefsFile(String key, int def) {
         try {
             java.io.File f = new java.io.File(
-                "/data/user_de/0/it.tugaia56.obsidian/shared_prefs/it.tugaia56.obsidian_preferences.xml");
+                "/data/user_de/0/it.tugaia56.oxydian/shared_prefs/it.tugaia56.oxydian_preferences.xml");
             if (!f.canRead()) return def;
             java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(f));
             StringBuilder sb = new StringBuilder();
@@ -647,8 +647,30 @@ public class StatusbarClock extends XposedMods {
                     int desired = (int) (textWidth + 0.5f)
                             + mClockView.getPaddingLeft() + mClockView.getPaddingRight();
                     int l = mClockView.getLeft(), t = mClockView.getTop(), b = mClockView.getBottom();
-                    if (mClockView.getWidth() < desired) {
-                        mClockView.layout(l, t, l + desired, b);
+                    int oldRight = mClockView.getRight();
+                    int newRight = l + desired;
+                    if (newRight == oldRight) return;
+                    mClockView.layout(l, t, newRight, b);
+                    // 2026-09-26: allargare l'orologio qui sposta il SUO bordo destro ma non tocca i
+                    // fratelli nello stesso contenitore (es. l'area icone notifiche, subito dopo
+                    // l'orologio) — segnalato "icone notifiche sopra orologio". Nessuna misura fissa:
+                    // spostiamo di netto (offsetLeftAndRight) ogni fratello che si trovava dopo il
+                    // vecchio bordo destro, della stessa quantità di cui l'orologio è cambiato — si
+                    // adatta da solo sia quando l'orologio si allarga sia quando si restringe di nuovo
+                    // (es. secondi disattivati).
+                    int delta = newRight - oldRight;
+                    try {
+                        ViewGroup container = (ViewGroup) p.thisObject;
+                        int count = container.getChildCount();
+                        for (int i = 0; i < count; i++) {
+                            View child = container.getChildAt(i);
+                            if (child == mClockView) continue;
+                            if (child.getLeft() >= oldRight) {
+                                child.offsetLeftAndRight(delta);
+                            }
+                        }
+                    } catch (Throwable st) {
+                        log("[ Obsidian ] StatusbarClock: sibling shift failed: " + st);
                     }
                 }
             });

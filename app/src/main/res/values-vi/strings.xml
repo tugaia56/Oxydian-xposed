@@ -455,11 +455,14 @@
     <string name="qs_tiles_customize_summary">Màu biểu tượng, hoạt ảnh, nhãn, thanh trượt độ sáng, bán kính góc</string>
     <string name="qs_tiles_icon_colors_section">Màu biểu tượng tùy chỉnh</string>
     <string name="qs_tiles_icon_colors_title">Màu biểu tượng tùy chỉnh</string>
+    <string name="qs_tiles_icon_colors_summary">Màu biểu tượng trong các ô, theo trạng thái bật/tắt/vô hiệu hóa</string>
     <string name="qs_tiles_icon_active_accent_title">Liên kết biểu tượng với màu nhấn</string>
     <string name="qs_tiles_bg_active_accent_title">Liên kết với màu nhấn</string>
     <string name="qs_tiles_color_active">Đang hoạt động</string>
     <string name="qs_tiles_color_inactive">Không hoạt động</string>
     <string name="qs_tiles_color_disabled">Đã tắt</string>
+    <string name="qs_tiles_misc_section">Cài đặt ô khác</string>
+    <string name="qs_tiles_misc_section_summary">Hoạt ảnh, nhãn, Cài đặt nhanh Tách biệt</string>
     <string name="qs_tiles_animation_section">Hoạt ảnh và chuyển tiếp ô</string>
     <string name="qs_tiles_animation_style_title">Kiểu hoạt ảnh</string>
     <string name="qs_tiles_animation_duration_title">Tốc độ hoạt ảnh</string>
@@ -472,6 +475,7 @@
     <string name="qs_tiles_label_color_title">Màu văn bản QS tùy chỉnh</string>
     <string name="qs_tiles_brightness_section">Thanh trượt QS</string>
     <string name="qs_tiles_sliders_master_title">Ô thanh trượt</string>
+    <string name="qs_tiles_sliders_master_summary">Màu, biểu tượng và viền của thanh trượt Độ sáng và Âm lượng</string>
     <string name="qs_tiles_brightness_icon_title">Đổi màu biểu tượng độ sáng tự động</string>
     <string name="qs_tiles_brightness_icon_color_title">Màu tùy chỉnh</string>
     <string name="qs_tiles_brightness_icon_title_volume">Đổi màu biểu tượng âm lượng</string>
@@ -486,9 +490,11 @@
     <string name="qs_tiles_bg_section">Nền ô</string>
     <string name="qs_tiles_radius_section">Bán kính góc ô</string>
     <string name="qs_tiles_jump_highlight">Ô nhỏ</string>
+    <string name="qs_tiles_jump_highlight_summary">Màu nền của các ô nhỏ (công tắc nhanh)</string>
     <string name="qs_tiles_jump_base">Ô lớn</string>
-    <string name="qs_tiles_jump_base_summary">Chỉ với kiểu Tách biệt</string>
+    <string name="qs_tiles_jump_base_summary">Màu nền của các ô lớn</string>
     <string name="qs_tiles_jump_media">Ô media</string>
+    <string name="qs_tiles_jump_media_summary">Màu nền của ô media</string>
     <string name="qs_tiles_jump_blocked_title">Không khả dụng trên thiết bị này</string>
     <string name="qs_widgets_nav_summary">Ảnh, thời tiết, ứng dụng nhanh trong bảng Cài đặt nhanh</string>
     <string name="qs_widgets_section">Tiện ích Cài đặt nhanh</string>

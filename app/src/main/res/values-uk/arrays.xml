@@ -767,6 +767,9 @@
         <item>Ромб</item>
         <item>Суперколо 1</item>
         <item>Суперколо 2</item>
+        <item>Еліпс</item>
+        <item>Шестикутник</item>
+        <item>П\'ятикутник</item>
     </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Вимк.</item>

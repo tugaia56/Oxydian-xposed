@@ -112,6 +112,15 @@ public class QuickSettingsFragment extends Fragment {
                 getString(R.string.qs_tiles_customize_summary),
                 () -> navigate(new QsTilesCustomizeFragment(), getString(R.string.quick_settings_tiles_main)),
                 0xFFE91E63))));
+        // "Varie Riquadri" (2026-09-26) — Animazione/Transizioni, Etichette, Impostazioni Rapide
+        // Separati: estratte da "Personalizza Riquadri" in una schermata di navigazione a sé,
+        // richiesta esplicita dell'utente (non un semplice titolo di sezione).
+        chain.add(new NavAdapter(List.of(new NavAdapter.NavItem(
+                R.drawable.ic_qs,
+                getString(R.string.qs_tiles_misc_section),
+                getString(R.string.qs_tiles_misc_section_summary),
+                () -> navigate(new QsTilesMiscFragment(), getString(R.string.qs_tiles_misc_section)),
+                0xFFE91E63))));
         chain.add(new NavAdapter(List.of(new NavAdapter.NavItem(
                 R.drawable.ic_qs,
                 getString(R.string.quick_settings_widgets),

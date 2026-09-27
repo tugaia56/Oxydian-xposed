@@ -445,11 +445,14 @@
     <string name="qs_tiles_customize_summary">Цвета иконок, анимация, подписи, ползунок яркости, радиус угла</string>
     <string name="qs_tiles_icon_colors_section">Свой цвет иконки</string>
     <string name="qs_tiles_icon_colors_title">Свои цвета иконок</string>
+    <string name="qs_tiles_icon_colors_summary">Цвет иконок в плитках, по состоянию активна/неактивна/отключена</string>
     <string name="qs_tiles_icon_active_accent_title">Связать иконку с акцентным цветом</string>
     <string name="qs_tiles_bg_active_accent_title">Связать с акцентным цветом</string>
     <string name="qs_tiles_color_active">Активна</string>
     <string name="qs_tiles_color_inactive">Неактивна</string>
     <string name="qs_tiles_color_disabled">Отключена</string>
+    <string name="qs_tiles_misc_section">Другие настройки плиток</string>
+    <string name="qs_tiles_misc_section_summary">Анимация, подписи, Раздельные быстрые настройки</string>
     <string name="qs_tiles_animation_section">Анимация и переходы плиток</string>
     <string name="qs_tiles_animation_style_title">Стиль анимации</string>
     <string name="qs_tiles_animation_duration_title">Скорость анимации</string>
@@ -462,6 +465,7 @@
     <string name="qs_tiles_label_color_title">Свой цвет текста QS</string>
     <string name="qs_tiles_brightness_section">Ползунки QS</string>
     <string name="qs_tiles_sliders_master_title">Плитка-ползунок</string>
+    <string name="qs_tiles_sliders_master_summary">Цвет, иконка и рамка ползунков Яркости и Громкости</string>
     <string name="qs_tiles_brightness_icon_title">Изменить цвет иконки авто-яркости</string>
     <string name="qs_tiles_brightness_icon_color_title">Свой цвет</string>
     <string name="qs_tiles_brightness_icon_title_volume">Изменить цвет иконки громкости</string>
@@ -476,9 +480,11 @@
     <string name="qs_tiles_bg_section">Фон плитки</string>
     <string name="qs_tiles_radius_section">Радиус угла плитки</string>
     <string name="qs_tiles_jump_highlight">Маленькие плитки</string>
+    <string name="qs_tiles_jump_highlight_summary">Цвет фона маленьких плиток (быстрые переключатели)</string>
     <string name="qs_tiles_jump_base">Большие плитки</string>
-    <string name="qs_tiles_jump_base_summary">Только со стилем "Раздельный"</string>
+    <string name="qs_tiles_jump_base_summary">Цвет фона больших плиток</string>
     <string name="qs_tiles_jump_media">Плитка медиа</string>
+    <string name="qs_tiles_jump_media_summary">Цвет фона плитки медиа</string>
     <string name="qs_tiles_jump_blocked_title">Недоступно на этом устройстве</string>
     <string name="qs_widgets_nav_summary">Фото, погода, быстрые приложения на панели быстрых настроек</string>
     <string name="qs_widgets_section">Виджеты быстрых настроек</string>

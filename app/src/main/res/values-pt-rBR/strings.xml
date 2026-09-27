@@ -445,11 +445,14 @@
     <string name="qs_tiles_customize_summary">Cores dos ícones, animação, rótulos, controle deslizante de brilho, raio de canto</string>
     <string name="qs_tiles_icon_colors_section">Cor personalizada do ícone</string>
     <string name="qs_tiles_icon_colors_title">Cores personalizadas dos ícones</string>
+    <string name="qs_tiles_icon_colors_summary">Cor dos ícones nos blocos, para o estado ativo/inativo/desativado</string>
     <string name="qs_tiles_icon_active_accent_title">Vincular ícone à cor de destaque</string>
     <string name="qs_tiles_bg_active_accent_title">Vincular à cor de destaque</string>
     <string name="qs_tiles_color_active">Ativo</string>
     <string name="qs_tiles_color_inactive">Inativo</string>
     <string name="qs_tiles_color_disabled">Desativado</string>
+    <string name="qs_tiles_misc_section">Outras configurações de blocos</string>
+    <string name="qs_tiles_misc_section_summary">Animação, etiquetas, Configurações Rápidas Separadas</string>
     <string name="qs_tiles_animation_section">Animação e transições dos blocos</string>
     <string name="qs_tiles_animation_style_title">Estilo de animação</string>
     <string name="qs_tiles_animation_duration_title">Velocidade da animação</string>
@@ -462,6 +465,7 @@
     <string name="qs_tiles_label_color_title">Cor de texto QS personalizada</string>
     <string name="qs_tiles_brightness_section">Controles deslizantes QS</string>
     <string name="qs_tiles_sliders_master_title">Bloco controle deslizante</string>
+    <string name="qs_tiles_sliders_master_summary">Cor, ícone e borda dos controles de Brilho e Volume</string>
     <string name="qs_tiles_brightness_icon_title">Alterar cor do ícone de brilho automático</string>
     <string name="qs_tiles_brightness_icon_color_title">Cor personalizada</string>
     <string name="qs_tiles_brightness_icon_title_volume">Alterar cor do ícone de volume</string>
@@ -476,9 +480,11 @@
     <string name="qs_tiles_bg_section">Fundo do bloco</string>
     <string name="qs_tiles_radius_section">Raio de canto do bloco</string>
     <string name="qs_tiles_jump_highlight">Blocos pequenos</string>
+    <string name="qs_tiles_jump_highlight_summary">Cor de fundo dos blocos pequenos (alternâncias rápidas)</string>
     <string name="qs_tiles_jump_base">Blocos grandes</string>
-    <string name="qs_tiles_jump_base_summary">Somente com o estilo Separado</string>
+    <string name="qs_tiles_jump_base_summary">Cor de fundo dos blocos grandes</string>
     <string name="qs_tiles_jump_media">Bloco de mídia</string>
+    <string name="qs_tiles_jump_media_summary">Cor de fundo do bloco de mídia</string>
     <string name="qs_tiles_jump_blocked_title">Não disponível neste dispositivo</string>
     <string name="qs_widgets_nav_summary">Foto, clima, apps rápidos no painel de Configurações Rápidas</string>
     <string name="qs_widgets_section">Widgets das Configurações Rápidas</string>

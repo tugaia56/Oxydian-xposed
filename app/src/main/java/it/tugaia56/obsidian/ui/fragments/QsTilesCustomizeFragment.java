@@ -35,7 +35,6 @@ import it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos;
 import it.tugaia56.obsidian.ui.events.ColorSelectedEvent;
 import it.tugaia56.obsidian.ui.models.DarkShadowItem;
 import it.tugaia56.obsidian.utils.ObsidianPrefs;
-import it.tugaia56.obsidian.xposed.hooks.systemui.QsSeparateMod;
 
 /**
  * Personalizza Riquadri — porting UI/prefs reale di OC's QuickSettingsCustomization
@@ -55,19 +54,7 @@ import it.tugaia56.obsidian.xposed.hooks.systemui.QsSeparateMod;
  */
 public class QsTilesCustomizeFragment extends Fragment {
 
-    // ── Animazione ───────────────────────────────────────────────────────────
-    private static final String KEY_ANIM_STYLE       = "qs_tile_animation_style";
-    private static final String KEY_ANIM_DURATION    = "qs_tile_animation_duration";
-    private static final String KEY_ANIM_INTERPOLATOR = "qs_tile_animation_interpolator";
-
-    // ── Transizioni ──────────────────────────────────────────────────────────
-    private static final String KEY_TRANSITIONS_ON = "qs_transitions_title_switch";
-    private static final String KEY_TRANSITIONS    = "qs_tile_transformations";
-
-    // ── Etichette ────────────────────────────────────────────────────────────
-    private static final String KEY_HIDE_LABELS   = "qs_hide_labels";
-    private static final String KEY_LABEL_COLOR_ON = "qs_tile_label_enabled";
-    private static final String KEY_LABEL_COLOR    = "qs_tile_label";
+    // Animazione/Transizioni/Etichette spostate in QsTilesMiscFragment (2026-09-26).
 
     // ── Cursore Luminosità ───────────────────────────────────────────────────
     /** "0"=predefinito "1"=scura "2"=bianca — sostituisce il vecchio switch booleano di OC
@@ -83,12 +70,24 @@ public class QsTilesCustomizeFragment extends Fragment {
     private static final String KEY_BRIGHTNESS_BG_ON     = "brightness_slider_background_color_enabled";
     private static final String KEY_BRIGHTNESS_BG_COLOR  = "brightness_slider_background_color";
 
+    // ── Cursore Volume (riempimento/sfondo — 2026-09-26, "Riquadro cursori" diviso in due
+    // sezioni indipendenti, vedi nota gemella in QsTilesCustomizeMod) ─────────────────────
+    private static final String KEY_VOLUME_SLIDER_CUSTOM_ON = "customize_volume_slider";
+    private static final String KEY_VOLUME_SLIDER_MODE      = "volume_slider_progress_color_mode";
+    private static final String KEY_VOLUME_SLIDER_COLOR     = "volume_slider_color";
+    private static final String KEY_VOLUME_SLIDER_BG_ON     = "volume_slider_background_color_enabled";
+    private static final String KEY_VOLUME_SLIDER_BG_COLOR  = "volume_slider_background_color";
+
     // ── Raggio riquadri ──────────────────────────────────────────────────────
     private static final String KEY_RADIUS_ON = "qs_sliders_radius_switch";
     private static final String KEY_RADIUS    = "qs_sliders_radius";
+    private static final String KEY_VOLUME_RADIUS_ON = "qs_volume_slider_radius_switch";
+    private static final String KEY_VOLUME_RADIUS    = "qs_volume_slider_radius";
 
-    // ── Interruttore master "Cursori Impostazioni Rapide" ───────────────────
-    private static final String KEY_SLIDERS_ON = "qs_sliders_customize_enabled";
+    // ── Master indipendenti Luminosità/Volume (sostituiscono KEY_SLIDERS_ON, non più letto/
+    // scritto — vedi nota gemella in QsTilesCustomizeMod) ───────────────────────────────────
+    private static final String KEY_BRIGHTNESS_SLIDER_ON = "qs_brightness_slider_section_on";
+    private static final String KEY_VOLUME_SLIDER_ON     = "qs_volume_slider_section_on";
 
     // ── Colori Icone (2 swatch: attivo/inattivo — "disabilitato" tolto, mai funzionante) ──
     // Confermato universale (Classico + Separati) il 2026-08-20 — OplusQSIconView (Separati) e
@@ -132,12 +131,7 @@ public class QsTilesCustomizeFragment extends Fragment {
     private static final String KEY_MEDIA_COVER_FILTER    = "qs_tile_media_cover_filter"; // "0".."4"
     private static final String KEY_MEDIA_COVER_BLUR      = "qs_tile_media_cover_blur";   // 0-100
 
-    // ── Impostazioni Rapide Separati (ex QsSeparateModsFragment, ora sezione inline) ────
-    private static final String KEY_SEP_HIDE_EDIT  = "OBS_QS_SEPARATE_HIDE_EDIT";
-    private static final String KEY_SEP_HIDE_MENU  = "OBS_QS_SEPARATE_HIDE_MENU";
-    private static final String KEY_SEP_WIDTH_ON   = "OBS_QS_SEPARATE_WIDTH_ON";
-    private static final String KEY_SEP_WIDTH_VAL  = "OBS_QS_SEPARATE_WIDTH_VALUE";
-    private static final String KEY_SEP_ON         = "OBS_QS_SEPARATE_MASTER_ON";
+    // Impostazioni Rapide Separati spostate in QsTilesMiscFragment (2026-09-26).
     private static final String KEY_TILE_RADIUS_BASE  = "qs_tile_radius_base_dp";
     private static final String KEY_TILE_RADIUS_HL    = "qs_tile_radius_highlight_dp";
     private static final String KEY_TILE_RADIUS_MEDIA = "qs_tile_radius_media_dp";
@@ -167,12 +161,11 @@ public class QsTilesCustomizeFragment extends Fragment {
     private boolean mBgMediaExpanded = false;
     private boolean mBorderExpanded  = false;
     private boolean mShapeExpanded   = false;
-    private boolean mSlidersExpanded = false;
-    // Stato SOLO visivo — header senza switch, tocco sul nome apre/chiude, stesso pattern
-    // di collapsibleHeader in LockscreenWidgetsFragment.
-    private boolean mSliderIconColorsExpanded;
-    private boolean mSepExpanded     = false;
-    private boolean mSepBtnBgExpanded = false;
+    // "Riquadro cursori" diviso in due card indipendenti 2026-09-26 (era mSlidersExpanded +
+    // mSliderIconColorsExpanded, un unico switch con le due icone annidate in un collapsibleHeader
+    // condiviso — ora ognuna ha la propria card, niente più annidamento extra).
+    private boolean mBrightnessSliderExpanded = false;
+    private boolean mVolumeSliderExpanded = false;
     /** dialogId -> pref key, per i due swatch singoli del Cursore Luminosità (non passano
      *  per DarkShadowItem/onColorSelected sopra, servono qui per sapere dove salvare). */
     private final java.util.Map<Integer, String> mSingleColorKeys = new java.util.HashMap<>();
@@ -228,39 +221,30 @@ public class QsTilesCustomizeFragment extends Fragment {
             rebuild();
         };
         bgBaseSwitch.onRowClick = () -> { mBgBaseExpanded = !mBgBaseExpanded; rebuild(); };
-        SwitchWidgetAdapter.SwitchItem bgHlSwitch = prefSwitch(getString(R.string.qs_tiles_jump_highlight), null, KEY_TILE_BG_HL_ON);
+        SwitchWidgetAdapter.SwitchItem bgHlSwitch = prefSwitch(getString(R.string.qs_tiles_jump_highlight),
+                getString(R.string.qs_tiles_jump_highlight_summary), KEY_TILE_BG_HL_ON);
         bgHlSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_TILE_BG_HL_ON, bgHlSwitch.checked);
             mBgHlExpanded = bgHlSwitch.checked;
             rebuild();
         };
         bgHlSwitch.onRowClick = () -> { mBgHlExpanded = !mBgHlExpanded; rebuild(); };
-        SwitchWidgetAdapter.SwitchItem borderSwitch = prefSwitch(getString(R.string.qs_tiles_border_title), null, KEY_TILE_BORDER_ON);
+        SwitchWidgetAdapter.SwitchItem borderSwitch = prefSwitch(getString(R.string.qs_tiles_border_title),
+                getString(R.string.qs_tiles_border_summary), KEY_TILE_BORDER_ON);
         borderSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_TILE_BORDER_ON, borderSwitch.checked);
             mBorderExpanded = borderSwitch.checked;
             rebuild();
         };
         borderSwitch.onRowClick = () -> { mBorderExpanded = !mBorderExpanded; rebuild(); };
-        SwitchWidgetAdapter.SwitchItem bgMediaSwitch = prefSwitch(getString(R.string.qs_tiles_jump_media), null, KEY_TILE_BG_MEDIA_ON);
+        SwitchWidgetAdapter.SwitchItem bgMediaSwitch = prefSwitch(getString(R.string.qs_tiles_jump_media),
+                getString(R.string.qs_tiles_jump_media_summary), KEY_TILE_BG_MEDIA_ON);
         bgMediaSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_TILE_BG_MEDIA_ON, bgMediaSwitch.checked);
             mBgMediaExpanded = bgMediaSwitch.checked;
             rebuild();
         };
         bgMediaSwitch.onRowClick = () -> { mBgMediaExpanded = !mBgMediaExpanded; rebuild(); };
-        // Default true (non false come prefSwitch()): il Mod tratta questo master come attivo
-        // finché non viene esplicitamente spento, per non disabilitare in silenzio le
-        // personalizzazioni già configurate da chi aggiorna da prima che esistesse.
-        SwitchWidgetAdapter.SwitchItem slidersSwitch = new SwitchWidgetAdapter.SwitchItem(
-                getString(R.string.qs_tiles_sliders_master_title), null,
-                ObsidianPrefs.getBoolean(KEY_SLIDERS_ON, true), null);
-        slidersSwitch.onChanged = () -> {
-            ObsidianPrefs.putBoolean(KEY_SLIDERS_ON, slidersSwitch.checked);
-            mSlidersExpanded = slidersSwitch.checked;
-            rebuild();
-        };
-        slidersSwitch.onRowClick = () -> { mSlidersExpanded = !mSlidersExpanded; rebuild(); };
 
         // Le opzioni di ogni riquadro si aprono SUBITO SOTTO il suo switch (non tutte in fondo
         // alla card) — accumula in "pending" finché non serve interrompere per uno swatch grid
@@ -310,41 +294,36 @@ public class QsTilesCustomizeFragment extends Fragment {
             GroupUtils.addGroup(chain, pending, true);
             pending = new ArrayList<>();
         }
-        pending.add(slidersSwitch);
         GroupUtils.addGroup(chain, pending);
 
-        // ── Riquadro cursori (ex "Cursori Impostazioni Rapide" — assorbito qui dentro,
-        // niente più titolo sezione a sé, è il quarto switch della card di Sfondo Riquadri) ──
-        if (mSlidersExpanded) {
+        // ── Riquadro Luminosità / Riquadro Volume (2026-09-26: "Riquadro cursori" diviso in due
+        // card indipendenti — prima condividevano lo stesso colore/sfondo/raggio perché il mod
+        // non distingueva le due istanze di OplusQsVerticalSeekBar, vedi isVolumeSliderView() in
+        // QsTilesCustomizeMod). Ognuna è una card a sé, stesso pattern di Riquadri grandi/piccoli/
+        // Media sopra — non più annidate una dentro l'altra con un collapsibleHeader condiviso.
+        SwitchWidgetAdapter.SwitchItem brightnessSliderSwitch = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.qs_tiles_brightness_slider_title), getString(R.string.qs_tiles_brightness_slider_summary),
+                ObsidianPrefs.getBoolean(KEY_BRIGHTNESS_SLIDER_ON, true), null);
+        brightnessSliderSwitch.onChanged = () -> {
+            ObsidianPrefs.putBoolean(KEY_BRIGHTNESS_SLIDER_ON, brightnessSliderSwitch.checked);
+            mBrightnessSliderExpanded = brightnessSliderSwitch.checked;
+            rebuild();
+        };
+        brightnessSliderSwitch.onRowClick = () -> { mBrightnessSliderExpanded = !mBrightnessSliderExpanded; rebuild(); };
+        GroupUtils.addGroup(chain, List.of(brightnessSliderSwitch));
+        if (mBrightnessSliderExpanded) {
             boolean brightnessOn = ObsidianPrefs.getBoolean(KEY_BRIGHTNESS_CUSTOM_ON, false);
             boolean radiusOn = ObsidianPrefs.getBoolean(KEY_RADIUS_ON, false);
 
-            List<Object> sliderRows = new ArrayList<>();
-            // 203/204 non passano più per singleColorRow() (righe separate tolte, stesso
-            // motivo di 201) — registrati qui a mano per onColorSelected.
+            List<Object> rows = new ArrayList<>();
             mSingleColorKeys.put(203, KEY_BRIGHTNESS_ICON_COLOR);
-            mSingleColorKeys.put(204, KEY_VOLUME_ICON_COLOR);
-            sliderRows.add(collapsibleHeader(getString(R.string.qs_tiles_slider_icon_colors_title),
-                    () -> { mSliderIconColorsExpanded = !mSliderIconColorsExpanded; rebuild(); }));
-            if (mSliderIconColorsExpanded) {
-                sliderRows.add(singleChoiceRow(getString(R.string.qs_tiles_brightness_icon_title), KEY_BRIGHTNESS_ICON_MODE,
-                        R.array.qs_brightness_icon_entries,
-                        idx -> { if (idx == 4) openColorPicker(203, KEY_BRIGHTNESS_ICON_COLOR); }));
-                // Stessa preferenza di VolumePanelMod (qs_volume_icon_mode/_custom_color) — voce
-                // duplicata qui su richiesta esplicita, non è un secondo controllo indipendente.
-                // Funzionante dal 2026-08-20: VolumePanelMod.applyLottieColorFilter usa il vero
-                // meccanismo Lottie (addValueCallback + KeyPath jolly), non tint/color filter.
-                sliderRows.add(singleChoiceRow(getString(R.string.qs_tiles_brightness_icon_title_volume), KEY_VOLUME_ICON_MODE,
-                        R.array.qs_brightness_icon_entries,
-                        idx -> { if (idx == 4) openColorPicker(204, KEY_VOLUME_ICON_COLOR); }));
-            }
-            sliderRows.add(gatingSwitch(getString(R.string.qs_tiles_brightness_custom_title), null, KEY_BRIGHTNESS_CUSTOM_ON));
+            rows.add(singleChoiceRow(getString(R.string.qs_tiles_brightness_icon_title), KEY_BRIGHTNESS_ICON_MODE,
+                    R.array.qs_brightness_icon_entries,
+                    idx -> { if (idx == 4) openColorPicker(203, KEY_BRIGHTNESS_ICON_COLOR); }));
+            rows.add(gatingSwitch(getString(R.string.qs_tiles_brightness_custom_title), null, KEY_BRIGHTNESS_CUSTOM_ON));
             if (brightnessOn) {
-                // 201 non passa più per singleColorRow() (la riga separata è stata tolta),
-                // quindi va registrato qui a mano perché openColorPicker/onColorSelected
-                // sappiano dove salvare il colore scelto dal dialog "Modalità colore cursore".
                 mSingleColorKeys.put(201, KEY_BRIGHTNESS_COLOR);
-                sliderRows.add(singleChoiceRow(getString(R.string.qs_tiles_brightness_mode_title), KEY_BRIGHTNESS_MODE,
+                rows.add(singleChoiceRow(getString(R.string.qs_tiles_brightness_mode_title), KEY_BRIGHTNESS_MODE,
                         R.array.brightness_slider_style_entries,
                         idx -> { if (idx == 2) openColorPicker(201, KEY_BRIGHTNESS_COLOR); }));
                 mSingleColorKeys.put(202, KEY_BRIGHTNESS_BG_COLOR);
@@ -356,13 +335,58 @@ public class QsTilesCustomizeFragment extends Fragment {
                                 it.tugaia56.obsidian.utils.ObsidianTheme.bgDerivedPresets());
                     }
                 };
-                sliderRows.add(bgColorSwitch);
+                rows.add(bgColorSwitch);
             }
-            sliderRows.add(gatingSwitch(getString(R.string.qs_tiles_radius_title), null, KEY_RADIUS_ON));
+            rows.add(gatingSwitch(getString(R.string.qs_tiles_radius_title), null, KEY_RADIUS_ON));
             if (radiusOn) {
-                sliderRows.add(sliderRow(getString(R.string.qs_tiles_radius_value_title), KEY_RADIUS, 0, 40, 20, "dp"));
+                rows.add(sliderRow(getString(R.string.qs_tiles_radius_value_title), KEY_RADIUS, 0, 40, 20, "dp"));
             }
-            GroupUtils.addGroup(chain, sliderRows, true);
+            GroupUtils.addGroup(chain, rows, true);
+        }
+
+        SwitchWidgetAdapter.SwitchItem volumeSliderSwitch = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.qs_tiles_volume_slider_title), getString(R.string.qs_tiles_volume_slider_summary),
+                ObsidianPrefs.getBoolean(KEY_VOLUME_SLIDER_ON, true), null);
+        volumeSliderSwitch.onChanged = () -> {
+            ObsidianPrefs.putBoolean(KEY_VOLUME_SLIDER_ON, volumeSliderSwitch.checked);
+            mVolumeSliderExpanded = volumeSliderSwitch.checked;
+            rebuild();
+        };
+        volumeSliderSwitch.onRowClick = () -> { mVolumeSliderExpanded = !mVolumeSliderExpanded; rebuild(); };
+        GroupUtils.addGroup(chain, List.of(volumeSliderSwitch));
+        if (mVolumeSliderExpanded) {
+            boolean volumeOn = ObsidianPrefs.getBoolean(KEY_VOLUME_SLIDER_CUSTOM_ON, false);
+            boolean volumeRadiusOn = ObsidianPrefs.getBoolean(KEY_VOLUME_RADIUS_ON, false);
+
+            List<Object> rows = new ArrayList<>();
+            mSingleColorKeys.put(204, KEY_VOLUME_ICON_COLOR);
+            // Stessa preferenza di VolumePanelMod (qs_volume_icon_mode/_custom_color) — voce
+            // duplicata qui su richiesta esplicita, non è un secondo controllo indipendente.
+            rows.add(singleChoiceRow(getString(R.string.qs_tiles_brightness_icon_title_volume), KEY_VOLUME_ICON_MODE,
+                    R.array.qs_brightness_icon_entries,
+                    idx -> { if (idx == 4) openColorPicker(204, KEY_VOLUME_ICON_COLOR); }));
+            rows.add(gatingSwitch(getString(R.string.qs_tiles_volume_custom_title), null, KEY_VOLUME_SLIDER_CUSTOM_ON));
+            if (volumeOn) {
+                mSingleColorKeys.put(214, KEY_VOLUME_SLIDER_COLOR);
+                rows.add(singleChoiceRow(getString(R.string.qs_tiles_brightness_mode_title), KEY_VOLUME_SLIDER_MODE,
+                        R.array.brightness_slider_style_entries,
+                        idx -> { if (idx == 2) openColorPicker(214, KEY_VOLUME_SLIDER_COLOR); }));
+                mSingleColorKeys.put(215, KEY_VOLUME_SLIDER_BG_COLOR);
+                SwitchWidgetAdapter.SwitchItem volBgColorSwitch = gatingSwitch(getString(R.string.qs_tiles_brightness_bg_title), null, KEY_VOLUME_SLIDER_BG_ON);
+                volBgColorSwitch.onRowClick = () -> {
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).showColorPickerDialog(
+                                215, ObsidianPrefs.getInt(KEY_VOLUME_SLIDER_BG_COLOR, 0xFFFFFFFF), true, true, true,
+                                it.tugaia56.obsidian.utils.ObsidianTheme.bgDerivedPresets());
+                    }
+                };
+                rows.add(volBgColorSwitch);
+            }
+            rows.add(gatingSwitch(getString(R.string.qs_tiles_radius_title), null, KEY_VOLUME_RADIUS_ON));
+            if (volumeRadiusOn) {
+                rows.add(sliderRow(getString(R.string.qs_tiles_radius_value_title), KEY_VOLUME_RADIUS, 0, 40, 20, "dp"));
+            }
+            GroupUtils.addGroup(chain, rows, true);
         }
 
         // ── Bordo Pulsanti (spostato sotto Riquadro Cursori su richiesta esplicita 2026-09-16) ──
@@ -385,13 +409,14 @@ public class QsTilesCustomizeFragment extends Fragment {
         GroupUtils.addGroup(chain, List.of(shapeSwitch));
         if (mShapeExpanded) {
             GroupUtils.addGroup(chain, List.of(
-                    singleChoiceRow(getString(R.string.qs_tiles_shape_preset_title), KEY_TILE_SHAPE,
+                    tileShapeChoiceRow(getString(R.string.qs_tiles_shape_preset_title), KEY_TILE_SHAPE,
                             R.array.qs_tiles_shape_entries)), true);
         }
 
         // ── Colori Icone (spostata sotto Sfondo Riquadri su richiesta esplicita) ────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_tiles_icon_colors_section))));
-        SwitchWidgetAdapter.SwitchItem iconSwitch = prefSwitch(getString(R.string.qs_tiles_icon_colors_title), null, KEY_ICON_COLORS_ON);
+        SwitchWidgetAdapter.SwitchItem iconSwitch = prefSwitch(getString(R.string.qs_tiles_icon_colors_title),
+                getString(R.string.qs_tiles_icon_colors_summary), KEY_ICON_COLORS_ON);
         iconSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_ICON_COLORS_ON, iconSwitch.checked);
             mIconExpanded = iconSwitch.checked;
@@ -405,85 +430,9 @@ public class QsTilesCustomizeFragment extends Fragment {
             chain.add(iconColorsRow());
         }
 
-        // ── Animazione (meno importante, dopo i Cursori) ────────────────────────
-        chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_tiles_animation_section))));
-        int animStyle = 0;
-        try { animStyle = Integer.parseInt(ObsidianPrefs.getString(KEY_ANIM_STYLE, "0")); } catch (NumberFormatException ignored) {}
-        List<Object> animRows = new ArrayList<>();
-        animRows.add(singleChoiceRow(getString(R.string.qs_tiles_animation_style_title), KEY_ANIM_STYLE,
-                R.array.qs_tile_animation_style_entries));
-        if (animStyle != 0) {
-            animRows.add(sliderRow(getString(R.string.qs_tiles_animation_duration_title), KEY_ANIM_DURATION, 1, 5, 1, ""));
-            animRows.add(singleChoiceRow(getString(R.string.qs_tiles_animation_interpolator_title), KEY_ANIM_INTERPOLATOR,
-                    R.array.qs_tile_animation_interpolator_entries));
-        }
-        // ── Transizioni (stesso gruppo di Animazione, sezione unica) — riga sola come
-        // "Stile Animazione": "Disattivata" è l'ultima voce dell'elenco invece di uno
-        // switch separato, tocco unico apre subito la scelta. ────────────────────
-        animRows.add(transitionsRow());
-        GroupUtils.addGroup(chain, animRows);
-
-        // ── Etichette (meno importante, dopo i Cursori) ─────────────────────────
-        chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_tiles_labels_section))));
-        mSingleColorKeys.put(205, KEY_LABEL_COLOR);
-        SwitchWidgetAdapter.SwitchItem labelColorSwitch = new SwitchWidgetAdapter.SwitchItem(
-                getString(R.string.qs_tiles_label_color_title), null,
-                ObsidianPrefs.getBoolean(KEY_LABEL_COLOR_ON, false), null);
-        labelColorSwitch.onChanged = () -> ObsidianPrefs.putBoolean(KEY_LABEL_COLOR_ON, labelColorSwitch.checked);
-        labelColorSwitch.onRowClick = () -> showLabelColorAccentChoice();
-        GroupUtils.addGroup(chain, List.of(
-                prefSwitch(getString(R.string.qs_tiles_hide_labels_title), null, KEY_HIDE_LABELS),
-                labelColorSwitch));
-
-        // ── Impostazioni Rapide Separati (pulsanti/larghezza tendina) ───────────
-        // Uniche opzioni davvero esclusive dello stile "Separati" (tutto il resto — sfondo,
-        // colori icone, etichette — si è rivelato universale ed è già sopra) — portate qui
-        // come sezione inline il 2026-08-20, non più una schermata/card di navigazione a sé.
-        // Stesso pattern di Cursori Impostazioni Rapide: switch master attiva/disattiva,
-        // il tocco sul nome apre/chiude le opzioni sottostanti.
-        chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_separate_mods))));
-        SwitchWidgetAdapter.SwitchItem sepSwitch = new SwitchWidgetAdapter.SwitchItem(
-                getString(R.string.qs_separate_mods), getString(R.string.qs_separate_mods_summary),
-                ObsidianPrefs.getBoolean(KEY_SEP_ON, true), null);
-        sepSwitch.onChanged = () -> {
-            ObsidianPrefs.putBoolean(KEY_SEP_ON, sepSwitch.checked);
-            mSepExpanded = sepSwitch.checked;
-            rebuild();
-        };
-        sepSwitch.onRowClick = () -> { mSepExpanded = !mSepExpanded; rebuild(); };
-        GroupUtils.addGroup(chain, List.of(sepSwitch));
-        if (mSepExpanded) {
-            SwitchWidgetAdapter.SwitchItem btnBgSwitch = gatingSwitch(
-                    getString(R.string.qs_separate_bg_section), null, QsSeparateMod.PREF_BTN_BG_ON);
-            btnBgSwitch.onChanged = () -> {
-                ObsidianPrefs.putBoolean(QsSeparateMod.PREF_BTN_BG_ON, btnBgSwitch.checked);
-                mSepBtnBgExpanded = btnBgSwitch.checked;
-                rebuild();
-            };
-            btnBgSwitch.onRowClick = () -> { mSepBtnBgExpanded = !mSepBtnBgExpanded; rebuild(); };
-            GroupUtils.addGroup(chain, List.of(btnBgSwitch));
-            if (mSepBtnBgExpanded) {
-                GroupUtils.addGroup(chain, List.of(
-                        bgButtonRow(getString(R.string.qs_separate_bg_edit), QsSeparateMod.PREF_EDIT_BG_ON,
-                                QsSeparateMod.PREF_EDIT_BG_ACCENT, QsSeparateMod.PREF_EDIT_BG_COLOR, 208),
-                        bgButtonRow(getString(R.string.qs_separate_bg_menu), QsSeparateMod.PREF_MENU_BG_ON,
-                                QsSeparateMod.PREF_MENU_BG_ACCENT, QsSeparateMod.PREF_MENU_BG_COLOR, 209),
-                        bgButtonRow(getString(R.string.qs_separate_bg_settings), QsSeparateMod.PREF_SETTINGS_BG_ON,
-                                QsSeparateMod.PREF_SETTINGS_BG_ACCENT, QsSeparateMod.PREF_SETTINGS_BG_COLOR, 210)));
-            }
-
-            GroupUtils.addGroup(chain, List.of(
-                    prefSwitch(getString(R.string.qs_separate_hide_edit), null, KEY_SEP_HIDE_EDIT),
-                    prefSwitch(getString(R.string.qs_separate_hide_menu), null, KEY_SEP_HIDE_MENU)));
-            boolean sepWidthOn = ObsidianPrefs.getBoolean(KEY_SEP_WIDTH_ON, false);
-            List<Object> sepWidthRows = new ArrayList<>();
-            sepWidthRows.add(gatingSwitch(getString(R.string.qs_separate_width_switch),
-                    getString(R.string.qs_separate_width_switch_summary), KEY_SEP_WIDTH_ON));
-            if (sepWidthOn) {
-                sepWidthRows.add(sliderRow(getString(R.string.qs_separate_width_value), KEY_SEP_WIDTH_VAL, 10, 85, 50, "%"));
-            }
-            GroupUtils.addGroup(chain, sepWidthRows);
-        }
+        // Animazione/Transizioni, Etichette, Impostazioni Rapide Separati spostate in
+        // QsTilesMiscFragment ("Varie Riquadri", 2026-09-26) — voce di navigazione a sé in
+        // Pannello Impostazioni Rapide, non più sezioni inline qui.
 
         android.os.Parcelable scrollState = mRv.getLayoutManager() != null
                 ? mRv.getLayoutManager().onSaveInstanceState() : null;
@@ -571,41 +520,8 @@ public class QsTilesCustomizeFragment extends Fragment {
         }
     }
 
-    /** "Stile Transizioni" — riga sola come "Stile Animazione": "Disattivata" è la prima
-     *  voce dell'elenco (indice 0) invece di un secondo switch "Abilita..." separato.
-     *  L'indice mostrato/scelto qui è sempre "indice reale + 1" (0 = Disattivata) — quello
-     *  salvato in KEY_TRANSITIONS per il Mod resta l'indice reale (indice UI - 1), così
-     *  TileTransformers.get() non deve cambiare. KEY_TRANSITIONS_ON resta il vero
-     *  interruttore letto dal Mod, sincronizzato qui in base alla voce scelta. */
-    private ListWidgetAdapter.ListItem transitionsRow() {
-        String[] entries = getResources().getStringArray(R.array.qs_tile_transitions_entries);
-        return new ListWidgetAdapter.ListItem(getString(R.string.qs_tiles_transitions_style_title),
-                entries[currentTransitionUiIndex(entries)], () -> showTransitionsDialog(entries));
-    }
-
-    private int currentTransitionUiIndex(String[] entries) {
-        if (!ObsidianPrefs.getBoolean(KEY_TRANSITIONS_ON, false)) return 0;
-        int idx = 0;
-        try { idx = Integer.parseInt(ObsidianPrefs.getString(KEY_TRANSITIONS, "0")); } catch (NumberFormatException ignored) {}
-        int uiIndex = idx + 1;
-        return (uiIndex > 0 && uiIndex < entries.length) ? uiIndex : 0;
-    }
-
-    private void showTransitionsDialog(String[] entries) {
-        int current = currentTransitionUiIndex(entries);
-        final int[] selected = {current};
-        ObsidianTheme.themeDialog(new android.app.AlertDialog.Builder(requireContext())
-                .setTitle(getString(R.string.qs_tiles_transitions_style_title))
-                .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
-                .setPositiveButton(R.string.apply, (d, w) -> {
-                    boolean off = selected[0] == 0;
-                    ObsidianPrefs.putBoolean(KEY_TRANSITIONS_ON, !off);
-                    if (!off) ObsidianPrefs.putString(KEY_TRANSITIONS, String.valueOf(selected[0] - 1));
-                    rebuild();
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show());
-    }
+    // transitionsRow/currentTransitionUiIndex/showTransitionsDialog spostate in
+    // QsTilesMiscFragment (2026-09-26).
 
     /** Apre subito il color picker per un singleColorRow, invece di lasciare che l'utente
      *  debba toccare a parte la riga swatch appena comparsa sotto dopo la scelta
@@ -632,69 +548,8 @@ public class QsTilesCustomizeFragment extends Fragment {
         }
     }
 
-    /** Come colorModeItem (altri fragment), ma con uno switch acceso/spento indipendente per il singolo
-     *  pulsante (2026-08-22) — stesso linguaggio "switch attiva, tocco nome configura" del
-     *  resto dell'app: lo switch abilita/disabilita lo sfondo colorato di QUESTO pulsante,
-     *  il tocco sul nome apre lo stesso dialog Accento/Personalizzato di colorModeItem. */
-    private SwitchWidgetAdapter.SwitchItem bgButtonRow(String title, String onKey,
-                                                        String accentKey, String colorKey, int dialogId) {
-        mSingleColorKeys.put(dialogId, colorKey);
-        SwitchWidgetAdapter.SwitchItem item = new SwitchWidgetAdapter.SwitchItem(
-                title, colorModeLabel(accentKey, colorKey),
-                ObsidianPrefs.getBoolean(onKey, true), null);
-        item.onChanged = () -> ObsidianPrefs.putBoolean(onKey, item.checked);
-        item.onRowClick = () -> showColorModeDialog(title, accentKey, colorKey, dialogId);
-        return item;
-    }
-
-    private String colorModeLabel(String accentKey, String colorKey) {
-        if (ObsidianPrefs.getBoolean(accentKey, true)) return getString(R.string.color_mode_accent);
-        return String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(colorKey, 0xFFFFFFFF));
-    }
-
-    private void showColorModeDialog(String title, String accentKey, String colorKey, int dialogId) {
-        String[] entries = { getString(R.string.color_mode_accent), getString(R.string.color_mode_custom) };
-        int current = ObsidianPrefs.getBoolean(accentKey, true) ? 0 : 1;
-        final int[] selected = {current};
-        ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(title)
-                .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
-                .setPositiveButton(R.string.apply, (d, w) -> {
-                    boolean accent = selected[0] == 0;
-                    ObsidianPrefs.putBoolean(accentKey, accent);
-                    rebuild();
-                    if (!accent && getActivity() instanceof MainActivity) {
-                        int currentColor = ObsidianPrefs.getInt(colorKey, 0xFFFFFFFF);
-                        ((MainActivity) getActivity()).showColorPickerDialog(dialogId, currentColor, true, true, true);
-                    }
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show());
-    }
-
-    /** Only "Colore Etichette" (205) gets Accento — the other three openColorPicker() callers
-     *  (203/204/201) already have their OWN Accento entry inside a mode array and reach this as
-     *  the "Personalizzata" fallback, so adding a second accent prompt here would double up. */
-    private void showLabelColorAccentChoice() {
-        String[] entries = { getString(R.string.color_mode_accent), getString(R.string.color_mode_custom) };
-        boolean currentAccent = ObsidianPrefs.getBoolean(KEY_LABEL_COLOR + "_use_accent", false);
-        final int[] selected = {currentAccent ? 0 : 1};
-        ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.qs_tiles_label_color_title)
-                .setSingleChoiceItems(entries, selected[0], (d, which) -> selected[0] = which)
-                .setPositiveButton(R.string.apply, (d, w) -> {
-                    boolean useAccent = selected[0] == 0;
-                    ObsidianPrefs.putBoolean(KEY_LABEL_COLOR + "_use_accent", useAccent);
-                    if (useAccent) {
-                        ObsidianPrefs.putInt(KEY_LABEL_COLOR, ObsidianTheme.accentColor());
-                        rebuild();
-                    } else {
-                        openColorPicker(205, KEY_LABEL_COLOR);
-                    }
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show());
-    }
+    // bgButtonRow/colorModeLabel/showColorModeDialog/showLabelColorAccentChoice spostate in
+    // QsTilesMiscFragment (2026-09-26).
 
     private void openColorPicker(int dialogId, String key) {
         if (getActivity() instanceof MainActivity) {
@@ -829,6 +684,185 @@ public class QsTilesCustomizeFragment extends Fragment {
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show());
+    }
+
+    /** Come singleChoiceRow/showSingleChoiceDialog, ma per "Forma riquadri" (KEY_TILE_SHAPE) —
+     *  richiesto 2026-09-26 mostrare le forme in ordine ALFABETICO senza però rinumerare gli indici
+     *  salvati (il pref è un indice grezzo nell'array TILE_SHAPE_KIND lato hook — riordinare
+     *  l'array.xml stesso avrebbe silenziosamente cambiato la forma già scelta da chi ha già
+     *  configurato l'app). Qui si ordina solo l'ETICHETTA mostrata nel dialog; "which" dell'utente
+     *  viene tradotto nell'indice stabile originale prima di scrivere il pref. */
+    private ListWidgetAdapter.ListItem tileShapeChoiceRow(String title, String key, int entriesArrayRes) {
+        return new ListWidgetAdapter.ListItem(
+                title, choiceLabel(key, entriesArrayRes),
+                () -> showTileShapeDialog(title, key, entriesArrayRes));
+    }
+
+    private void showTileShapeDialog(String title, String key, int entriesArrayRes) {
+        String[] entries = getResources().getStringArray(entriesArrayRes);
+        Integer[] order = new Integer[entries.length];
+        for (int i = 0; i < order.length; i++) order[i] = i;
+        java.util.Arrays.sort(order, (a, b) -> entries[a].compareToIgnoreCase(entries[b]));
+        String[] sortedLabels = new String[entries.length];
+        for (int i = 0; i < order.length; i++) sortedLabels[i] = entries[order[i]];
+
+        int currentIdx = 0;
+        try { currentIdx = Integer.parseInt(ObsidianPrefs.getString(key, "0")); } catch (NumberFormatException ignored) {}
+        int currentPos = 0;
+        for (int i = 0; i < order.length; i++) if (order[i] == currentIdx) { currentPos = i; break; }
+
+        final int[] selectedPos = {currentPos};
+        int normalColor = ObsidianTheme.systemDialogTextColor(requireContext());
+        int accentColor = ObsidianTheme.accentColor();
+        int padH = ObsidianTheme.dp(requireContext(), 24), padV = ObsidianTheme.dp(requireContext(), 12);
+        int gap = ObsidianTheme.dp(requireContext(), 12);
+        // Riga costruita a mano (icona + etichetta a peso 1 + RadioButton), non il CheckedTextView
+        // di android.R.layout.simple_list_item_single_choice: quel pallino si posiziona subito
+        // dopo il testo qualunque LayoutParams gli si dia (segnalato 2026-09-26, screenshot — non
+        // flush a destra come nelle liste native). Con l'etichetta a layout_weight=1 il RadioButton
+        // finisce sempre allo stesso bordo destro, indipendentemente dalla lunghezza del nome.
+        android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<>(
+                requireContext(), android.R.layout.simple_list_item_1, sortedLabels) {
+            @NonNull @Override
+            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                android.widget.LinearLayout row = new android.widget.LinearLayout(requireContext());
+                row.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+                row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+                row.setPadding(padH, padV, padH, padV);
+                row.setLayoutParams(new android.widget.AbsListView.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                boolean selected = position == selectedPos[0];
+                int color = selected ? accentColor : normalColor;
+
+                android.widget.TextView label = new android.widget.TextView(requireContext());
+                label.setText(sortedLabels[position]);
+                label.setTextColor(color);
+                label.setTextSize(16); // stessa dimensione delle liste a scelta singola native
+                int iconSize = (int) label.getTextSize(); // "della stessa dimensione del nome"
+                android.widget.ImageView icon = new android.widget.ImageView(requireContext());
+                icon.setImageDrawable(shapeIconDrawable(order[position], iconSize, color));
+                android.widget.LinearLayout.LayoutParams iconLp = new android.widget.LinearLayout.LayoutParams(iconSize, iconSize);
+                iconLp.setMarginEnd(gap);
+                row.addView(icon, iconLp);
+
+                android.widget.LinearLayout.LayoutParams labelLp = new android.widget.LinearLayout.LayoutParams(
+                        0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+                row.addView(label, labelLp);
+
+                android.widget.RadioButton radio = new android.widget.RadioButton(requireContext());
+                radio.setChecked(selected);
+                radio.setClickable(false);
+                // Un discendente focusable dentro la riga di una ListView le impedisce di ricevere
+                // il tap (bug/gotcha noto di AbsListView) — setClickable(false) da solo non basta.
+                radio.setFocusable(false);
+                radio.setFocusableInTouchMode(false);
+                row.addView(radio);
+                return row;
+            }
+        };
+        android.app.AlertDialog dialog = new android.app.AlertDialog.Builder(requireContext())
+                .setTitle(title)
+                .setSingleChoiceItems(adapter, currentPos, (d, which) -> {
+                    selectedPos[0] = which;
+                    adapter.notifyDataSetChanged(); // riaccenta nome/icona della riga appena scelta
+                })
+                .setPositiveButton(R.string.apply, (d, w) -> {
+                    ObsidianPrefs.putString(key, String.valueOf(order[selectedPos[0]]));
+                    rebuild();
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .create();
+        ObsidianTheme.themeDialog(dialog);
+        dialog.show();
+        // Bug 2026-09-26: alla PRIMA apertura la finestra del dialog è ancora wrap_content (la sua
+        // larghezza finale non è ancora nota), quindi ListView misura le righe con MATCH_PARENT
+        // ignorato (torna al wrap del testo, pallino vicino al nome) — solo DOPO che una vera
+        // richiesta di layout con larghezza nota è avvenuta (es. il notifyDataSetChanged() sopra,
+        // dopo un tocco) le righe si allargano per davvero. Fix: forziamo SUBITO una larghezza fissa
+        // della finestra invece di lasciarla wrap_content, così anche il primissimo giro di misura
+        // usa una larghezza reale e il pallino nasce già allineato a destra.
+        if (dialog.getWindow() != null) {
+            int w = (int) (getResources().getDisplayMetrics().widthPixels * 0.85f);
+            dialog.getWindow().setLayout(w, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+    }
+
+    /** Anteprima della forma scelta in "Forma riquadri" (richiesta 2026-09-26), mostrata prima del
+     *  nome nel dialog di scelta — approssimazione visiva (stroke, non le stesse costanti esatte di
+     *  QsTilesCustomizeMod.buildShapedPath, che vive in un'altra classe/contesto Xposed): l'utente
+     *  ha confermato che va bene così ("le img non corrispondono esattamente, va bene comunque").
+     *  shapeIndex è l'indice STABILE (non la posizione ordinata alfabeticamente nel dialog). */
+    private android.graphics.drawable.Drawable shapeIconDrawable(int shapeIndex, int sizePx, int color) {
+        android.graphics.Bitmap bmp = android.graphics.Bitmap.createBitmap(sizePx, sizePx, android.graphics.Bitmap.Config.ARGB_8888);
+        android.graphics.Canvas canvas = new android.graphics.Canvas(bmp);
+        android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        paint.setStyle(android.graphics.Paint.Style.STROKE);
+        paint.setStrokeJoin(android.graphics.Paint.Join.ROUND);
+        paint.setStrokeWidth(sizePx * 0.1f);
+        paint.setColor(color);
+        float pad = sizePx * 0.12f;
+        android.graphics.RectF b = new android.graphics.RectF(pad, pad, sizePx - pad, sizePx - pad);
+        canvas.drawPath(shapeIconPath(shapeIndex, b), paint);
+        return new android.graphics.drawable.BitmapDrawable(getResources(), bmp);
+    }
+
+    /** Path semplificata per icona — un poligono/ovale/round-rect di base per ciascuna delle 10
+     *  forme (stesso ordine di TILE_SHAPE_KIND in QsTilesCustomizeMod), non la geometria esatta
+     *  (chamfer in dp fisso, inset ellisse, ecc.) — sufficiente a farla riconoscere in piccolo. */
+    private android.graphics.Path shapeIconPath(int shapeIndex, android.graphics.RectF b) {
+        android.graphics.Path p = new android.graphics.Path();
+        switch (shapeIndex) {
+            case 0: case 2: { // Finestra, Ottagono: angolo tagliato
+                float ch = b.width() * (shapeIndex == 0 ? 0.22f : 0.30f);
+                p.moveTo(b.left + ch, b.top);
+                p.lineTo(b.right - ch, b.top);
+                p.lineTo(b.right, b.top + ch);
+                p.lineTo(b.right, b.bottom - ch);
+                p.lineTo(b.right - ch, b.bottom);
+                p.lineTo(b.left + ch, b.bottom);
+                p.lineTo(b.left, b.bottom - ch);
+                p.lineTo(b.left, b.top + ch);
+                p.close();
+                break;
+            }
+            case 1: { // Goccia: TL/TR/BL larghi, BR stretto (segnalato 2026-09-26 "uguale a Rombo" —
+                // il caso condiviso di prima usava lo STESSO pattern per entrambi, ora rispecchia i
+                // veri raggi di QsTilesCustomizeMod.TILE_SHAPE_CORNERS_DP, {30,30,4,30}).
+                float rNarrow = b.width() * 0.06f, rWide = b.width() * 0.42f;
+                float[] radii = {rWide, rWide, rWide, rWide, rNarrow, rNarrow, rWide, rWide};
+                p.addRoundRect(b, radii, android.graphics.Path.Direction.CW);
+                break;
+            }
+            case 4: { // Rombo: TL/BR stretti (diagonale), TR/BL larghi — {4,30,4,30} reale.
+                float rNarrow = b.width() * 0.06f, rWide = b.width() * 0.42f;
+                float[] radii = {rNarrow, rNarrow, rWide, rWide, rNarrow, rNarrow, rWide, rWide};
+                p.addRoundRect(b, radii, android.graphics.Path.Direction.CW);
+                break;
+            }
+            case 7: { // Ellisse
+                android.graphics.RectF r = new android.graphics.RectF(b);
+                r.inset(b.width() * 0.12f, 0);
+                p.addOval(r, android.graphics.Path.Direction.CW);
+                break;
+            }
+            case 8: case 9: { // Esagono, Pentagono
+                int sides = shapeIndex == 8 ? 6 : 5;
+                float cx = b.centerX(), cy = b.centerY(), r = Math.min(b.width(), b.height()) / 2f;
+                for (int i = 0; i < sides; i++) {
+                    double angle = -Math.PI / 2 + i * (2 * Math.PI / sides);
+                    float x = cx + r * (float) Math.cos(angle), y = cy + r * (float) Math.sin(angle);
+                    if (i == 0) p.moveTo(x, y); else p.lineTo(x, y);
+                }
+                p.close();
+                break;
+            }
+            default: { // Quadrato, Supercerchio 1/2: raggio uniforme crescente
+                float r = b.width() * (shapeIndex == 3 ? 0.14f : shapeIndex == 5 ? 0.26f : 0.42f);
+                p.addRoundRect(b, r, r, android.graphics.Path.Direction.CW);
+            }
+        }
+        return p;
     }
 
     private SliderWidgetAdapter.SliderItem sliderRow(String title, String key, int min, int max, int def, String unit) {

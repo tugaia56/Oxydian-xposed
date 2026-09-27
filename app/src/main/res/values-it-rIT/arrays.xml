@@ -553,6 +553,9 @@
         <item>Rombo</item>
         <item>Supercerchio 1</item>
         <item>Supercerchio 2</item>
+        <item>Ellisse</item>
+        <item>Esagono</item>
+        <item>Pentagono</item>
     </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Off</item>

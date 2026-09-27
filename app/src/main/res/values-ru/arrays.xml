@@ -765,6 +765,9 @@
         <item>Ромб</item>
         <item>Суперкруг 1</item>
         <item>Суперкруг 2</item>
+        <item>Эллипс</item>
+        <item>Шестиугольник</item>
+        <item>Пятиугольник</item>
     </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>Выкл</item>

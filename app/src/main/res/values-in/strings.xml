@@ -445,11 +445,14 @@
     <string name="qs_tiles_customize_summary">Warna ikon, animasi, label, penggeser kecerahan, radius sudut</string>
     <string name="qs_tiles_icon_colors_section">Warna Ikon Kustom</string>
     <string name="qs_tiles_icon_colors_title">Warna Ikon Kustom</string>
+    <string name="qs_tiles_icon_colors_summary">Warna ikon di ubin, untuk status aktif/tidak aktif/nonaktif</string>
     <string name="qs_tiles_icon_active_accent_title">Tautkan ikon ke warna aksen</string>
     <string name="qs_tiles_bg_active_accent_title">Tautkan ke warna aksen</string>
     <string name="qs_tiles_color_active">Aktif</string>
     <string name="qs_tiles_color_inactive">Tidak Aktif</string>
     <string name="qs_tiles_color_disabled">Dinonaktifkan</string>
+    <string name="qs_tiles_misc_section">Pengaturan Ubin Lainnya</string>
+    <string name="qs_tiles_misc_section_summary">Animasi, label, Pengaturan Cepat Terpisah</string>
     <string name="qs_tiles_animation_section">Animasi dan Transisi Ubin</string>
     <string name="qs_tiles_animation_style_title">Gaya Animasi</string>
     <string name="qs_tiles_animation_duration_title">Kecepatan Animasi</string>
@@ -462,6 +465,7 @@
     <string name="qs_tiles_label_color_title">Warna Teks QS Kustom</string>
     <string name="qs_tiles_brightness_section">Penggeser QS</string>
     <string name="qs_tiles_sliders_master_title">Ubin penggeser</string>
+    <string name="qs_tiles_sliders_master_summary">Warna, ikon, dan batas penggeser Kecerahan dan Volume</string>
     <string name="qs_tiles_brightness_icon_title">Ubah warna ikon kecerahan otomatis</string>
     <string name="qs_tiles_brightness_icon_color_title">Warna Kustom</string>
     <string name="qs_tiles_brightness_icon_title_volume">Ubah warna ikon volume</string>
@@ -476,9 +480,11 @@
     <string name="qs_tiles_bg_section">Latar Belakang Ubin</string>
     <string name="qs_tiles_radius_section">Radius Sudut Ubin</string>
     <string name="qs_tiles_jump_highlight">Ubin Kecil</string>
+    <string name="qs_tiles_jump_highlight_summary">Warna latar ubin kecil (sakelar cepat)</string>
     <string name="qs_tiles_jump_base">Ubin Besar</string>
-    <string name="qs_tiles_jump_base_summary">Hanya dengan gaya Terpisah</string>
+    <string name="qs_tiles_jump_base_summary">Warna latar ubin besar</string>
     <string name="qs_tiles_jump_media">Ubin Media</string>
+    <string name="qs_tiles_jump_media_summary">Warna latar ubin Media</string>
     <string name="qs_tiles_jump_blocked_title">Tidak tersedia di perangkat ini</string>
     <string name="qs_widgets_nav_summary">Foto, cuaca, aplikasi cepat di panel Pengaturan Cepat</string>
     <string name="qs_widgets_section">Widget Pengaturan Cepat</string>

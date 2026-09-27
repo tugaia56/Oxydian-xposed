@@ -766,6 +766,9 @@
         <item>菱形</item>
         <item>超椭圆1</item>
         <item>超椭圆2</item>
+        <item>椭圆</item>
+        <item>六边形</item>
+        <item>五边形</item>
     </string-array>
     <string-array name="settings_icons_solid_entries">
         <item>关</item>
