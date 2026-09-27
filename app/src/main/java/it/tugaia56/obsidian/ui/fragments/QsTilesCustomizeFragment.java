@@ -802,7 +802,10 @@ public class QsTilesCustomizeFragment extends Fragment {
         android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(android.graphics.Paint.Style.STROKE);
         paint.setStrokeJoin(android.graphics.Paint.Join.ROUND);
-        paint.setStrokeWidth(sizePx * 0.1f);
+        // 2026-09-27: spessore fisso (~2dp, come l'anello vuoto del RadioButton nativo accanto),
+        // non più proporzionale alla dimensione dell'icona — era diventato troppo spesso dopo
+        // l'ingrandimento 1.5x.
+        paint.setStrokeWidth(ObsidianTheme.dp(requireContext(), 2));
         paint.setColor(color);
         float pad = sizePx * 0.12f;
         android.graphics.RectF b = new android.graphics.RectF(pad, pad, sizePx - pad, sizePx - pad);
