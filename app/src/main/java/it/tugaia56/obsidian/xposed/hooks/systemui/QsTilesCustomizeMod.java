@@ -1629,12 +1629,21 @@ public class QsTilesCustomizeMod extends XposedMods {
                 "com.oplus.systemui.qs.base.res.SepQSResPool", "com.oplus.systemui.qs.base.res.StdQSResPool"}) {
             // Un solo interruttore per categoria (lo stesso dello sfondo) — niente doppia voce
             // "Riquadri base"/"in evidenza"/"Media" ripetuta anche per il raggio, su richiesta utente.
+            // 2026-09-28: updateTileOutline/updateHighLightTileOutline sono chiamate native
+            // CONDIVISE da tutti i riquadri di quella categoria (piccoli E grandi/in evidenza),
+            // non per-View — non c'è modo di distinguerli qui. Usare tileShapePresetRadiusDp()
+            // quando mTileShapeOn è attivo (pensato per i riquadri piccoli) sovrascriveva anche
+            // l'ombra/clip nativo dei riquadri grandi, facendo sembrare "resettato" il loro
+            // Raggio configurato (segnalato: "cambio forma piccoli e i grandi perdono il
+            // raggio"). Il riempimento VISIBILE segue già il raggio giusto per tipo (drawShaped
+            // per i piccoli, mTileRadiusBaseDp/HlDp per i grandi, invariato) — qui usiamo sempre
+            // il raggio dedicato "Riquadri grandi/in evidenza", mai la stima della forma.
             hookOutlineUpdater(lp, cls, "updateTileOutline",
                     () -> mTileBgBaseOn || mTileShapeOn,
-                    () -> mTileShapeOn ? tileShapePresetRadiusDp() : mTileRadiusBaseDp);
+                    () -> mTileRadiusBaseDp);
             hookOutlineUpdater(lp, cls, "updateHighLightTileOutline",
                     () -> mTileBgHighlightOn || mTileShapeOn,
-                    () -> mTileShapeOn ? tileShapePresetRadiusDp() : mTileRadiusHlDp);
+                    () -> mTileRadiusHlDp);
             hookOutlineUpdater(lp, cls, "updateMediaPanelOutline", () -> mTileBgMediaOn, () -> mTileRadiusMediaDp);
         }
     }
