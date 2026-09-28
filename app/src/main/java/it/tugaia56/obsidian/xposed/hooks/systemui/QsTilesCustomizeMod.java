@@ -207,6 +207,11 @@ public class QsTilesCustomizeMod extends XposedMods {
     // SettingsIconsResourceManager per il pack icone Settings — un vero rombo/goccia non è un
     // round-rect).
     private static final int SHAPE_KIND_UNIFORM = 0, SHAPE_KIND_OCTAGON = 1, SHAPE_KIND_CORNERS = 2, SHAPE_KIND_ELLIPSE = 3, SHAPE_KIND_POLYGON = 4;
+    // Croce/Stella/Quadrifoglio/Cuore (2026-09-28) — SOLO riquadri piccoli: buildShapedPath qui
+    // non ha (e non deve avere) la logica "tallNarrow" di SHAPE_KIND_POLYGON/ELLISSE che estende
+    // la forma per i cursori, perché queste 4 non sono selezionabili lì (useOwnShape resta
+    // gated a smallRoundTile, invariato).
+    private static final int SHAPE_KIND_CROSS = 5, SHAPE_KIND_STAR = 6, SHAPE_KIND_CLOVER = 7, SHAPE_KIND_HEART = 8;
     // Ellisse aggiunta 2026-09-25, Esagono/Pentagono 2026-09-26 (Triangolo a lati dritti scartato:
     // "non mi piace, non c'è nelle forme, c'è il curvilinear triangle/plettro" — un tentativo di
     // Plettro/SHAPE_KIND_PICK con lati a curva bulge fu aggiunto e poi RIMOSSO lo stesso giorno,
@@ -223,20 +228,14 @@ public class QsTilesCustomizeMod extends XposedMods {
             SHAPE_KIND_ELLIPSE,
             SHAPE_KIND_POLYGON, SHAPE_KIND_POLYGON,
             SHAPE_KIND_POLYGON, SHAPE_KIND_POLYGON, // Ettagono(10), Decagono(11) — 2026-09-27
-            // Croce/Cuore/Quadrifoglio/Stella (12-15) — 2026-09-27: solo UI/picker per ora,
-            // geometria reale non ancora scritta (placeholder UNIFORM così non crashano se
-            // selezionate — vedi buildShapedPath, SHAPE_KIND_UNIFORM è il fallback sicuro).
-            SHAPE_KIND_UNIFORM, SHAPE_KIND_UNIFORM, SHAPE_KIND_UNIFORM, SHAPE_KIND_UNIFORM,
+            SHAPE_KIND_CROSS, SHAPE_KIND_HEART, SHAPE_KIND_CLOVER, SHAPE_KIND_STAR, // 2026-09-28
     };
     // Numero di lati — solo indici POLYGON (Esagono=6, Pentagono=5, Ettagono=7, Decagono=10).
     private static final int[] TILE_SHAPE_POLYGON_SIDES = {
             0, 0, 0, 0, 0, 0, 0, 0, 6, 5, 7, 10,
     };
     // Supercerchio 2 era 40dp ma segnalato "sono cerchi" (saturava) — abbassato a 26dp.
-    // 12-15: placeholder Croce/Cuore/Quadrifoglio/Stella, stesso raggio di Supercerchio 1 finché
-    // non hanno una geometria propria.
-    private static final int[] TILE_SHAPE_UNIFORM_DP =
-            {0, 0, 0, 10, 0, 16, 26, 0, 0, 0, 0, 0, 16, 16, 16, 16}; // solo indici UNIFORM
+    private static final int[] TILE_SHAPE_UNIFORM_DP = {0, 0, 0, 10, 0, 16, 26}; // solo indici UNIFORM
     // {TL, TR, BR, BL} in dp — solo indici CORNERS. Goccia: angolo stretto uguagliato a Rombo (4dp,
     // era 22 — segnalato "fallo della stessa misura di rombo"). Angoli larghi 80dp->30dp (2026-09-23,
     // "media da correggere, angolo più stretto fai uguale a rombo"): 80dp si affidava al clamp
@@ -323,10 +322,13 @@ public class QsTilesCustomizeMod extends XposedMods {
                 // tra i due cursori affiancati (segnalato 2026-09-26 "allargare i cursori
                 // Ellisse, la parte interna più vicina") — niente restringimento quando i bounds
                 // sono già più alti che larghi, l'ellisse usa tutta la larghezza disponibile.
+                // 2026-09-28: orizzontale su richiesta (era verticale, inset sull'asse X) — solo
+                // riquadri piccoli, il ramo tallNarrow (cursori) non è più raggiungibile da tempo
+                // (Forma riquadri non tocca più i cursori) ma resta come guardia innocua.
                 boolean tallNarrow = bounds.height() > bounds.width() * 1.3f;
-                float insetX = tallNarrow ? 0f : dp(TILE_SHAPE_ELLIPSE_INSET_DP);
+                float insetY = tallNarrow ? 0f : dp(TILE_SHAPE_ELLIPSE_INSET_DP);
                 android.graphics.RectF r = new android.graphics.RectF(bounds);
-                r.inset(insetX, 0);
+                r.inset(0, insetY);
                 p.addOval(r, android.graphics.Path.Direction.CW);
                 break;
             }
@@ -378,12 +380,105 @@ public class QsTilesCustomizeMod extends XposedMods {
                 p.close();
                 break;
             }
+            case SHAPE_KIND_CROSS: {
+                // Poligono a 12 vertici (croce/più) — solo riquadri piccoli (bounds ~quadrati),
+                // nessuna estensione per cursori (vedi nota su SHAPE_KIND_CROSS).
+                float cx = bounds.exactCenterX(), cy = bounds.exactCenterY();
+                float r = Math.min(bounds.width(), bounds.height()) / 2f;
+                float a = r * 0.46f; // metà spessore del braccio (allargato 2026-09-28)
+                float[][] v = {
+                        {cx - a, cy - r}, {cx + a, cy - r}, {cx + a, cy - a},
+                        {cx + r, cy - a}, {cx + r, cy + a}, {cx + a, cy + a},
+                        {cx + a, cy + r}, {cx - a, cy + r}, {cx - a, cy + a},
+                        {cx - r, cy + a}, {cx - r, cy - a}, {cx - a, cy - a},
+                };
+                for (int i = 0; i < v.length; i++) {
+                    if (i == 0) p.moveTo(v[i][0], v[i][1]); else p.lineTo(v[i][0], v[i][1]);
+                }
+                p.close();
+                break;
+            }
+            case SHAPE_KIND_STAR: {
+                // Stella a 5 punte — solo riquadri piccoli. 2026-09-28: angoli interni più larghi
+                // (rInner 0.45->0.58) e punte esterne un po' arrotondate (angolo tagliato +
+                // ricongiunto con una curva quadratica, stesso principio di un corner-cut
+                // arrotondato — solo le punte, non le valli interne).
+                int points = 5;
+                float cx = bounds.exactCenterX(), cy = bounds.exactCenterY();
+                float rOuter = Math.min(bounds.width(), bounds.height()) / 2f, rInner = rOuter * 0.58f;
+                int n = points * 2;
+                float[] vx = new float[n], vy = new float[n];
+                for (int i = 0; i < n; i++) {
+                    double angle = -Math.PI / 2 + i * (Math.PI / points);
+                    float r = (i % 2 == 0) ? rOuter : rInner;
+                    vx[i] = cx + r * (float) Math.cos(angle);
+                    vy[i] = cy + r * (float) Math.sin(angle);
+                }
+                float cornerFrac = 0.16f;
+                for (int i = 0; i < n; i++) {
+                    if (i % 2 == 0) { // punta esterna: tagliata e arrotondata
+                        int prev = (i - 1 + n) % n, next = (i + 1) % n;
+                        float ax = vx[i] + (vx[prev] - vx[i]) * cornerFrac, ay = vy[i] + (vy[prev] - vy[i]) * cornerFrac;
+                        float bx = vx[i] + (vx[next] - vx[i]) * cornerFrac, by = vy[i] + (vy[next] - vy[i]) * cornerFrac;
+                        if (i == 0) p.moveTo(ax, ay); else p.lineTo(ax, ay);
+                        p.quadTo(vx[i], vy[i], bx, by);
+                    } else { // valle interna: vertice pieno, invariata
+                        p.lineTo(vx[i], vy[i]);
+                    }
+                }
+                p.close();
+                break;
+            }
+            case SHAPE_KIND_CLOVER: {
+                // Quadrifoglio — 4 cerchi sovrapposti (union), solo riquadri piccoli.
+                float cx = bounds.exactCenterX(), cy = bounds.exactCenterY();
+                float r = Math.min(bounds.width(), bounds.height()) / 2f;
+                float petalR = r * 0.62f, offset = r * 0.52f;
+                p.addCircle(cx, cy - offset, petalR, android.graphics.Path.Direction.CW);
+                android.graphics.Path petal = new android.graphics.Path();
+                petal.addCircle(cx, cy + offset, petalR, android.graphics.Path.Direction.CW);
+                p.op(petal, android.graphics.Path.Op.UNION);
+                petal.reset(); petal.addCircle(cx - offset, cy, petalR, android.graphics.Path.Direction.CW);
+                p.op(petal, android.graphics.Path.Op.UNION);
+                petal.reset(); petal.addCircle(cx + offset, cy, petalR, android.graphics.Path.Direction.CW);
+                p.op(petal, android.graphics.Path.Op.UNION);
+                break;
+            }
+            case SHAPE_KIND_HEART: {
+                // Cuore — 2026-09-28 round 3: le due approssimazioni precedenti (cubiche, poi due
+                // cerchi+triangolo) non convincevano ("cono gelato con due palline"). Path esatto
+                // dell'icona Material "favorite" (fornito dall'utente, heart.xml, viewport 24x24),
+                // scalato/centrato su bounds via min(w,h) come le altre forme.
+                buildHeartPath(p, bounds);
+                break;
+            }
             default: {
                 float r = dp(TILE_SHAPE_UNIFORM_DP[mTileShapePreset]);
                 p.addRoundRect(new android.graphics.RectF(bounds), r, r, android.graphics.Path.Direction.CW);
             }
         }
         return p;
+    }
+
+    /** Path esatto dell'icona Material "favorite" (viewport 24x24, vedi heart.xml fornito
+     *  dall'utente), scalato uniformemente su min(bounds.width(),height()) e centrato sul
+     *  centro esatto dei bounds — stesso principio di raggio unico usato dai poligoni, per non
+     *  deformare la forma se i bounds non sono perfettamente quadrati. */
+    private void buildHeartPath(android.graphics.Path p, android.graphics.Rect bounds) {
+        float size = Math.min(bounds.width(), bounds.height());
+        float scale = size / 24f;
+        float ox = bounds.exactCenterX() - 12f * scale;
+        float oy = bounds.exactCenterY() - 12f * scale;
+        p.moveTo(ox + 12f * scale, oy + 21.35f * scale);
+        p.lineTo(ox + 10.55f * scale, oy + 20.03f * scale);
+        p.cubicTo(ox + 5.4f * scale, oy + 15.36f * scale, ox + 2f * scale, oy + 12.27f * scale, ox + 2f * scale, oy + 8.5f * scale);
+        p.cubicTo(ox + 2f * scale, oy + 5.41f * scale, ox + 4.42f * scale, oy + 3f * scale, ox + 7.5f * scale, oy + 3f * scale);
+        p.cubicTo(ox + 9.24f * scale, oy + 3f * scale, ox + 10.91f * scale, oy + 3.81f * scale, ox + 12f * scale, oy + 5.08f * scale);
+        p.cubicTo(ox + 13.09f * scale, oy + 3.81f * scale, ox + 14.76f * scale, oy + 3f * scale, ox + 16.5f * scale, oy + 3f * scale);
+        p.cubicTo(ox + 19.58f * scale, oy + 3f * scale, ox + 22f * scale, oy + 5.41f * scale, ox + 22f * scale, oy + 8.5f * scale);
+        p.cubicTo(ox + 22f * scale, oy + 12.27f * scale, ox + 18.6f * scale, oy + 15.36f * scale, ox + 13.45f * scale, oy + 20.03f * scale);
+        p.lineTo(ox + 12f * scale, oy + 21.35f * scale);
+        p.close();
     }
 
     /** Disegna (riempimento o contorno, secondo lo stile del Paint passato) la forma scelta in

@@ -846,9 +846,9 @@ public class QsTilesCustomizeFragment extends Fragment {
                 p.addRoundRect(b, radii, android.graphics.Path.Direction.CW);
                 break;
             }
-            case 7: { // Ellisse
+            case 7: { // Ellisse — orizzontale (2026-09-28)
                 android.graphics.RectF r = new android.graphics.RectF(b);
-                r.inset(b.width() * 0.12f, 0);
+                r.inset(0, b.height() * 0.12f);
                 p.addOval(r, android.graphics.Path.Direction.CW);
                 break;
             }
@@ -863,25 +863,41 @@ public class QsTilesCustomizeFragment extends Fragment {
                 p.close();
                 break;
             }
-            case 12: { // Croce — icona approssimata, geometria reale del riquadro non ancora scritta
-                float cx = b.centerX(), cy = b.centerY(), armPad = b.width() * 0.30f;
-                p.addRect(cx - armPad, b.top, cx + armPad, b.bottom, android.graphics.Path.Direction.CW);
-                android.graphics.Path h = new android.graphics.Path();
-                h.addRect(b.left, cy - armPad, b.right, cy + armPad, android.graphics.Path.Direction.CW);
-                p.op(h, android.graphics.Path.Op.UNION);
-                break;
-            }
-            case 13: { // Cuore — icona approssimata
-                float w = b.width(), h2 = b.height();
-                float cx = b.centerX(), top = b.top + h2 * 0.22f;
-                p.moveTo(cx, b.bottom);
-                p.cubicTo(b.left - w * 0.05f, top + h2 * 0.35f, b.left + w * 0.05f, top - h2 * 0.1f, cx, top + h2 * 0.18f);
-                p.cubicTo(b.right - w * 0.05f, top - h2 * 0.1f, b.right + w * 0.05f, top + h2 * 0.35f, cx, b.bottom);
+            case 12: { // Croce — stessa geometria di QsTilesCustomizeMod.SHAPE_KIND_CROSS
+                float cx = b.centerX(), cy = b.centerY(), r = Math.min(b.width(), b.height()) / 2f;
+                float a = r * 0.46f;
+                float[][] v = {
+                        {cx - a, cy - r}, {cx + a, cy - r}, {cx + a, cy - a},
+                        {cx + r, cy - a}, {cx + r, cy + a}, {cx + a, cy + a},
+                        {cx + a, cy + r}, {cx - a, cy + r}, {cx - a, cy + a},
+                        {cx - r, cy + a}, {cx - r, cy - a}, {cx - a, cy - a},
+                };
+                for (int i = 0; i < v.length; i++) {
+                    if (i == 0) p.moveTo(v[i][0], v[i][1]); else p.lineTo(v[i][0], v[i][1]);
+                }
                 p.close();
                 break;
             }
-            case 14: { // Quadrifoglio — icona approssimata, 4 petali circolari
-                float cx = b.centerX(), cy = b.centerY(), petalR = b.width() * 0.28f, offset = b.width() * 0.26f;
+            case 13: { // Cuore — stesso path esatto (Material "favorite") di QsTilesCustomizeMod
+                float size = Math.min(b.width(), b.height());
+                float scale = size / 24f;
+                float ox = b.centerX() - 12f * scale;
+                float oy = b.centerY() - 12f * scale;
+                p.moveTo(ox + 12f * scale, oy + 21.35f * scale);
+                p.lineTo(ox + 10.55f * scale, oy + 20.03f * scale);
+                p.cubicTo(ox + 5.4f * scale, oy + 15.36f * scale, ox + 2f * scale, oy + 12.27f * scale, ox + 2f * scale, oy + 8.5f * scale);
+                p.cubicTo(ox + 2f * scale, oy + 5.41f * scale, ox + 4.42f * scale, oy + 3f * scale, ox + 7.5f * scale, oy + 3f * scale);
+                p.cubicTo(ox + 9.24f * scale, oy + 3f * scale, ox + 10.91f * scale, oy + 3.81f * scale, ox + 12f * scale, oy + 5.08f * scale);
+                p.cubicTo(ox + 13.09f * scale, oy + 3.81f * scale, ox + 14.76f * scale, oy + 3f * scale, ox + 16.5f * scale, oy + 3f * scale);
+                p.cubicTo(ox + 19.58f * scale, oy + 3f * scale, ox + 22f * scale, oy + 5.41f * scale, ox + 22f * scale, oy + 8.5f * scale);
+                p.cubicTo(ox + 22f * scale, oy + 12.27f * scale, ox + 18.6f * scale, oy + 15.36f * scale, ox + 13.45f * scale, oy + 20.03f * scale);
+                p.lineTo(ox + 12f * scale, oy + 21.35f * scale);
+                p.close();
+                break;
+            }
+            case 14: { // Quadrifoglio — stessa geometria di QsTilesCustomizeMod.SHAPE_KIND_CLOVER
+                float cx = b.centerX(), cy = b.centerY();
+                float r = Math.min(b.width(), b.height()) / 2f, petalR = r * 0.62f, offset = r * 0.52f;
                 p.addCircle(cx, cy - offset, petalR, android.graphics.Path.Direction.CW);
                 android.graphics.Path petal = new android.graphics.Path();
                 petal.addCircle(cx, cy + offset, petalR, android.graphics.Path.Direction.CW);
@@ -892,15 +908,29 @@ public class QsTilesCustomizeFragment extends Fragment {
                 p.op(petal, android.graphics.Path.Op.UNION);
                 break;
             }
-            case 15: { // Stella — icona approssimata, 5 punte
+            case 15: { // Stella — stessa geometria di QsTilesCustomizeMod.SHAPE_KIND_STAR
                 int points = 5;
                 float cx = b.centerX(), cy = b.centerY();
-                float rOuter = Math.min(b.width(), b.height()) / 2f, rInner = rOuter * 0.42f;
-                for (int i = 0; i < points * 2; i++) {
+                float rOuter = Math.min(b.width(), b.height()) / 2f, rInner = rOuter * 0.58f;
+                int n = points * 2;
+                float[] vx = new float[n], vy = new float[n];
+                for (int i = 0; i < n; i++) {
                     double angle = -Math.PI / 2 + i * (Math.PI / points);
                     float r = (i % 2 == 0) ? rOuter : rInner;
-                    float x = cx + r * (float) Math.cos(angle), y = cy + r * (float) Math.sin(angle);
-                    if (i == 0) p.moveTo(x, y); else p.lineTo(x, y);
+                    vx[i] = cx + r * (float) Math.cos(angle);
+                    vy[i] = cy + r * (float) Math.sin(angle);
+                }
+                float cornerFrac = 0.16f;
+                for (int i = 0; i < n; i++) {
+                    if (i % 2 == 0) {
+                        int prev = (i - 1 + n) % n, next = (i + 1) % n;
+                        float ax = vx[i] + (vx[prev] - vx[i]) * cornerFrac, ay = vy[i] + (vy[prev] - vy[i]) * cornerFrac;
+                        float bx = vx[i] + (vx[next] - vx[i]) * cornerFrac, by = vy[i] + (vy[next] - vy[i]) * cornerFrac;
+                        if (i == 0) p.moveTo(ax, ay); else p.lineTo(ax, ay);
+                        p.quadTo(vx[i], vy[i], bx, by);
+                    } else {
+                        p.lineTo(vx[i], vy[i]);
+                    }
                 }
                 p.close();
                 break;
