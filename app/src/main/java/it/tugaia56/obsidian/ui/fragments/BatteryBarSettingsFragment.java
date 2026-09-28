@@ -113,8 +113,8 @@ public class BatteryBarSettingsFragment extends Fragment {
         // ── Aspetto ───────────────────────────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.bb_appearance_section))));
         GroupUtils.addGroup(chain, List.of(
-                prefSwitch(getString(R.string.bb_colorful), null, PREF_COLORFUL),
-                prefSwitch(getString(R.string.bb_transit_colors), null, PREF_TRANSIT_COLORS),
+                prefSwitch(getString(R.string.bb_colorful), getString(R.string.bb_colorful_summary), PREF_COLORFUL),
+                prefSwitch(getString(R.string.bb_transit_colors), getString(R.string.bb_transit_colors_summary), PREF_TRANSIT_COLORS),
                 sliderItem(getString(R.string.bb_opacity), PREF_OPACITY, 0, 100, 100, "%"),
                 sliderItem(getString(R.string.bb_height), PREF_HEIGHT, 1, 100, 50, "")
         ));
@@ -122,15 +122,15 @@ public class BatteryBarSettingsFragment extends Fragment {
         // ── Posizione ─────────────────────────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.bb_position_section))));
         GroupUtils.addGroup(chain, List.of(
-                prefSwitch(getString(R.string.bb_on_bottom), null, PREF_ON_BOTTOM),
-                prefSwitch(getString(R.string.bb_centered), null, PREF_CENTERED)
+                prefSwitch(getString(R.string.bb_on_bottom), getString(R.string.bb_on_bottom_summary), PREF_ON_BOTTOM),
+                prefSwitch(getString(R.string.bb_centered), getString(R.string.bb_centered_summary), PREF_CENTERED)
         ));
 
         // ── Comportamento ─────────────────────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.bb_behavior_section))));
         GroupUtils.addGroup(chain, List.of(
-                prefSwitch(getString(R.string.bb_only_charging), null, PREF_ONLY_CHARGING),
-                prefSwitch(getString(R.string.bb_animate_charging), null, PREF_ANIMATE_CHARGING)
+                prefSwitch(getString(R.string.bb_only_charging), getString(R.string.bb_only_charging_summary), PREF_ONLY_CHARGING),
+                prefSwitch(getString(R.string.bb_animate_charging), getString(R.string.bb_animate_charging_summary), PREF_ANIMATE_CHARGING)
         ));
 
         // ── Colori livello ────────────────────────────────────────────────────
@@ -146,7 +146,7 @@ public class BatteryBarSettingsFragment extends Fragment {
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.bb_state_colors_section))));
 
         List<Object> stateRows = new ArrayList<>();
-        SwitchWidgetAdapter.SwitchItem chargingSwitch = gatingSwitch(getString(R.string.bb_indicate_charging), PREF_INDICATE_CHARGING, true);
+        SwitchWidgetAdapter.SwitchItem chargingSwitch = gatingSwitch(getString(R.string.bb_indicate_charging), getString(R.string.bb_indicate_charging_summary), PREF_INDICATE_CHARGING, true);
         chargingSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(PREF_INDICATE_CHARGING, chargingSwitch.checked);
             mChargingExpanded = chargingSwitch.checked;
@@ -158,7 +158,7 @@ public class BatteryBarSettingsFragment extends Fragment {
             stateRows.add(colorItem(getString(R.string.bb_charging_color), PREF_CHARGING_COLOR, DLG_CHARGING, DEF_CHARGING_COLOR));
         }
 
-        SwitchWidgetAdapter.SwitchItem fastChargingSwitch = gatingSwitch(getString(R.string.bb_indicate_fast_charging), PREF_INDICATE_FAST_CHARGING, false);
+        SwitchWidgetAdapter.SwitchItem fastChargingSwitch = gatingSwitch(getString(R.string.bb_indicate_fast_charging), getString(R.string.bb_indicate_fast_charging_summary), PREF_INDICATE_FAST_CHARGING, false);
         fastChargingSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(PREF_INDICATE_FAST_CHARGING, fastChargingSwitch.checked);
             mFastChargingExpanded = fastChargingSwitch.checked;
@@ -170,7 +170,7 @@ public class BatteryBarSettingsFragment extends Fragment {
             stateRows.add(colorItem(getString(R.string.bb_fast_charging_color), PREF_FAST_CHARGING_COLOR, DLG_FAST_CHARGING, DEF_FAST_CHARGING_COLOR));
         }
 
-        SwitchWidgetAdapter.SwitchItem powerSaveSwitch = gatingSwitch(getString(R.string.bb_indicate_power_save), PREF_INDICATE_POWER_SAVE, false);
+        SwitchWidgetAdapter.SwitchItem powerSaveSwitch = gatingSwitch(getString(R.string.bb_indicate_power_save), getString(R.string.bb_indicate_power_save_summary), PREF_INDICATE_POWER_SAVE, false);
         powerSaveSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(PREF_INDICATE_POWER_SAVE, powerSaveSwitch.checked);
             mPowerSaveExpanded = powerSaveSwitch.checked;
@@ -213,9 +213,9 @@ public class BatteryBarSettingsFragment extends Fragment {
         return item;
     }
 
-    private SwitchWidgetAdapter.SwitchItem gatingSwitch(String title, String key, boolean def) {
+    private SwitchWidgetAdapter.SwitchItem gatingSwitch(String title, String summary, String key, boolean def) {
         SwitchWidgetAdapter.SwitchItem item = new SwitchWidgetAdapter.SwitchItem(
-                title, null, ObsidianPrefs.getBoolean(key, def), null);
+                title, summary, ObsidianPrefs.getBoolean(key, def), null);
         item.onChanged = () -> {
             ObsidianPrefs.putBoolean(key, item.checked);
             rebuild();

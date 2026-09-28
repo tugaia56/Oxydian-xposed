@@ -59,13 +59,50 @@ public class SignalStyleFragment extends Fragment {
     private int mPendingIndex    = -1;
     private RecyclerView mRecyclerView;
     // Tap sul TITOLO di "Icone Segnale WI-FI"/"Mobile" espande/comprime la riga Colore
-    // sottostante (switch+expand, come altrove in app) — l'interruttore sulla riga NON
-    // attiva/disattiva niente, apre invece la schermata di scelta stile (WifiIconsFragment/
-    // SignalIconsFragment): l'utente lo ha chiesto esplicitamente perché uno switch "salta
-    // all'occhio" più di una freccia come punto da toccare, anche se qui non rispecchia un
-    // vero stato on/off — resta sempre spento, la richiesta è solo visiva/di scoperta.
+    // sottostante (switch+expand, come altrove in app) — l'interruttore sulla riga apre
+    // invece la schermata di scelta stile (WifiIconsFragment/SignalIconsFragment): l'utente
+    // lo ha chiesto esplicitamente perché uno switch "salta all'occhio" più di una freccia
+    // come punto da toccare. 2026-09-28: ora riflette anche il vero stato (acceso se un
+    // preset personalizzato è scelto, vedi wifiItem/mobileItem sotto — prima restava
+    // sempre spento e sembrava "disattivarsi da solo" tornando indietro).
     private boolean mWifiColorExpanded   = false;
     private boolean mMobileColorExpanded = false;
+
+    // Stesso elenco preset di WifiIconsFragment/SignalIconsFragment (chiave -> nome file
+    // drawable, es. "aurora" per obs_wifi_aurora_signal_4 / obs_signal_aurora_3) — duplicato
+    // qui solo per risolvere l'icona di anteprima della riga switch, mostrando lo stile
+    // davvero scelto invece di uno fisso (Aurora) sempre uguale.
+    private static final String[][] ICON_PRESETS = {
+            // { DST_PRESET_WIFI_ICON key, DST_PRESET_SIGNAL_ICON key, drawable file name }
+            {"DSTWIFI_AURORA",      "DSTSIG_AURORA",      "aurora"},
+            {"DSTWIFI_BARS",        "DSTSIG_BARS",        "bars"},
+            {"DSTWIFI_DORA",        "DSTSIG_DORA",        "dora"},
+            {"DSTWIFI_FAINT_UI",    "DSTSIG_FAINT_UI",    "faint_ui"},
+            {"DSTWIFI_FORLORN",     "DSTSIG_FORLORN",     "forlorn"},
+            {"DSTWIFI_GRADICON",    "DSTSIG_GRADICON",    "gradicon"},
+            {"DSTWIFI_INSIDE",      "DSTSIG_INSIDE",      "inside"},
+            {"DSTWIFI_NOTHING_DOT", "DSTSIG_NOTHING_DOT", "nothing_dot"},
+            {"DSTWIFI_PLUMPY",      "DSTSIG_PLUMPY",      "plumpy"},
+            {"DSTWIFI_PUI",         "DSTSIG_PUI",         "pui"},
+            {"DSTWIFI_ROUND",       "DSTSIG_ROUND",       "round"},
+            {"DSTWIFI_SNEAKY",      "DSTSIG_SNEAKY",      "sneaky"},
+            {"DSTWIFI_STROKE",      "DSTSIG_STROKE",      "stroke"},
+            {"DSTWIFI_WAVY",        "DSTSIG_WAVY",        "wavy"},
+            {"DSTWIFI_WEED",        null,                 "weed"},
+            {"DSTWIFI_XPERIA",      "DSTSIG_XPERIA",      "xperia"},
+            {"DSTWIFI_ZIGZAG",      "DSTSIG_ZIGZAG",      "zigzag"},
+            {"DSTWIFI_HOS",         "DSTSIG_HOS",         "hos"},
+    };
+
+    @SuppressWarnings("DiscouragedApi")
+    private int resolveIconRes(String presetKey, int keyColumn, String fallbackDrawable, String namePrefix, String nameSuffix) {
+        String drawableName = fallbackDrawable;
+        for (String[] row : ICON_PRESETS) {
+            if (presetKey != null && presetKey.equals(row[keyColumn])) { drawableName = row[2]; break; }
+        }
+        int resId = getResources().getIdentifier(namePrefix + drawableName + nameSuffix, "drawable", requireContext().getPackageName());
+        return resId != 0 ? resId : R.drawable.obs_wifi_aurora_signal_4;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,6 +126,16 @@ public class SignalStyleFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mRecyclerView = (RecyclerView) view;
+        rebuild();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // 2026-09-28: mancava — gli switch "Icone Wi-Fi"/"Icone Segnale" navigano via e si
+        // resettano a checked=false solo in memoria (onChanged), ma senza un rebuild() al
+        // ritorno la View restava visivamente sullo stato ON del tap. Stesso pattern già usato
+        // altrove (es. BatteryIconFragment) per le righe che aprono una sotto-pagina.
         rebuild();
     }
 
@@ -117,14 +164,31 @@ public class SignalStyleFragment extends Fragment {
 
         // ── "Icone Segnale WI-FI"/"Mobile" — switch+expand invertito su richiesta utente:
         // tocco sul NOME espande/comprime la riga Colore sotto; l'INTERRUTTORE (non il
-        // nome) apre la schermata di scelta stile. Lo switch non riflette un vero stato
-        // on/off, resta sempre spento — serve solo come punto di tocco ben visibile. ──────
+        // nome) apre la schermata di scelta stile. 2026-09-28: lo switch ORA riflette se
+        // uno stile personalizzato è attivo (DST_PRESET_WIFI_ICON non nullo) — prima si
+        // resettava sempre a spento, sembrava "disattivarsi da solo" tornando indietro. ──
+        String currentWifiPreset = ObsidianPrefs.getString("DST_PRESET_WIFI_ICON", null);
         SwitchWidgetAdapter.SwitchItem wifiItem = new SwitchWidgetAdapter.SwitchItem(
                 getString(R.string.nav_wifi_icons), getString(R.string.nav_wifi_icons_summary),
-                R.drawable.obs_wifi_aurora_signal_4, false, null);
+                resolveIconRes(currentWifiPreset, 0, "aurora", "obs_wifi_", "_signal_4"),
+                currentWifiPreset != null, null);
         wifiItem.onChanged = () -> {
-            wifiItem.checked = false; // momentaneo, non persiste stato
-            navigate(new WifiIconsFragment(), getString(R.string.nav_wifi_icons));
+            if (wifiItem.checked) {
+                // Acceso: apre il picker per scegliere lo stile (comportamento invariato).
+                wifiItem.checked = ObsidianPrefs.getString("DST_PRESET_WIFI_ICON", null) != null; // torna al vero stato
+                navigate(new WifiIconsFragment(), getString(R.string.nav_wifi_icons));
+            } else {
+                // Spento: prima riapriva comunque il picker (nessun modo di disattivare da
+                // qui) — ora pulisce il preset come il pulsante DISABILITA dentro
+                // WifiIconsFragment, stessa chiave pref + boot prop.
+                ObsidianPrefs.remove("DST_PRESET_WIFI_ICON");
+                try {
+                    Runtime.getRuntime().exec(new String[]{"su", "-c",
+                            "resetprop persist.obsidian.dst.wifi_icon_preset \"\""});
+                } catch (Throwable ignored) {}
+                AppUtils.showRestartReminder(requireContext());
+                rebuild();
+            }
         };
         wifiItem.onRowClick = () -> { mWifiColorExpanded = !mWifiColorExpanded; rebuild(); };
         wifiItem.groupPos = mWifiColorExpanded ? ObsidianTheme.GroupPos.TOP : ObsidianTheme.GroupPos.SINGLE;
@@ -136,12 +200,24 @@ public class SignalStyleFragment extends Fragment {
                         true, ObsidianTheme.GroupPos.BOTTOM)
                 : null;
 
+        String currentSignalPreset = ObsidianPrefs.getString("DST_PRESET_SIGNAL_ICON", null);
         SwitchWidgetAdapter.SwitchItem mobileItem = new SwitchWidgetAdapter.SwitchItem(
                 getString(R.string.nav_signal_icons), getString(R.string.nav_signal_icons_summary),
-                R.drawable.obs_signal_bars_3, false, null);
+                resolveIconRes(currentSignalPreset, 1, "bars", "obs_signal_", "_3"),
+                currentSignalPreset != null, null);
         mobileItem.onChanged = () -> {
-            mobileItem.checked = false;
-            navigate(new SignalIconsFragment(), getString(R.string.nav_signal_icons));
+            if (mobileItem.checked) {
+                mobileItem.checked = ObsidianPrefs.getString("DST_PRESET_SIGNAL_ICON", null) != null;
+                navigate(new SignalIconsFragment(), getString(R.string.nav_signal_icons));
+            } else {
+                ObsidianPrefs.remove("DST_PRESET_SIGNAL_ICON");
+                try {
+                    Runtime.getRuntime().exec(new String[]{"su", "-c",
+                            "resetprop persist.obsidian.dst.signal_icon_preset \"\""});
+                } catch (Throwable ignored) {}
+                AppUtils.showRestartReminder(requireContext());
+                rebuild();
+            }
         };
         mobileItem.onRowClick = () -> { mMobileColorExpanded = !mMobileColorExpanded; rebuild(); };
         mobileItem.groupPos = mMobileColorExpanded ? ObsidianTheme.GroupPos.TOP : ObsidianTheme.GroupPos.SINGLE;

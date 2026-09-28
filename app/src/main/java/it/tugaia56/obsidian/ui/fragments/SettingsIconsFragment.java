@@ -422,7 +422,7 @@ public class SettingsIconsFragment extends Fragment {
                 }));
 
         SwitchWidgetAdapter.SwitchItem solidItem = new SwitchWidgetAdapter.SwitchItem(
-                getString(R.string.settings_icons_opt_bg_solid), null, mBgSolid, null);
+                getString(R.string.settings_icons_opt_bg_solid), getString(R.string.settings_icons_opt_bg_solid_summary), mBgSolid, null);
         solidItem.onChanged = () -> {
             mBgSolid = solidItem.checked;
             ObsidianPrefs.putBoolean(KEY_BG_SOLID, mBgSolid);

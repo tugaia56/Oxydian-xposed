@@ -66,7 +66,7 @@ public class QsTilesFragment extends Fragment {
 
         boolean on = ObsidianPrefs.getBoolean(PREF_CUSTOMIZE, false);
         SwitchWidgetAdapter.SwitchItem customizeItem = new SwitchWidgetAdapter.SwitchItem(
-                getString(R.string.qs_tiles_customize), null, on, null);
+                getString(R.string.qs_tiles_customize), getString(R.string.qs_tiles_customize_summary), on, null);
         customizeItem.onChanged = () -> {
             ObsidianPrefs.putBoolean(PREF_CUSTOMIZE, customizeItem.checked);
             mCustomizeExpanded = customizeItem.checked;

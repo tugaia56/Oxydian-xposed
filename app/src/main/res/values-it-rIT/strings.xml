@@ -10,6 +10,7 @@
     <string name="color_mode_transparent">Trasparente</string>
     <string name="color_mode_default">Predefinito</string>
     <string name="aod_clock_switch_title">Orologio Personalizzato</string>
+    <string name="aod_clock_switch_summary">Sostituisce l\'orologio AOD nativo con uno stile personalizzato</string>
 
     <!-- Sfondo con Effetto Profondità (solo anteprima UI, hook non ancora collegato) -->
     <string name="depth_wallpaper_title">Sfondo con Effetto Profondità</string>
@@ -20,7 +21,9 @@
     <string name="enable_title">Abilita</string>
     <string name="pick_image_summary">Scegli la tua immagine personalizzata</string>
     <string name="aod_clock_prefs">Orologio</string>
+    <string name="weather_elements_section">Elementi Meteo</string>
     <string name="aod_clock_custom_color_title">Colore Personalizzato</string>
+    <string name="aod_clock_custom_color_summary">Sceglie un colore diverso da quello nativo per l\'orologio AOD</string>
     <string name="aod_font_line_height_title">Altezza linea</string>
     <string name="aod_clock_text_scaling">Scala testo</string>
     <string name="aod_clock_custom_user_title">Testo Utente personalizzato</string>
@@ -41,6 +44,7 @@
     <string name="edge_light_10_min">10 min</string>
     <string name="edge_light_style_title">Stile</string>
     <string name="edge_light_show_blur">Mostra Sfocatura</string>
+    <string name="edge_light_show_blur_summary">Aggiunge una sfocatura attorno al bordo luminoso</string>
     <string name="edge_light_blur_mode_title">Modalità Sfocatura</string>
     <string name="edge_light_blur_mode_both">Entrambi</string>
     <string name="edge_light_blur_mode_blur_only">Solo Sfocatura</string>
@@ -128,6 +132,7 @@
     <string name="settings_icons_build_ok">Compilato. Riavvia il dispositivo, poi torna qui e tocca di nuovo Applica per attivarlo.</string>
     <string name="settings_icons_opt_bg_color">Colore Sfondo</string>
     <string name="settings_icons_opt_bg_solid">Sfondo Solido</string>
+    <string name="settings_icons_opt_bg_solid_summary">Riempie lo sfondo dell\'icona con un colore solido invece di un gradiente</string>
     <string name="settings_icons_opt_bg_shape">Forma Sfondo</string>
     <string name="settings_icons_opt_icon_color">Colore Icona</string>
     <string name="nav_quick_settings">Intestazione Impostazioni Rapide</string>
@@ -143,8 +148,11 @@
     <string name="nav_fingerprint_icon">Icona Impronta Digitale</string>
     <string name="nav_fingerprint_icon_summary">Stile personalizzato icona impronta</string>
     <string name="lockscreen_fp_remove_icon">Rimuovi Icona Impronta Digitale</string>
+    <string name="lockscreen_fp_remove_icon_summary">Nasconde l\'icona dell\'impronta digitale sulla schermata di blocco</string>
     <string name="lockscreen_fp_custom_icon">Icona Impronta Digitale Personalizzata</string>
+    <string name="lockscreen_fp_custom_icon_summary">Sostituisce l\'icona nativa con una scelta tra i preset disponibili</string>
     <string name="lockscreen_fp_icon_title">Icone Impronta Digitale Predefinite</string>
+    <string name="lockscreen_fp_icon_title_summary">Scegli tra le icone predefinite incluse nell\'app</string>
     <string name="lockscreen_fp_style">Impronta digitale %d</string>
     <string name="lockscreen_fp_icon_picker_title">Scegli Icona personalizzata</string>
     <string name="lockscreen_fp_icon_picker_summary">Scegli la tua icona personalizzata.\nLa risoluzione dell\'immagine consigliata è di circa 216 x 216.</string>
@@ -152,8 +160,11 @@
     <string name="nav_lock_buttons">Lucchetto e Scorciatoie</string>
     <string name="nav_lock_buttons_summary">Nascondi icona lucchetto e pulsanti di scorciatoia in basso</string>
     <string name="lockscreen_hide_lock_icon">Nascondi icona lucchetto</string>
+    <string name="lockscreen_hide_lock_icon_summary">Nasconde l\'icona del lucchetto sulla schermata di blocco</string>
     <string name="lockscreen_affordance_remove_left">Rimuovi Pulsante Sinistro</string>
+    <string name="lockscreen_affordance_remove_left_summary">Rimuove la scorciatoia in basso a sinistra (es. fotocamera/torcia)</string>
     <string name="lockscreen_affordance_remove_right">Rimuovi Pulsante Destro</string>
+    <string name="lockscreen_affordance_remove_right_summary">Rimuove la scorciatoia in basso a destra (es. fotocamera/torcia)</string>
     <string name="lockscreen_hide_sos">Nascondi Pulsante SOS</string>
     <string name="lockscreen_hide_sos_summary">Nasconde il pulsante SOS in basso sulla schermata di blocco</string>
     <string name="lockscreen_hide_carrier">Nascondi Operatore</string>
@@ -165,6 +176,7 @@
     <string name="lockscreen_hide_power_menu">Nascondi Menù Accensione</string>
     <string name="lockscreen_hide_power_menu_summary">Nasconde il menù accensione quando lo schermo è bloccato con sicurezza attiva. Richiede riavvio completo del device (non basta riavviare SystemUI)</string>
     <string name="lockscreen_album_art">Copertina Album</string>
+    <string name="qs_tiles_media_filter_summary">Applica un filtro colore sopra la copertina dell\'album in riproduzione</string>
     <string name="lockscreen_album_art_summary">Mostra copertina album quando disponibile</string>
     <string name="lockscreen_album_art_filter">Filtro Copertina</string>
     <string name="lockscreen_media_blur">Intensità Sfocatura</string>
@@ -177,13 +189,16 @@
     <!-- Orologio SdB (solo anteprima UI, hook non ancora collegato) -->
     <string name="nav_lock_clock_new">Orologio</string>
     <string name="lockscreen_clock_switch">Orologio Personalizzato</string>
+    <string name="lockscreen_clock_switch_summary">Sostituisce l\'orologio della schermata di blocco con uno stile personalizzato</string>
     <string name="lockscreen_clock_style_title">Stile Orologio</string>
     <string name="lockscreen_clock_font_prefs_title">Font</string>
     <string name="lockscreen_clock_font_custom_enabled">Font Personalizzato</string>
     <string name="pick_font_title">Scegli Font</string>
+    <string name="pick_font_switch_summary">Usa un carattere personalizzato invece di quello di sistema</string>
     <string name="pick_font_summary">Scegli un file di font personalizzato</string>
     <string name="lockscreen_clock_prefs">Orologio</string>
     <string name="lockscreen_clock_custom_color_title">Colore Personalizzato</string>
+    <string name="lockscreen_clock_custom_color_summary">Sceglie un colore diverso da quello nativo per l\'orologio</string>
     <string name="general_color_accent1">Colore Accento 1</string>
     <string name="general_color_accent2">Colore Accento 2</string>
     <string name="general_color_accent3">Colore Accento 3</string>
@@ -210,6 +225,7 @@
     <string name="nav_lock_weather">Meteo</string>
     <string name="nav_lock_weather_summary">Mostra il meteo sulla schermata di blocco</string>
     <string name="lockscreen_weather_enabled">Abilita Meteo</string>
+    <string name="lockscreen_weather_enabled_summary">Mostra meteo e temperatura</string>
     <string name="weather_update_interval_title">Intervallo Aggiornamento</string>
     <string name="weather_last_update">Ultimo Aggiornamento</string>
     <string name="weather_provider_title">Provider</string>
@@ -217,14 +233,19 @@
     <string name="weather_yandex_key">Chiave Yandex</string>
     <string name="weather_units_title">Unità</string>
     <string name="weather_show_location">Mostra Posizione</string>
+    <string name="weather_show_location_summary">Mostra il nome della città</string>
     <string name="weather_show_condition">Mostra Condizione</string>
+    <string name="weather_show_condition_summary">Mostra la descrizione delle condizioni (es. nuvoloso)</string>
     <string name="weather_show_humidity">Mostra Umidità</string>
+    <string name="weather_show_humidity_summary">Mostra la percentuale di umidità</string>
     <string name="weather_show_wind">Mostra Vento</string>
+    <string name="weather_show_wind_summary">Mostra la velocità del vento</string>
     <string name="weather_text_size">Dimensione Testo</string>
     <string name="weather_image_size">Dimensione Icona</string>
     <string name="weather_custom_color">Colore Personalizzato</string>
     <string name="weather_custom_location_title">Posizione Personalizzata</string>
     <string name="weather_location_mode_title">Posizione</string>
+    <string name="weather_location_mode_summary">Attivo: posizione automatica via GPS — disattivo: città inserita a mano</string>
     <string name="weather_location_mode_gps">Automatica (GPS)</string>
     <string name="weather_location_mode_manual">Manuale</string>
     <string name="weather_gps_refresh_title">Aggiorna posizione (GPS)</string>
@@ -252,9 +273,10 @@
     <string name="weather_centered">Centrato</string>
     <string name="weather_centered_summary">Centra il widget meteo</string>
     <string name="weather_custom_margins">Margini Personalizzati</string>
+    <string name="weather_custom_margins_summary">Sposta il meteo cambiando i margini</string>
     <string name="weather_margin_top">Margine Superiore</string>
     <string name="weather_margin_left">Margine Sinistro</string>
-    <string name="lockscreen_weather_selection_title">Sfondo</string>
+    <string name="lockscreen_weather_selection_title">Sfondo Widget</string>
 
     <!-- Widget SdB → "Aggiungi Widget" (solo anteprima UI, hook non ancora collegato) -->
     <string name="nav_lock_widgets">Aggiungi Widget</string>
@@ -281,7 +303,9 @@
     <string name="custom_widgets4">Mini Widget 4</string>
     <string name="widgets_custom_color">Impostazioni Widget</string>
     <string name="widgets_custom_color_title">Colori Personalizzati</string>
+    <string name="widgets_custom_color_title_summary">Imposta colori personalizzati per il widget invece di quelli predefiniti</string>
     <string name="widgets_custom_bg_title">Sfondo Personalizzato</string>
+    <string name="widgets_custom_bg_title_summary">Imposta uno sfondo personalizzato dietro il widget</string>
     <string name="widgets_big_color_section">Widget Grande</string>
     <string name="widgets_mini_color_section">Widget Mini</string>
     <string name="big_active">Grande — Attivo</string>
@@ -321,6 +345,7 @@
     <string name="nav_misc_power_menu">Menù Accensione</string>
     <string name="nav_misc_power_menu_summary">Personalizzazione completa menù accensione</string>
     <string name="misc_power_menu_hide_sos">Nascondi SOS nel menù alimentazione</string>
+    <string name="misc_power_menu_hide_sos_summary">Rimuove il pulsante SOS dal menù di alimentazione</string>
     <string name="show_advanced_reboot_title">Riavvio Avanzato</string>
     <string name="show_advanced_reboot_summary">Aggiungi opzioni di riavvio avanzate al menu di accensione</string>
     <string name="use_auth_for_advanced_reboot_title">Usa Autenticazione</string>
@@ -460,7 +485,9 @@
     <string name="qs_tiles_icon_colors_title">Personalizza i colori delle icone</string>
     <string name="qs_tiles_icon_colors_summary">Colore delle icone nei riquadri, per stato attivo/inattivo/disabilitato</string>
     <string name="qs_tiles_icon_active_accent_title">Collega icona all\'Accento</string>
+    <string name="qs_tiles_icon_active_accent_summary">Il colore dell\'icona segue sempre l\'Accento attuale</string>
     <string name="qs_tiles_bg_active_accent_title">Collega all\'Accento</string>
+    <string name="qs_tiles_bg_active_accent_summary">Il colore segue sempre l\'Accento attuale, si aggiorna se lo cambi</string>
     <string name="qs_tiles_border_title">Bordo riquadri</string>
     <string name="qs_tiles_border_summary">Bordo colorato attorno a riquadri grandi, riquadri piccoli, cursori e Media</string>
     <string name="qs_tiles_border_color_title">Colore Bordo</string>
@@ -481,7 +508,9 @@
     <string name="qs_tiles_transitions_style_title">Stile Transizioni</string>
     <string name="qs_tiles_labels_section">Etichette Impostazioni Rapide</string>
     <string name="qs_tiles_hide_labels_title">Nascondi etichette Impostazioni Rapide</string>
+    <string name="qs_tiles_hide_labels_summary">Nasconde il nome sotto ogni riquadro</string>
     <string name="qs_tiles_label_color_title">Personalizza il colore testo di Impostazioni Rapide</string>
+    <string name="qs_tiles_label_color_summary">Sceglie un colore diverso da quello nativo per il testo dei riquadri</string>
     <string name="qs_tiles_brightness_section">Cursori Impostazioni Rapide</string>
     <string name="qs_tiles_brightness_slider_title">Riquadro Luminosità</string>
     <string name="qs_tiles_brightness_slider_summary">Colore, sfondo, raggio e icona del cursore Luminosità</string>
@@ -491,12 +520,15 @@
     <string name="qs_tiles_brightness_icon_color_title">Colore personalizzato</string>
     <string name="qs_tiles_brightness_icon_title_volume">Cambia colore icona Volume</string>
     <string name="qs_tiles_brightness_custom_title">Personalizza colore cursore</string>
+    <string name="qs_tiles_slider_custom_summary">Sceglie colore e stile del cursore invece dell\'aspetto nativo</string>
     <string name="qs_tiles_volume_custom_title">Personalizza colore cursore</string>
     <string name="qs_tiles_brightness_mode_title">Modalità colore cursore</string>
     <string name="qs_tiles_brightness_color_title">Colore personalizzato</string>
     <string name="qs_tiles_brightness_bg_title">Personalizza colore sfondo</string>
+    <string name="qs_tiles_slider_bg_summary">Sceglie un colore di sfondo diverso da quello nativo</string>
     <string name="qs_tiles_brightness_bg_color_title">Colore personalizzato</string>
     <string name="qs_tiles_radius_title">Personalizza raggio dei cursori</string>
+    <string name="qs_tiles_slider_radius_summary">Imposta un raggio angoli diverso da quello nativo</string>
     <string name="qs_tiles_radius_value_title">Raggio</string>
     <string name="qs_tiles_bg_section">Sfondo Riquadri</string>
     <string name="qs_tiles_radius_section">Raggio Angoli Riquadri</string>
@@ -510,6 +542,7 @@
     <string name="qs_widgets_nav_summary">Foto, meteo, app rapide nel pannello Impostazioni Rapide</string>
     <string name="qs_widgets_section">Widget Impostazioni Rapide</string>
     <string name="qs_widgets_switch_title">Attiva Widget Impostazioni Rapide</string>
+    <string name="qs_widgets_switch_title_summary">Mostra widget aggiuntivi sotto i riquadri Impostazioni Rapide</string>
     <string name="qs_widgets_types_section">Tipi di widget previsti</string>
     <string name="qs_widgets_type_photo">Foto personalizzata</string>
     <string name="widget_wip_suffix"> (in costruzione)</string>
@@ -543,8 +576,11 @@
     <string name="qs_separate_mods_summary">Nascondi pulsanti modifica/menù, larghezza tendina personalizzata</string>
     <string name="qs_separate_buttons_section">Pulsanti</string>
     <string name="qs_separate_hide_edit">Nascondi pulsante modifica</string>
+    <string name="qs_separate_hide_edit_summary">Nasconde il pulsante di modifica nel pannello Separati</string>
     <string name="qs_separate_hide_menu">Nascondi pulsante menù</string>
+    <string name="qs_separate_hide_menu_summary">Nasconde il pulsante menù nel pannello Separati</string>
     <string name="qs_separate_bg_section">Colore sfondo pulsanti</string>
+    <string name="qs_separate_bg_section_summary">Sceglie il colore di sfondo dei pulsanti modifica/menù/impostazioni</string>
     <string name="qs_separate_bg_edit">Sfondo Modifica</string>
     <string name="qs_separate_bg_menu">Sfondo Menù</string>
     <string name="qs_separate_bg_settings">Sfondo Impostazioni</string>
@@ -554,15 +590,19 @@
     <string name="qs_separate_width_value">Larghezza zona tendina</string>
     <string name="qs_transparency">Trasparenza e Sfocatura</string>
     <string name="qs_transparency_title">Personalizza Trasparenza</string>
+    <string name="qs_transparency_title_summary">Regola la trasparenza del pannello Impostazioni Rapide</string>
     <string name="qs_transparency_value">Trasparenza</string>
     <string name="qs_blur_lockscreen_section">Sfocatura Schermata di Blocco</string>
     <string name="qs_blur_enable_switch">Attiva Sfocatura</string>
+    <string name="qs_blur_enable_switch_summary">Sfoca lo sfondo dietro la schermata di blocco</string>
     <string name="qs_blur_intentisy">Intensità Sfocatura</string>
     <string name="qs_blur_max_amount">Sfocatura Massima</string>
     <string name="quick_pulldown">Apertura Rapida</string>
+    <string name="quick_pulldown_summary">Apre subito il pannello Impostazioni Rapide con una sola tirata</string>
     <string name="quick_pulldown_length">Lunghezza Apertura Rapida</string>
     <string name="quick_settings_side">Lato Apertura Rapida</string>
     <string name="quick_collapse">Chiusura Rapida</string>
+    <string name="quick_collapse_summary">Chiude subito il pannello con una sola tirata verso l\'alto</string>
     <string name="my_device">Il Mio Dispositivo</string>
     <string name="my_device_title">Forza Il Mio Dispositivo</string>
     <string name="my_device_summary">Forza la visualizzazione del riquadro "Il Mio Dispositivo" nel Centro di Controllo (richiede l\'app My Device installata)</string>
@@ -651,6 +691,7 @@
     <string name="clock_section_advanced">Avanzate (sovrascrive le impostazioni precedenti)</string>
     <string name="status_bar_clock_chip_category">Chip Orologio</string>
     <string name="status_bar_clock_background_chip_title">Chip di sfondo</string>
+    <string name="status_bar_clock_background_chip_title_summary">Aggiunge uno sfondo colorato dietro l\'orologio nella barra di stato</string>
     <string name="status_bar_clock_background_chip_style_title">Stile Chip di Sfondo</string>
     <string name="clock_chip_style_solid">Pieno</string>
     <string name="clock_chip_style_outline">Contorno</string>
@@ -664,6 +705,7 @@
     <string name="clock_chip_use_accent_color">Usa Colore Accento</string>
     <string name="clock_chip_stroke_width_title">Spessore Bordo</string>
     <string name="clock_chip_round_corners_title">Angoli Arrotondati</string>
+    <string name="clock_chip_round_corners_title_summary">Arrotonda gli angoli dello sfondo dell\'orologio</string>
     <string name="clock_chip_margin_section">Margine Personalizzato</string>
     <string name="clock_chip_padding_section">Spazio Personalizzato</string>
     <string name="direction_top">In alto</string>
@@ -693,6 +735,7 @@
     <!-- Notifiche Barra di Stato — aggiunte reali OC statusbar_notifications.xml -->
     <string name="notif_expansion_section">Espansione Notifiche</string>
     <string name="statusbar_use_app_icon">Usa icone app per notifiche</string>
+    <string name="statusbar_use_app_icon_summary">Mostra l\'icona dell\'app invece dell\'icona notifica predefinita</string>
     <string name="statusbar_app_icon_scale">Scala Icona</string>
     <string name="notif_default_expansion_title">Espansione predefinita notifiche</string>
     <string name="default_value">Predefinito</string>
@@ -702,6 +745,7 @@
     <string name="notif_show_buttons">Mostra il pulsante espandi e comprimi</string>
     <string name="notif_show_buttons_summary">Mostra il pulsante di espandi/comprimi nel pannello notifiche</string>
     <string name="customize_clear_all_button">Personalizza Pulsante Notifiche</string>
+    <string name="customize_clear_all_button_summary">Cambia l\'aspetto del pulsante "Cancella tutto"</string>
     <string name="clear_all_link_bg_accent">Collega sfondo all\'accento</string>
     <string name="clear_all_bg_color">Colore sfondo personalizzato</string>
     <string name="clear_all_link_bg_icon_accent">Collega icona all\'accento</string>
@@ -732,7 +776,9 @@
     <!-- Orologio stock QS -->
     <string name="qs_header_stock_section">Preferenze Orologio Stock</string>
     <string name="qs_header_stock_time_color_title">Colore orario personalizzato</string>
+    <string name="qs_header_stock_time_color_summary">Sceglie un colore diverso da quello nativo per l\'ora</string>
     <string name="qs_header_clock_colors_title">Colori orologio personalizzato</string>
+    <string name="qs_header_clock_colors_summary">Personalizza i colori dell\'orologio scelto sopra</string>
     <string name="qs_header_clock_font_title">Font orologio personalizzato</string>
     <string name="qs_header_stock_color">Colore orologio stock</string>
     <string name="qs_header_stock_hide_date">Nascondi data</string>
@@ -740,12 +786,16 @@
     <string name="qs_header_stock_uno_rosso">Comportamento Uno rosso</string>
     <string name="qs_header_stock_clock_red_one_color">Colore per l\'1 nell\'orologio</string>
     <string name="qs_header_stock_clock_date_custom_color_title">Colore data personalizzato</string>
+    <string name="qs_header_stock_clock_date_custom_color_summary">Sceglie un colore diverso da quello nativo per la data</string>
     <string name="qs_header_stock_clock_date_custom_color">Colore data stock</string>
     <string name="qs_header_stock_clock_background_chip">Chip sfondo orologio</string>
+    <string name="qs_header_stock_clock_background_chip_summary">Aggiunge uno sfondo colorato dietro l\'orologio</string>
     <string name="qs_header_stock_clock_background_chip_style">Stile chip sfondo</string>
     <string name="qs_header_stock_date_background_chip">Chip sfondo data</string>
+    <string name="qs_header_stock_date_background_chip_summary">Aggiunge uno sfondo colorato dietro la data</string>
     <string name="qs_header_stock_date_background_chip_style">Stile chip sfondo</string>
     <string name="qs_header_stock_clock_hide_carrier_label">Nascondi operatore</string>
+    <string name="qs_header_stock_clock_hide_carrier_label_summary">Nasconde il nome dell\'operatore telefonico</string>
 
     <!-- Impostazioni app -->
     <string name="nav_settings">Impostazioni</string>
@@ -948,15 +998,20 @@
     <string name="navcolor_title">Colore Icone Barra di Navigazione</string>
     <string name="gesture_back_title">Configura Gesture Indietro</string>
     <string name="gesture_left_title">Lato Sinistro dello Schermo</string>
+    <string name="gesture_left_summary">Attiva il gesto indietro trascinando dal bordo sinistro</string>
     <string name="gesture_right_title">Lato Destro dello Schermo</string>
+    <string name="gesture_right_summary">Attiva il gesto indietro trascinando dal bordo destro</string>
     <string name="gesture_height_title">Altezza Gesture</string>
     <string name="gesture_back_on_rotate">Attiva Anche in Orizzontale</string>
+    <string name="gesture_back_on_rotate_summary">Mantiene il gesto indietro attivo anche con lo schermo ruotato</string>
     <string name="gesture_override_back_hold">Sostituisci gesto indietro</string>
+    <string name="gesture_override_back_hold_summary">Esegue un\'azione diversa tenendo premuto durante il gesto indietro</string>
     <string name="gesture_override_back_hold_mode">Metodo di sostituzione</string>
     <string name="gesture_override_back_hold_common">Tieni premuto indietro</string>
     <string name="gesture_override_back_hold_right">Comando lato destro</string>
     <string name="gesture_nav_pill_cat">Pillola Barra di Navigazione</string>
     <string name="colorpill">Pillola Colore Accento</string>
+    <string name="colorpill_summary">Colora la pillola di navigazione con l\'Accento invece del colore nativo</string>
     <string name="gesture_nav_pill_width_title">Larghezza Rispetto alla Dimensione Standard</string>
     <string name="qs_widget_custom_app">App Personalizzata</string>
     <string name="gesture_override_back_hold_mode_default">Entrambi i comandi per i lati sinistro e destro</string>
@@ -1015,6 +1070,7 @@
     <string name="battery_icon_enabled">Abilita Icona Batteria</string>
     <string name="battery_icon_enabled_summary">Sostituisce l\'icona batteria predefinita con uno stile personalizzato</string>
     <string name="battery_bar_enabled">Abilita Barra Batteria</string>
+    <string name="battery_bar_enabled_summary">Mostra una barra colorata sotto la barra di stato per il livello di carica</string>
     <string name="battery_reverse_layout">Inverti disposizione</string>
     <string name="battery_rotate_layout">Ruota disposizione</string>
     <string name="battery_animate_charging">Anima la carica</string>
@@ -1033,8 +1089,10 @@
     <string name="battery_powersave_icon_color">Colore indicatore risparmio</string>
     <string name="battery_style_prefs_page">Preferenze icona batteria</string>
     <string name="battery_percent_size_enable">Personalizza dimensione percentuale</string>
+    <string name="battery_percent_size_enable_summary">Sceglie una dimensione diversa per la percentuale accanto all\'icona</string>
     <string name="battery_percent_size_page">Dimensione percentuale</string>
     <string name="battery_charging_icon_enable">Icona di ricarica personalizzata</string>
+    <string name="battery_charging_icon_enable_summary">Mostra un\'icona diversa mentre il telefono è in carica</string>
     <string name="battery_charging_icon_page">Preferenza Icona Ricarica Batteria</string>
     <string name="battery_charging_icon_style_title">Stile icona ricarica</string>
     <string name="battery_charging_icon_color_title">Colore icona</string>
@@ -1055,15 +1113,21 @@
     <string name="battery_bar_settings">Impostazioni Barra Batteria</string>
     <string name="bb_appearance_section">Aspetto</string>
     <string name="bb_colorful">Modalità colorata</string>
+    <string name="bb_colorful_summary">Usa colori diversi invece di un colore unico</string>
     <string name="bb_transit_colors">Sfuma i colori per livello</string>
+    <string name="bb_transit_colors_summary">Sfuma il colore gradualmente in base al livello di carica</string>
     <string name="bb_opacity">Opacità</string>
     <string name="bb_height">Altezza</string>
     <string name="bb_position_section">Posizione</string>
     <string name="bb_on_bottom">In basso nella barra di stato</string>
+    <string name="bb_on_bottom_summary">Posiziona la barra in basso invece che in alto</string>
     <string name="bb_centered">Centrata</string>
+    <string name="bb_centered_summary">Centra la barra invece di allinearla a un lato</string>
     <string name="bb_behavior_section">Comportamento</string>
     <string name="bb_only_charging">Solo durante la carica</string>
+    <string name="bb_only_charging_summary">Mostra la barra solo quando il telefono è in carica</string>
     <string name="bb_animate_charging">Animazione carica</string>
+    <string name="bb_animate_charging_summary">Anima la barra mentre il telefono è in carica</string>
     <string name="bb_level_colors_section">Colori per livello</string>
     <string name="bb_critical_level">Soglia critica</string>
     <string name="bb_critical_color">Colore critico</string>
@@ -1071,10 +1135,13 @@
     <string name="bb_warning_color">Colore avviso</string>
     <string name="bb_state_colors_section">Colori per stato</string>
     <string name="bb_indicate_charging">Indica la carica</string>
+    <string name="bb_indicate_charging_summary">Colora la barra in modo diverso mentre è in carica</string>
     <string name="bb_charging_color">Colore carica</string>
     <string name="bb_indicate_fast_charging">Indica la carica rapida</string>
+    <string name="bb_indicate_fast_charging_summary">Colora la barra in modo diverso durante la ricarica rapida</string>
     <string name="bb_fast_charging_color">Colore carica rapida</string>
     <string name="bb_indicate_power_save">Indica risparmio energetico</string>
+    <string name="bb_indicate_power_save_summary">Colora la barra in modo diverso quando il risparmio energetico è attivo</string>
     <string name="bb_power_save_color">Colore risparmio energetico</string>
     <string name="statusbar_padding">Padding Barra di Stato</string>
     <string name="statusbar_top_padding">Padding Superiore</string>
@@ -1095,4 +1162,5 @@
     <string name="launcher_page_indicator_tap_title">Azione al tocco sull\u2019indicatore di pagina</string>
     <string name="launcher_page_indicator_tap_summary">Apre un\u2019app a tua scelta quando tocchi la voce di ricerca sotto l\u2019indicatore di pagina della home (serve \u00abMostra Cerca sul fondo\u00bb attivo). Tocca per scegliere l\u2019app.</string>
     <string name="qs_big_icon_border_title">Bordo icone</string>
+    <string name="qs_tiles_icon_border_summary">Aggiunge un bordo colorato attorno alle icone</string>
 </resources>

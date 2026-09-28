@@ -111,7 +111,7 @@ public class DeviceWidgetSettingsFragment extends Fragment {
         chain.add(styleRow());
 
         SwitchWidgetAdapter.SwitchItem colorSwitch = gatingSwitch(
-                getString(R.string.widgets_custom_color_title), null, KEY_COLOR_SWITCH);
+                getString(R.string.widgets_custom_color_title), getString(R.string.widgets_custom_color_title_summary), KEY_COLOR_SWITCH);
         colorSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_COLOR_SWITCH, colorSwitch.checked);
             mColorExpanded = colorSwitch.checked;

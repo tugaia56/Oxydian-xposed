@@ -95,7 +95,7 @@ public class QsWidgetsFragment extends Fragment {
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_widgets_section))));
         GroupUtils.addGroup(chain, List.of(gatingSwitch(
-                getString(R.string.qs_widgets_switch_title), null, KEY_WIDGETS_ON)));
+                getString(R.string.qs_widgets_switch_title), getString(R.string.qs_widgets_switch_title_summary), KEY_WIDGETS_ON)));
 
         List<String> widgets = currentList();
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_widgets_list_section))));

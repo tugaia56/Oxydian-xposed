@@ -69,7 +69,7 @@ public class FingerprintIconFragment extends Fragment {
         RecyclerView rv = (RecyclerView) view;
 
         SwitchWidgetAdapter.SwitchItem removeItem = new SwitchWidgetAdapter.SwitchItem(
-                getString(R.string.lockscreen_fp_remove_icon), null,
+                getString(R.string.lockscreen_fp_remove_icon), getString(R.string.lockscreen_fp_remove_icon_summary),
                 ObsidianPrefs.getBoolean("lockscreen_fp_remove_icon", false),
                 null);
         removeItem.onChanged = () -> {
@@ -78,7 +78,7 @@ public class FingerprintIconFragment extends Fragment {
         };
 
         SwitchWidgetAdapter.SwitchItem customItem = new SwitchWidgetAdapter.SwitchItem(
-                getString(R.string.lockscreen_fp_custom_icon), null,
+                getString(R.string.lockscreen_fp_custom_icon), getString(R.string.lockscreen_fp_custom_icon_summary),
                 ObsidianPrefs.getBoolean("lockscreen_fp_custom_icon", false),
                 null);
         customItem.onChanged = () -> {
@@ -91,7 +91,7 @@ public class FingerprintIconFragment extends Fragment {
         List<NavAdapter.NavItem> navItems = List.of(
                 new NavAdapter.NavItem(
                         R.drawable.ic_lock,
-                        getString(R.string.lockscreen_fp_icon_title), null,
+                        getString(R.string.lockscreen_fp_icon_title), getString(R.string.lockscreen_fp_icon_title_summary),
                         () -> navigate(new FingerprintPresetFragment(), getString(R.string.lockscreen_fp_icon_title))),
                 new NavAdapter.NavItem(
                         R.drawable.ic_lock,

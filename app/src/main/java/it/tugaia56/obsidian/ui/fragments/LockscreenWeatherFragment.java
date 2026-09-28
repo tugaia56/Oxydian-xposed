@@ -145,7 +145,7 @@ public class LockscreenWeatherFragment extends Fragment {
         List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
 
         List<Object> topRows = new ArrayList<>();
-        SwitchWidgetAdapter.SwitchItem weatherSwitch = gatingSwitch(getString(R.string.lockscreen_weather_enabled), null, KEY_ENABLED);
+        SwitchWidgetAdapter.SwitchItem weatherSwitch = gatingSwitch(getString(R.string.lockscreen_weather_enabled), getString(R.string.lockscreen_weather_enabled_summary), KEY_ENABLED);
         weatherSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_ENABLED, weatherSwitch.checked);
             mWeatherExpanded = weatherSwitch.checked;
@@ -173,10 +173,10 @@ public class LockscreenWeatherFragment extends Fragment {
         if (mWeatherExpanded) {
             chain.add(new SectionTitleAdapter(List.of(getString(R.string.lockscreen_weather_selection_title))));
             List<Object> displayRows = new ArrayList<>(List.of(
-                    prefSwitch(getString(R.string.weather_show_location), null, KEY_SHOW_LOCATION),
-                    prefSwitch(getString(R.string.weather_show_condition), null, KEY_SHOW_CONDITION),
-                    prefSwitch(getString(R.string.weather_show_humidity), null, KEY_SHOW_HUMIDITY),
-                    prefSwitch(getString(R.string.weather_show_wind), null, KEY_SHOW_WIND)));
+                    prefSwitch(getString(R.string.weather_show_location), getString(R.string.weather_show_location_summary), KEY_SHOW_LOCATION),
+                    prefSwitch(getString(R.string.weather_show_condition), getString(R.string.weather_show_condition_summary), KEY_SHOW_CONDITION),
+                    prefSwitch(getString(R.string.weather_show_humidity), getString(R.string.weather_show_humidity_summary), KEY_SHOW_HUMIDITY),
+                    prefSwitch(getString(R.string.weather_show_wind), getString(R.string.weather_show_wind_summary), KEY_SHOW_WIND)));
             displayRows.add(sliderItem(getString(R.string.weather_text_size), KEY_TEXT_SIZE, 13, 24, 16, "sp"));
             displayRows.add(sliderItem(getString(R.string.weather_image_size), KEY_IMAGE_SIZE, 13, 24, 18, "dp"));
             it.tugaia56.obsidian.ui.adapters.GroupUtils.addGroup(chain, displayRows);
@@ -188,7 +188,7 @@ public class LockscreenWeatherFragment extends Fragment {
             List<Object> locRows = new ArrayList<>();
             boolean manual = ObsidianPrefs.getBoolean(KEY_LOC_SWITCH, false);
             SwitchWidgetAdapter.SwitchItem locSwitch = new SwitchWidgetAdapter.SwitchItem(
-                    getString(R.string.weather_location_mode_title), null, !manual, null);
+                    getString(R.string.weather_location_mode_title), getString(R.string.weather_location_mode_summary), !manual, null);
             locSwitch.onChanged = () -> {
                 ObsidianPrefs.putBoolean(KEY_LOC_SWITCH, !locSwitch.checked);
                 mLocExpanded = true;
@@ -210,7 +210,7 @@ public class LockscreenWeatherFragment extends Fragment {
 
         List<Object> bottomRows = new ArrayList<>();
         bottomRows.add(prefSwitch(getString(R.string.weather_centered), getString(R.string.weather_centered_summary), KEY_CENTERED));
-        SwitchWidgetAdapter.SwitchItem marginsSwitch = gatingSwitch(getString(R.string.weather_custom_margins), null, KEY_MARGINS_SWITCH);
+        SwitchWidgetAdapter.SwitchItem marginsSwitch = gatingSwitch(getString(R.string.weather_custom_margins), getString(R.string.weather_custom_margins_summary), KEY_MARGINS_SWITCH);
         marginsSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_MARGINS_SWITCH, marginsSwitch.checked);
             mMarginsExpanded = marginsSwitch.checked;
@@ -228,7 +228,7 @@ public class LockscreenWeatherFragment extends Fragment {
         it.tugaia56.obsidian.ui.adapters.GroupUtils.addGroup(chain, bottomRows);
 
         List<Object> fontRows = new ArrayList<>();
-        SwitchWidgetAdapter.SwitchItem fontSwitch = gatingSwitch(getString(R.string.pick_font_title), null, KEY_FONT_SWITCH);
+        SwitchWidgetAdapter.SwitchItem fontSwitch = gatingSwitch(getString(R.string.pick_font_title), getString(R.string.pick_font_switch_summary), KEY_FONT_SWITCH);
         fontSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_FONT_SWITCH, fontSwitch.checked);
             mFontExpanded = fontSwitch.checked;

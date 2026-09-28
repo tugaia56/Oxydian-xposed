@@ -133,12 +133,12 @@ public class QsTilesMiscFragment extends Fragment {
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_tiles_labels_section))));
         mSingleColorKeys.put(205, KEY_LABEL_COLOR);
         SwitchWidgetAdapter.SwitchItem labelColorSwitch = new SwitchWidgetAdapter.SwitchItem(
-                getString(R.string.qs_tiles_label_color_title), null,
+                getString(R.string.qs_tiles_label_color_title), getString(R.string.qs_tiles_label_color_summary),
                 ObsidianPrefs.getBoolean(KEY_LABEL_COLOR_ON, false), null);
         labelColorSwitch.onChanged = () -> ObsidianPrefs.putBoolean(KEY_LABEL_COLOR_ON, labelColorSwitch.checked);
         labelColorSwitch.onRowClick = () -> showLabelColorAccentChoice();
         GroupUtils.addGroup(chain, List.of(
-                prefSwitch(getString(R.string.qs_tiles_hide_labels_title), null, KEY_HIDE_LABELS),
+                prefSwitch(getString(R.string.qs_tiles_hide_labels_title), getString(R.string.qs_tiles_hide_labels_summary), KEY_HIDE_LABELS),
                 labelColorSwitch));
 
         // ── Impostazioni Rapide Separati (pulsanti/larghezza tendina) — uniche opzioni
@@ -158,7 +158,7 @@ public class QsTilesMiscFragment extends Fragment {
         GroupUtils.addGroup(chain, List.of(sepSwitch));
         if (mSepExpanded) {
             SwitchWidgetAdapter.SwitchItem btnBgSwitch = gatingSwitch(
-                    getString(R.string.qs_separate_bg_section), null, QsSeparateMod.PREF_BTN_BG_ON);
+                    getString(R.string.qs_separate_bg_section), getString(R.string.qs_separate_bg_section_summary), QsSeparateMod.PREF_BTN_BG_ON);
             btnBgSwitch.onChanged = () -> {
                 ObsidianPrefs.putBoolean(QsSeparateMod.PREF_BTN_BG_ON, btnBgSwitch.checked);
                 mSepBtnBgExpanded = btnBgSwitch.checked;
@@ -177,8 +177,8 @@ public class QsTilesMiscFragment extends Fragment {
             }
 
             GroupUtils.addGroup(chain, List.of(
-                    prefSwitch(getString(R.string.qs_separate_hide_edit), null, KEY_SEP_HIDE_EDIT),
-                    prefSwitch(getString(R.string.qs_separate_hide_menu), null, KEY_SEP_HIDE_MENU)));
+                    prefSwitch(getString(R.string.qs_separate_hide_edit), getString(R.string.qs_separate_hide_edit_summary), KEY_SEP_HIDE_EDIT),
+                    prefSwitch(getString(R.string.qs_separate_hide_menu), getString(R.string.qs_separate_hide_menu_summary), KEY_SEP_HIDE_MENU)));
             boolean sepWidthOn = ObsidianPrefs.getBoolean(KEY_SEP_WIDTH_ON, false);
             List<Object> sepWidthRows = new ArrayList<>();
             sepWidthRows.add(gatingSwitch(getString(R.string.qs_separate_width_switch),

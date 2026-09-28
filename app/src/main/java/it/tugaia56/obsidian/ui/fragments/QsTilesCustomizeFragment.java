@@ -255,11 +255,11 @@ public class QsTilesCustomizeFragment extends Fragment {
         if (mBgBaseExpanded) {
             GroupUtils.addGroup(chain, pending);
             pending = new ArrayList<>();
-            addNestedEdge(chain, gatingSwitch(getString(R.string.qs_tiles_bg_active_accent_title), null, KEY_TILE_BG_BASE_ACCENT), GroupPos.TOP);
+            addNestedEdge(chain, gatingSwitch(getString(R.string.qs_tiles_bg_active_accent_title), getString(R.string.qs_tiles_bg_active_accent_summary), KEY_TILE_BG_BASE_ACCENT), GroupPos.TOP);
             chain.add(tileBgBaseColorsRow());
             addNestedEdge(chain, sliderRow(getString(R.string.qs_tiles_radius_value_title), KEY_TILE_RADIUS_BASE, 0, 40, 20, "dp"), GroupPos.BOTTOM);
             List<Object> iconBorderRows = new ArrayList<>();
-            iconBorderRows.add(gatingSwitch(getString(R.string.qs_big_icon_border_title), null, KEY_ICON_BORDER_ON));
+            iconBorderRows.add(gatingSwitch(getString(R.string.qs_big_icon_border_title), getString(R.string.qs_tiles_icon_border_summary), KEY_ICON_BORDER_ON));
             if (ObsidianPrefs.getBoolean(KEY_ICON_BORDER_ON, false)) {
                 iconBorderRows.add(singleColorRow(getString(R.string.qs_tiles_border_color_title), KEY_ICON_BORDER_COLOR, 213));
             }
@@ -269,7 +269,7 @@ public class QsTilesCustomizeFragment extends Fragment {
         if (mBgHlExpanded) {
             GroupUtils.addGroup(chain, pending);
             pending = new ArrayList<>();
-            addNestedEdge(chain, gatingSwitch(getString(R.string.qs_tiles_bg_active_accent_title), null, KEY_TILE_BG_HL_ACCENT), GroupPos.TOP);
+            addNestedEdge(chain, gatingSwitch(getString(R.string.qs_tiles_bg_active_accent_title), getString(R.string.qs_tiles_bg_active_accent_summary), KEY_TILE_BG_HL_ACCENT), GroupPos.TOP);
             chain.add(tileBgHlColorsRow());
             addNestedEdge(chain, sliderRow(getString(R.string.qs_tiles_radius_value_title), KEY_TILE_RADIUS_HL, 0, 40, 20, "dp"), GroupPos.BOTTOM);
         }
@@ -281,7 +281,7 @@ public class QsTilesCustomizeFragment extends Fragment {
             pending.add(sliderRow(getString(R.string.qs_tiles_radius_value_title), KEY_TILE_RADIUS_MEDIA, 0, 40, 20, "dp"));
 
             boolean coverFilterOn = ObsidianPrefs.getBoolean(KEY_MEDIA_COVER_FILTER_ON, false);
-            pending.add(gatingSwitch(getString(R.string.lockscreen_album_art), null, KEY_MEDIA_COVER_FILTER_ON));
+            pending.add(gatingSwitch(getString(R.string.lockscreen_album_art), getString(R.string.qs_tiles_media_filter_summary), KEY_MEDIA_COVER_FILTER_ON));
             if (coverFilterOn) {
                 int coverFilter = 0;
                 try { coverFilter = Integer.parseInt(ObsidianPrefs.getString(KEY_MEDIA_COVER_FILTER, "0")); } catch (NumberFormatException ignored) {}
@@ -320,14 +320,14 @@ public class QsTilesCustomizeFragment extends Fragment {
             rows.add(singleChoiceRow(getString(R.string.qs_tiles_brightness_icon_title), KEY_BRIGHTNESS_ICON_MODE,
                     R.array.qs_brightness_icon_entries,
                     idx -> { if (idx == 4) openColorPicker(203, KEY_BRIGHTNESS_ICON_COLOR); }));
-            rows.add(gatingSwitch(getString(R.string.qs_tiles_brightness_custom_title), null, KEY_BRIGHTNESS_CUSTOM_ON));
+            rows.add(gatingSwitch(getString(R.string.qs_tiles_brightness_custom_title), getString(R.string.qs_tiles_slider_custom_summary), KEY_BRIGHTNESS_CUSTOM_ON));
             if (brightnessOn) {
                 mSingleColorKeys.put(201, KEY_BRIGHTNESS_COLOR);
                 rows.add(singleChoiceRow(getString(R.string.qs_tiles_brightness_mode_title), KEY_BRIGHTNESS_MODE,
                         R.array.brightness_slider_style_entries,
                         idx -> { if (idx == 2) openColorPicker(201, KEY_BRIGHTNESS_COLOR); }));
                 mSingleColorKeys.put(202, KEY_BRIGHTNESS_BG_COLOR);
-                SwitchWidgetAdapter.SwitchItem bgColorSwitch = gatingSwitch(getString(R.string.qs_tiles_brightness_bg_title), null, KEY_BRIGHTNESS_BG_ON);
+                SwitchWidgetAdapter.SwitchItem bgColorSwitch = gatingSwitch(getString(R.string.qs_tiles_brightness_bg_title), getString(R.string.qs_tiles_slider_bg_summary), KEY_BRIGHTNESS_BG_ON);
                 bgColorSwitch.onRowClick = () -> {
                     if (getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).showColorPickerDialog(
@@ -337,7 +337,7 @@ public class QsTilesCustomizeFragment extends Fragment {
                 };
                 rows.add(bgColorSwitch);
             }
-            rows.add(gatingSwitch(getString(R.string.qs_tiles_radius_title), null, KEY_RADIUS_ON));
+            rows.add(gatingSwitch(getString(R.string.qs_tiles_radius_title), getString(R.string.qs_tiles_slider_radius_summary), KEY_RADIUS_ON));
             if (radiusOn) {
                 rows.add(sliderRow(getString(R.string.qs_tiles_radius_value_title), KEY_RADIUS, 0, 40, 20, "dp"));
             }
@@ -365,14 +365,14 @@ public class QsTilesCustomizeFragment extends Fragment {
             rows.add(singleChoiceRow(getString(R.string.qs_tiles_brightness_icon_title_volume), KEY_VOLUME_ICON_MODE,
                     R.array.qs_brightness_icon_entries,
                     idx -> { if (idx == 4) openColorPicker(204, KEY_VOLUME_ICON_COLOR); }));
-            rows.add(gatingSwitch(getString(R.string.qs_tiles_volume_custom_title), null, KEY_VOLUME_SLIDER_CUSTOM_ON));
+            rows.add(gatingSwitch(getString(R.string.qs_tiles_volume_custom_title), getString(R.string.qs_tiles_slider_custom_summary), KEY_VOLUME_SLIDER_CUSTOM_ON));
             if (volumeOn) {
                 mSingleColorKeys.put(214, KEY_VOLUME_SLIDER_COLOR);
                 rows.add(singleChoiceRow(getString(R.string.qs_tiles_brightness_mode_title), KEY_VOLUME_SLIDER_MODE,
                         R.array.brightness_slider_style_entries,
                         idx -> { if (idx == 2) openColorPicker(214, KEY_VOLUME_SLIDER_COLOR); }));
                 mSingleColorKeys.put(215, KEY_VOLUME_SLIDER_BG_COLOR);
-                SwitchWidgetAdapter.SwitchItem volBgColorSwitch = gatingSwitch(getString(R.string.qs_tiles_brightness_bg_title), null, KEY_VOLUME_SLIDER_BG_ON);
+                SwitchWidgetAdapter.SwitchItem volBgColorSwitch = gatingSwitch(getString(R.string.qs_tiles_brightness_bg_title), getString(R.string.qs_tiles_slider_bg_summary), KEY_VOLUME_SLIDER_BG_ON);
                 volBgColorSwitch.onRowClick = () -> {
                     if (getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).showColorPickerDialog(
@@ -382,7 +382,7 @@ public class QsTilesCustomizeFragment extends Fragment {
                 };
                 rows.add(volBgColorSwitch);
             }
-            rows.add(gatingSwitch(getString(R.string.qs_tiles_radius_title), null, KEY_VOLUME_RADIUS_ON));
+            rows.add(gatingSwitch(getString(R.string.qs_tiles_radius_title), getString(R.string.qs_tiles_slider_radius_summary), KEY_VOLUME_RADIUS_ON));
             if (volumeRadiusOn) {
                 rows.add(sliderRow(getString(R.string.qs_tiles_radius_value_title), KEY_VOLUME_RADIUS, 0, 40, 20, "dp"));
             }
@@ -426,7 +426,7 @@ public class QsTilesCustomizeFragment extends Fragment {
         GroupUtils.addGroup(chain, List.of(iconSwitch));
         if (mIconExpanded) {
             GroupUtils.addGroup(chain, List.of(
-                    gatingSwitch(getString(R.string.qs_tiles_icon_active_accent_title), null, KEY_ICON_ACTIVE_ACCENT)));
+                    gatingSwitch(getString(R.string.qs_tiles_icon_active_accent_title), getString(R.string.qs_tiles_icon_active_accent_summary), KEY_ICON_ACTIVE_ACCENT)));
             chain.add(iconColorsRow());
         }
 
@@ -600,7 +600,17 @@ public class QsTilesCustomizeFragment extends Fragment {
 
     private ListWidgetAdapter.ListItem singleColorRow(String title, String key, int dialogId) {
         mSingleColorKeys.put(dialogId, key);
-        return new ListWidgetAdapter.ListItem(title, null, () -> showSingleColorAccentChoice(title, key, dialogId));
+        return new ListWidgetAdapter.ListItem(title, singleColorSummary(key),
+                () -> showSingleColorAccentChoice(title, key, dialogId));
+    }
+
+    /** 2026-09-28: "Sfondo Media" non mostrava alcuna descrizione (era null) — né "Accento" né
+     *  l'hex del colore scelto, a differenza di tutte le altre righe colore dell'app. */
+    private String singleColorSummary(String key) {
+        if (ObsidianPrefs.getBoolean(key + "_use_accent", false)) {
+            return getString(R.string.color_mode_accent);
+        }
+        return String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(key, 0xFFFFFFFF));
     }
 
     /** Only caller today is Sfondo Media — Accento/Personalizzato inserted before the row opens

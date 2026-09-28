@@ -85,17 +85,17 @@ public class GestureNavigationFragment extends Fragment {
         // ── Gesture Indietro ─────────────────────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.gesture_back_title))));
         GroupUtils.addGroup(chain, List.of(
-                prefSwitch(getString(R.string.gesture_left_title), null, PREF_GESTURE_LEFT),
+                prefSwitch(getString(R.string.gesture_left_title), getString(R.string.gesture_left_summary), PREF_GESTURE_LEFT),
                 dualSliderItem(getString(R.string.gesture_height_title),
                         PREF_GESTURE_LEFT_HEIGHT_MIN, PREF_GESTURE_LEFT_HEIGHT_MAX, 0, 100, "%", true),
-                prefSwitch(getString(R.string.gesture_right_title), null, PREF_GESTURE_RIGHT),
+                prefSwitch(getString(R.string.gesture_right_title), getString(R.string.gesture_right_summary), PREF_GESTURE_RIGHT),
                 dualSliderItem(getString(R.string.gesture_height_title),
                         PREF_GESTURE_RIGHT_HEIGHT_MIN, PREF_GESTURE_RIGHT_HEIGHT_MAX, 0, 100, "%", false),
-                prefSwitch(getString(R.string.gesture_back_on_rotate), null, PREF_GESTURE_ON_ROTATE)));
+                prefSwitch(getString(R.string.gesture_back_on_rotate), getString(R.string.gesture_back_on_rotate_summary), PREF_GESTURE_ON_ROTATE)));
 
         // ── Override Hold Back ──────────────────────────────────────────────────
         SwitchWidgetAdapter.SwitchItem holdbackSwitch = gatingSwitch(
-                getString(R.string.gesture_override_back_hold), null, PREF_HOLDBACK_ON);
+                getString(R.string.gesture_override_back_hold), getString(R.string.gesture_override_back_hold_summary), PREF_HOLDBACK_ON);
         holdbackSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(PREF_HOLDBACK_ON, holdbackSwitch.checked);
             mHoldbackExpanded = holdbackSwitch.checked;
@@ -120,7 +120,7 @@ public class GestureNavigationFragment extends Fragment {
         // ── Pillola di Navigazione ───────────────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.gesture_nav_pill_cat))));
         GroupUtils.addGroup(chain, List.of(
-                prefSwitch(getString(R.string.colorpill), null, PREF_PILL_ACCENT),
+                prefSwitch(getString(R.string.colorpill), getString(R.string.colorpill_summary), PREF_PILL_ACCENT),
                 sliderItem(getString(R.string.gesture_nav_pill_width_title), PREF_PILL_WIDTH, 10, 100, 50, "%")));
 
         android.os.Parcelable scrollState = mRv.getLayoutManager() != null

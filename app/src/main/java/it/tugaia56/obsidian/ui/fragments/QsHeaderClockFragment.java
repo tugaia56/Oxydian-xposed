@@ -167,7 +167,7 @@ public class QsHeaderClockFragment extends Fragment {
             List<Object> stockRows = new ArrayList<>();
             stockRows.add(redOneModeItem());
 
-            SwitchWidgetAdapter.SwitchItem stockColorSwitch = gatingSwitch(getString(R.string.qs_header_stock_time_color_title), null, PREF_STOCK_COLOR_ON);
+            SwitchWidgetAdapter.SwitchItem stockColorSwitch = gatingSwitch(getString(R.string.qs_header_stock_time_color_title), getString(R.string.qs_header_stock_time_color_summary), PREF_STOCK_COLOR_ON);
             stockColorSwitch.onChanged = () -> {
                 ObsidianPrefs.putBoolean(PREF_STOCK_COLOR_ON, stockColorSwitch.checked);
                 mStockColorExpanded = stockColorSwitch.checked;
@@ -181,10 +181,10 @@ public class QsHeaderClockFragment extends Fragment {
             }
 
             boolean hideDate = ObsidianPrefs.getBoolean(PREF_STOCK_HIDE_DATE, false);
-            stockRows.add(gatingSwitch(getString(R.string.qs_header_stock_hide_date), null, PREF_STOCK_HIDE_DATE));
+            stockRows.add(gatingSwitch(getString(R.string.qs_header_stock_hide_date), getString(R.string.qs_header_stock_hide_date_summary), PREF_STOCK_HIDE_DATE));
 
             if (!hideDate) {
-                SwitchWidgetAdapter.SwitchItem dateColorSwitch = gatingSwitch(getString(R.string.qs_header_stock_clock_date_custom_color_title), null, PREF_STOCK_DATE_COLOR_ON);
+                SwitchWidgetAdapter.SwitchItem dateColorSwitch = gatingSwitch(getString(R.string.qs_header_stock_clock_date_custom_color_title), getString(R.string.qs_header_stock_clock_date_custom_color_summary), PREF_STOCK_DATE_COLOR_ON);
                 dateColorSwitch.onChanged = () -> {
                     ObsidianPrefs.putBoolean(PREF_STOCK_DATE_COLOR_ON, dateColorSwitch.checked);
                     mDateColorExpanded = dateColorSwitch.checked;
@@ -198,7 +198,7 @@ public class QsHeaderClockFragment extends Fragment {
                 }
             }
 
-            SwitchWidgetAdapter.SwitchItem clockChipSwitch = gatingSwitch(getString(R.string.qs_header_stock_clock_background_chip), null, PREF_STOCK_CLOCK_CHIP_ON);
+            SwitchWidgetAdapter.SwitchItem clockChipSwitch = gatingSwitch(getString(R.string.qs_header_stock_clock_background_chip), getString(R.string.qs_header_stock_clock_background_chip_summary), PREF_STOCK_CLOCK_CHIP_ON);
             clockChipSwitch.onChanged = () -> {
                 ObsidianPrefs.putBoolean(PREF_STOCK_CLOCK_CHIP_ON, clockChipSwitch.checked);
                 mClockChipExpanded = clockChipSwitch.checked;
@@ -210,7 +210,7 @@ public class QsHeaderClockFragment extends Fragment {
                     getString(R.string.qs_header_stock_clock_background_chip_style)));
 
             if (!hideDate) {
-                SwitchWidgetAdapter.SwitchItem dateChipSwitch = gatingSwitch(getString(R.string.qs_header_stock_date_background_chip), null, PREF_STOCK_DATE_CHIP_ON);
+                SwitchWidgetAdapter.SwitchItem dateChipSwitch = gatingSwitch(getString(R.string.qs_header_stock_date_background_chip), getString(R.string.qs_header_stock_date_background_chip_summary), PREF_STOCK_DATE_CHIP_ON);
                 dateChipSwitch.onChanged = () -> {
                     ObsidianPrefs.putBoolean(PREF_STOCK_DATE_CHIP_ON, dateChipSwitch.checked);
                     mDateChipExpanded = dateChipSwitch.checked;
@@ -222,7 +222,7 @@ public class QsHeaderClockFragment extends Fragment {
                         getString(R.string.qs_header_stock_date_background_chip_style)));
             }
 
-            stockRows.add(prefSwitch(getString(R.string.qs_header_stock_clock_hide_carrier_label), null, PREF_STOCK_HIDE_CARRIER));
+            stockRows.add(prefSwitch(getString(R.string.qs_header_stock_clock_hide_carrier_label), getString(R.string.qs_header_stock_clock_hide_carrier_label_summary), PREF_STOCK_HIDE_CARRIER));
             GroupUtils.addGroup(chain, stockRows);
         } else {
             // ── Stile Orologio — griglia con anteprima reale, visibile SOLO quando
@@ -232,7 +232,7 @@ public class QsHeaderClockFragment extends Fragment {
 
             // ── Font ─────────────────────────────────────────────────────────────
             chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_header_font_section))));
-            SwitchWidgetAdapter.SwitchItem fontSwitch = gatingSwitch(getString(R.string.qs_header_clock_font_title), null, PREF_CUSTOM_FONT);
+            SwitchWidgetAdapter.SwitchItem fontSwitch = gatingSwitch(getString(R.string.qs_header_clock_font_title), getString(R.string.pick_font_switch_summary), PREF_CUSTOM_FONT);
             fontSwitch.onChanged = () -> {
                 ObsidianPrefs.putBoolean(PREF_CUSTOM_FONT, fontSwitch.checked);
                 mFontExpanded = fontSwitch.checked;
@@ -246,7 +246,7 @@ public class QsHeaderClockFragment extends Fragment {
 
             // ── Preferenze Orologio Personalizzato: colori/scala/formato/immagine ──
             chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_header_clock_custom_prefs_section))));
-            SwitchWidgetAdapter.SwitchItem colorAllSwitch = gatingSwitch(getString(R.string.qs_header_clock_colors_title), null, PREF_COLOR_ALL_ON);
+            SwitchWidgetAdapter.SwitchItem colorAllSwitch = gatingSwitch(getString(R.string.qs_header_clock_colors_title), getString(R.string.qs_header_clock_colors_summary), PREF_COLOR_ALL_ON);
             colorAllSwitch.onChanged = () -> {
                 ObsidianPrefs.putBoolean(PREF_COLOR_ALL_ON, colorAllSwitch.checked);
                 mColorAllExpanded = colorAllSwitch.checked;
@@ -508,8 +508,12 @@ public class QsHeaderClockFragment extends Fragment {
     // ── Single-colour "trigger" row — no persistent swatch, tap opens the picker ────
 
     private ListWidgetAdapter.ListItem colorTriggerItem(String title, String key, int dialogId, int def) {
+        // 2026-09-28: mostrava sempre "pick_color" (un placeholder generico "scegli colore") per
+        // qualunque colore personalizzato già scelto — sembrava che nessun colore fosse
+        // impostato anche quando lo era. Ora mostra l'hex reale, come le altre righe colore.
         String label = ObsidianPrefs.getBoolean(key + "_use_accent", false)
-                ? getString(R.string.color_mode_accent) : getString(R.string.pick_color);
+                ? getString(R.string.color_mode_accent)
+                : String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(key, def));
         ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
                 title, label, () -> showTriggerColorAccentChoice(title, key, dialogId, def));
         item.useAccentColor = false;

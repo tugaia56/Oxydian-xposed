@@ -105,11 +105,11 @@ public class AodClockFragment extends Fragment {
         List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
 
         GroupUtils.addGroup(chain, List.of(
-                gatingSwitch(getString(R.string.aod_clock_switch_title), null, KEY_SWITCH),
+                gatingSwitch(getString(R.string.aod_clock_switch_title), getString(R.string.aod_clock_switch_summary), KEY_SWITCH),
                 clockStylePickerItem()));
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.aod_clock_prefs))));
-        SwitchWidgetAdapter.SwitchItem colorSwitch = gatingSwitch(getString(R.string.aod_clock_custom_color_title), null, KEY_COLOR_SWITCH);
+        SwitchWidgetAdapter.SwitchItem colorSwitch = gatingSwitch(getString(R.string.aod_clock_custom_color_title), getString(R.string.aod_clock_custom_color_summary), KEY_COLOR_SWITCH);
         colorSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_COLOR_SWITCH, colorSwitch.checked);
             mColorExpanded = colorSwitch.checked;
@@ -128,7 +128,7 @@ public class AodClockFragment extends Fragment {
         // Stessa chiave pref di sempre, solo spostata di schermata.
         restRows.add(sliderItem(getString(R.string.lockscreen_clock_bottom_margin_title), KEY_BOTTOM_MARGIN_AOD, -200, 600, 40, "dp", true));
 
-        SwitchWidgetAdapter.SwitchItem fontSwitch = gatingSwitch(getString(R.string.lockscreen_clock_font_custom_enabled), null, KEY_CUSTOM_FONT);
+        SwitchWidgetAdapter.SwitchItem fontSwitch = gatingSwitch(getString(R.string.lockscreen_clock_font_custom_enabled), getString(R.string.pick_font_switch_summary), KEY_CUSTOM_FONT);
         fontSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_CUSTOM_FONT, fontSwitch.checked);
             mFontExpanded = fontSwitch.checked;

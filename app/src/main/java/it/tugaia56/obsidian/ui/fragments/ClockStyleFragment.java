@@ -97,7 +97,8 @@ public class ClockStyleFragment extends Fragment {
         boolean chipOn = ObsidianPrefs.getBoolean(PREF_BG_CHIP_ON, false);
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.status_bar_clock_chip_category))));
         SwitchWidgetAdapter.SwitchItem chipSwitch = new SwitchWidgetAdapter.SwitchItem(
-                getString(R.string.status_bar_clock_background_chip_title), null,
+                getString(R.string.status_bar_clock_background_chip_title),
+                getString(R.string.status_bar_clock_background_chip_title_summary),
                 chipOn, null);
         chipSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(PREF_BG_CHIP_ON, chipSwitch.checked);

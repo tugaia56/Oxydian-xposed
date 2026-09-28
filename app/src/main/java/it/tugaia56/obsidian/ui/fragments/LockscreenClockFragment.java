@@ -113,11 +113,11 @@ public class LockscreenClockFragment extends Fragment {
         List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
 
         GroupUtils.addGroup(chain, List.of(
-                gatingSwitch(getString(R.string.lockscreen_clock_switch), null, KEY_SWITCH),
+                gatingSwitch(getString(R.string.lockscreen_clock_switch), getString(R.string.lockscreen_clock_switch_summary), KEY_SWITCH),
                 clockStylePickerItem()));
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.lockscreen_clock_prefs))));
-        SwitchWidgetAdapter.SwitchItem colorSwitch = gatingSwitch(getString(R.string.lockscreen_clock_custom_color_title), null, KEY_COLOR_SWITCH);
+        SwitchWidgetAdapter.SwitchItem colorSwitch = gatingSwitch(getString(R.string.lockscreen_clock_custom_color_title), getString(R.string.lockscreen_clock_custom_color_summary), KEY_COLOR_SWITCH);
         colorSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_COLOR_SWITCH, colorSwitch.checked);
             mColorExpanded = colorSwitch.checked;
@@ -131,7 +131,7 @@ public class LockscreenClockFragment extends Fragment {
         restRows.add(sliderItem(getString(R.string.lockscreen_font_line_height_title), KEY_LINE_HEIGHT, -120, 120, 0, "dp", true));
         restRows.add(sliderItem(getString(R.string.lockscreen_clock_text_scaling), KEY_TEXT_SCALING, 50, 150, 100, "%", true));
 
-        SwitchWidgetAdapter.SwitchItem fontSwitch = gatingSwitch(getString(R.string.lockscreen_clock_font_custom_enabled), null, KEY_CUSTOM_FONT);
+        SwitchWidgetAdapter.SwitchItem fontSwitch = gatingSwitch(getString(R.string.lockscreen_clock_font_custom_enabled), getString(R.string.pick_font_switch_summary), KEY_CUSTOM_FONT);
         fontSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_CUSTOM_FONT, fontSwitch.checked);
             mFontExpanded = fontSwitch.checked;

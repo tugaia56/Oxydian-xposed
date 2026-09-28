@@ -121,7 +121,7 @@ public class AodEdgeLightFragment extends Fragment {
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.edge_light_style_title))));
         GroupUtils.addGroup(chain, List.of(
                 singleChoiceItem(getString(R.string.edge_light_style_title), KEY_STYLE, R.array.edge_light_style_entries, true),
-                prefSwitchRefresh(getString(R.string.edge_light_show_blur), null, KEY_SHOW_BLUR),
+                prefSwitchRefresh(getString(R.string.edge_light_show_blur), getString(R.string.edge_light_show_blur_summary), KEY_SHOW_BLUR),
                 singleChoiceItem(getString(R.string.edge_light_blur_mode_title), KEY_BLUR_MODE, R.array.edge_light_blur_mode_entries, true),
                 singleChoiceItem(getString(R.string.edge_light_blur_type_title), KEY_BLUR_TYPE, R.array.edge_light_blur_type_entries, true),
                 colorModeItem(),

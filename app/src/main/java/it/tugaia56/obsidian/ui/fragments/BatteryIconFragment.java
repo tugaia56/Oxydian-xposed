@@ -85,6 +85,7 @@ public class BatteryIconFragment extends Fragment {
 
         addGatedCommand(chain,
                 getString(R.string.battery_icon_enabled),
+                getString(R.string.battery_icon_enabled_summary),
                 PREF_ENABLED,
                 getString(R.string.battery_style_prefs_page),
                 BatteryStylePrefsFragment::new,
@@ -92,6 +93,7 @@ public class BatteryIconFragment extends Fragment {
 
         addGatedCommand(chain,
                 getString(R.string.battery_bar_enabled),
+                getString(R.string.battery_bar_enabled_summary),
                 PREF_BATTERY_BAR,
                 getString(R.string.battery_bar_settings),
                 BatteryBarSettingsFragment::new,
@@ -101,6 +103,7 @@ public class BatteryIconFragment extends Fragment {
 
         addGatedCommand(chain,
                 getString(R.string.battery_charging_icon_enable),
+                getString(R.string.battery_charging_icon_enable_summary),
                 PREF_CHARGING_ICON_ENABLED,
                 getString(R.string.battery_charging_icon_page),
                 BatteryChargingIconFragment::new,
@@ -115,11 +118,11 @@ public class BatteryIconFragment extends Fragment {
     }
 
     /** Switch (abilita soltanto) + tocco sul nome per mostrare la riga di navigazione. */
-    private void addGatedCommand(List<RecyclerView.Adapter<?>> chain, String title, String key,
+    private void addGatedCommand(List<RecyclerView.Adapter<?>> chain, String title, String summary, String key,
                                   String pageTitle, java.util.function.Supplier<Fragment> pageSupplier,
                                   boolean expanded, java.util.function.Consumer<Boolean> setExpanded) {
         boolean on = ObsidianPrefs.getBoolean(key, false);
-        SwitchWidgetAdapter.SwitchItem sw = new SwitchWidgetAdapter.SwitchItem(title, null, on, null);
+        SwitchWidgetAdapter.SwitchItem sw = new SwitchWidgetAdapter.SwitchItem(title, summary, on, null);
         sw.onChanged = () -> {
             ObsidianPrefs.putBoolean(key, sw.checked);
             setExpanded.accept(sw.checked);
@@ -140,7 +143,7 @@ public class BatteryIconFragment extends Fragment {
     private void addPercentSizeCommand(List<RecyclerView.Adapter<?>> chain) {
         boolean on = ObsidianPrefs.getBoolean(PREF_PERCENT_SIZE_ENABLED, false);
         SwitchWidgetAdapter.SwitchItem sw = new SwitchWidgetAdapter.SwitchItem(
-                getString(R.string.battery_percent_size_enable), null, on, null);
+                getString(R.string.battery_percent_size_enable), getString(R.string.battery_percent_size_enable_summary), on, null);
         sw.onChanged = () -> {
             ObsidianPrefs.putBoolean(PREF_PERCENT_SIZE_ENABLED, sw.checked);
             mPercentSizeExpanded = sw.checked;

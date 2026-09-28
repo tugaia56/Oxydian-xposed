@@ -20,7 +20,6 @@ import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.activity.MainActivity;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.NavAdapter;
-import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
 import it.tugaia56.obsidian.utils.ObsidianPrefs;
@@ -99,18 +98,19 @@ public class QuickSettingsFragment extends Fragment {
         // ── Quick Settings Tiles ──────────────────────────────────────────────
         // "Numero di riquadri" reale (porting di OC's QSTiles); il resto resta
         // segnaposto — sottosistemi grandi a sé in OC.
-        chain.add(new SectionTitleAdapter(List.of(getString(R.string.quick_settings_tiles_title))));
-        chain.add(new NavAdapter(List.of(new NavAdapter.NavItem(
-                R.drawable.ic_qs,
-                getString(R.string.quick_settings_tiles_number),
-                getString(R.string.qs_tiles_customize),
-                () -> navigate(new QsTilesFragment(), getString(R.string.quick_settings_tiles_number)),
-                0xFFE91E63))));
+        // 2026-09-28: titolo sezione "Riquadri Impostazioni Rapide" rimosso (richiesta esplicita)
+        // e "Numero di riquadri" spostato DOPO "Personalizza Riquadri" (era prima).
         chain.add(new NavAdapter(List.of(new NavAdapter.NavItem(
                 R.drawable.ic_qs,
                 getString(R.string.quick_settings_tiles_main),
                 getString(R.string.qs_tiles_customize_summary),
                 () -> navigate(new QsTilesCustomizeFragment(), getString(R.string.quick_settings_tiles_main)),
+                0xFFE91E63))));
+        chain.add(new NavAdapter(List.of(new NavAdapter.NavItem(
+                R.drawable.ic_qs,
+                getString(R.string.quick_settings_tiles_number),
+                getString(R.string.qs_tiles_customize),
+                () -> navigate(new QsTilesFragment(), getString(R.string.quick_settings_tiles_number)),
                 0xFFE91E63))));
         // "Varie Riquadri" (2026-09-26) — Animazione/Transizioni, Etichette, Impostazioni Rapide
         // Separati: estratte da "Personalizza Riquadri" in una schermata di navigazione a sé,
@@ -134,7 +134,7 @@ public class QuickSettingsFragment extends Fragment {
         // ── Trasparenza (reale OC) — la Sfocatura si è spostata in Schermata di
         // Blocco → Opzioni SdB, dato che il blur nativo OOS agisce su entrambe le
         // superfici e lì è più visibile/utile ────────────────────────────────────
-        SwitchWidgetAdapter.SwitchItem transpSwitch = prefSwitch(getString(R.string.qs_transparency_title), null, PREF_TRANSP_ON);
+        SwitchWidgetAdapter.SwitchItem transpSwitch = prefSwitch(getString(R.string.qs_transparency_title), getString(R.string.qs_transparency_title_summary), PREF_TRANSP_ON);
         transpSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(PREF_TRANSP_ON, transpSwitch.checked);
             mTranspExpanded = transpSwitch.checked;
@@ -148,7 +148,7 @@ public class QuickSettingsFragment extends Fragment {
         }
 
         // ── Quick Pulldown (reale OC) ────────────────────────────────────────────
-        SwitchWidgetAdapter.SwitchItem pulldownSwitch = prefSwitch(getString(R.string.quick_pulldown), null, PREF_PULLDOWN_ON);
+        SwitchWidgetAdapter.SwitchItem pulldownSwitch = prefSwitch(getString(R.string.quick_pulldown), getString(R.string.quick_pulldown_summary), PREF_PULLDOWN_ON);
         pulldownSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(PREF_PULLDOWN_ON, pulldownSwitch.checked);
             mPulldownExpanded = pulldownSwitch.checked;
@@ -160,7 +160,7 @@ public class QuickSettingsFragment extends Fragment {
             List<Object> pulldownRows = new ArrayList<>();
             pulldownRows.add(sliderItem(getString(R.string.quick_pulldown_length), PREF_PULLDOWN_LENGTH, 0, 100, 25, "%"));
             pulldownRows.add(singleChoiceItem(getString(R.string.quick_settings_side), PREF_PULLDOWN_SIDE, R.array.quick_pulldown_side_entries));
-            pulldownRows.add(prefSwitch(getString(R.string.quick_collapse), null, PREF_PULLDOWN_COLLAPSE));
+            pulldownRows.add(prefSwitch(getString(R.string.quick_collapse), getString(R.string.quick_collapse_summary), PREF_PULLDOWN_COLLAPSE));
             it.tugaia56.obsidian.ui.adapters.GroupUtils.addGroup(chain, pulldownRows);
         }
 

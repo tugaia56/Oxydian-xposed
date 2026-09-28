@@ -98,9 +98,9 @@ public class BatteryStylePrefsFragment extends Fragment {
         GroupUtils.addGroup(chain, List.of(
                 slider(getString(R.string.battery_width_label), PREF_WIDTH, 10, 30, 20, "dp"),
                 slider(getString(R.string.battery_height_label), PREF_HEIGHT, 10, 30, 20, "dp"),
-                sw(getString(R.string.battery_hide_percentage), PREF_HIDE_PERCENT, false),
-                sw(getString(R.string.battery_inside_percentage), PREF_INSIDE_PERCENT, false),
-                sw(getString(R.string.battery_hide_battery), PREF_HIDE_BATTERY, false)
+                sw(getString(R.string.battery_hide_percentage), getString(R.string.battery_hide_percentage_summary), PREF_HIDE_PERCENT, false),
+                sw(getString(R.string.battery_inside_percentage), getString(R.string.battery_inside_percentage_summary), PREF_INSIDE_PERCENT, false),
+                sw(getString(R.string.battery_hide_battery), getString(R.string.battery_hide_battery_summary), PREF_HIDE_BATTERY, false)
         ));
 
         android.os.Parcelable scrollState = mRv.getLayoutManager() != null
@@ -113,9 +113,9 @@ public class BatteryStylePrefsFragment extends Fragment {
 
     // ── Row builders ──────────────────────────────────────────────────────────
 
-    private SwitchWidgetAdapter.SwitchItem sw(String title, String key, boolean def) {
+    private SwitchWidgetAdapter.SwitchItem sw(String title, String summary, String key, boolean def) {
         SwitchWidgetAdapter.SwitchItem item = new SwitchWidgetAdapter.SwitchItem(
-                title, null, ObsidianPrefs.getBoolean(key, def), null);
+                title, summary, ObsidianPrefs.getBoolean(key, def), null);
         item.onChanged = () -> ObsidianPrefs.putBoolean(key, item.checked);
         return item;
     }

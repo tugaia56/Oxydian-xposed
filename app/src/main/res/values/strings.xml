@@ -10,6 +10,7 @@
     <string name="color_mode_transparent">Transparent</string>
     <string name="color_mode_default">Default</string>
     <string name="aod_clock_switch_title">Custom AOD Clock</string>
+    <string name="aod_clock_switch_summary">Replaces the native AOD clock with a custom style</string>
 
     <!-- Depth Wallpaper (UI-only preview, no hook yet) -->
     <string name="depth_wallpaper_title">Depth Wallpaper</string>
@@ -20,7 +21,9 @@
     <string name="enable_title">Enable</string>
     <string name="pick_image_summary">Pick your custom image</string>
     <string name="aod_clock_prefs">Clock</string>
+    <string name="weather_elements_section">Weather Elements</string>
     <string name="aod_clock_custom_color_title">Custom Color</string>
+    <string name="aod_clock_custom_color_summary">Choose a color different from the native one for the AOD clock</string>
     <string name="aod_font_line_height_title">Line Height</string>
     <string name="aod_clock_text_scaling">Text Scaling</string>
     <string name="aod_clock_custom_user_title">Custom User Text</string>
@@ -41,6 +44,7 @@
     <string name="edge_light_10_min">10 min</string>
     <string name="edge_light_style_title">Style</string>
     <string name="edge_light_show_blur">Show Blur</string>
+    <string name="edge_light_show_blur_summary">Adds a blur around the edge light</string>
     <string name="edge_light_blur_mode_title">Blur Mode</string>
     <string name="edge_light_blur_mode_both">Both</string>
     <string name="edge_light_blur_mode_blur_only">Blur Only</string>
@@ -131,6 +135,7 @@
     <string name="settings_icons_build_ok">Built. Reboot the device, then come back and tap Apply again to activate it.</string>
     <string name="settings_icons_opt_bg_color">Background Color</string>
     <string name="settings_icons_opt_bg_solid">Solid Background</string>
+    <string name="settings_icons_opt_bg_solid_summary">Fills the icon background with a solid color instead of a gradient</string>
     <string name="settings_icons_opt_bg_shape">Background Shape</string>
     <string name="settings_icons_opt_icon_color">Icon Color</string>
     <string name="nav_quick_settings">Header Quick Settings</string>
@@ -146,8 +151,11 @@
     <string name="nav_fingerprint_icon">Fingerprint Icon</string>
     <string name="nav_fingerprint_icon_summary">Custom fingerprint icon style</string>
     <string name="lockscreen_fp_remove_icon">Remove Fingerprint Icon</string>
+    <string name="lockscreen_fp_remove_icon_summary">Hides the fingerprint icon on the lock screen</string>
     <string name="lockscreen_fp_custom_icon">Custom Fingerprint Icon</string>
+    <string name="lockscreen_fp_custom_icon_summary">Replaces the native icon with one chosen from the available presets</string>
     <string name="lockscreen_fp_icon_title">Fingerprint Icons Presets</string>
+    <string name="lockscreen_fp_icon_title_summary">Choose from the built-in preset icons</string>
     <string name="lockscreen_fp_style">Fingerprint %d</string>
     <string name="lockscreen_fp_icon_picker_title">Pick Custom Icon</string>
     <string name="lockscreen_fp_icon_picker_summary">Pick your custom icon.\nThe recommended image resolution is around 216 x 216.</string>
@@ -155,8 +163,11 @@
     <string name="nav_lock_buttons">Lock Icon and Shortcuts</string>
     <string name="nav_lock_buttons_summary">Hide lock icon and bottom shortcut buttons</string>
     <string name="lockscreen_hide_lock_icon">Hide lock icon</string>
+    <string name="lockscreen_hide_lock_icon_summary">Hides the lock icon on the lock screen</string>
     <string name="lockscreen_affordance_remove_left">Remove Left Affordance</string>
+    <string name="lockscreen_affordance_remove_left_summary">Removes the bottom-left shortcut (e.g. camera/flashlight)</string>
     <string name="lockscreen_affordance_remove_right">Remove Right Affordance</string>
+    <string name="lockscreen_affordance_remove_right_summary">Removes the bottom-right shortcut (e.g. camera/flashlight)</string>
     <string name="lockscreen_hide_sos">Hide SOS Button</string>
     <string name="lockscreen_hide_sos_summary">Hide bottom SOS button on lock screen</string>
     <string name="lockscreen_hide_carrier">Hide Carrier</string>
@@ -168,6 +179,7 @@
     <string name="lockscreen_hide_power_menu">Hide Power Menu</string>
     <string name="lockscreen_hide_power_menu_summary">Hide power menu while on a secure lock screen. Requires a full device reboot (SystemUI restart is not enough)</string>
     <string name="lockscreen_album_art">Album Cover</string>
+    <string name="qs_tiles_media_filter_summary">Applies a color filter over the currently playing album cover</string>
     <string name="lockscreen_album_art_summary">Show album cover when available</string>
     <string name="lockscreen_album_art_filter">Cover Filter</string>
     <string name="lockscreen_media_blur">Blur Amount</string>
@@ -180,13 +192,16 @@
     <!-- Orologio SdB (UI-only preview, no hook yet) -->
     <string name="nav_lock_clock_new">Clock</string>
     <string name="lockscreen_clock_switch">Custom Lockscreen Clock</string>
+    <string name="lockscreen_clock_switch_summary">Replaces the lock screen clock with a custom style</string>
     <string name="lockscreen_clock_style_title">Clock Style</string>
     <string name="lockscreen_clock_font_prefs_title">Font</string>
     <string name="lockscreen_clock_font_custom_enabled">Custom Font</string>
     <string name="pick_font_title">Pick Font</string>
+    <string name="pick_font_switch_summary">Use a custom font instead of the system one</string>
     <string name="pick_font_summary">Pick a custom font file</string>
     <string name="lockscreen_clock_prefs">Clock</string>
     <string name="lockscreen_clock_custom_color_title">Custom Color</string>
+    <string name="lockscreen_clock_custom_color_summary">Choose a color different from the native one for the clock</string>
     <string name="general_color_accent1">Accent Color 1</string>
     <string name="general_color_accent2">Accent Color 2</string>
     <string name="general_color_accent3">Accent Color 3</string>
@@ -213,6 +228,7 @@
     <string name="nav_lock_weather">Weather</string>
     <string name="nav_lock_weather_summary">Show weather on the lock screen</string>
     <string name="lockscreen_weather_enabled">Enable Weather</string>
+    <string name="lockscreen_weather_enabled_summary">Shows weather and temperature</string>
     <string name="weather_update_interval_title">Update Interval</string>
     <string name="weather_last_update">Last Update</string>
     <string name="weather_provider_title">Provider</string>
@@ -220,14 +236,19 @@
     <string name="weather_yandex_key">Yandex Key</string>
     <string name="weather_units_title">Units</string>
     <string name="weather_show_location">Show Location</string>
+    <string name="weather_show_location_summary">Shows the city name</string>
     <string name="weather_show_condition">Show Condition</string>
+    <string name="weather_show_condition_summary">Shows the condition description (e.g. cloudy)</string>
     <string name="weather_show_humidity">Show Humidity</string>
+    <string name="weather_show_humidity_summary">Shows the humidity percentage</string>
     <string name="weather_show_wind">Show Wind</string>
+    <string name="weather_show_wind_summary">Shows the wind speed</string>
     <string name="weather_text_size">Text Size</string>
     <string name="weather_image_size">Icon Size</string>
     <string name="weather_custom_color">Custom Color</string>
     <string name="weather_custom_location_title">Custom Location</string>
     <string name="weather_location_mode_title">Location</string>
+    <string name="weather_location_mode_summary">On: automatic GPS location — off: manually entered city</string>
     <string name="weather_location_mode_gps">Automatic (GPS)</string>
     <string name="weather_location_mode_manual">Manual</string>
     <string name="weather_gps_refresh_title">Update location (GPS)</string>
@@ -255,9 +276,10 @@
     <string name="weather_centered">Centered</string>
     <string name="weather_centered_summary">Center the weather widget</string>
     <string name="weather_custom_margins">Custom Margins</string>
+    <string name="weather_custom_margins_summary">Moves the weather widget by adjusting its margins</string>
     <string name="weather_margin_top">Top Margin</string>
     <string name="weather_margin_left">Left Margin</string>
-    <string name="lockscreen_weather_selection_title">Background</string>
+    <string name="lockscreen_weather_selection_title">Widget Background</string>
 
     <!-- Widget SdB → "Aggiungi Widget" (UI-only preview, no hook yet) -->
     <string name="nav_lock_widgets">Add Widget</string>
@@ -284,7 +306,9 @@
     <string name="custom_widgets4">Mini Widget 4</string>
     <string name="widgets_custom_color">Widget Settings</string>
     <string name="widgets_custom_color_title">Custom Colors</string>
+    <string name="widgets_custom_color_title_summary">Sets custom colors for the widget instead of the default ones</string>
     <string name="widgets_custom_bg_title">Custom Background</string>
+    <string name="widgets_custom_bg_title_summary">Sets a custom background behind the widget</string>
     <string name="widgets_big_color_section">Large Widget</string>
     <string name="widgets_mini_color_section">Mini Widget</string>
     <string name="big_active">Large — Active</string>
@@ -324,6 +348,7 @@
     <string name="nav_misc_power_menu">Power Menu</string>
     <string name="nav_misc_power_menu_summary">Full power menu customization</string>
     <string name="misc_power_menu_hide_sos">Hide SOS in Power Menu</string>
+    <string name="misc_power_menu_hide_sos_summary">Removes the SOS button from the power menu</string>
     <string name="show_advanced_reboot_title">Advanced Reboot</string>
     <string name="show_advanced_reboot_summary">Add advanced reboot options to power menu</string>
     <string name="use_auth_for_advanced_reboot_title">Use Authentication</string>
@@ -463,7 +488,9 @@
     <string name="qs_tiles_icon_colors_title">Custom Icon Colors</string>
     <string name="qs_tiles_icon_colors_summary">Icon color in the tiles, for active/inactive/disabled state</string>
     <string name="qs_tiles_icon_active_accent_title">Link icon to accent color</string>
+    <string name="qs_tiles_icon_active_accent_summary">Icon color always follows the current Accent</string>
     <string name="qs_tiles_bg_active_accent_title">Link to accent color</string>
+    <string name="qs_tiles_bg_active_accent_summary">Color always follows the current Accent, updates automatically if you change it</string>
     <string name="qs_tiles_border_title">Tile border</string>
     <string name="qs_tiles_border_summary">Colored border around large tiles, small tiles, sliders and Media</string>
     <string name="qs_tiles_border_color_title">Border Color</string>
@@ -484,7 +511,9 @@
     <string name="qs_tiles_transitions_style_title">Transition Style</string>
     <string name="qs_tiles_labels_section">QS Labels</string>
     <string name="qs_tiles_hide_labels_title">Hide QS Labels</string>
+    <string name="qs_tiles_hide_labels_summary">Hides the name below each tile</string>
     <string name="qs_tiles_label_color_title">Custom QS Text Color</string>
+    <string name="qs_tiles_label_color_summary">Choose a color different from the native one for the tile text</string>
     <string name="qs_tiles_brightness_section">QS Sliders</string>
     <string name="qs_tiles_brightness_slider_title">Brightness Slider Tile</string>
     <string name="qs_tiles_brightness_slider_summary">Color, background, radius and icon of the Brightness slider</string>
@@ -494,12 +523,15 @@
     <string name="qs_tiles_brightness_icon_color_title">Custom Color</string>
     <string name="qs_tiles_brightness_icon_title_volume">Change volume icon color</string>
     <string name="qs_tiles_brightness_custom_title">Customize slider color</string>
+    <string name="qs_tiles_slider_custom_summary">Choose the slider\'s color and style instead of the native look</string>
     <string name="qs_tiles_volume_custom_title">Customize slider color</string>
     <string name="qs_tiles_brightness_mode_title">Slider Color Mode</string>
     <string name="qs_tiles_brightness_color_title">Custom Color</string>
     <string name="qs_tiles_brightness_bg_title">Custom Background Color</string>
+    <string name="qs_tiles_slider_bg_summary">Choose a background color different from the native one</string>
     <string name="qs_tiles_brightness_bg_color_title">Custom Color</string>
     <string name="qs_tiles_radius_title">Customize Sliders Radius</string>
+    <string name="qs_tiles_slider_radius_summary">Set a corner radius different from the native one</string>
     <string name="qs_tiles_radius_value_title">Radius</string>
     <string name="qs_tiles_bg_section">Tile Background</string>
     <string name="qs_tiles_radius_section">Tile Corner Radius</string>
@@ -513,6 +545,7 @@
     <string name="qs_widgets_nav_summary">Photo, weather, quick apps in the Quick Settings panel</string>
     <string name="qs_widgets_section">Quick Settings Widgets</string>
     <string name="qs_widgets_switch_title">Enable Quick Settings Widgets</string>
+    <string name="qs_widgets_switch_title_summary">Shows extra widgets below the Quick Settings tiles</string>
     <string name="qs_widgets_types_section">Planned widget types</string>
     <string name="qs_widgets_type_photo">Custom photo</string>
     <string name="widget_wip_suffix"> (in progress)</string>
@@ -546,8 +579,11 @@
     <string name="qs_separate_mods_summary">Hide edit/menu buttons, custom pulldown width</string>
     <string name="qs_separate_buttons_section">Buttons</string>
     <string name="qs_separate_hide_edit">Hide edit button</string>
+    <string name="qs_separate_hide_edit_summary">Hides the edit button in the Separated panel</string>
     <string name="qs_separate_hide_menu">Hide menu button</string>
+    <string name="qs_separate_hide_menu_summary">Hides the menu button in the Separated panel</string>
     <string name="qs_separate_bg_section">Button background color</string>
+    <string name="qs_separate_bg_section_summary">Choose the background color of the edit/menu/settings buttons</string>
     <string name="qs_separate_bg_edit">Edit background</string>
     <string name="qs_separate_bg_menu">Menu background</string>
     <string name="qs_separate_bg_settings">Settings background</string>
@@ -557,15 +593,19 @@
     <string name="qs_separate_width_value">Pulldown zone width</string>
     <string name="qs_transparency">QS Transparency &amp; Blur</string>
     <string name="qs_transparency_title">Customize QS Transparency</string>
+    <string name="qs_transparency_title_summary">Adjusts the Quick Settings panel transparency</string>
     <string name="qs_transparency_value">QS Transparency</string>
     <string name="qs_blur_lockscreen_section">Lock Screen Blur</string>
     <string name="qs_blur_enable_switch">Enable Blur</string>
+    <string name="qs_blur_enable_switch_summary">Blurs the background behind the lock screen</string>
     <string name="qs_blur_intentisy">Blur Intensity</string>
     <string name="qs_blur_max_amount">Max Blur Amount</string>
     <string name="quick_pulldown">Quick Pulldown</string>
+    <string name="quick_pulldown_summary">Opens Quick Settings fully with a single swipe</string>
     <string name="quick_pulldown_length">Quick Pulldown Length</string>
     <string name="quick_settings_side">Quick Pulldown Side</string>
     <string name="quick_collapse">Quick Collapse</string>
+    <string name="quick_collapse_summary">Closes the panel fully with a single swipe up</string>
     <string name="my_device">My Device</string>
     <string name="my_device_title">Force My Device</string>
     <string name="my_device_summary">Force-show the "My Device" tile in Control Center (needs the My Device app installed)</string>
@@ -650,6 +690,7 @@
     <string name="clock_section_advanced">Advanced (overrides other settings)</string>
     <string name="status_bar_clock_chip_category">Clock Chip</string>
     <string name="status_bar_clock_background_chip_title">Background Chip</string>
+    <string name="status_bar_clock_background_chip_title_summary">Adds a colored background behind the status bar clock</string>
     <string name="status_bar_clock_background_chip_style_title">Background Chip Style</string>
     <string name="clock_chip_style_solid">Solid</string>
     <string name="clock_chip_style_outline">Outline</string>
@@ -665,6 +706,7 @@
     <string name="clock_chip_use_accent_color">Use Accent Color</string>
     <string name="clock_chip_stroke_width_title">Border Width</string>
     <string name="clock_chip_round_corners_title">Rounded Corners</string>
+    <string name="clock_chip_round_corners_title_summary">Rounds the corners of the clock background chip</string>
     <string name="clock_chip_margin_section">Custom Margin</string>
     <string name="clock_chip_padding_section">Custom Spacing</string>
     <string name="direction_top">Top</string>
@@ -692,6 +734,7 @@
     <!-- Statusbar Notifications — real OC statusbar_notifications.xml additions -->
     <string name="notif_expansion_section">Notification Expansion</string>
     <string name="statusbar_use_app_icon">Use App Icon for Notifications</string>
+    <string name="statusbar_use_app_icon_summary">Shows the app\'s own icon instead of the stock notification icon</string>
     <string name="statusbar_app_icon_scale">Icon Scale</string>
     <string name="notif_default_expansion_title">Notification Default Expansion</string>
     <string name="default_value">Default</string>
@@ -701,6 +744,7 @@
     <string name="notif_show_buttons">Show Expand and Collapse Button</string>
     <string name="notif_show_buttons_summary">Show expand and collapse button in the notification panel</string>
     <string name="customize_clear_all_button">Customize Notification Button</string>
+    <string name="customize_clear_all_button_summary">Changes the appearance of the "Clear all" button</string>
     <string name="clear_all_link_bg_accent">Link Background to Accent</string>
     <string name="clear_all_bg_color">Custom Background Color</string>
     <string name="clear_all_link_bg_icon_accent">Link Icon to Accent</string>
@@ -731,7 +775,9 @@
     <!-- Stock QS clock -->
     <string name="qs_header_stock_section">Stock Clock Preferences</string>
     <string name="qs_header_stock_time_color_title">Custom time color</string>
+    <string name="qs_header_stock_time_color_summary">Choose a color different from the native one for the time</string>
     <string name="qs_header_clock_colors_title">Custom clock colors</string>
+    <string name="qs_header_clock_colors_summary">Customize the colors of the clock style chosen above</string>
     <string name="qs_header_clock_font_title">Custom clock font</string>
     <string name="qs_header_stock_color">Stock clock color</string>
     <string name="qs_header_stock_hide_date">Hide date</string>
@@ -739,12 +785,16 @@
     <string name="qs_header_stock_uno_rosso">Red One behavior</string>
     <string name="qs_header_stock_clock_red_one_color">Color for 1 in Clock</string>
     <string name="qs_header_stock_clock_date_custom_color_title">Custom Date Color</string>
+    <string name="qs_header_stock_clock_date_custom_color_summary">Choose a color different from the native one for the date</string>
     <string name="qs_header_stock_clock_date_custom_color">Stock date color</string>
     <string name="qs_header_stock_clock_background_chip">Clock Background Chip</string>
+    <string name="qs_header_stock_clock_background_chip_summary">Adds a colored background behind the clock</string>
     <string name="qs_header_stock_clock_background_chip_style">Chip Style Background</string>
     <string name="qs_header_stock_date_background_chip">Chip Background Data</string>
+    <string name="qs_header_stock_date_background_chip_summary">Adds a colored background behind the date</string>
     <string name="qs_header_stock_date_background_chip_style">Chip Background style</string>
     <string name="qs_header_stock_clock_hide_carrier_label">Hide carrier label</string>
+    <string name="qs_header_stock_clock_hide_carrier_label_summary">Hides the mobile carrier name</string>
 
     <!-- App settings -->
     <string name="nav_settings">Settings</string>
@@ -896,6 +946,7 @@
     <string name="battery_icon_enabled">Enable Custom Battery Icon</string>
     <string name="battery_icon_enabled_summary">Replace the stock battery icon with a custom style</string>
     <string name="battery_bar_enabled">Enable Battery Bar</string>
+    <string name="battery_bar_enabled_summary">Shows a colored bar below the status bar for the battery level</string>
     <string name="battery_reverse_layout">Reverse Layout</string>
     <string name="battery_rotate_layout">Rotate Layout</string>
     <string name="battery_animate_charging">Animate charging</string>
@@ -914,8 +965,10 @@
     <string name="battery_powersave_icon_color">Powersave Indicator Color</string>
     <string name="battery_style_prefs_page">Battery icon preferences</string>
     <string name="battery_percent_size_enable">Customize percentage size</string>
+    <string name="battery_percent_size_enable_summary">Choose a different size for the percentage next to the icon</string>
     <string name="battery_percent_size_page">Percentage size</string>
     <string name="battery_charging_icon_enable">Custom charging icon</string>
+    <string name="battery_charging_icon_enable_summary">Shows a different icon while the phone is charging</string>
     <string name="battery_charging_icon_page">Charging icon preferences</string>
     <string name="battery_charging_icon_style_title">Charging icon style</string>
     <string name="battery_charging_icon_color_title">Icon color</string>
@@ -959,15 +1012,21 @@
     <string name="battery_bar_settings">Battery Bar Settings</string>
     <string name="bb_appearance_section">Appearance</string>
     <string name="bb_colorful">Colorful mode</string>
+    <string name="bb_colorful_summary">Uses different colors instead of a single one</string>
     <string name="bb_transit_colors">Blend level colors</string>
+    <string name="bb_transit_colors_summary">Fades the color gradually based on charge level</string>
     <string name="bb_opacity">Opacity</string>
     <string name="bb_height">Height</string>
     <string name="bb_position_section">Position</string>
     <string name="bb_on_bottom">Bottom of status bar</string>
+    <string name="bb_on_bottom_summary">Positions the bar at the bottom instead of the top</string>
     <string name="bb_centered">Centered</string>
+    <string name="bb_centered_summary">Centers the bar instead of aligning it to one side</string>
     <string name="bb_behavior_section">Behavior</string>
     <string name="bb_only_charging">Only while charging</string>
+    <string name="bb_only_charging_summary">Shows the bar only while the phone is charging</string>
     <string name="bb_animate_charging">Charging animation</string>
+    <string name="bb_animate_charging_summary">Animates the bar while the phone is charging</string>
     <string name="bb_level_colors_section">Level colors</string>
     <string name="bb_critical_level">Critical threshold</string>
     <string name="bb_critical_color">Critical color</string>
@@ -975,10 +1034,13 @@
     <string name="bb_warning_color">Warning color</string>
     <string name="bb_state_colors_section">State colors</string>
     <string name="bb_indicate_charging">Indicate charging</string>
+    <string name="bb_indicate_charging_summary">Colors the bar differently while charging</string>
     <string name="bb_charging_color">Charging color</string>
     <string name="bb_indicate_fast_charging">Indicate fast charging</string>
+    <string name="bb_indicate_fast_charging_summary">Colors the bar differently during fast charging</string>
     <string name="bb_fast_charging_color">Fast charging color</string>
     <string name="bb_indicate_power_save">Indicate power save</string>
+    <string name="bb_indicate_power_save_summary">Colors the bar differently when battery saver is on</string>
     <string name="bb_power_save_color">Power save color</string>
     <string name="statusbar_padding">Status Bar Padding</string>
     <string name="statusbar_top_padding">Top Padding</string>
@@ -1078,15 +1140,20 @@
     <string name="navcolor_title">Navigation Bar Icon Color</string>
     <string name="gesture_back_title">Configure Back Gesture</string>
     <string name="gesture_left_title">Left Side of the Screen</string>
+    <string name="gesture_left_summary">Enables the back gesture by swiping from the left edge</string>
     <string name="gesture_right_title">Right Side of the Screen</string>
+    <string name="gesture_right_summary">Enables the back gesture by swiping from the right edge</string>
     <string name="gesture_height_title">Gesture Height</string>
     <string name="gesture_back_on_rotate">Enable in Landscape Too</string>
+    <string name="gesture_back_on_rotate_summary">Keeps the back gesture active even when the screen is rotated</string>
     <string name="gesture_override_back_hold">Override Hold-Back Gesture</string>
+    <string name="gesture_override_back_hold_summary">Runs a different action when holding during the back gesture</string>
     <string name="gesture_override_back_hold_mode">Override Back Mode</string>
     <string name="gesture_override_back_hold_common">Hold-Back Command</string>
     <string name="gesture_override_back_hold_right">Right Side Command</string>
     <string name="gesture_nav_pill_cat">Navigation Bar Pill</string>
     <string name="colorpill">Accent-Colored Gesture Pill</string>
+    <string name="colorpill_summary">Colors the navigation pill with the Accent instead of the native color</string>
     <string name="gesture_nav_pill_width_title">Width Compared to Standard Size</string>
     <string name="qs_widget_custom_app">Custom App</string>
     <string name="gesture_override_back_hold_mode_default">Same Command for Both Sides</string>
@@ -1123,4 +1190,5 @@
     <string name="launcher_page_indicator_tap_title">Page indicator tap action</string>
     <string name="launcher_page_indicator_tap_summary">Opens a chosen app when you tap the search entry under the home page indicator (needs \u201cShow Search at the bottom\u201d on). Tap to choose the app.</string>
     <string name="qs_big_icon_border_title">Icon border</string>
+    <string name="qs_tiles_icon_border_summary">Adds a colored border around the icons</string>
 </resources>

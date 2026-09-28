@@ -203,7 +203,7 @@ public class ClockChipStyleFragment extends Fragment {
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.clock_chip_corner_section))));
         List<Object> cornerRows = new ArrayList<>();
-        SwitchWidgetAdapter.SwitchItem cornerSwitch = gatingSwitch(getString(R.string.clock_chip_round_corners_title), prefRound(), false);
+        SwitchWidgetAdapter.SwitchItem cornerSwitch = gatingSwitch(getString(R.string.clock_chip_round_corners_title), getString(R.string.clock_chip_round_corners_title_summary), prefRound(), false);
         cornerSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(prefRound(), cornerSwitch.checked);
             mCornerExpanded = cornerSwitch.checked;
@@ -307,9 +307,9 @@ public class ClockChipStyleFragment extends Fragment {
 
     // ── Righe generiche ──────────────────────────────────────────────────────
 
-    private SwitchWidgetAdapter.SwitchItem gatingSwitch(String title, String key, boolean def) {
+    private SwitchWidgetAdapter.SwitchItem gatingSwitch(String title, String summary, String key, boolean def) {
         SwitchWidgetAdapter.SwitchItem item = new SwitchWidgetAdapter.SwitchItem(
-                title, null, ObsidianPrefs.getBoolean(key, def), null);
+                title, summary, ObsidianPrefs.getBoolean(key, def), null);
         item.onChanged = () -> {
             ObsidianPrefs.putBoolean(key, item.checked);
             rebuild();

@@ -181,7 +181,7 @@ public class LockscreenWidgetsFragment extends Fragment {
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.widgets_custom_color))));
         SwitchWidgetAdapter.SwitchItem colorSwitch = exclusiveGatingSwitch(
-                getString(R.string.widgets_custom_color_title), null, KEY_COLOR_SWITCH, KEY_BG_SWITCH);
+                getString(R.string.widgets_custom_color_title), getString(R.string.widgets_custom_color_title_summary), KEY_COLOR_SWITCH, KEY_BG_SWITCH);
         colorSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_COLOR_SWITCH, colorSwitch.checked);
             mColorSwitchExpanded = colorSwitch.checked;
@@ -206,7 +206,7 @@ public class LockscreenWidgetsFragment extends Fragment {
         // Stessa sezione "IMPOSTAZIONI WIDGET" di sopra (Colori Personalizzati) — switch
         // gemello per lo Sfondo, invece di una nuova SectionTitleAdapter.
         SwitchWidgetAdapter.SwitchItem bgSwitch = exclusiveGatingSwitch(
-                getString(R.string.widgets_custom_bg_title), null, KEY_BG_SWITCH, KEY_COLOR_SWITCH);
+                getString(R.string.widgets_custom_bg_title), getString(R.string.widgets_custom_bg_title_summary), KEY_BG_SWITCH, KEY_COLOR_SWITCH);
         bgSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_BG_SWITCH, bgSwitch.checked);
             mBgSwitchExpanded = bgSwitch.checked;

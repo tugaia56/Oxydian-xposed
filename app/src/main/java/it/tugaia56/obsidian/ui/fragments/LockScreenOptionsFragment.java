@@ -87,7 +87,7 @@ public class LockScreenOptionsFragment extends Fragment {
         // QS, si vede anche qui perché ScrimViewExImp è condiviso tra le due superfici) ──
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_blur_lockscreen_section))));
         SwitchWidgetAdapter.SwitchItem lockBlurSwitch = gatingSwitch(
-                getString(R.string.qs_blur_enable_switch), null, PREF_BLUR_ON);
+                getString(R.string.qs_blur_enable_switch), getString(R.string.qs_blur_enable_switch_summary), PREF_BLUR_ON);
         lockBlurSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(PREF_BLUR_ON, lockBlurSwitch.checked);
             mLockBlurExpanded = lockBlurSwitch.checked;
@@ -104,11 +104,11 @@ public class LockScreenOptionsFragment extends Fragment {
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.nav_lock_misc))));
         SwitchWidgetAdapter.SwitchItem lockIconItem = prefSwitch(
-                getString(R.string.lockscreen_hide_lock_icon), null, "lockscreen_hide_lock_icon");
+                getString(R.string.lockscreen_hide_lock_icon), getString(R.string.lockscreen_hide_lock_icon_summary), "lockscreen_hide_lock_icon");
         SwitchWidgetAdapter.SwitchItem leftItem = prefSwitch(
-                getString(R.string.lockscreen_affordance_remove_left), null, "lockscreen_affordance_remove_left");
+                getString(R.string.lockscreen_affordance_remove_left), getString(R.string.lockscreen_affordance_remove_left_summary), "lockscreen_affordance_remove_left");
         SwitchWidgetAdapter.SwitchItem rightItem = prefSwitch(
-                getString(R.string.lockscreen_affordance_remove_right), null, "lockscreen_affordance_remove_right");
+                getString(R.string.lockscreen_affordance_remove_right), getString(R.string.lockscreen_affordance_remove_right_summary), "lockscreen_affordance_remove_right");
         SwitchWidgetAdapter.SwitchItem sosItem = prefSwitch(
                 getString(R.string.lockscreen_hide_sos), getString(R.string.lockscreen_hide_sos_summary),
                 "lockscreen_hide_sos");

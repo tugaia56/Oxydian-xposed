@@ -107,7 +107,7 @@ public class StatusbarNotifsFragment extends Fragment {
         // ── Usa icone app / Espansione / pulsanti ─────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.notif_expansion_section))));
         SwitchWidgetAdapter.SwitchItem appIconSwitch = gatingSwitch(
-                getString(R.string.statusbar_use_app_icon), null, PREF_APP_ICON);
+                getString(R.string.statusbar_use_app_icon), getString(R.string.statusbar_use_app_icon_summary), PREF_APP_ICON);
         appIconSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(PREF_APP_ICON, appIconSwitch.checked);
             mAppIconExpanded = appIconSwitch.checked;
@@ -128,7 +128,7 @@ public class StatusbarNotifsFragment extends Fragment {
         // ── Personalizza pulsante Cancella tutto ────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.customize_clear_all_button))));
         SwitchWidgetAdapter.SwitchItem clearBtnSwitch = gatingSwitch(
-                getString(R.string.customize_clear_all_button), null, PREF_CUSTOMIZE_CLEAR);
+                getString(R.string.customize_clear_all_button), getString(R.string.customize_clear_all_button_summary), PREF_CUSTOMIZE_CLEAR);
         clearBtnSwitch.onChanged = () -> {
             ObsidianPrefs.putBoolean(PREF_CUSTOMIZE_CLEAR, clearBtnSwitch.checked);
             mClearBtnExpanded = clearBtnSwitch.checked;

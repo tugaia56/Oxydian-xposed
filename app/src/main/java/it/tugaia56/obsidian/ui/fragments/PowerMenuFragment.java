@@ -315,7 +315,7 @@ public class PowerMenuFragment extends Fragment {
                 ObsidianPrefs.putBoolean("advanced_reboot_auth", authItem.checked);
 
         SwitchWidgetAdapter.SwitchItem hideSosItem = new SwitchWidgetAdapter.SwitchItem(
-                getString(R.string.misc_power_menu_hide_sos), null,
+                getString(R.string.misc_power_menu_hide_sos), getString(R.string.misc_power_menu_hide_sos_summary),
                 ObsidianPrefs.getBoolean("power_menu_hide_sos", false),
                 null);
         hideSosItem.onChanged = () -> {
