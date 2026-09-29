@@ -62,6 +62,10 @@ public class PowerMenuFragment extends Fragment {
     private static final String PREF_USE_ACCENT   = "advanced_reboot_use_accent";
     private static final String PREF_CUSTOM_COLOR = "advanced_reboot_custom_color";
     private static final int DIALOG_CUSTOM_COLOR  = PREF_CUSTOM_COLOR.hashCode();
+    private static final String PREF_ADV_REBOOT_BORDER = "advanced_reboot_border_enabled";
+    private static final String PREF_ADV_REBOOT_BORDER_USE_ACCENT   = "advanced_reboot_border_use_accent";
+    private static final String PREF_ADV_REBOOT_BORDER_CUSTOM_COLOR = "advanced_reboot_border_custom_color";
+    private static final int DIALOG_ADV_REBOOT_BORDER_CUSTOM_COLOR = PREF_ADV_REBOOT_BORDER_CUSTOM_COLOR.hashCode();
 
     // Riavvia/Spegni pill — independent from the button's own colour above.
     private static final String PREF_GRADIENT_MODE   = "power_menu_gradient_mode";
@@ -270,6 +274,8 @@ public class PowerMenuFragment extends Fragment {
             ObsidianPrefs.putString(PREF_HANDLER_MODE, "custom");
         } else if (event.dialogId() == DIALOG_HANDLER_BORDER_CUSTOM_COLOR) {
             ObsidianPrefs.putInt(PREF_HANDLER_BORDER_CUSTOM_COLOR, event.color());
+        } else if (event.dialogId() == DIALOG_ADV_REBOOT_BORDER_CUSTOM_COLOR) {
+            ObsidianPrefs.putInt(PREF_ADV_REBOOT_BORDER_CUSTOM_COLOR, event.color());
         } else {
             return;
         }
@@ -323,19 +329,44 @@ public class PowerMenuFragment extends Fragment {
             AppUtils.showRestartReminder(requireContext());
         };
 
-        // Switch enables only — tap the row NAME to expand/collapse "Colore Pulsante" below it.
-        SwitchWidgetAdapter.SwitchItem advancedRebootItem = new SwitchWidgetAdapter.SwitchItem(
+        // Two mutually-exclusive top-level switches instead of one master switch + a nested
+        // style toggle — picking one (List or Tiles) automatically turns the other off, both
+        // share the same "show_advanced_reboot" enabled flag underneath, differing only in
+        // "advanced_reboot_grid_style". Tap either row NAME to expand/collapse the shared
+        // Colore/Offset (and, for Tiles, Personalizza Riquadri) rows below.
+        boolean advRebootGridStyle = ObsidianPrefs.getBoolean("advanced_reboot_grid_style", false);
+        boolean advRebootOn = ObsidianPrefs.getBoolean("show_advanced_reboot", false);
+
+        SwitchWidgetAdapter.SwitchItem advancedRebootListItem = new SwitchWidgetAdapter.SwitchItem(
                 getString(R.string.show_advanced_reboot_title),
                 getString(R.string.show_advanced_reboot_summary),
-                ObsidianPrefs.getBoolean("show_advanced_reboot", false),
+                advRebootOn && !advRebootGridStyle,
                 null);
-        advancedRebootItem.onChanged = () -> {
-            ObsidianPrefs.putBoolean("show_advanced_reboot", advancedRebootItem.checked);
-            mAdvancedRebootExpanded = advancedRebootItem.checked;
+        advancedRebootListItem.onChanged = () -> {
+            ObsidianPrefs.putBoolean("show_advanced_reboot", advancedRebootListItem.checked);
+            if (advancedRebootListItem.checked) ObsidianPrefs.putBoolean("advanced_reboot_grid_style", false);
+            mAdvancedRebootExpanded = advancedRebootListItem.checked;
             AppUtils.showRestartReminder(requireContext());
             rebuild();
         };
-        advancedRebootItem.onRowClick = () -> {
+        advancedRebootListItem.onRowClick = () -> {
+            mAdvancedRebootExpanded = !mAdvancedRebootExpanded;
+            rebuild();
+        };
+
+        SwitchWidgetAdapter.SwitchItem advancedRebootGridItem = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.advanced_reboot_grid_style_title),
+                getString(R.string.advanced_reboot_grid_style_summary),
+                advRebootOn && advRebootGridStyle,
+                null);
+        advancedRebootGridItem.onChanged = () -> {
+            ObsidianPrefs.putBoolean("show_advanced_reboot", advancedRebootGridItem.checked);
+            if (advancedRebootGridItem.checked) ObsidianPrefs.putBoolean("advanced_reboot_grid_style", true);
+            mAdvancedRebootExpanded = advancedRebootGridItem.checked;
+            AppUtils.showRestartReminder(requireContext());
+            rebuild();
+        };
+        advancedRebootGridItem.onRowClick = () -> {
             mAdvancedRebootExpanded = !mAdvancedRebootExpanded;
             rebuild();
         };
@@ -345,6 +376,27 @@ public class PowerMenuFragment extends Fragment {
                 ObsidianPrefs.getInt("advanced_reboot_y_offset", 0),
                 0, 100, "dp", 0,
                 value -> ObsidianPrefs.putInt("advanced_reboot_y_offset", value));
+
+        SwitchWidgetAdapter.SwitchItem advRebootBorderItem = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.advanced_reboot_border_title),
+                ObsidianPrefs.getBoolean(PREF_ADV_REBOOT_BORDER, false)
+                        ? accentCustomColorLabel(PREF_ADV_REBOOT_BORDER_USE_ACCENT, PREF_ADV_REBOOT_BORDER_CUSTOM_COLOR)
+                        : getString(R.string.advanced_reboot_border_summary),
+                ObsidianPrefs.getBoolean(PREF_ADV_REBOOT_BORDER, false),
+                null);
+        advRebootBorderItem.onChanged = () -> {
+            ObsidianPrefs.putBoolean(PREF_ADV_REBOOT_BORDER, advRebootBorderItem.checked);
+            AppUtils.showRestartReminder(requireContext());
+            rebuild();
+            if (advRebootBorderItem.checked) showAccentCustomDialog(PREF_ADV_REBOOT_BORDER_USE_ACCENT, PREF_ADV_REBOOT_BORDER_CUSTOM_COLOR,
+                    DIALOG_ADV_REBOOT_BORDER_CUSTOM_COLOR, R.string.advanced_reboot_border_color_title);
+        };
+        advRebootBorderItem.onRowClick = () -> {
+            if (ObsidianPrefs.getBoolean(PREF_ADV_REBOOT_BORDER, false)) {
+                showAccentCustomDialog(PREF_ADV_REBOOT_BORDER_USE_ACCENT, PREF_ADV_REBOOT_BORDER_CUSTOM_COLOR,
+                        DIALOG_ADV_REBOOT_BORDER_CUSTOM_COLOR, R.string.advanced_reboot_border_color_title);
+            }
+        };
 
         // ── Pillolone (Riavvia/Spegni): Colore / Sfondo / Bordo, own section. One row each —
         // switch ON immediately pops the mode dialog (no separate "tap to open" row underneath,
@@ -490,13 +542,27 @@ public class PowerMenuFragment extends Fragment {
         // ── Riavvio Avanzato: card a sé con titolo — separata dal resto (richiesta esplicita).
         // Colore Pulsante/Offset compaiono solo quando mAdvancedRebootExpanded, che riparte
         // sempre chiuso ad ogni apertura dello schermo (vedi commento sul campo). ──────────
-        sections.add(new SectionTitleAdapter(List.of(getString(R.string.show_advanced_reboot_title))));
-        List<Object> advRebootRows = new java.util.ArrayList<>(List.of(advancedRebootItem));
-        if (mAdvancedRebootExpanded) {
-            advRebootRows.add(colorModeItem());
-            advRebootRows.add(yOffsetItem);
+        sections.add(new SectionTitleAdapter(List.of(getString(R.string.advanced_reboot_title))));
+        List<Object> advRebootRows = new java.util.ArrayList<>(
+                List.of(advancedRebootListItem, advancedRebootGridItem));
+        if (mAdvancedRebootExpanded && ObsidianPrefs.getBoolean("advanced_reboot_grid_style", false)) {
+            advRebootRows.add(new ListWidgetAdapter.ListItem(
+                    getString(R.string.advanced_reboot_customize_tiles_title), null,
+                    () -> {
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).navigateTo(
+                                    new AdvancedRebootTilesFragment(),
+                                    getString(R.string.advanced_reboot_customize_tiles_title));
+                        }
+                    }));
         }
         GroupUtils.addGroup(sections, advRebootRows);
+
+        // Colore Pulsante/Offset: card a sé, separata dalle due scelte Lista/Riquadri sopra
+        // (richiesta esplicita) — compare solo quando una delle due è espansa.
+        if (mAdvancedRebootExpanded) {
+            GroupUtils.addGroup(sections, List.of(colorModeItem(), advRebootBorderItem, yOffsetItem));
+        }
 
         // ── Sfondo Menù Power — sopra Pillolone, sua card a sé con titolo "Power Menù" (stesso
         // trattamento di Riavvio Avanzato). Ritaglio (anteprima+zoom) solo quando il mode è
@@ -538,9 +604,67 @@ public class PowerMenuFragment extends Fragment {
         }
     }
 
+    /** "Colore Pulsante" — 3-way Accento/Colore Personalizzato/Immagine, stessa idea di "Sfondo
+     *  Pallino" (showHandlerModeDialog): l'immagine apre AdvancedRebootButtonPresetFragment
+     *  (stessa griglia preset fingerprint_N + foto propria, il pulsante è anch'esso circolare).
+     *  Migra da PREF_USE_ACCENT (il vecchio switch 2-way) finché l'utente non riapre questo
+     *  picker — PREF_ADV_REBOOT_MODE non scritto finché non lo tocca esplicitamente. */
+    private static final String PREF_ADV_REBOOT_MODE = "advanced_reboot_mode";
+
     private ListWidgetAdapter.ListItem colorModeItem() {
-        return accentCustomColorItem(PREF_USE_ACCENT, PREF_CUSTOM_COLOR,
-                DIALOG_CUSTOM_COLOR, R.string.advanced_reboot_color_title);
+        return new ListWidgetAdapter.ListItem(
+                getString(R.string.advanced_reboot_color_title),
+                advRebootColorLabel(),
+                this::showAdvRebootColorModeDialog);
+    }
+
+    private String advRebootModeCurrent() {
+        String stored = ObsidianPrefs.getString(PREF_ADV_REBOOT_MODE, null);
+        if (stored != null) return stored;
+        return ObsidianPrefs.getBoolean(PREF_USE_ACCENT, true) ? "accent" : "custom";
+    }
+
+    private String advRebootColorLabel() {
+        String mode = advRebootModeCurrent();
+        if ("image".equals(mode)) return getString(R.string.color_mode_image);
+        if ("custom".equals(mode)) {
+            return String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(PREF_CUSTOM_COLOR, ObsidianTheme.DEFAULT_ACCENT));
+        }
+        return getString(R.string.color_mode_accent);
+    }
+
+    private void showAdvRebootColorModeDialog() {
+        String[] entries = {
+                getString(R.string.color_mode_accent),
+                getString(R.string.power_menu_bg_mode_custom),
+                getString(R.string.color_mode_image)
+        };
+        String currentMode = advRebootModeCurrent();
+        int current = "custom".equals(currentMode) ? 1 : "image".equals(currentMode) ? 2 : 0;
+        final int[] selected = {current};
+        ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.advanced_reboot_color_title)
+                .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
+                .setPositiveButton(R.string.apply, (d, w) -> {
+                    if (selected[0] == 2) {
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).navigateTo(
+                                    new AdvancedRebootButtonPresetFragment(),
+                                    getString(R.string.advanced_reboot_color_title));
+                        }
+                        return;
+                    }
+                    String newMode = selected[0] == 1 ? "custom" : "accent";
+                    ObsidianPrefs.putString(PREF_ADV_REBOOT_MODE, newMode);
+                    rebuild();
+                    if (selected[0] == 1 && getActivity() instanceof MainActivity) {
+                        int currentColor = ObsidianPrefs.getInt(PREF_CUSTOM_COLOR, ObsidianTheme.DEFAULT_ACCENT);
+                        ((MainActivity) getActivity()).showColorPickerDialog(
+                                DIALOG_CUSTOM_COLOR, currentColor, true, true, true);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show());
     }
 
     /** 2-way Accento/Personalizzato picker — shared by the button colour and the border colour

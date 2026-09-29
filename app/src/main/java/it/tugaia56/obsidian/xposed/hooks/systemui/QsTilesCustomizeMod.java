@@ -1151,8 +1151,11 @@ public class QsTilesCustomizeMod extends XposedMods {
                 paint.setStrokeWidth(strokeWidth);
                 paint.setColor(mTileBorderColor);
                 // "Forma riquadri" non copre più Media (2026-09-26) — sempre "Media -> Raggio".
+                // Stesso fix gemello del bordo riquadri/pulsanti/cursori — raggio ridotto
+                // dell'inset così la curva del bordo resta concentrica col riempimento.
+                float mediaBorderRadius = Math.max(0f, dp(mTileRadiusMediaDp) - inset);
                 canvas.drawRoundRect(inset, inset, getWidth() - inset, getHeight() - inset,
-                        dp(mTileRadiusMediaDp), dp(mTileRadiusMediaDp), paint);
+                        mediaBorderRadius, mediaBorderRadius, paint);
             }
         };
         v.setWillNotDraw(false);
@@ -1368,8 +1371,12 @@ public class QsTilesCustomizeMod extends XposedMods {
                             paint.setStyle(android.graphics.Paint.Style.STROKE);
                             paint.setStrokeWidth(strokeWidth);
                             paint.setColor(gIcon ? mIconBorderColor : mTileBorderColor);
+                            // 2026-09-29: stesso fix gemello del blocco "mixcolor tile border draw"
+                            // più sotto — bounds ristretti di "inset" ma raggio pieno facevano
+                            // sporgere lo sfondo oltre la curva del bordo agli angoli.
+                            float borderRadius = Math.max(0f, radius - inset);
                             canvas.drawRoundRect(bounds.left + inset, bounds.top + inset,
-                                    bounds.right - inset, bounds.bottom - inset, radius, radius, paint);
+                                    bounds.right - inset, bounds.bottom - inset, borderRadius, borderRadius, paint);
                         }
                     } catch (Throwable t) { dbg("tile border draw failed: " + t); }
                 }
@@ -1550,10 +1557,23 @@ public class QsTilesCustomizeMod extends XposedMods {
                             paint.setStyle(android.graphics.Paint.Style.STROKE);
                             paint.setStrokeWidth(strokeWidth);
                             paint.setColor(bigCardIcon ? mIconBorderColor : mTileBorderColor);
-                            // inset non applicato: trascurabile per un bordo sottile
-                            if (useOwnShape) drawShaped(canvas, bounds, paint);
-                            else canvas.drawRoundRect(bounds.left + inset, bounds.top + inset,
-                                    bounds.right - inset, bounds.bottom - inset, radius, radius, paint);
+                            if (useOwnShape) {
+                                drawShaped(canvas, bounds, paint);
+                            } else {
+                                // 2026-09-29: lo sfondo (drawRoundRect pieno, bounds NON ristretti)
+                                // usa "radius" sull'intero rettangolo; il bordo qui viene disegnato
+                                // su un rettangolo ristretto di "inset" (metà spessore) per restare
+                                // tutto dentro i bordi del riquadro — usando lo STESSO raggio
+                                // assoluto su un rettangolo più piccolo, la curva del bordo si
+                                // stringe più del dovuto e lo sfondo (raggio pieno, rettangolo
+                                // grande) sporge visibilmente oltre agli angoli (segnalato: "sfondo
+                                // che esce dal bordo usato in raggio"). Riducendo il raggio del
+                                // bordo della stessa quantità dell'inset, le due curve restano
+                                // concentriche — stesso principio di un bordo CSS/inset-shadow.
+                                float borderRadius = Math.max(0f, radius - inset);
+                                canvas.drawRoundRect(bounds.left + inset, bounds.top + inset,
+                                        bounds.right - inset, bounds.bottom - inset, borderRadius, borderRadius, paint);
+                            }
                         }
                     } catch (Throwable t) { dbg("mixcolor tile border draw failed: " + t); }
                 }
@@ -1990,8 +2010,11 @@ public class QsTilesCustomizeMod extends XposedMods {
                         paint.setStrokeWidth(strokeWidth);
                         paint.setColor(mTileBorderColor);
                         float radius = getFloatField(p.thisObject, "mCurBackgroundRadius");
+                        // Stesso fix gemello del bordo riquadri/pulsanti sopra — raggio ridotto
+                        // dell'inset così la curva del bordo resta concentrica col riempimento.
+                        float borderRadius = Math.max(0f, radius - inset);
                         canvas.drawRoundRect(rect.left + inset, rect.top + inset, rect.right - inset, rect.bottom - inset,
-                                radius, radius, paint);
+                                borderRadius, borderRadius, paint);
                     } catch (Throwable t) { dbg("slider border draw failed: " + t); }
                 }
             });

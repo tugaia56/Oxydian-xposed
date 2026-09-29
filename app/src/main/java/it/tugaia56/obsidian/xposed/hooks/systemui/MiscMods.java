@@ -64,8 +64,19 @@ public class MiscMods extends XposedMods {
     private boolean mAdvancedRebootAuth  = false;
     private int     mAdvancedRebootYOffset = 0;
     private boolean mBlockClipboardOverlay = false;
-    private boolean mAdvRebootUseAccent  = true;
+    private boolean mAdvRebootUseAccent  = true; // legacy 2-way switch, read once for migration into mAdvRebootMode below
     private int     mAdvRebootCustomColor = 0xFF908DFF; // matches ObsidianTheme.DEFAULT_ACCENT
+    // "Colore Pulsante" — 3-way Accento/Personalizzato/Immagine (AdvancedRebootButtonPresetFragment
+    // for the image side, same fingerprint-preset+gallery flow as "Sfondo Pallino"). "accent"|
+    // "custom"|"image" — migrated from mAdvRebootUseAccent above if never explicitly set.
+    private String  mAdvRebootMode = "accent";
+    private static final String ADV_REBOOT_IMAGE_SUBPATH = ".obsidian/advanced_reboot_button_image";
+    private Bitmap  mAdvRebootBitmap;
+    private long    mAdvRebootBitmapMtime = -1;
+    private int     mAdvRebootCropZoom = 100;
+    private boolean mAdvRebootBorderEnabled = false;
+    private boolean mAdvRebootBorderUseAccent = true;
+    private int     mAdvRebootBorderCustomColor = 0xFF908DFF;
 
     // Riavvia/Spegni pill — independent from the Riavvio Avanzato button's own colour above.
     // mode is one of "stock" (leave OOS green/red/white alone) / "accent" / "custom" / "split"
@@ -144,6 +155,13 @@ public class MiscMods extends XposedMods {
         mBlockClipboardOverlay = Xprefs.getBoolean("block_clipboard_overlay", false);
         mAdvRebootUseAccent   = Xprefs.getBoolean("advanced_reboot_use_accent", true);
         mAdvRebootCustomColor = Xprefs.getInt("advanced_reboot_custom_color", 0xFF908DFF);
+        String advRebootModeStored = Xprefs.getString("advanced_reboot_mode", null);
+        mAdvRebootMode = advRebootModeStored != null ? advRebootModeStored : (mAdvRebootUseAccent ? "accent" : "custom");
+        mAdvRebootCropZoom = Xprefs.getInt("advanced_reboot_button_crop_zoom", 100);
+        mAdvRebootBorderEnabled = Xprefs.getBoolean("advanced_reboot_border_enabled", false);
+        mAdvRebootBorderUseAccent = Xprefs.getBoolean("advanced_reboot_border_use_accent", true);
+        mAdvRebootBorderCustomColor = Xprefs.getInt("advanced_reboot_border_custom_color", 0xFF908DFF);
+        refreshAdvRebootBitmap();
         mPowerMenuGradientMode = Xprefs.getString("power_menu_gradient_mode", "accent");
         mPowerMenuGradientCustomColor = Xprefs.getInt("power_menu_gradient_custom_color", 0xFF908DFF);
         mPowerMenuGradientRestartColor = Xprefs.getInt("power_menu_gradient_restart_color", 0xFF00BD13);
@@ -506,7 +524,7 @@ public class MiscMods extends XposedMods {
      *  Personalizzato choice as everywhere else in the app, reading the same shared
      *  DST_ACCENT1/_on prefs "Accento" resolves to elsewhere. */
     private int advancedRebootColor() {
-        return mAdvRebootUseAccent ? sharedAccentColor() : mAdvRebootCustomColor;
+        return "custom".equals(mAdvRebootMode) ? mAdvRebootCustomColor : sharedAccentColor();
     }
 
     /** Stock ARGB ints fed into LinearGradient for the Riavvia/Spegni halves — portrait uses
@@ -572,6 +590,10 @@ public class MiscMods extends XposedMods {
      *  lets the handle be e.g. navy fill + accent ring. */
     private int handlerBorderColor() {
         return mPowerMenuHandlerBorderUseAccent ? sharedAccentColor() : mPowerMenuHandlerBorderCustomColor;
+    }
+
+    private int advRebootBorderColor() {
+        return mAdvRebootBorderUseAccent ? sharedAccentColor() : mAdvRebootBorderCustomColor;
     }
 
     /** Colore Pallino — null means "stock" (leave OOS's default white handler alone). */
@@ -853,6 +875,29 @@ public class MiscMods extends XposedMods {
         @Override public int getOpacity() { return android.graphics.PixelFormat.TRANSLUCENT; }
     }
 
+    /** Re-decodes the Riavvio Avanzato button's image only when the file's mtime changed — same
+     *  reasoning as refreshPowerMenuHandlerBitmap() below, independent cache/file. */
+    private void refreshAdvRebootBitmap() {
+        if (!"image".equals(mAdvRebootMode)) {
+            mAdvRebootBitmap = null;
+            mAdvRebootBitmapMtime = -1;
+            return;
+        }
+        File f = new File(Environment.getExternalStorageDirectory(), ADV_REBOOT_IMAGE_SUBPATH);
+        if (!f.exists()) {
+            mAdvRebootBitmap = null;
+            mAdvRebootBitmapMtime = -1;
+            return;
+        }
+        long mtime = f.lastModified();
+        if (mAdvRebootBitmap != null && mtime == mAdvRebootBitmapMtime) return;
+        Bitmap bmp = decodeSampledBitmap(f);
+        if (bmp != null) {
+            mAdvRebootBitmap = bmp;
+            mAdvRebootBitmapMtime = mtime;
+        }
+    }
+
     /** Re-decodes the pallino's image only when the file's mtime changed — same reasoning as
      *  refreshPowerMenuBgBitmap() above, independent cache/file. */
     private void refreshPowerMenuHandlerBitmap() {
@@ -1004,10 +1049,6 @@ public class MiscMods extends XposedMods {
 
     private void drawAdvancedReboot(Canvas canvas, Object shutdownView) {
         try {
-            Paint buttonPaint = new Paint();
-            buttonPaint.setColor(advancedRebootColor());
-            buttonPaint.setStyle(Paint.Style.FILL);
-
             Paint textPaint = new Paint();
             textPaint.setColor(Color.GRAY);
             textPaint.setTextAlign(Paint.Align.CENTER);
@@ -1019,13 +1060,40 @@ public class MiscMods extends XposedMods {
             mCenterX = viewWidth / 2;
             mCenterY = mRadius + dp(50) + dp(mAdvancedRebootYOffset);
 
-            canvas.drawCircle(mCenterX, mCenterY, mRadius, buttonPaint);
+            boolean drewImage = false;
+            if ("image".equals(mAdvRebootMode) && mAdvRebootBitmap != null) {
+                canvas.save();
+                Path clip = new Path();
+                clip.addCircle(mCenterX, mCenterY, mRadius, Path.Direction.CW);
+                canvas.clipPath(clip);
+                RectF dst = new RectF(mCenterX - mRadius, mCenterY - mRadius,
+                        mCenterX + mRadius, mCenterY + mRadius);
+                drawContainedOnly(canvas, mAdvRebootBitmap, dst, mAdvRebootCropZoom);
+                canvas.restore();
+                drewImage = true;
+            }
 
-            if (mAdvancedRebootDrawable != null) {
-                Rect iconBounds = new Rect(mCenterX - mRadius / 2, mCenterY - mRadius / 2,
-                        mCenterX + mRadius / 2, mCenterY + mRadius / 2);
-                mAdvancedRebootDrawable.setBounds(iconBounds);
-                mAdvancedRebootDrawable.draw(canvas);
+            if (!drewImage) {
+                Paint buttonPaint = new Paint();
+                buttonPaint.setColor(advancedRebootColor());
+                buttonPaint.setStyle(Paint.Style.FILL);
+                canvas.drawCircle(mCenterX, mCenterY, mRadius, buttonPaint);
+
+                if (mAdvancedRebootDrawable != null) {
+                    Rect iconBounds = new Rect(mCenterX - mRadius / 2, mCenterY - mRadius / 2,
+                            mCenterX + mRadius / 2, mCenterY + mRadius / 2);
+                    mAdvancedRebootDrawable.setBounds(iconBounds);
+                    mAdvancedRebootDrawable.draw(canvas);
+                }
+            }
+
+            if (mAdvRebootBorderEnabled) {
+                Paint borderPaint = new Paint();
+                borderPaint.setAntiAlias(true);
+                borderPaint.setStyle(Paint.Style.STROKE);
+                borderPaint.setStrokeWidth(dp(2));
+                borderPaint.setColor(advRebootBorderColor());
+                canvas.drawCircle(mCenterX, mCenterY, mRadius, borderPaint);
             }
 
             String buttonText = ResourceManager.modRes != null
