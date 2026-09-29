@@ -9,6 +9,7 @@ import android.provider.MediaStore;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import it.tugaia56.obsidian.BuildConfig;
+import it.tugaia56.obsidian.ui.activity.MainActivity;
 
 /**
  * Porting semplificato di OC's ActivityLauncherUtils — lancia un'Intent "dismissando" la
@@ -106,8 +107,7 @@ public class ActivityLauncherUtils {
      *  Meteo installata riconosciuta. */
     public void launchWeatherSettings() {
         Intent intent = new Intent();
-        intent.setComponent(new ComponentName(BuildConfig.APPLICATION_ID,
-                BuildConfig.APPLICATION_ID + ".ui.activity.MainActivity"));
+        intent.setComponent(new ComponentName(BuildConfig.APPLICATION_ID, MainActivity.class.getName()));
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         launch(intent);
     }

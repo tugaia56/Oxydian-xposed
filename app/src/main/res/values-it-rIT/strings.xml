@@ -380,6 +380,10 @@
     <string name="advanced_reboot_safe_mode">Modalità provvisoria</string>
     <string name="advanced_reboot_fast_reboot">Riavvio Veloce</string>
     <string name="advanced_reboot_systemui">Riavvia SystemUI</string>
+    <string name="advanced_reboot_lock_screen">Blocca Schermo</string>
+    <string name="advanced_reboot_screenshot">Screenshot</string>
+    <string name="advanced_reboot_fastbootd">Riavvia in Fastbootd</string>
+    <string name="advanced_reboot_download_mode">Riavvia in Download Mode</string>
     <string name="nav_misc_settings_entry">Mostra Voce nelle Impostazioni</string>
     <string name="nav_misc_settings_entry_summary">Aggiunge la voce Oxydian nelle Impostazioni di sistema</string>
     <string name="nav_screenshot_enabler">Abilita Screenshot</string>

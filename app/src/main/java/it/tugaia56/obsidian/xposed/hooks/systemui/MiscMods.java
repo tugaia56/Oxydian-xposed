@@ -37,6 +37,7 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import it.tugaia56.obsidian.BuildConfig;
 import it.tugaia56.obsidian.R;
+import it.tugaia56.obsidian.ui.activity.AuthActivity;
 import it.tugaia56.obsidian.xposed.ResourceManager;
 import it.tugaia56.obsidian.xposed.XposedMods;
 
@@ -1035,8 +1036,7 @@ public class MiscMods extends XposedMods {
 
     private void launchAdvancedReboot(boolean shouldAuth) {
         Intent intent = new Intent();
-        intent.setComponent(new ComponentName(BuildConfig.APPLICATION_ID,
-                BuildConfig.APPLICATION_ID + ".ui.activity.AuthActivity"));
+        intent.setComponent(new ComponentName(BuildConfig.APPLICATION_ID, AuthActivity.class.getName()));
         intent.putExtra("shouldAuth", shouldAuth);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(intent);
@@ -1064,8 +1064,7 @@ public class MiscMods extends XposedMods {
      *  success, instead of showing the Recovery/Bootloader/etc. chooser. */
     private void launchStockAuth(String stockAction) {
         Intent intent = new Intent();
-        intent.setComponent(new ComponentName(BuildConfig.APPLICATION_ID,
-                BuildConfig.APPLICATION_ID + ".ui.activity.AuthActivity"));
+        intent.setComponent(new ComponentName(BuildConfig.APPLICATION_ID, AuthActivity.class.getName()));
         intent.putExtra("stockAction", stockAction);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(intent);

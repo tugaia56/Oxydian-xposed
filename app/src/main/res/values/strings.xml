@@ -383,6 +383,10 @@
     <string name="advanced_reboot_safe_mode">Safe Mode</string>
     <string name="advanced_reboot_fast_reboot">Fast Reboot</string>
     <string name="advanced_reboot_systemui">Restart SystemUI</string>
+    <string name="advanced_reboot_lock_screen">Lock Screen</string>
+    <string name="advanced_reboot_screenshot">Screenshot</string>
+    <string name="advanced_reboot_fastbootd">Reboot Fastbootd</string>
+    <string name="advanced_reboot_download_mode">Reboot Download Mode</string>
     <string name="nav_misc_settings_entry">Show Entry in Settings</string>
     <string name="nav_misc_settings_entry_summary">Adds Oxydian entry to system Settings</string>
     <string name="nav_screenshot_enabler">Enable Screenshot</string>

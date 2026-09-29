@@ -115,7 +115,10 @@ public class AuthActivity extends FragmentActivity {
                 getString(R.string.advanced_reboot_bootloader),
                 getString(R.string.advanced_reboot_safe_mode),
                 getString(R.string.advanced_reboot_fast_reboot),
-                getString(R.string.advanced_reboot_systemui)
+                getString(R.string.advanced_reboot_systemui),
+                getString(R.string.advanced_reboot_lock_screen),
+                getString(R.string.advanced_reboot_screenshot),
+                getString(R.string.advanced_reboot_fastbootd)
         };
 
         it.tugaia56.obsidian.utils.ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(this)
@@ -127,6 +130,17 @@ public class AuthActivity extends FragmentActivity {
                         case 2 -> "reboot safemode";
                         case 3 -> "killall zygote; killall zygote64";
                         case 4 -> "killall " + SYSTEM_UI;
+                        // KEYCODE_POWER: locks the screen immediately, same as a physical power
+                        // press — not the OOS "true" lockdown (which also disables biometric
+                        // bypass until credential re-entry, needs a hidden LockPatternUtils
+                        // call not reachable from plain root shell).
+                        case 5 -> "input keyevent 26";
+                        // OOS ignores a synthetic KEYCODE_SYSRQ (confirmed on-device: no capture
+                        // happened) — screencap writes the file directly instead, bypassing the
+                        // key-injection path entirely. No system edit/share panel this way, but
+                        // it reliably produces a real screenshot.
+                        case 6 -> "mkdir -p /sdcard/Pictures/Screenshots && screencap -p /sdcard/Pictures/Screenshots/Screenshot_$(date +%Y%m%d_%H%M%S).png";
+                        case 7 -> "reboot fastboot";
                         default -> "";
                     };
                     try { Shell.cmd(cmd).exec(); } catch (Throwable ignored) {}
