@@ -29,6 +29,7 @@ public class ImpostazioniTabFragment extends Fragment {
     private static final int ACCENT_BACKUP  = 0xFF4CAF50; // green
     private static final int ACCENT_UPDATE  = 0xFF00BCD4; // cyan
     private static final int ACCENT_ABOUT   = 0xFFFF9800; // amber
+    private static final int ACCENT_HEALTH  = 0xFFE91E63; // pink
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -78,7 +79,15 @@ public class ImpostazioniTabFragment extends Fragment {
                         getString(R.string.nav_settings_about_summary),
                         () -> navigate(new SettingsAboutFragment(), getString(R.string.nav_settings_about)),
                         ACCENT_ABOUT,
-                        "info", "about", "github", "crediti", "credits", "supporto", "traduci")
+                        "info", "about", "github", "crediti", "credits", "supporto", "traduci"),
+
+                new NavAdapter.NavItem(
+                        R.drawable.ic_check,
+                        getString(R.string.nav_mod_health),
+                        getString(R.string.nav_mod_health_summary),
+                        () -> navigate(new ModHealthFragment(), getString(R.string.nav_mod_health)),
+                        ACCENT_HEALTH,
+                        "stato", "status", "diagnostica", "diagnostics", "rom", "aggiornamento", "update", "rotto", "broken")
         );
 
         rv.setAdapter(new NavAdapter(items));

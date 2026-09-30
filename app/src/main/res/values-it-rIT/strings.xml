@@ -577,13 +577,12 @@
     <string name="qs_widgets_type_mini">Widget rapidi (Wi-Fi, torcia, calcolatrice, ecc.)</string>
     <string name="qs_widgets_type_customapp">App personalizzata</string>
     <string name="qs_widgets_status_section">Stato</string>
-    <string name="qs_widgets_status_body">I widget scelti qui compaiono nel pannello Impostazioni Rapide, in righe da 2 (Toccare la riga del Widget per aprire un menu con "Sposta su" / "Sposta giù" / "Rimuovi").</string>
-    <string name="qs_widgets_too_many">Il pannello mostra solo i primi 4 widget (2 righe). Rimuovine uno prima di aggiungerne un altro.</string>
+    <string name="qs_widgets_status_body">I widget scelti qui compaiono nel pannello Impostazioni Rapide, in righe da 2. Trascina la maniglia per riordinare, tocca Rimuovi per eliminare una riga — solo le prime 4 vengono davvero mostrate nel pannello.</string>
+    <string name="qs_widgets_too_many">Il pannello mostra solo i primi 4 widget (2 righe) — gli altri restano salvati ma nascosti. Trascina per cambiare quali vengono mostrati.</string>
     <string name="qs_widgets_list_section">Widget</string>
     <string name="qs_widgets_list_empty">Nessun widget aggiunto</string>
-    <string name="qs_widgets_row_hint">Tocca per spostare o rimuovere</string>
-    <string name="qs_widgets_move_up">Sposta su</string>
-    <string name="qs_widgets_move_down">Sposta giù</string>
+    <string name="qs_widgets_row_visible">Visibile nel pannello</string>
+    <string name="qs_widgets_row_hidden">Non visibile — oltre il limite di 4</string>
     <string name="qs_widgets_remove_action">Rimuovi</string>
     <string name="qs_widgets_add">Aggiungi Widget</string>
     <string name="qs_widgets_add_all_used">Tutti gli slot widget sono già in uso</string>
@@ -851,6 +850,23 @@
     <string name="nav_settings_update_summary">Controllo aggiornamenti</string>
     <string name="nav_settings_about">Info</string>
     <string name="nav_settings_about_summary">GitHub, supporto, crediti</string>
+    <string name="nav_mod_health">Stato Oxydian</string>
+    <string name="nav_mod_health_summary">Controlla quali mod funzionano ancora dopo un aggiornamento ROM</string>
+
+    <string name="mod_health_title">Stato Oxydian</string>
+    <string name="mod_health_intro">Mostra quali mod si sono installati correttamente all\'ultimo avvio di ogni processo (SystemUI, Impostazioni, Launcher, Framework). Non è un controllo in tempo reale: riflette lo stato dell\'ultimo riavvio — dopo un aggiornamento ROM basta riavviare e riaprire questa schermata.</string>
+    <string name="mod_health_process_settings">Impostazioni</string>
+    <string name="mod_health_process_framework">Sistema (framework)</string>
+    <string name="mod_health_last_checked">Ultimo controllo</string>
+    <string name="mod_health_never_checked">Mai — quel processo non è ancora partito da quando questa funzione è stata aggiunta, o non ha mod da controllare</string>
+    <string name="mod_health_ok">OK</string>
+    <string name="mod_health_group_summary_fmt">%1$d/%2$d OK</string>
+    <string name="mod_health_fail_fmt">Rotto (%s) — tocca per i dettagli</string>
+    <string name="mod_health_export_section">Esporta</string>
+    <string name="mod_health_export_title">Esporta log</string>
+    <string name="mod_health_export_summary">Salva un file di testo con tutti i dettagli, utile da condividere per assistenza</string>
+    <string name="mod_health_export_ok_fmt">Salvato: %s</string>
+    <string name="mod_health_export_fail">Impossibile salvare il file</string>
 
     <string name="settings_appearance_section">Aspetto</string>
     <string name="settings_theme_title">Tema</string>

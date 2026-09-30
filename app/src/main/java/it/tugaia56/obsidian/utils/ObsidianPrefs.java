@@ -22,6 +22,7 @@ public class ObsidianPrefs {
     public static int     getInt(String key, int d)          { try { return prefs.getInt(key, d); } catch (ClassCastException e) { return d; } }
     public static float   getFloat(String key, float d)      { try { return prefs.getFloat(key, d); } catch (ClassCastException e) { return d; } }
     public static String  getString(String key, String d)    { try { return prefs.getString(key, d); } catch (ClassCastException e) { return d; } }
+    public static long    getLong(String key, long d)        { try { return prefs.getLong(key, d); } catch (ClassCastException e) { return d; } }
     public static void    remove(String key)                  { prefs.edit().remove(key).commit(); }
     public static void    clear()                             { prefs.edit().clear().commit(); }
 }

@@ -172,11 +172,14 @@ public class XPLauncher {
         Runnable startMods = () -> {
             // Phase 1 – install hooks immediately so they fire during SystemUI init.
             // Preference fields use preloaded/static values or Java defaults until Phase 2.
-            installHooks(lpparam);
+            // installHooks() already wraps every mod in try/catch (a class/method an OEM ROM
+            // update renamed throws here) — the return value is that same pass/fail info,
+            // just captured instead of only logged, for the "Stato Mod" diagnostic screen.
+            String healthLine = installHooks(lpparam);
 
             // Phase 2 – background thread: wait for ContentProvider, then push live prefs.
             if (!ModPacks.getMods(lpparam.packageName).isEmpty()) {
-                new Thread(() -> waitAndRefreshPrefs(lpparam)).start();
+                new Thread(() -> waitAndRefreshPrefs(lpparam, healthLine)).start();
             }
         };
 
@@ -211,10 +214,14 @@ public class XPLauncher {
     /**
      * Phase 1: create each mod instance and install its hooks immediately.
      * updatePrefs() is NOT called here — Xprefs isn't ready yet.
+     * Returns a compact "ModName=OK;ModName=FAIL:ExceptionType::message" line — same
+     * try/catch that always ran here, just captured for the "Stato Mod" diagnostic screen
+     * instead of only going to logcat.
      */
-    private void installHooks(XC_LoadPackage.LoadPackageParam lpparam) {
+    private String installHooks(XC_LoadPackage.LoadPackageParam lpparam) {
         Log.d("ObsidianXP", "installHooks: " + lpparam.packageName
                 + " mods=" + ModPacks.getMods(lpparam.packageName).size());
+        StringBuilder health = new StringBuilder();
         for (Class<? extends XposedMods> mod : ModPacks.getMods(lpparam.packageName)) {
             try {
                 Log.d("ObsidianXP", "installing: " + mod.getSimpleName());
@@ -228,12 +235,37 @@ public class XPLauncher {
                 Log.d("ObsidianXP", "installed OK: " + mod.getSimpleName());
                 log("[ Obsidian ] hooks installed: " + mod.getSimpleName()
                         + " for " + lpparam.packageName);
+                if (health.length() > 0) health.append(';');
+                health.append(mod.getSimpleName()).append("=OK");
             } catch (Throwable t) {
                 Log.d("ObsidianXP", "installHooks FAILED: " + mod.getSimpleName() + ": " + t);
                 log("[ Obsidian ] installHooks failed: " + mod.getSimpleName()
                         + ": " + t.getMessage());
+                if (health.length() > 0) health.append(';');
+                String reason = String.valueOf(t.getMessage());
+                // Un'eccezione incapsulata (raro con i lanci diretti di XposedHelpers, ma
+                // possibile) lascerebbe il messaggio esterno generico — aggiunge anche la
+                // causa quando dice qualcosa di diverso, per non perdere l'indizio vero.
+                Throwable cause = t.getCause();
+                if (cause != null && cause != t && cause.getMessage() != null
+                        && !cause.getMessage().equals(t.getMessage())) {
+                    reason += " <- " + cause.getMessage();
+                }
+                health.append(mod.getSimpleName()).append("=FAIL:")
+                        .append(t.getClass().getSimpleName()).append("::")
+                        .append(sanitizeReason(reason));
             }
         }
+        return health.toString();
+    }
+
+    /** Toglie separatori usati dal formato compatto ("dbmp;" / "=") e caratteri di riga dal
+     *  messaggio di un'eccezione, e lo tronca — serve da indizio per risalire alla classe/
+     *  metodo OOS rinominato, non da stacktrace completo. */
+    private static String sanitizeReason(String message) {
+        String s = message.replace(';', ',').replace('=', ':')
+                .replace('\n', ' ').replace('\r', ' ').trim();
+        return s.length() > 300 ? s.substring(0, 300) : s;
     }
 
     /**
@@ -241,7 +273,7 @@ public class XPLauncher {
      * running mod so they switch from default/preloaded values to the user's saved prefs.
      * On slow boots the app may start 10-30 s after SystemUI — we wait indefinitely.
      */
-    private void waitAndRefreshPrefs(XC_LoadPackage.LoadPackageParam lpparam) {
+    private void waitAndRefreshPrefs(XC_LoadPackage.LoadPackageParam lpparam, String healthLine) {
         // 2026-09-05: il retry "per sempre" originale presumeva che ogni fallimento fosse un
         // problema di TIMING (il provider di Obsidian non ancora partito) — vero per la
         // maggior parte dei processi, ma falso per alcune app (com.oneplus.account,
@@ -294,6 +326,18 @@ public class XPLauncher {
         // listener, altrimenti i futuri cambi di preferenza non arriverebbero mai a questo
         // processo pur avendo installato correttamente gli hook.
         XPrefs.ensureListenerRegistered();
+
+        // Schermata "Stato Mod" (Impostazioni > Diagnostica) — scritto qui perché è il primo
+        // punto in cui il ContentProvider è garantito raggiungibile; non aggiunge alcuna
+        // attesa in più al boot (il retry sopra correva comunque per aggiornare le prefs).
+        if (healthLine != null && !healthLine.isEmpty()) {
+            try {
+                Xprefs.edit()
+                        .putString("mod_health_" + lpparam.packageName, healthLine)
+                        .putLong("mod_health_" + lpparam.packageName + "_ts", System.currentTimeMillis())
+                        .apply();
+            } catch (Throwable ignored) {}
+        }
 
         for (XposedMods mod : new ArrayList<>(runningMods)) {
             if (!mod.listensTo(lpparam.packageName)) continue;
