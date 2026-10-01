@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Override di com.oneplus.deskclock:color/coui_navigation_tab_color — tinge di accento la
+     scheda attiva della barra inferiore (Sveglia/Mondo/Cronometro/Timer). L'originale usa
+     ?attr/couiColorSecondNeutral per lo stato non selezionato, ma un overlay non può risolvere
+     un attr del pacchetto target senza qualificarlo esplicitamente — qui il valore concreto
+     (coui_color_secondary_neutral_dark, da colors.xml dell'app originale) è scritto diretto
+     per evitare il problema. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:state_selected="true"
+        android:color="@*android:color/accent_material_dark"/>
+    <item android:color="#8affffff"/>
+</selector>

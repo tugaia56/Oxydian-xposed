@@ -464,12 +464,9 @@
     <string name="qs_tiles_hide_labels_title">QS-Beschriftungen ausblenden</string>
     <string name="qs_tiles_label_color_title">Eigene QS-Textfarbe</string>
     <string name="qs_tiles_brightness_section">QS-Regler</string>
-    <string name="qs_tiles_sliders_master_title">Reglerkachel</string>
-    <string name="qs_tiles_sliders_master_summary">Farbe, Symbol und Rahmen der Helligkeits- und Lautstärkeregler</string>
     <string name="qs_tiles_brightness_icon_title">Farbe des Icons für automatische Helligkeit ändern</string>
     <string name="qs_tiles_brightness_icon_color_title">Eigene Farbe</string>
     <string name="qs_tiles_brightness_icon_title_volume">Farbe des Lautstärke-Icons ändern</string>
-    <string name="qs_tiles_slider_icon_colors_title">Icon-Farbe</string>
     <string name="qs_tiles_brightness_custom_title">QS-Regler anpassen</string>
     <string name="qs_tiles_brightness_mode_title">Farbmodus des Reglers</string>
     <string name="qs_tiles_brightness_color_title">Eigene Farbe</string>
@@ -501,9 +498,6 @@
     <string name="qs_widgets_too_many">Das Panel zeigt nur die ersten 4 Widgets (2 Reihen). Entferne eines, bevor du ein weiteres hinzufügst.</string>
     <string name="qs_widgets_list_section">Widgets</string>
     <string name="qs_widgets_list_empty">Keine Widgets hinzugefügt</string>
-    <string name="qs_widgets_row_hint">Zum Verschieben oder Entfernen antippen</string>
-    <string name="qs_widgets_move_up">Nach oben verschieben</string>
-    <string name="qs_widgets_move_down">Nach unten verschieben</string>
     <string name="qs_widgets_remove_action">Entfernen</string>
     <string name="qs_widgets_add">Widget hinzufügen</string>
     <string name="qs_widgets_add_all_used">Alle Widget-Plätze sind bereits belegt</string>

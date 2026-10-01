@@ -12,6 +12,7 @@ import static it.tugaia56.obsidian.xposed.XPrefs.Xprefs;
 import android.annotation.SuppressLint;
 import android.util.Log;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -124,6 +125,10 @@ public class StatusbarClock extends XposedMods {
     // prima-dopo/data (Stile Data) senza dover disattivare l'intero modulo per testare.
     private boolean mClockStyleOn = true;
     private boolean mDateStyleOn  = true;
+
+    /** "none" / "timer" / "stopwatch" — tocco sull'orologio della statusbar apre l'app
+     *  Orologio OnePlus direttamente sulla scheda Timer o Cronometro. */
+    private String  mClockTapAction = "none";
 
     private boolean mAutoHideLauncher = false;
     private boolean mAutoHide         = false;
@@ -241,6 +246,8 @@ public class StatusbarClock extends XposedMods {
         mAfterClock  = Xprefs.getString("sbc_after_clock_format", "");
         mAfterSmall  = Xprefs.getBoolean("sbc_after_small", false);
 
+        mClockTapAction = Xprefs.getString("status_bar_clock_tap_action", "none");
+
         mAutoHideLauncher = Xprefs.getBoolean("status_bar_clock_auto_hide_launcher", false);
         mAutoHide         = Xprefs.getBoolean("status_bar_clock_auto_hide", false);
         mHideDuration     = Xprefs.getSliderInt("status_bar_clock_auto_hide_hduration", DEFAULT_HIDE_DURATION);
@@ -272,6 +279,9 @@ public class StatusbarClock extends XposedMods {
                 case "status_bar_clock_auto_hide":
                 case "status_bar_clock_auto_hide_launcher":
                     updateAutoHide();
+                    break;
+                case "status_bar_clock_tap_action":
+                    applyClockTapAction();
                     break;
                 case "status_bar_clock_background_chip_switch":
                 case "status_bar_clock_background_chip_style":
@@ -305,6 +315,7 @@ public class StatusbarClock extends XposedMods {
                 refreshClock();
                 updateAutoHide();
                 updateChip();
+                applyClockTapAction();
             });
         }
     }
@@ -431,6 +442,7 @@ public class StatusbarClock extends XposedMods {
                     refreshClock();
                     updateAutoHide();
                     updateChip();
+                    applyClockTapAction();
                 }
             });
         } catch (Throwable t) {
@@ -926,6 +938,35 @@ public class StatusbarClock extends XposedMods {
             // larghezza quando il testo non è ancora pronto (View appena creata), quindi senza
             // questo requestLayout esplicito quel passaggio corretto potrebbe non arrivare mai.
             mClockView.requestLayout();
+        });
+    }
+
+    /** Tocco sull'orologio: apre l'app Orologio OnePlus direttamente sulla scheda Timer o
+     *  Cronometro. Trucco trovato via decompilazione di Clock.apk: HandleApiActivity.e0()
+     *  gira "android.intent.action.SHOW_TIMERS" in un Intent verso AlarmClock con azione
+     *  "com.oplus.alarmclock.alarmclock.enter_and_open_timer" ed extra "clock_tab_index"
+     *  (int) — nonostante il nome dell'azione parli solo di timer, l'indice vale per
+     *  qualunque scheda: 0=Sveglia, 1=Orologio mondiale, 2=Cronometro, 3=Timer. */
+    private void applyClockTapAction() {
+        if (mClockView == null) return;
+        if ("none".equals(mClockTapAction)) {
+            mClockView.setOnClickListener(null);
+            mClockView.setClickable(false);
+            return;
+        }
+        final int tabIndex = "timer".equals(mClockTapAction) ? 3 : 2;
+        mClockView.setOnClickListener(v -> {
+            try {
+                Intent intent = new Intent();
+                intent.setComponent(new ComponentName(
+                        "com.oneplus.deskclock", "com.oplus.alarmclock.AlarmClock"));
+                intent.setAction("com.oplus.alarmclock.alarmclock.enter_and_open_timer");
+                intent.putExtra("clock_tab_index", tabIndex);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                mContext.startActivity(intent);
+            } catch (Throwable t) {
+                log("[ Obsidian ] StatusbarClock: clock tap action failed: " + t);
+            }
         });
     }
 

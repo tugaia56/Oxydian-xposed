@@ -464,12 +464,9 @@
     <string name="qs_tiles_hide_labels_title">隐藏 QS 标签</string>
     <string name="qs_tiles_label_color_title">自定义 QS 文字颜色</string>
     <string name="qs_tiles_brightness_section">QS 滑块</string>
-    <string name="qs_tiles_sliders_master_title">滑块磁贴</string>
-    <string name="qs_tiles_sliders_master_summary">亮度和音量滑块的颜色、图标和边框</string>
     <string name="qs_tiles_brightness_icon_title">更改自动亮度图标颜色</string>
     <string name="qs_tiles_brightness_icon_color_title">自定义颜色</string>
     <string name="qs_tiles_brightness_icon_title_volume">更改音量图标颜色</string>
-    <string name="qs_tiles_slider_icon_colors_title">图标颜色</string>
     <string name="qs_tiles_brightness_custom_title">自定义 QS 滑块</string>
     <string name="qs_tiles_brightness_mode_title">滑块颜色模式</string>
     <string name="qs_tiles_brightness_color_title">自定义颜色</string>
@@ -501,9 +498,6 @@
     <string name="qs_widgets_too_many">面板只显示前 4 个小组件（2 行）。请先移除一个再添加新的。</string>
     <string name="qs_widgets_list_section">小组件</string>
     <string name="qs_widgets_list_empty">未添加小组件</string>
-    <string name="qs_widgets_row_hint">点击以移动或移除</string>
-    <string name="qs_widgets_move_up">上移</string>
-    <string name="qs_widgets_move_down">下移</string>
     <string name="qs_widgets_remove_action">移除</string>
     <string name="qs_widgets_add">添加小组件</string>
     <string name="qs_widgets_add_all_used">所有小组件位置均已被占用</string>

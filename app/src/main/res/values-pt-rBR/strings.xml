@@ -464,12 +464,9 @@
     <string name="qs_tiles_hide_labels_title">Ocultar rótulos QS</string>
     <string name="qs_tiles_label_color_title">Cor de texto QS personalizada</string>
     <string name="qs_tiles_brightness_section">Controles deslizantes QS</string>
-    <string name="qs_tiles_sliders_master_title">Bloco controle deslizante</string>
-    <string name="qs_tiles_sliders_master_summary">Cor, ícone e borda dos controles de Brilho e Volume</string>
     <string name="qs_tiles_brightness_icon_title">Alterar cor do ícone de brilho automático</string>
     <string name="qs_tiles_brightness_icon_color_title">Cor personalizada</string>
     <string name="qs_tiles_brightness_icon_title_volume">Alterar cor do ícone de volume</string>
-    <string name="qs_tiles_slider_icon_colors_title">Cor do ícone</string>
     <string name="qs_tiles_brightness_custom_title">Personalizar controles deslizantes QS</string>
     <string name="qs_tiles_brightness_mode_title">Modo de cor do controle deslizante</string>
     <string name="qs_tiles_brightness_color_title">Cor personalizada</string>
@@ -501,9 +498,6 @@
     <string name="qs_widgets_too_many">O painel mostra apenas os 4 primeiros widgets (2 fileiras). Remova um antes de adicionar outro.</string>
     <string name="qs_widgets_list_section">Widgets</string>
     <string name="qs_widgets_list_empty">Nenhum widget adicionado</string>
-    <string name="qs_widgets_row_hint">Toque para mover ou remover</string>
-    <string name="qs_widgets_move_up">Mover para cima</string>
-    <string name="qs_widgets_move_down">Mover para baixo</string>
     <string name="qs_widgets_remove_action">Remover</string>
     <string name="qs_widgets_add">Adicionar widget</string>
     <string name="qs_widgets_add_all_used">Todos os espaços de widget já estão em uso</string>

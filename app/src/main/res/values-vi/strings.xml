@@ -474,12 +474,9 @@
     <string name="qs_tiles_hide_labels_title">Ẩn nhãn QS</string>
     <string name="qs_tiles_label_color_title">Màu văn bản QS tùy chỉnh</string>
     <string name="qs_tiles_brightness_section">Thanh trượt QS</string>
-    <string name="qs_tiles_sliders_master_title">Ô thanh trượt</string>
-    <string name="qs_tiles_sliders_master_summary">Màu, biểu tượng và viền của thanh trượt Độ sáng và Âm lượng</string>
     <string name="qs_tiles_brightness_icon_title">Đổi màu biểu tượng độ sáng tự động</string>
     <string name="qs_tiles_brightness_icon_color_title">Màu tùy chỉnh</string>
     <string name="qs_tiles_brightness_icon_title_volume">Đổi màu biểu tượng âm lượng</string>
-    <string name="qs_tiles_slider_icon_colors_title">Màu biểu tượng</string>
     <string name="qs_tiles_brightness_custom_title">Tùy chỉnh thanh trượt QS</string>
     <string name="qs_tiles_brightness_mode_title">Chế độ màu thanh trượt</string>
     <string name="qs_tiles_brightness_color_title">Màu tùy chỉnh</string>
@@ -511,9 +508,6 @@
     <string name="qs_widgets_too_many">Bảng chỉ hiển thị 4 tiện ích đầu tiên (2 hàng). Hãy xóa một tiện ích trước khi thêm tiện ích khác.</string>
     <string name="qs_widgets_list_section">Tiện ích</string>
     <string name="qs_widgets_list_empty">Chưa thêm tiện ích nào</string>
-    <string name="qs_widgets_row_hint">Nhấn để di chuyển hoặc xóa</string>
-    <string name="qs_widgets_move_up">Di chuyển lên</string>
-    <string name="qs_widgets_move_down">Di chuyển xuống</string>
     <string name="qs_widgets_remove_action">Xóa</string>
     <string name="qs_widgets_add">Thêm tiện ích</string>
     <string name="qs_widgets_add_all_used">Tất cả các vị trí tiện ích đều đã được sử dụng</string>

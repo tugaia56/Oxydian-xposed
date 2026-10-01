@@ -464,12 +464,9 @@
     <string name="qs_tiles_hide_labels_title">Sembunyikan Label QS</string>
     <string name="qs_tiles_label_color_title">Warna Teks QS Kustom</string>
     <string name="qs_tiles_brightness_section">Penggeser QS</string>
-    <string name="qs_tiles_sliders_master_title">Ubin penggeser</string>
-    <string name="qs_tiles_sliders_master_summary">Warna, ikon, dan batas penggeser Kecerahan dan Volume</string>
     <string name="qs_tiles_brightness_icon_title">Ubah warna ikon kecerahan otomatis</string>
     <string name="qs_tiles_brightness_icon_color_title">Warna Kustom</string>
     <string name="qs_tiles_brightness_icon_title_volume">Ubah warna ikon volume</string>
-    <string name="qs_tiles_slider_icon_colors_title">Warna ikon</string>
     <string name="qs_tiles_brightness_custom_title">Sesuaikan Penggeser QS</string>
     <string name="qs_tiles_brightness_mode_title">Mode Warna Penggeser</string>
     <string name="qs_tiles_brightness_color_title">Warna Kustom</string>
@@ -501,9 +498,6 @@
     <string name="qs_widgets_too_many">Panel hanya menampilkan 4 widget pertama (2 baris). Hapus satu sebelum menambahkan yang lain.</string>
     <string name="qs_widgets_list_section">Widget</string>
     <string name="qs_widgets_list_empty">Tidak ada widget yang ditambahkan</string>
-    <string name="qs_widgets_row_hint">Ketuk untuk memindahkan atau menghapus</string>
-    <string name="qs_widgets_move_up">Naikkan</string>
-    <string name="qs_widgets_move_down">Turunkan</string>
     <string name="qs_widgets_remove_action">Hapus</string>
     <string name="qs_widgets_add">Tambah Widget</string>
     <string name="qs_widgets_add_all_used">Semua slot widget sudah digunakan</string>

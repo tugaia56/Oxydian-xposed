@@ -474,12 +474,9 @@
     <string name="qs_tiles_hide_labels_title">Приховати підписи QS</string>
     <string name="qs_tiles_label_color_title">Власний колір тексту QS</string>
     <string name="qs_tiles_brightness_section">Повзунки QS</string>
-    <string name="qs_tiles_sliders_master_title">Плитка-повзунок</string>
-    <string name="qs_tiles_sliders_master_summary">Колір, іконка та рамка повзунків Яскравості та Гучності</string>
     <string name="qs_tiles_brightness_icon_title">Змінити колір іконки авто-яскравості</string>
     <string name="qs_tiles_brightness_icon_color_title">Власний колір</string>
     <string name="qs_tiles_brightness_icon_title_volume">Змінити колір іконки гучності</string>
-    <string name="qs_tiles_slider_icon_colors_title">Колір іконки</string>
     <string name="qs_tiles_brightness_custom_title">Налаштувати повзунки QS</string>
     <string name="qs_tiles_brightness_mode_title">Режим кольору повзунка</string>
     <string name="qs_tiles_brightness_color_title">Власний колір</string>
@@ -511,9 +508,6 @@
     <string name="qs_widgets_too_many">Панель показує лише перші 4 віджети (2 ряди). Видаліть один, перш ніж додавати інший.</string>
     <string name="qs_widgets_list_section">Віджети</string>
     <string name="qs_widgets_list_empty">Віджетів не додано</string>
-    <string name="qs_widgets_row_hint">Торкніться, щоб перемістити або видалити</string>
-    <string name="qs_widgets_move_up">Перемістити вгору</string>
-    <string name="qs_widgets_move_down">Перемістити вниз</string>
     <string name="qs_widgets_remove_action">Видалити</string>
     <string name="qs_widgets_add">Додати віджет</string>
     <string name="qs_widgets_add_all_used">Усі слоти для віджетів вже зайняті</string>

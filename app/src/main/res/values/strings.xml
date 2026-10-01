@@ -713,6 +713,11 @@
     <string name="clock_ampm_small">Small (70%)</string>
     <string name="clock_ampm_hidden">Hidden</string>
     <string name="clock_section_advanced">Advanced (overrides other settings)</string>
+    <string name="status_bar_clock_tap_category">Clock Tap</string>
+    <string name="status_bar_clock_tap_timer_title">Open Timer</string>
+    <string name="status_bar_clock_tap_timer_summary">Tapping the status bar clock opens the Timer</string>
+    <string name="status_bar_clock_tap_stopwatch_title">Open Stopwatch</string>
+    <string name="status_bar_clock_tap_stopwatch_summary">Tapping the status bar clock opens the Stopwatch</string>
     <string name="status_bar_clock_chip_category">Clock Chip</string>
     <string name="status_bar_clock_background_chip_title">Background Chip</string>
     <string name="status_bar_clock_background_chip_title_summary">Adds a colored background behind the status bar clock</string>

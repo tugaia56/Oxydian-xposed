@@ -714,6 +714,11 @@
     <string name="clock_ampm_small">Piccolo (70%)</string>
     <string name="clock_ampm_hidden">Nascosto</string>
     <string name="clock_section_advanced">Avanzate (sovrascrive le impostazioni precedenti)</string>
+    <string name="status_bar_clock_tap_category">Tocco Orologio</string>
+    <string name="status_bar_clock_tap_timer_title">Apri Timer</string>
+    <string name="status_bar_clock_tap_timer_summary">Toccando l\'orologio della statusbar si apre il Timer</string>
+    <string name="status_bar_clock_tap_stopwatch_title">Apri Cronometro</string>
+    <string name="status_bar_clock_tap_stopwatch_summary">Toccando l\'orologio della statusbar si apre il Cronometro</string>
     <string name="status_bar_clock_chip_category">Chip Orologio</string>
     <string name="status_bar_clock_background_chip_title">Chip di sfondo</string>
     <string name="status_bar_clock_background_chip_title_summary">Aggiunge uno sfondo colorato dietro l\'orologio nella barra di stato</string>

@@ -464,12 +464,9 @@
     <string name="qs_tiles_hide_labels_title">QS Etiketlerini Gizle</string>
     <string name="qs_tiles_label_color_title">Özel QS Metin Rengi</string>
     <string name="qs_tiles_brightness_section">QS Kaydırıcıları</string>
-    <string name="qs_tiles_sliders_master_title">Kaydırıcı karosu</string>
-    <string name="qs_tiles_sliders_master_summary">Parlaklık ve Ses kaydırıcılarının rengi, simgesi ve kenarlığı</string>
     <string name="qs_tiles_brightness_icon_title">Otomatik parlaklık simgesi rengini değiştir</string>
     <string name="qs_tiles_brightness_icon_color_title">Özel Renk</string>
     <string name="qs_tiles_brightness_icon_title_volume">Ses simgesi rengini değiştir</string>
-    <string name="qs_tiles_slider_icon_colors_title">Simge rengi</string>
     <string name="qs_tiles_brightness_custom_title">QS Kaydırıcılarını Özelleştir</string>
     <string name="qs_tiles_brightness_mode_title">Kaydırıcı Renk Modu</string>
     <string name="qs_tiles_brightness_color_title">Özel Renk</string>
@@ -501,9 +498,6 @@
     <string name="qs_widgets_too_many">Panel yalnızca ilk 4 widget\'ı gösterir (2 satır). Başka bir tane eklemeden önce birini kaldırın.</string>
     <string name="qs_widgets_list_section">Widget\'lar</string>
     <string name="qs_widgets_list_empty">Widget eklenmedi</string>
-    <string name="qs_widgets_row_hint">Taşımak veya kaldırmak için dokunun</string>
-    <string name="qs_widgets_move_up">Yukarı taşı</string>
-    <string name="qs_widgets_move_down">Aşağı taşı</string>
     <string name="qs_widgets_remove_action">Kaldır</string>
     <string name="qs_widgets_add">Widget Ekle</string>
     <string name="qs_widgets_add_all_used">Tüm widget slotları zaten kullanımda</string>

@@ -40,6 +40,10 @@ public class ClockStyleFragment extends Fragment {
     private static final String PREF_CHIP_PREFIX = "status_bar_clock_background_chip";
     private static final String PREF_BG_CHIP_ON = PREF_CHIP_PREFIX + "_switch";
     private static final String PREF_CHIP_STYLE = PREF_CHIP_PREFIX + "_style";
+    /** "none" (default) / "timer" / "stopwatch" — tocco sull'orologio della statusbar, letto
+     *  direttamente da StatusbarClock senza passare da Xprefs (stesso pattern delle altre
+     *  opzioni qui). */
+    public static final String PREF_TAP_ACTION = "status_bar_clock_tap_action";
     // 2026-09-25: switch diagnostico richiesto dall'utente dopo il troncamento "09:..." mai
     // risolto del tutto (vedi 09-20) — spegne rapidamente TUTTO questo hook (posizione,
     // dimensione, padding, chip) senza dover disattivare l'intero modulo Oxydian.
@@ -92,6 +96,27 @@ public class ClockStyleFragment extends Fragment {
                         getString(R.string.clock_padding_title),
                         paddingLabel(),
                         this::showPaddingDialog)));
+
+        // ── Tocco orologio: Timer / Cronometro, mutuamente esclusivi ────────────
+        String tapAction = ObsidianPrefs.getString(PREF_TAP_ACTION, "none");
+        chain.add(new SectionTitleAdapter(List.of(getString(R.string.status_bar_clock_tap_category))));
+        SwitchWidgetAdapter.SwitchItem timerTapItem = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.status_bar_clock_tap_timer_title),
+                getString(R.string.status_bar_clock_tap_timer_summary),
+                "timer".equals(tapAction), null);
+        SwitchWidgetAdapter.SwitchItem stopwatchTapItem = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.status_bar_clock_tap_stopwatch_title),
+                getString(R.string.status_bar_clock_tap_stopwatch_summary),
+                "stopwatch".equals(tapAction), null);
+        timerTapItem.onChanged = () -> {
+            ObsidianPrefs.putString(PREF_TAP_ACTION, timerTapItem.checked ? "timer" : "none");
+            rebuild();
+        };
+        stopwatchTapItem.onChanged = () -> {
+            ObsidianPrefs.putString(PREF_TAP_ACTION, stopwatchTapItem.checked ? "stopwatch" : "none");
+            rebuild();
+        };
+        GroupUtils.addGroup(chain, List.of(timerTapItem, stopwatchTapItem));
 
         // ── Chip di sfondo (reale OC status_bar_clock_background_chip) ──────────
         boolean chipOn = ObsidianPrefs.getBoolean(PREF_BG_CHIP_ON, false);
