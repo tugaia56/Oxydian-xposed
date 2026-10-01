@@ -17,7 +17,7 @@ android {
         applicationId  = "it.tugaia56.oxydian"
         minSdk         = 31
         targetSdk      = 34
-        versionCode    = 100
+        versionCode    = 101
         versionName    = "1.0.0"
         buildConfigField("int", "MIN_SDK_VERSION", "$minSdk")
     }
