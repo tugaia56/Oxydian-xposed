@@ -22,7 +22,7 @@ echo ${GITHUB_REF_NAME} >> $GITHUB_ENV
 echo 'EOF' >> $GITHUB_ENV
 
 echo 'VName<<EOF' >> $GITHUB_ENV
-echo 'Obsidian v'$NEWVERNAME >> $GITHUB_ENV
+echo 'Oxydian v'$NEWVERNAME >> $GITHUB_ENV
 echo 'EOF' >> $GITHUB_ENV
 
 echo "ApkName=Oxydian-release-$NEWVERNAME.apk" >> $GITHUB_ENV
