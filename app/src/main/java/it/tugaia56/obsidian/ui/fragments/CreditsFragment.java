@@ -60,6 +60,8 @@ public class CreditsFragment extends Fragment {
         GroupUtils.addGroup(chain, List.of(
                 link("Oxygen Customizer", getString(R.string.credits_oc_summary),
                         "https://github.com/DHD2280/Oxygen-Customizer"),
+                link("Claude", getString(R.string.credits_claude_summary),
+                        "https://claude.ai"),
                 link("crDroid", getString(R.string.credits_crdroid_summary),
                         "https://github.com/crdroidandroid"),
                 link("LSPosed", getString(R.string.credits_lsposed_summary),

@@ -915,7 +915,8 @@
     <string name="settings_credits_summary">Authors and libraries used</string>
     <string name="credits_thanks">Special Thanks</string>
     <string name="credits_libraries">Libraries</string>
-    <string name="credits_oc_summary">Base for most of the ported mods (Launcher, QS, Dock, etc.)</string>
+    <string name="credits_oc_summary">Luigi (@LC9889) — base for most of the ported mods, and the inspiration for starting this whole project</string>
+    <string name="credits_claude_summary">AI assistant (Anthropic) — this app simply wouldn\'t exist without it</string>
     <string name="credits_crdroid_summary">Pulse Controller — battery styles</string>
     <string name="credits_lsposed_summary">The framework everything runs on</string>
 
