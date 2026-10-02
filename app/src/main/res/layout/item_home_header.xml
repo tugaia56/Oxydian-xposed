@@ -33,12 +33,13 @@
 
     <!-- Tagline -->
     <TextView
+        android:id="@+id/headerTagline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:fontFamily="sans-serif"
         android:letterSpacing="0.05"
-        android:text="OOS 16 · OnePlus 12"
+        android:text="OxygenOS"
         android:textColor="?android:attr/textColorSecondary"
         android:textSize="12sp" />
 

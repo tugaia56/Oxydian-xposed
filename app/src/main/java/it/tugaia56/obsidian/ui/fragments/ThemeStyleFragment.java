@@ -185,6 +185,7 @@ public class ThemeStyleFragment extends Fragment {
                     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                         View v = LayoutInflater.from(parent.getContext())
                                 .inflate(R.layout.item_home_header, parent, false);
+                        it.tugaia56.obsidian.utils.DeviceInfo.applyTagline(v);
                         return new RecyclerView.ViewHolder(v) {};
                     }
                     @Override public void onBindViewHolder(@NonNull RecyclerView.ViewHolder h, int pos) {}

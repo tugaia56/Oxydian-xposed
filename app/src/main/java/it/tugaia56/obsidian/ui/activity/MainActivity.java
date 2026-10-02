@@ -945,6 +945,7 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
         if (mHomeHeaderContainer != null) {
             mHomeHeaderContainer.removeAllViews();
             getLayoutInflater().inflate(R.layout.item_home_header, mHomeHeaderContainer, true);
+            it.tugaia56.obsidian.utils.DeviceInfo.applyTagline(mHomeHeaderContainer);
             mHomeHeaderContainer.setVisibility(View.VISIBLE);
         }
         // Search now lives only on its own dedicated "Cerca" tab (see showSearchTab()) — the

@@ -1,8 +1,14 @@
 Aggiunto:
-- Build automatica: tag su Git -> APK firmato + GitHub Release + invio su Telegram
+- Crediti: ringraziamenti a Luigi (@LC9889), sviluppatore di Oxygen Customizer, e a Claude
+- Tocco sull'orologio della statusbar: apre direttamente Timer o Cronometro (Orologio & data > Stile Orologio)
+- Schermata "Stato Oxydian" (Impostazioni): mostra quali mod funzionano dopo un aggiornamento ROM, con esportazione del log
 
 Aggiornato:
--
+- Home: nome dispositivo e versione OOS letti dal telefono (prima era scritto a mano "OnePlus 12")
+- Tema Dark Shadow: nell'app Orologio la scheda attiva usa il colore accento
+- Widget Quick Settings: elenco riordinabile con trascinamento, nessun limite ai widget aggiunti (nel pannello se ne vedono i primi 4)
+- Nuova icona dell'app
+- Titolo della release: Oxydian al posto del vecchio nome
 
 Rimosso:
 -
