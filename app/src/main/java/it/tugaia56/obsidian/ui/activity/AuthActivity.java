@@ -160,11 +160,13 @@ public class AuthActivity extends FragmentActivity {
             // bypass until credential re-entry, needs a hidden LockPatternUtils
             // call not reachable from plain root shell).
             case 5 -> "input keyevent 26";
-            // OOS ignores a synthetic KEYCODE_SYSRQ (confirmed on-device: no capture
-            // happened) — screencap writes the file directly instead, bypassing the
-            // key-injection path entirely. No system edit/share panel this way, but
-            // it reliably produces a real screenshot.
-            case 6 -> "mkdir -p /sdcard/Pictures/Screenshots && screencap -p /sdcard/Pictures/Screenshots/Screenshot_$(date +%Y%m%d_%H%M%S).png";
+            // Screenshot nativo OPLUS via SystemUI (broadcast da root, risponde result=42);
+            // se SystemUI non risponde (hook non attivo) ripiega su screencap, che scrive il
+            // file direttamente ma senza pannello modifica/condividi. KEYCODE_SYSRQ sintetico
+            // è ignorato da OOS (verificato su device).
+            case 6 -> "out=$(am broadcast -a it.tugaia56.oxydian.ACTION_TAKE_SCREENSHOT -p com.android.systemui 2>&1); "
+                    + "echo \"$out\" | grep -q 'result=42' || { mkdir -p /sdcard/Pictures/Screenshots && "
+                    + "screencap -p /sdcard/Pictures/Screenshots/Screenshot_$(date +%Y%m%d_%H%M%S).png; }";
             case 7 -> "reboot fastboot";
             case 8 -> "reboot";
             case 9 -> "reboot -p";

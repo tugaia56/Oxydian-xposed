@@ -6,6 +6,9 @@ import static it.tugaia56.obsidian.utils.Constants.Packages.SYSTEM_UI;
 import static it.tugaia56.obsidian.xposed.XPrefs.Xprefs;
 
 import android.app.ActivityManager;
+import android.content.BroadcastReceiver;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -72,6 +75,7 @@ public class HoldBackGesture extends XposedMods {
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
+        registerScreenshotReceiver();
         Class<?> sideGestureDetector;
         try {
             sideGestureDetector = findClass(
@@ -149,6 +153,31 @@ public class HoldBackGesture extends XposedMods {
                 XposedBridge.log("[ Obsidian ] HoldBackGesture.killForegroundApp ERROR: " + t);
             }
         });
+    }
+
+    // ── Screenshot da fuori SystemUI (Riavvio Avanzato → Screenshot) ───────────
+    // Il comando root "screencap" non basta su tutti i telefoni OOS: l'app lancia un broadcast
+    // da shell root e SystemUI scatta lo screenshot nativo OPLUS (come il gesto). Il permesso
+    // DUMP sul ricevitore lo rende raggiungibile solo da shell/root, non da app normali.
+    public static final String ACTION_TAKE_SCREENSHOT = "it.tugaia56.oxydian.ACTION_TAKE_SCREENSHOT";
+    private static boolean sScreenshotReceiverRegistered = false;
+
+    private void registerScreenshotReceiver() {
+        if (sScreenshotReceiverRegistered) return;
+        try {
+            BroadcastReceiver receiver = new BroadcastReceiver() {
+                @Override public void onReceive(Context c, Intent i) {
+                    takeScreenshot("systemQuickTileScreenshotIn");
+                    if (isOrderedBroadcast()) setResultCode(42); // l'app sa che SystemUI ha risposto
+                }
+            };
+            mContext.registerReceiver(receiver, new IntentFilter(ACTION_TAKE_SCREENSHOT),
+                    "android.permission.DUMP", null, Context.RECEIVER_EXPORTED);
+            sScreenshotReceiverRegistered = true;
+            XposedBridge.log("[ Obsidian ] HoldBackGesture: screenshot receiver registered");
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] HoldBackGesture: screenshot receiver FAILED: " + t);
+        }
     }
 
     // ── Screenshot (OPLUS internal screenshot manager, same mechanism as OC) ───

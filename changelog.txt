@@ -11,6 +11,8 @@ Aggiornato:
 - Pulsante riavvio SystemUI più affidabile su configurazioni root diverse
 - Log di Stato Oxydian: include modello, versione OOS, versione di Oxydian e diagnosi root; ogni esportazione ha un nome nuovo (prima non sovrascriveva il file vecchio)
 - Crediti: aggiunti LuckyTool, CorePatch e DisableFlagSecure
+- Menù Accensione > Riavvio Avanzato > Screenshot: usa lo screenshot nativo di OxygenOS (con anteprima e modifica)
+- Log di Stato Oxydian: elenca anche i disegni Wi-Fi presenti nel SystemUI, per diagnosticare lo stile icone Wi-Fi
 - Nuova icona dell'app
 - Titolo della release: Oxydian al posto del vecchio nome
 
