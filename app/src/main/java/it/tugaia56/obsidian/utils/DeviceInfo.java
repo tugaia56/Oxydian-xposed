@@ -34,6 +34,35 @@ public final class DeviceInfo {
                 + " (" + it.tugaia56.obsidian.BuildConfig.VERSION_CODE + ")" + nl;
     }
 
+    /** Diagnosi root per il log: la shell di Oxydian è davvero root? Servono i comandi usati da
+     *  riavvio SystemUI, blocco schermo e screenshot. Da chiamare fuori dal thread UI. */
+    public static String rootDiagnostics() {
+        String nl = System.lineSeparator();
+        StringBuilder sb = new StringBuilder();
+        try {
+            sb.append("Root: shell root=").append(com.topjohnwu.superuser.Shell.getShell().isRoot())
+                    .append(" (accesso concesso=").append(com.topjohnwu.superuser.Shell.isAppGrantedRoot()).append(")").append(nl);
+            sb.append("  uid: ").append(shellLine("id -u")).append("  su: ").append(shellLine("su -v")).append(nl);
+            sb.append("  comandi: ");
+            for (String c : new String[]{"killall", "pkill", "pidof", "input", "screencap"})
+                sb.append(c).append('=').append(shellLine("command -v " + c).isEmpty() ? "NO" : "ok").append(' ');
+            sb.append(nl);
+            sb.append("  prova killall inesistente: ").append(shellLine("killall oxydian_nonexistent_probe 2>&1; echo rc=$?")).append(nl);
+        } catch (Throwable t) {
+            sb.append("Root: errore diagnosi ").append(t.getClass().getSimpleName()).append(nl);
+        }
+        return sb.toString();
+    }
+
+    private static String shellLine(String cmd) {
+        try {
+            java.util.List<String> out = com.topjohnwu.superuser.Shell.cmd(cmd).exec().getOut();
+            return out.isEmpty() ? "" : String.join(" | ", out).trim();
+        } catch (Throwable t) {
+            return "";
+        }
+    }
+
     /** Imposta la riga sotto al nome app nell'header home (item_home_header). */
     public static void applyTagline(View header) {
         TextView tv = header.findViewById(R.id.headerTagline);

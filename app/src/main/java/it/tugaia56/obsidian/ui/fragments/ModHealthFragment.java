@@ -185,6 +185,7 @@ public class ModHealthFragment extends Fragment {
             sb.append("Oxydian - Stato Oxydian\n");
             sb.append("Generato: ").append(formatTimestamp(System.currentTimeMillis())).append("\n");
             sb.append(it.tugaia56.obsidian.utils.DeviceInfo.diagnosticSummary());
+            sb.append(it.tugaia56.obsidian.utils.DeviceInfo.rootDiagnostics());
             for (ProcessGroup g : groups()) {
                 long ts = ObsidianPrefs.getLong("mod_health_" + g.pkg() + "_ts", 0);
                 sb.append("\n== ").append(g.pkg()).append(" (").append(g.label()).append(") == ");
@@ -201,7 +202,11 @@ public class ModHealthFragment extends Fragment {
             }
 
             File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            File file = new File(dir, "Oxydian_ModHealth.txt");
+            // Nome nuovo a ogni export: un file con lo stesso nome già in Download (creato da
+            // un'installazione precedente) non è sovrascrivibile e l'export falliva in silenzio.
+            File file = new File(dir, "Oxydian_ModHealth_"
+                    + new java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.US).format(new java.util.Date())
+                    + ".txt");
             String result;
             try {
                 if (!dir.exists()) dir.mkdirs();

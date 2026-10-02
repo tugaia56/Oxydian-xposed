@@ -65,7 +65,13 @@ public class CreditsFragment extends Fragment {
                 link("crDroid", getString(R.string.credits_crdroid_summary),
                         "https://github.com/crdroidandroid"),
                 link("LSPosed", getString(R.string.credits_lsposed_summary),
-                        "https://github.com/LSPosed/LSPosed")));
+                        "https://github.com/LSPosed/LSPosed"),
+                link("LuckyTool", getString(R.string.credits_luckytool_summary),
+                        "https://github.com/luckyzyx/LuckyTool"),
+                link("CorePatch", getString(R.string.credits_corepatch_summary),
+                        "https://github.com/LSPosed/CorePatch"),
+                link("DisableFlagSecure", getString(R.string.credits_disableflagsecure_summary),
+                        "https://github.com/LSPosed/DisableFlagSecure")));
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.credits_libraries))));
         GroupUtils.addGroup(chain, List.of(

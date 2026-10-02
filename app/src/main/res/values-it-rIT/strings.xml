@@ -921,6 +921,9 @@
     <string name="credits_claude_summary">Assistente IA (Anthropic) — senza non sarebbe mai esistita questa app</string>
     <string name="credits_crdroid_summary">Pulse Controller — stili batteria</string>
     <string name="credits_lsposed_summary">Il framework su cui gira tutto</string>
+    <string name="credits_luckytool_summary">luckyzyx — le mod "Extra OOS" e quelle degli screenshot sono portate da questo modulo open source</string>
+    <string name="credits_corepatch_summary">Core Patch — permette il downgrade, salta la blocklist, disattiva il verificatore pacchetti</string>
+    <string name="credits_disableflagsecure_summary">Abilita Screenshot — consente gli screenshot nelle schermate protette</string>
 
     <!-- System Colors (Impostazioni → Colori → Colore in primo piano) -->
     <string name="nav_system_colors">Colore Accento Sistema</string>

@@ -9,7 +9,8 @@ Aggiornato:
 - Widget Quick Settings: elenco riordinabile con trascinamento, nessun limite ai widget aggiunti (nel pannello se ne vedono i primi 4)
 - Menù Accensione > Riavvio Avanzato: conferma OK/Annulla prima di riavviare o spegnere (Lista e Riquadri)
 - Pulsante riavvio SystemUI più affidabile su configurazioni root diverse
-- Log di Stato Oxydian: include modello, versione OOS e versione di Oxydian
+- Log di Stato Oxydian: include modello, versione OOS, versione di Oxydian e diagnosi root; ogni esportazione ha un nome nuovo (prima non sovrascriveva il file vecchio)
+- Crediti: aggiunti LuckyTool, CorePatch e DisableFlagSecure
 - Nuova icona dell'app
 - Titolo della release: Oxydian al posto del vecchio nome
 
