@@ -409,6 +409,7 @@
     <string name="advanced_reboot_download_mode">Reboot Download Mode</string>
     <string name="advanced_reboot_restart">Restart</string>
     <string name="advanced_reboot_shutdown">Shut Down</string>
+    <string name="advanced_reboot_confirm_message">Proceed?</string>
     <string name="nav_misc_settings_entry">Show Entry in Settings</string>
     <string name="nav_misc_settings_entry_summary">Adds Oxydian entry to system Settings</string>
     <string name="nav_screenshot_enabler">Enable Screenshot</string>

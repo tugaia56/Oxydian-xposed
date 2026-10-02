@@ -7,6 +7,7 @@ Aggiornato:
 - Home: nome dispositivo e versione OOS letti dal telefono (prima era scritto a mano "OnePlus 12")
 - Tema Dark Shadow: nell'app Orologio la scheda attiva usa il colore accento
 - Widget Quick Settings: elenco riordinabile con trascinamento, nessun limite ai widget aggiunti (nel pannello se ne vedono i primi 4)
+- Menù Accensione > Riavvio Avanzato: conferma OK/Annulla prima di riavviare o spegnere (Lista e Riquadri)
 - Nuova icona dell'app
 - Titolo della release: Oxydian al posto del vecchio nome
 

@@ -406,6 +406,7 @@
     <string name="advanced_reboot_download_mode">Riavvia in Download Mode</string>
     <string name="advanced_reboot_restart">Riavvia</string>
     <string name="advanced_reboot_shutdown">Spegni</string>
+    <string name="advanced_reboot_confirm_message">Vuoi procedere?</string>
     <string name="nav_misc_settings_entry">Mostra Voce nelle Impostazioni</string>
     <string name="nav_misc_settings_entry_summary">Aggiunge la voce Oxydian nelle Impostazioni di sistema</string>
     <string name="nav_screenshot_enabler">Abilita Screenshot</string>

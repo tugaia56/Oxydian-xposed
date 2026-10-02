@@ -172,7 +172,30 @@ public class AuthActivity extends FragmentActivity {
         };
     }
 
+    /** Voci che riavviano/spengono (o riavviano SystemUI) — chiedono conferma prima di
+     *  partire, così un tocco sbagliato si può annullare. Blocca Schermo (5) e Screenshot (6)
+     *  partono subito, non ha senso confermarli. */
+    private static boolean needsConfirm(int which) {
+        return which != 5 && which != 6;
+    }
+
     private void runRebootChoice(int which) {
+        if (!needsConfirm(which)) {
+            executeRebootChoice(which);
+            return;
+        }
+        CharSequence label = rebootLabels()[which];
+        ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(this)
+                .setTitle(label)
+                .setMessage(R.string.advanced_reboot_confirm_message)
+                .setPositiveButton(android.R.string.ok, (d, w) -> executeRebootChoice(which))
+                // Annulla riporta all'elenco/griglia, per scegliere un'altra voce o chiudere da lì.
+                .setNegativeButton(R.string.cancel, (d, w) -> showAdvancedReboot())
+                .setOnCancelListener(d -> showAdvancedReboot())
+                .show());
+    }
+
+    private void executeRebootChoice(int which) {
         try { Shell.cmd(rebootCommand(which)).exec(); } catch (Throwable ignored) {}
         finishAndRemoveTask();
     }
