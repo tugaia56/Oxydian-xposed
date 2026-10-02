@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_random_name_description">Rendi casuale il nome del file di output delle immagini patchate e dei file tar per impedirne il rilevamento</string>
+    <string name="settings_random_name_title">Nome di output casuale</string>
+    <string name="settings_su_restrict_summary">"Limiterà le nuove app Superuser per impostazione predefinita. Attenzione: questa impostazione non funzionerà correttamente per la maggior parte delle app. Non abilitarla se non sai cosa stai facendo."</string>
+    <string name="settings_su_restrict_title">Limita le capacità di root</string>
+
+</resources>

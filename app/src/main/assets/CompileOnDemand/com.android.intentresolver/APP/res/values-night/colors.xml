@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="chooser_content_preview_textcolor">#99ffffff</color>
+    <color name="chooser_gradient_background">@*android:color/secondary_text_nodisable_holo_light</color>
+    <color name="chooser_row_divider">@*android:color/secondary_text_holo_light</color>
+    <color name="oplus_black">#ffffffff</color>
+    <color name="oplus_resolver_dot_circle">#4dffffff</color>
+    <color name="oplus_resolver_dot_color">#66ffffff</color>
+    <color name="oplus_resolver_empty_color">#66e7e7e7</color>
+    <color name="oplus_resolver_navigation_bar">@*android:color/background_dark</color>
+    <color name="oplus_resolver_opened_summary_color">#8cffffff</color>
+    <color name="oplus_resolver_oshare_divider">#1fffffff</color>
+    <color name="oplus_resolver_share_blue">@*android:color/accent_material_dark</color>
+    <color name="oplus_resolver_share_closed_bg">#ff484848</color>
+    <color name="resolve_dialog_item_textcolor">#8cffffff</color>
+</resources>

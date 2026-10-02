@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_color">@*android:color/background_dark</color>
+    <color name="colorPrimaryLight11">#ff85caff</color>
+    <color name="color_inverse">#ffffffff</color>
+    <color name="form_result_info">#ffe1e1e1</color>
+    <color name="his_element_bg">@*android:color/button_material_dark</color>
+    <color name="inputBgColor">@*android:color/accent_material_dark</color>
+    <color name="inputTextColor">#ffaaaaaa</color>
+    <color name="lines_color">#ffc1c1c1</color>
+    <color name="nav_bar_sel_bg">#11ffffff</color>
+    <color name="nav_bar_std_icon_color">#ffd1d1d1</color>
+    <color name="nav_bar_std_txt_color">#ffffffff</color>
+    <color name="options_list_bg_border">@*android:color/white</color>
+    <color name="result_actions_bg">@*android:color/button_material_dark</color>
+    <color name="result_button_label">#ffb6b6b6</color>
+    <color name="result_line_bg">#ff313131</color>
+</resources>

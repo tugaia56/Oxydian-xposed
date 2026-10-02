@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector android:height="24.0dip" android:width="24.0dip" android:autoMirrored="true" android:viewportWidth="24.0" android:viewportHeight="24.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="@*android:color/accent_material_dark" android:pathData="M3,7C3,4.791 4.795,3 7,3L7,3C9.209,3 11,4.795 11,7L11,11L7,11C4.791,11 3,9.205 3,7L3,7Z" android:strokeColor="#00000000" android:strokeWidth="1.0" android:fillType="evenOdd" />
+    <path android:fillColor="@*android:color/accent_material_dark" android:pathData="M3,17C3,19.209 4.795,21 7,21L7,21C9.209,21 11,19.205 11,17L11,13L7,13C4.791,13 3,14.795 3,17L3,17Z" android:strokeColor="#00000000" android:strokeWidth="1.0" android:fillType="evenOdd" />
+    <path android:fillColor="@*android:color/accent_material_dark" android:pathData="M21,7C21,4.791 19.205,3 17,3L17,3C14.791,3 13,4.795 13,7L13,11L17,11C19.209,11 21,9.205 21,7L21,7Z" android:strokeColor="#00000000" android:strokeWidth="1.0" android:fillType="evenOdd" />
+    <path android:fillColor="@*android:color/accent_material_dark" android:pathData="M21,17C21,19.209 19.205,21 17,21L17,21C14.791,21 13,19.205 13,17L13,13L17,13C19.209,13 21,14.795 21,17L21,17Z" android:strokeColor="#00000000" android:strokeWidth="1.0" android:fillType="evenOdd" />
+</vector>

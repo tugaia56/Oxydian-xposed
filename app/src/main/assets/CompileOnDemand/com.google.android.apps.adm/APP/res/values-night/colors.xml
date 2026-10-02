@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent_error">@*android:color/accent_material_dark</color>
+    <color name="accent_warning">@*android:color/accent_material_dark</color>
+    <color name="background_error">@*android:color/button_material_dark</color>
+    <color name="background_warning">@*android:color/button_material_dark</color>
+    <color name="people_chip_selected_state_background_color">#1eeeeaed</color>
+    <color name="settingslib_materialColorOnPrimary">#ff003730</color>
+    <color name="settingslib_materialColorOnPrimaryContainer">#ffa1f1e2</color>
+    <color name="settingslib_materialColorOnSurface">#ffe5e2e1</color>
+    <color name="settingslib_materialColorOnSurfaceVariant">#ffc7c7c7</color>
+    <color name="settingslib_materialColorOutline">#ff919191</color>
+    <color name="settingslib_materialColorPrimary">#ff83d6c7</color>
+    <color name="settingslib_materialColorPrimaryContainer">#ff005047</color>
+    <color name="settingslib_materialColorSecondaryContainer">#ff334c47</color>
+    <color name="settingslib_materialColorSurfaceContainer">@*android:color/background_dark</color>
+    <color name="settingslib_materialColorSurfaceContainerHigh">@*android:color/background_dark</color>
+    <color name="settingslib_materialColorSurfaceContainerHighest">@*android:color/background_dark</color>
+    <color name="settingslib_materialColorSurfaceVariant">#ff474747</color>
+    <color name="survey_disabled_state_color">#61e8eaed</color>
+    <color name="survey_surface_color_elevation_2">@*android:color/background_dark</color>
+    <color name="survey_surface_color_elevation_3">@*android:color/background_dark</color>
+    <color name="user_location_centered_tint_color">#ffa1c9ff</color>
+    <color name="user_location_fab_background_color">@*android:color/background_dark</color>
+    <color name="user_location_searching_tint_color">#ffe3e3e3</color>
+    <color name="user_location_unavailable_tint_color">#ffff8983</color>
+</resources>

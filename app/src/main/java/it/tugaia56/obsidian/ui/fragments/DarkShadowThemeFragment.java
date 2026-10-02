@@ -89,6 +89,15 @@ public class DarkShadowThemeFragment extends Fragment {
                         "toast", "popup", "toolbar", "tema", "theme", "substratum", "impronte", "fingerprint"),
 
                 new NavAdapter.NavItem(
+                        R.drawable.ic_palette,
+                        getString(R.string.app_themes_title),
+                        getString(R.string.app_themes_card_desc),
+                        () -> navigate(new AppThemesFragment(),
+                                getString(R.string.app_themes_title)),
+                        "google", "app", "utente", "user", "messaggi", "messages", "substratum",
+                        "firefox", "dropbox", "youtube", "gmail", "maps", "tema", "theme"),
+
+                new NavAdapter.NavItem(
                         R.drawable.ic_lock,
                         getString(R.string.section_pin_style),
                         getString(R.string.section_pin_style_summary),

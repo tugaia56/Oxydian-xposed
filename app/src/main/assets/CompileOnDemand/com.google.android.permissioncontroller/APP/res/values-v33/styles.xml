@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="SafetyCenterIndicatorCardView">
+        <item name="android:clickable">true</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">16.0dip</item>
+        <item name="android:foreground">?android:selectableItemBackground</item>
+        <item name="cardBackgroundColor">@*android:color/button_material_dark</item>
+        <item name="cardCornerRadius">28.0dip</item>
+        <item name="cardElevation">0.0dip</item>
+    </style>
+</resources>

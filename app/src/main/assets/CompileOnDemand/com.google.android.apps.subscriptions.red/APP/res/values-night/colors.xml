@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="benefits_v2_image_overlay_scrim_color">#40ffffff</color>
+    <color name="delete_button_enabled_color">@*android:color/background_dark</color>
+    <color name="delete_button_enabled_text_color">@*android:color/accent_material_dark</color>
+    <color name="settingslib_materialColorOnPrimary">#ff003730</color>
+    <color name="settingslib_materialColorOnPrimaryContainer">#ffa1f1e2</color>
+    <color name="settingslib_materialColorOnSurface">#ffe5e2e1</color>
+    <color name="settingslib_materialColorOnSurfaceVariant">#ffc7c7c7</color>
+    <color name="settingslib_materialColorOutline">#ff919191</color>
+    <color name="settingslib_materialColorPrimary">#ff83d6c7</color>
+    <color name="settingslib_materialColorPrimaryContainer">#ff005047</color>
+    <color name="settingslib_materialColorSecondaryContainer">#ff334c47</color>
+    <color name="settingslib_materialColorSurfaceContainer">@*android:color/background_dark</color>
+    <color name="settingslib_materialColorSurfaceContainerHigh">@*android:color/background_dark</color>
+    <color name="settingslib_materialColorSurfaceContainerHighest">@*android:color/background_dark</color>
+    <color name="settingslib_materialColorSurfaceVariant">#ff474747</color>
+    <color name="survey_disabled_state_color">@*android:color/ripple_material_dark</color>
+    <color name="survey_surface_color_elevation_2">@*android:color/background_dark</color>
+    <color name="survey_surface_color_elevation_3">@*android:color/background_dark</color>
+</resources>

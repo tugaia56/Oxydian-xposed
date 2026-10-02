@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval"
+          xmlns:android="http://schemas.android.com/apk/res/android">
+            <solid android:color="@*android:color/group_button_dialog_focused_holo_light" />
+            <size android:height="32.0dip" android:width="32.0dip" />
+        </shape>
+    </item>
+    <item android:gravity="center" android:drawable="@null" />
+</layer-list>

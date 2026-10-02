@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Divider">
+        <item name="*android:background">@*android:color/background_dark</item>
+        <item name="*android:layout_width">fill_parent</item>
+        <item name="*android:layout_height">1.0dip</item>
+    </style>
+
+    <style name="TextPreview" parent="@*android:style/TextAppearance.Medium">
+        <item name="*android:textColor">#ffffffff</item>
+        <item name="*android:background">@*android:color/background_dark</item>
+        <item name="*android:paddingLeft">10.0dip</item>
+        <item name="*android:paddingRight">10.0dip</item>
+        <item name="*android:layout_width">fill_parent</item>
+        <item name="*android:layout_height">wrap_content</item>
+        <item name="*android:minHeight">40.0dip</item>
+        <item name="*android:singleLine">false</item>
+    </style>
+    <style name="TextPreviewBorder">
+        <item name="*android:background">@*android:color/accent_material_dark</item>
+        <item name="*android:padding">1.0dip</item>
+        <item name="*android:layout_width">0.0dip</item>
+        <item name="*android:layout_height">wrap_content</item>
+    </style>
+    <style name="TextProgressPreview" parent="@*android:style/TextAppearance.Medium">
+        <item name="*android:textColor">#ffffffff</item>
+        <item name="*android:layout_gravity">bottom</item>
+        <item name="*android:background">@*android:color/background_dark</item>
+        <item name="*android:paddingLeft">2.0dip</item>
+        <item name="*android:paddingRight">2.0dip</item>
+        <item name="*android:layout_width">wrap_content</item>
+        <item name="*android:layout_height">wrap_content</item>
+        <item name="*android:minWidth">100.0dip</item>
+        <item name="*android:singleLine">true</item>
+        <item name="*android:textIsSelectable">false</item>
+    </style>
+
+</resources>

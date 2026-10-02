@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="border_primary">#fff8f9f9</color>
+    <color name="ig_search_meta_ai_searchbar_background_color">@*android:color/button_material_dark</color>
+    <color name="igds_search_meta_ai_send_button_background_color">@*android:color/accent_material_dark</color>
+    <color name="meta_ai_bottom_sheet_primary_background">@*android:color/background_dark</color>
+    <color name="meta_ai_composer_background">@*android:color/button_material_dark</color>
+    <color name="meta_ai_fullscreen_primary_background">@*android:color/background_dark</color>
+    <color name="meta_ai_voice_controls">@*android:color/white</color>
+    <color name="sup_bottom_sheet_ig_icon">#fff5f5f5</color>
+    <color name="sup_bottom_sheet_ig_text">#ffa8a8a8</color>
+</resources>

@@ -43,6 +43,7 @@ public class FingerprintIconMods extends XposedMods {
             Environment.getExternalStorageDirectory() + "/.obsidian/lockscreen_fp_icon.png";
 
     private boolean mHideFingerprint   = false;
+    private boolean mHideInAod         = false;
     private boolean mCustomFingerprint = false;
     private int     mFingerprintStyle  = 0;
     private float   mFpScale           = 1.0f;
@@ -60,6 +61,7 @@ public class FingerprintIconMods extends XposedMods {
     public void updatePrefs(String... Key) {
         if (Xprefs == null) return;
         mHideFingerprint   = Xprefs.getBoolean("lockscreen_fp_remove_icon", false);
+        mHideInAod         = Xprefs.getBoolean("lockscreen_fp_hide_aod", false);
         mCustomFingerprint = Xprefs.getBoolean("lockscreen_fp_custom_icon", false);
         mFingerprintStyle  = Xprefs.getInt("lockscreen_fp_icon_custom", 0);
         mFpScale           = Xprefs.getFloat("lockscreen_fp_icon_scaling", 1.0f);
@@ -75,6 +77,25 @@ public class FingerprintIconMods extends XposedMods {
                 "com.oplus.systemui.biometrics.finger.udfps.OnScreenFingerprintUiMach",  // OOS14
                 "com.oplus.systemui.keyguard.finger.onscreenfingerprint.OnScreenFingerprintUiMech"); // OOS13
         if (cls == null) return;
+
+        // Icona impronta nascosta solo con lo schermo spento (AOD): lì può finire sotto al blocco
+        // orologio/meteo che l'AOD sposta. Sulla schermata di blocco resta visibile.
+        try {
+            Class<?> iconCls = tryFindClass(lp, "com.oplus.systemui.biometrics.finger.udfps.OnScreenFingerprintIcon");
+            if (iconCls != null) {
+                hookAllMethods(iconCls, "setVisibility", new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) {
+                        if (!mHideInAod || p.args.length == 0 || !(p.args[0] instanceof Integer)) return;
+                        if ((Integer) p.args[0] == 0
+                                && it.tugaia56.obsidian.xposed.utils.KeyguardUiState.isDozing(mContext)) {
+                            p.args[0] = 8;
+                        }
+                    }
+                });
+            }
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] FingerprintIconMods hide-in-AOD hook failed: " + t);
+        }
 
         hookAllConstructors(cls, new XC_MethodHook() {
             @Override protected void afterHookedMethod(MethodHookParam p) {

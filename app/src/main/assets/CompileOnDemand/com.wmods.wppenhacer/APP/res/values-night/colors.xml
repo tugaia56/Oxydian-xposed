@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="card_shadow">#00000000</color>
+    <color name="log_error">#ff8a80</color>
+    <color name="log_info">#e0e0e0</color>
+    <color name="log_success">#69f0ae</color>
+    <color name="log_warning">#ffd180</color>
+    <color name="nav_background">@*android:color/background_dark</color>
+    <color name="nav_indicator">@*android:color/accent_material_dark</color>
+    <color name="ripple_color">#33ffffff</color>
+    <color name="surface_container">@*android:color/button_material_dark</color>
+    <color name="surface_container_high">@*android:color/background_dark</color>
+    <color name="surface_elevated">@*android:color/background_dark</color>
+    <color name="text_primary">#ffffffff</color>
+    <color name="text_secondary">#ffb3b3b3</color>
+</resources>

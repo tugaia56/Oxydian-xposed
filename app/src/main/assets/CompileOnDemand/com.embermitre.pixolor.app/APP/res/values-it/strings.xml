@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="use_standard_action_buttons_in_notification">Utilizza i Pulsanti Azione standard nelle notifiche</string>
+    <string name="color_picker">Colore Selezionato</string>
+    <string name="color_pickers">Colori Selezionati</string>
+    <string name="palette">Tavolozza</string>
+    <string name="help_improve_pixolor">Aiutaci a migliorare Pixolor</string>
+    <string name="support_email">Email di supporto</string>
+    <string name="material_style_guidelines">Stile Material Design - Linee guida di Google per la progettazione</string>
+    <string name="automatic_anonymous_reporting">Segnalazione anonima automatica</string>
+    <string name="usage_data_and_errors">Utilizzo, dati ed errori</string>
+    <string name="errors_only">Solo errori</string>
+    <string name="nothing">Nessuno</string>
+    <string name="hue_wheel_picker">Cerchio selettore tonalità</string>
+    <string name="about">Informazioni </string>
+    <string name="thank_you_for_your_support">Grazie per il tuo sostegno</string>
+    <string name="legal_notices">Note legali</string>
+    <string name="no_color_loaded">Nessun colore caricato</string>
+    <string name="hide">Nascondi</string>
+    <string name="settings">Impostazioni</string>
+</resources>

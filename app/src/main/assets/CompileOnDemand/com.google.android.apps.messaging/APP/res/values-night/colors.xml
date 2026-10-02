@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="action_bar_status_bar_background_color">@*android:color/background_dark</color>
+    <color name="alert_dialog_background_color">@*android:color/background_dark</color>
+    <color name="avatar_person">@*android:color/background_dark</color>
+<color name="cross_country_avatar_background_color">@*android:color/background_dark</color>
+<color name="cross_country_avatar_foreground_color">#ffe3e3e3</color>
+    <color name="material_google_red_500">@*android:color/accent_material_dark</color>
+    <color name="material_grey_white_1000">@*android:color/background_dark</color>
+    <color name="message_video_selected_tint">@*android:color/accent_material_dark</color>
+    <color name="oneplus_unknown_sender_background">@*android:color/accent_material_dark</color>
+    <color name="play_protect_auth_accent_color">@*android:color/accent_material_dark</color>
+    <color name="settingslib_materialColorOnPrimary">#ff003730</color>
+    <color name="settingslib_materialColorOnPrimaryContainer">#ffa1f1e2</color>
+    <color name="settingslib_materialColorOnSurface">#ffe5e2e1</color>
+    <color name="settingslib_materialColorOnSurfaceVariant">#ffc7c7c7</color>
+    <color name="settingslib_materialColorOutline">#ff919191</color>
+    <color name="settingslib_materialColorPrimary">#ff83d6c7</color>
+    <color name="settingslib_materialColorPrimaryContainer">#ff005047</color>
+    <color name="settingslib_materialColorSecondaryContainer">#ff334c47</color>
+    <color name="settingslib_materialColorSurfaceContainer">@*android:color/background_dark</color>
+    <color name="settingslib_materialColorSurfaceContainerHigh">@*android:color/background_dark</color>
+    <color name="settingslib_materialColorSurfaceContainerHighest">@*android:color/background_dark</color>
+    <color name="settingslib_materialColorSurfaceVariant">#ff474747</color>
+    <color name="survey_disabled_state_color">@*android:color/ripple_material_dark</color>
+    <color name="survey_surface_color_elevation_2">@*android:color/background_dark</color>
+    <color name="survey_surface_color_elevation_3">@*android:color/background_dark</color>
+    <color name="switcher_option_background_color">@*android:color/accent_material_dark</color>
+    <color name="tooltip_shadow_color">#a4000000</color>
+    <color name="unknown_avatar_background">#ff5e5e5e</color>
+</resources>

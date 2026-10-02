@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MainSwitchText.Settingslib" parent="@*android:style/TextAppearance.DeviceDefault.Widget.ActionBar.Title">
+        <item name="*android:textSize">20.0sp</item>
+        <item name="*android:textColor">@*android:color/white</item>
+        <item name="*android:fontFamily">google_sans_text_medium</item>
+    </style>
+    <style name="DialogWhenLarge" parent="@*android:style/Theme.DeviceDefault.DialogWhenLarge.NoActionBar">
+        <item name="*android:textAppearanceMedium">@*android:style/TextAppearance.Medium</item>
+        <item name="*android:textAppearanceSmall">@*android:style/TextAppearance.Small</item>
+        <item name="*android:titleTextStyle">@*android:style/TextAppearance.Large</item>
+    </style>
+    <style name="Theme.DialogWhenLarge" parent="@*android:style/Theme.Material.DialogWhenLarge.NoActionBar">
+        <item name="*android:textAppearanceMedium">@*android:style/TextAppearance.Medium</item>
+        <item name="*android:textAppearanceSmall">@*android:style/TextAppearance.Small</item>
+        <item name="*android:titleTextStyle">@*android:style/TextAppearance.Large</item>
+    </style>
+    <style name="TitleText">
+        <item name="*android:textSize">20.0dip</item>
+        <item name="*android:textColor">@*android:color/white</item>
+        <item name="*android:fontFamily">sans-serif-medium</item>
+    </style>
+    <style name="AlertDialogActivity" parent="@*android:style/Theme.DeviceDefault.Panel">
+        <item name="*android:backgroundDimEnabled">true</item>
+    </style>
+    <style name="GrantPermissions"
+            parent="@*android:style/Theme.DeviceDefault.Dialog.NoActionBar">
+        <item name="*android:windowBackground">@*android:color/transparent</item>
+        <item name="*android:windowFixedHeightMajor">100.0%</item>
+        <item name="*android:windowFixedHeightMinor">100.0%</item>
+    </style>
+    <style name="Base.Widget.AppCompat.Light.ActionBar.TabText" parent="@*android:style/Widget.Material.ActionBar.TabText" />
+    <style name="Base.Widget.AppCompat.Light.ActionBar.TabText.Inverse" parent="@*android:style/Widget.Material.ActionBar.TabText" />
+    <style name="Base.Widget.AppCompat.Light.ActionBar.TabView" parent="@*android:style/Widget.Material.ActionBar.TabView" />
+    <style name="Base.Widget.AppCompat.Light.PopupMenu" parent="@*android:style/Widget.Material.PopupMenu" />
+    <style name="Platform.V21.AppCompat.Light" parent="@*android:style/Theme.DeviceDefault.Settings.Dark.NoActionBar">
+        <item name="*android:textColorHintInverse">@*android:color/accent_material_dark</item>
+        <item name="*android:textColorHint">@*android:color/accent_material_dark</item>
+        <item name="*android:textColorLink">@*android:color/accent_material_dark</item>
+        <item name="*android:buttonBarStyle">?android:buttonBarStyle</item>
+        <item name="*android:buttonBarButtonStyle">?android:buttonBarButtonStyle</item>
+        <item name="*android:textColorLinkInverse">@*android:color/accent_material_dark</item>
+    </style>
+    <style name="Platform.V25.AppCompat.Light" parent="@*android:style/Theme.DeviceDefault.Settings.Dark.NoActionBar" />
+    <style name="Header.Settings" parent="@*android:style/Theme.DeviceDefault.Settings.Dark.NoActionBar" />
+    <style name="Settings" parent="@*android:style/Theme.DeviceDefault.Settings.Dark.NoActionBar">
+        <item name="*android:textColorPrimaryInverse">#ffffffff</item>
+    </style>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="banner_accent_attention_high">#fff28b82</color>
+    <color name="banner_accent_attention_low">#ff81c995</color>
+    <color name="banner_accent_attention_medium">#fffdd663</color>
+    <color name="banner_background_attention_high">#ff3b2d2c</color>
+    <color name="banner_background_attention_low">#ff2b3328</color>
+    <color name="banner_background_attention_medium">#ff333121</color>
+    <color name="settingslib_dialog_colorError">#fff28b82</color>
+    <color name="settingslib_materialColorOnPrimary">#ffffffff</color>
+    <color name="settingslib_materialColorOnPrimaryContainer">#ff9e80</color>
+    <color name="settingslib_materialColorOnSurface">#ffffffff</color>
+    <color name="settingslib_materialColorOnSurfaceInverse">#827717</color>
+    <color name="settingslib_materialColorOnSurfaceVariant">@*android:color/darker_gray</color>
+    <color name="settingslib_materialColorOutline">@*android:color/accent_material_dark</color>
+    <color name="settingslib_materialColorPrimary">@*android:color/accent_material_dark</color>
+    <color name="settingslib_materialColorPrimaryContainer">#40c4ff</color>
+    <color name="settingslib_materialColorSecondaryContainer">#01579b</color>
+    <color name="settingslib_materialColorSurfaceContainer">#7c4dff</color>
+    <color name="settingslib_materialColorSurfaceContainerHigh">#e040fb</color>
+    <color name="settingslib_materialColorSurfaceContainerHighest">@*android:color/background_dark</color>
+    <color name="settingslib_materialColorSurfaceVariant">@*android:color/background_dark</color>
+    <color name="settingslib_protection_color">#c51162</color>
+</resources>

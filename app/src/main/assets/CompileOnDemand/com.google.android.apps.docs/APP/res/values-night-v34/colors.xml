@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="settingslib_materialColorOnPrimary">#dd2c00</color>
+    <color name="settingslib_materialColorOnPrimaryContainer">#ff3d00</color>
+    <color name="settingslib_materialColorOnSurface">#ff6e40</color>
+    <color name="settingslib_materialColorOnSurfaceVariant">#ff9e80</color>
+    <color name="settingslib_materialColorOutline">#bf360c</color>
+    <color name="settingslib_materialColorPrimary">#d84315</color>
+    <color name="settingslib_materialColorPrimaryContainer">#e64a19</color>
+    <color name="settingslib_materialColorSecondaryContainer">@*android:color/accent_material_dark</color>
+    <color name="settingslib_materialColorSurfaceBright">#ff5722</color>
+    <color name="settingslib_materialColorSurfaceContainer">#00ff00</color>
+    <color name="settingslib_materialColorSurfaceContainerHigh">#ff6d00</color>
+    <color name="settingslib_materialColorSurfaceContainerHighest">#aeea00</color>
+    <color name="settingslib_materialColorSurfaceVariant">#827717</color>
+    <color name="sud_color_on_surface">#9e9d24</color>
+    <color name="settingslib_state_on_color">#afb42b</color>
+    <color name="settingslib_text_color_primary_device_default">#c0ca33</color>
+    <color name="settingslib_text_color_secondary_device_default">#cddc39</color>
+    <color name="settingslib_thumb_disabled_color">#d4e157</color>
+    <color name="settingslib_thumb_off_color">#dce775</color>
+    <color name="settingslib_track_off_color">#00c853</color>
+    <color name="settingslib_track_on_color">#00e676</color>
+    <color name="settingslib_thumb_on_color">#1b5e20</color>
+</resources>

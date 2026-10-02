@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="chip_checked_text_color">@*android:color/background_dark</color>
+    <color name="couiSingleSecondCompatBarDisabledColor">@*android:color/accent_material_dark</color>
+    <color name="couiSingleSecondCompatLightNormal">@*android:color/accent_material_dark</color>
+    <color name="couiSingleSecondCompatLightPressed">@*android:color/accent_material_dark</color>
+    <color name="couiSingleSecondCompatNormal">@*android:color/accent_material_dark</color>
+    <color name="couiSingleSecondCompatPressed">@*android:color/accent_material_dark</color>
+    <color name="couiSingleSecondCompatTextHighLight">@*android:color/accent_material_dark</color>
+    <color name="coui_btn_eye_slash_color_left_top">@*android:color/background_dark</color>
+</resources>

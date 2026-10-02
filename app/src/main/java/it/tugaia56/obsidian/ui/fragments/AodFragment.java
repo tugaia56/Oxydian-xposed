@@ -64,7 +64,17 @@ public class AodFragment extends Fragment {
                         () -> navigate(new AodEdgeLightFragment(),
                                 getString(R.string.nav_aod_edge_lighting)))
         );
-        rv.setAdapter(new NavAdapter(items, 0xFFFF5722)); // deep orange, colore categoria "Always-On Display"
+        // Interruttore: nasconde l'icona impronta solo con lo schermo spento (stessa preferenza
+        // della schermata Icona Impronta Digitale).
+        it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter.SwitchItem fpItem =
+                new it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter.SwitchItem(
+                        getString(R.string.lockscreen_fp_hide_aod), getString(R.string.lockscreen_fp_hide_aod_summary),
+                        it.tugaia56.obsidian.utils.ObsidianPrefs.getBoolean("lockscreen_fp_hide_aod", false), null);
+        fpItem.onChanged = () -> it.tugaia56.obsidian.utils.ObsidianPrefs.putBoolean("lockscreen_fp_hide_aod", fpItem.checked);
+        java.util.List<RecyclerView.Adapter<?>> chain = new java.util.ArrayList<>();
+        chain.add(new NavAdapter(items, 0xFFFF5722)); // deep orange, colore categoria "Always-On Display"
+        it.tugaia56.obsidian.ui.adapters.GroupUtils.addGroup(chain, List.of(fpItem));
+        rv.setAdapter(new androidx.recyclerview.widget.ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
 
     private void navigate(Fragment fragment, String title) {

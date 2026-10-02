@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="androidx_core_ripple_material_light">#1f000000</color>
+    <color name="androidx_core_secondary_text_default_material_light">#8a000000</color>
+    <color name="call_notification_answer_color">@*android:color/accent_material_dark</color>
+    <color name="call_notification_decline_color">@*android:color/holo_red_dark</color>
+    <color name="ic_launcher_background">@*android:color/accent_material_dark</color>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="backup_adapter_item_text_color">#ffffffff</color>
+    <color name="backup_adapter_section_text_color">#ffb0b0b0</color>
+    <color name="badge_settings_text_color_normal">#ffffffff</color>
+    <color name="cardIdleBackground">#20d0d0d0</color>
+    <color name="popup_color_primary">@*android:color/background_dark</color>
+    <color name="popup_color_secondary">@*android:color/background_dark</color>
+    <color name="popup_color_tertiary">@*android:color/background_dark</color>
+    <color name="prime_text_color">@*android:color/accent_material_dark</color>
+    <color name="switcher_bar_background_color">@*android:color/background_dark</color>
+</resources>

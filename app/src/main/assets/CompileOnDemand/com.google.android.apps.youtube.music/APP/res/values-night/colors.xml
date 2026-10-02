@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="cf_divider">@*android:color/transparent</color>
+    <color name="cf_primary">@*android:color/accent_material_dark</color>
+    <color name="cf_surface">@*android:color/background_dark</color>
+    <color name="cf_text_primary">@*android:color/white</color>
+    <color name="cf_text_secondary">@*android:color/secondary_text_default_material_dark</color>
+    <color name="survey_smiley">@*android:color/accent_material_dark</color>
+
+</resources>

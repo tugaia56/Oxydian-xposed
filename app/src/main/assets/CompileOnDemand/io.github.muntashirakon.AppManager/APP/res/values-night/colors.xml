@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="defaultSymbolInputBackgroundColor">@*android:color/background_dark</color>
+    <color name="defaultSymbolInputTextColor">@*android:color/white</color>
+    <color name="disabled_user">#bf4f1c14</color>
+    <color name="highlight">#ff6f5f4f</color>
+    <color name="red">@*android:color/accent_material_dark</color>
+    <color name="sd_label_text_color">#ffbdbdbd</color>
+    <color name="sd_overlay_color">#aa000000</color>
+    <color name="semi_transparent">#10ffffff</color>
+    <color name="sixty_percent_black">#9affffff</color>
+    <color name="sixty_percent_white">#9a000000</color>
+    <color name="textColorPrimary">@*android:color/white</color>
+    <color name="textColorSecondary">#ffbebebe</color>
+    <color name="tracker">@*android:color/ripple_material_dark</color>
+</resources>

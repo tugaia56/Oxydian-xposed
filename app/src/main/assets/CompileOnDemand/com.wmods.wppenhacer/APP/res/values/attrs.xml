@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="allowDividerAbove" format="boolean" />
+    <attr name="allowDividerBelow" format="boolean" />
+    <attr name="colorPrimary" format="color" />
+    <attr name="colorSurface" format="color" />
+    <attr name="dialogPreferenceStyle" format="reference" />
+</resources>

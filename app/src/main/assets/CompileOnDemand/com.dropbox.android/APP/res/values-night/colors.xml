@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="color__brighten">#ccffffff</color>
+    <color name="color__dampen">#cc000000</color>
+    <color name="color__dig__accent__light">@*android:color/accent_material_dark</color>
+    <color name="color__dig__primary__lighter">@*android:color/accent_material_dark</color>
+    <color name="color__inverse__attention__text">@*android:color/accent_material_dark</color>
+    <color name="color__inverse__core__accent">@*android:color/accent_material_dark</color>
+    <color name="color__inverse__core__primary">@*android:color/background_dark</color>
+    <color name="color__inverse__core__secondary">#fff7f5f2</color>
+    <color name="color__inverse__disabled__text">#66524a3e</color>
+    <color name="color__inverse__elevated__background">#fffbfaf9</color>
+    <color name="color__inverse__faint__background">#fff7f5f2</color>
+    <color name="color__inverse__faint__border">#33a69171</color>
+    <color name="color__inverse__faint__text">#c7524a3e</color>
+    <color name="color__inverse__opacity__1">#24a69171</color>
+    <color name="color__inverse__opacity__2">#3da69171</color>
+    <color name="color__inverse__opacity__3">#52a69171</color>
+    <color name="color__inverse__standard__background">#ffffffff</color>
+    <color name="color__inverse__standard__border">#33a69171</color>
+    <color name="color__inverse__standard__text">@*android:color/background_dark</color>
+    <color name="standard_text">#ffffffff</color>
+</resources>

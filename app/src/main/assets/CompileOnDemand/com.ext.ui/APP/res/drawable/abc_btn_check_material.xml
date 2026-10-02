@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true" android:drawable="@*android:drawable/btn_checkbox_checked_mtrl" />
+    <item android:drawable="@*android:drawable/btn_checkbox_unchecked_mtrl" />
+</selector>

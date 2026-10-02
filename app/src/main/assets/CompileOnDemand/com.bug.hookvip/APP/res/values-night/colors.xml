@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="about_page_background">@*android:color/background_dark</color>
+    <color name="about_page_card_normal">@*android:color/button_material_dark</color>
+    <color name="about_page_card_text_color">#deffffff</color>
+    <color name="about_page_category_text_color">@*android:color/accent_material_dark</color>
+    <color name="about_page_hint">#80ffffff</color>
+    <color name="about_page_line">@*android:color/black</color>
+    <color name="about_page_navigationBarColor">#5c000000</color>
+</resources>

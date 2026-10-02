@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="settingslib_materialColorOnPrimary">#3e2723</color>
+    <color name="settingslib_materialColorOnPrimaryContainer">#5d4037</color>
+    <color name="settingslib_materialColorOnSurface">#795548</color>
+    <color name="settingslib_materialColorOnSurfaceVariant">#bcaaa4</color>
+    <color name="settingslib_materialColorOutline">#00c853</color>
+    <color name="settingslib_materialColorPrimary">#1b5e20</color>
+    <color name="settingslib_materialColorPrimaryContainer">#388e3c</color>
+    <color name="settingslib_materialColorSecondaryContainer">#0091ea</color>
+    <color name="settingslib_materialColorSurfaceContainer">#00b0ff</color>
+    <color name="settingslib_materialColorSurfaceContainerHigh">#40c4ff</color>
+    <color name="settingslib_materialColorSurfaceContainerHighest">#80d8ff</color>
+    <color name="settingslib_materialColorSurfaceVariant">#c51162</color>
+    <color name="sud_color_on_surface">#f50057</color>
+    <color name="settingslib_state_on_color">#ff4081</color>
+    <color name="settingslib_text_color_primary_device_default">#ff80ab</color>
+    <color name="settingslib_text_color_secondary_device_default">#d50000</color>
+    <color name="settingslib_thumb_disabled_color">#ff1744</color>
+    <color name="settingslib_thumb_off_color">#ff5252</color>
+    <color name="settingslib_track_off_color">#ff8a80</color>
+    <color name="settingslib_track_on_color">#b71c1c</color>
+    <color name="settingslib_thumb_on_color">#ef9a9a</color>
+</resources>

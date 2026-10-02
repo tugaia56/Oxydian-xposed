@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="divider_height">0.0dip</dimen>					        							<!-- 0.5dip -->
+    <dimen name="weather_image_size">40.0dip</dimen>       	  										<!-- 30.0dip -->
+    <dimen name="weather_temperature_current_size">40.0sp</dimen>       							<!-- 34.0dip -->
+    <dimen name="widget_divider_width">0.0dip</dimen>       										<!-- 40.0dip -->
+    <dimen name="widget_image_size">18.0dip</dimen>       											<!-- 12.0dip -->
+    <dimen name="widget_items_margin_left_right">4.0dip</dimen>       								<!-- 4.0dip -->
+    <dimen name="widget_items_margin_top_bottom">4.0dip</dimen>       								<!-- 4.0dip -->
+    <dimen name="widget_location_subtitle_size">9.0sp</dimen>       								<!-- 10.0dip -->
+    <dimen name="widget_location_title_size">12.0sp</dimen>       									<!-- 11.0dip -->
+    <dimen name="widget_padding">4.0dip</dimen>       												<!-- 4.0dip -->
+    <dimen name="widget_precip_icon_size">15.0dip</dimen>       									<!-- 15.0dip -->
+    <dimen name="widget_precipitation_label_size">11.0sp</dimen>       								<!-- 11.0sp -->
+    <dimen name="widget_precipitation_text_size">11.0sp</dimen>       								<!-- 11.0sp -->
+    <dimen name="widget_pws_image_size">10.0dip</dimen>       										<!-- 10.0dip -->
+    <dimen name="widget_refresh_area_size">48.0dip</dimen>       									<!-- 48.0dip -->
+    <dimen name="widget_refresh_text_size">8.0sp</dimen>       										<!-- 10.0sp -->
+    <dimen name="widget_small_margin_top_bottom">4.0dip</dimen>       								<!-- 4.0dip -->
+    <dimen name="widget_temp_max_min_size">12.0sp</dimen>       									<!-- 12.0sp -->
+    <dimen name="widget_temp_unit_mark_size">10.0dip</dimen>       									<!-- 10.0sp -->
+    <dimen name="widget_temperature_left_margin">7.0dip</dimen>       								<!-- 7.0dip -->
+    <dimen name="widget_thermometer_size">10.0dip</dimen>       									<!-- 10.0dip -->
+    <dimen name="widget_weather_condition_size">14.0sp</dimen>       								<!-- 14.0sp -->
+    <dimen name="thermometer_width">0.0dip</dimen>       											<!-- 8.0dip -->
+    <dimen name="thermometer_height">0.0dip</dimen>       											<!-- 16.0dip -->
+    <dimen name="smart_forecast_range_bar_condition_bar_height">2.0dip</dimen>       				<!-- 4.0dip -->
+    <dimen name="widget_location_alert_size">16.0sp</dimen>											<!-- 12.0sp -->
+	
+</resources>

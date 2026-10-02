@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="settingslib_materialColorErrorContainer">#dd2c00</color>
+    <color name="settingslib_materialColorOnBackground">#ff9e80</color>
+    <color name="settingslib_materialColorOnError">#ff3d00</color>
+    <color name="settingslib_materialColorOnErrorContainer">#aeea00</color>
+    <color name="settingslib_materialColorOnPrimary">#ffffffff</color>
+    <color name="settingslib_materialColorOnPrimaryContainer">#eeff41</color>
+    <color name="settingslib_materialColorOnSecondary">#f4ff81</color>
+    <color name="settingslib_materialColorOnSecondaryContainer">#827717</color>
+    <color name="settingslib_materialColorOnSurface">#ffffffff</color>
+    <color name="settingslib_materialColorOnSurfaceInverse">#9e9d24</color>
+    <color name="settingslib_materialColorOnSurfaceVariant">@*android:color/accent_material_dark</color>
+    <color name="settingslib_materialColorOnTertiary">#00c853</color>
+    <color name="settingslib_materialColorOnTertiaryContainer">#00e676</color>
+    <color name="settingslib_materialColorOutline">@*android:color/accent_material_dark</color>
+    <color name="settingslib_materialColorOutlineVariant">#1b5e20</color>
+    <color name="settingslib_materialColorPrimary">@*android:color/accent_material_dark</color>
+    <color name="settingslib_materialColorPrimaryContainer">#43a047</color>
+    <color name="settingslib_materialColorPrimaryInverse">#00bfa5</color>
+    <color name="settingslib_materialColorSecondary">#1de9b6</color>
+    <color name="settingslib_materialColorSecondaryContainer">#004d40</color>
+    <color name="settingslib_materialColorSurface">#80cbc4</color>
+    <color name="settingslib_materialColorSurfaceBright">#80cbc4</color>
+    <color name="settingslib_materialColorSurfaceContainer">#2962ff</color>
+    <color name="settingslib_materialColorSurfaceContainerHigh">#2979ff</color>
+    <color name="settingslib_materialColorSurfaceContainerHighest">@*android:color/background_dark</color>
+    <color name="settingslib_materialColorSurfaceContainerLow">#448aff</color>
+    <color name="settingslib_materialColorSurfaceContainerLowest">#0d47a1</color>
+    <color name="settingslib_materialColorSurfaceDim">@*android:color/background_dark</color>
+    <color name="settingslib_materialColorSurfaceInverse">#0091ea</color>
+    <color name="settingslib_materialColorSurfaceVariant">#80d8ff</color>
+    <color name="settingslib_materialColorTertiary">#01579b</color>
+    <color name="settingslib_materialColorTertiaryContainer">#80d8ff</color>
+</resources>

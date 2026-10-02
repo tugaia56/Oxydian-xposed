@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TemperatureMeasureMark">
+        <item name="*android:textSize">0.0sp</item>
+        <item name="*android:textColor">@*android:color/transparent</item>
+        <item name="*android:includeFontPadding">false</item>
+        <item name="*android:fontFamily">sans-serif</item>
+    </style>
+</resources>

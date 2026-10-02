@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="launcher_app_settings_badge_background_margin">0.0dip</dimen>
+    <dimen name="launcher_app_settings_badge_background_diameter">0.0dip</dimen>	
+    <dimen name="launcher_app_settings_badge_diameter">0.0dip</dimen>	
+</resources>

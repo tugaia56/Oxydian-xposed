@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="crop_exclude_nav_bar">Escludi barra di navigazione</string>
+    <string name="crop_exclude_status_bar">Escludi barra di stato</string>
+    <string name="crop_exclude_status_nav_bar">Escludi barra di stato e di navigazione</string>
+    <string name="crop_full_screen">A schermo intero</string>
+    <string name="action_screenshot">Cartella Screenshot</string>
+    <string name="stitch">Unisci Foto</string>
+    <string name="input_url">Digita o incolla URL</string>
+    <string name="record_video">Registra Video</string>
+    <string name="skitch">Modifica Foto</string>
+    <string name="action_home">Impostazioni</string>
+    <string name="web_capture_one">1. Inserisci o condividi l\'URL su <b>%s</b></string>
+    <string name="web_capture_two">2. Attendere che la pagina venga caricata completamente, quindi fare clic su <b>\"Pulsante di cattura\"</b> per catturare la pagina</string>
+    <string name="turn_on_capture">Attiva Cattura Schermo</string>
+    <string name="file_name_prefix">Prefisso nome file</string>
+    <string name="kn_cpv_custom">Personalizza</string>
+    <string name="kn_cpv_default_title">Seleziona un colore</string>
+    <string name="kn_cpv_opacity">Opacità</string>
+    <string name="kn_cpv_presets">Preimpostazioni</string>
+    <string name="kn_cpv_select">Seleziona</string>
+    <string name="remove_sticky">Rimuovi elementi adesivi</string>
+    <string name="show_floating">Mostra pulsante mobile</string>
+    <string name="float_button_alpha_des">Opacità del pulsante mobile</string>
+    <string name="float_button_size_des">Dimensione del pulsante mobile</string>
+    <string name="lock_floating_button">Blocca posizione del pulsante mobile</string>
+    <string name="auto_hide_side">Nascondi automaticamente di lato</string>
+    <string name="float_button_color_des">Colore di sfondo del pulsante mobile</string>
+    <string name="float_button_style">Impostazioni pulsante mobile</string>
+    <string name="kn_share">Condividi</string>
+    <string name="action_share">Condividi</string>
+    <string name="kn_edit">Modifica</string>
+    <string name="action_edit">Modifica</string>
+    <string name="action_delete">Elimina</string>
+    <string name="kn_delete">Elimina</string>
+    <string name="set_start_pos">Inizia qui</string>
+    <string name="set_end_pos">Termina qui e cattura</string>
+    <string name="capture_whole_page">Cattura l\'intera pagina</string>
+    <string name="kn_no_data">Vuoto</string>
+	
+    <string name="auto_scroll_mode">Modalità di scorrimento automatico</string>
+    <string name="auto_scroll_screenshot">Screenshot a scorrimento automatico</string>
+    <string name="auto_scroll_screenshot_desc">Il servizio di accessibilità deve essere abilitato per aiutarti a fare screenshot lunghi</string>
+    <string name="auto_scroll_screenshot_desc_34">Abilita questa funzione per acquisire schermate senza confermare l\'autorizzazione ogni volta</string>
+    <string name="auto_start_des">Abilita il servizio Screenshot all\'avvio</string>
+	
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ColorDeShowcase">@*android:color/accent_material_dark</color>
+    <color name="ColorOscuroEnLightYClaroEnDark">@*android:color/accent_material_dark</color>
+    <color name="FondoAdvertencia">@*android:color/ripple_material_dark</color>
+    <color name="FondoConTransparencia75">#bf000000</color>
+    <color name="FondoDialogo">@*android:color/transparent</color>
+    <color name="FondoDropDown">@*android:color/darker_gray</color>
+    <color name="FondoGris">@*android:color/button_material_dark</color>
+    <color name="PerfilBloqueado">@*android:color/accent_material_dark</color>
+    <color name="PerfilNoSeleccionado">@*android:color/ripple_material_dark</color>
+</resources>

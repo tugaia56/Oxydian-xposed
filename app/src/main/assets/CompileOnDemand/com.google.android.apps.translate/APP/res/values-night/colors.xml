@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="banner_accent_attention_high">@*android:color/accent_material_dark</color>
+    <color name="banner_accent_attention_low">@*android:color/ripple_material_dark</color>
+    <color name="banner_accent_attention_medium">@*android:color/accent_material_dark</color>
+    <color name="banner_background_attention_high">@*android:color/button_material_dark</color>
+    <color name="banner_background_attention_low">@*android:color/background_dark</color>
+    <color name="banner_background_attention_medium">@*android:color/holo_light_primary_dark</color>
+    <color name="disabled_content">#61eeeeee</color>
+    <color name="on_surface_activated">#ffffffff</color>
+    <color name="scrollbar_thumb_color">#4dffffff</color>
+    <color name="surface_elevation_plus_four">#ff38393c</color>
+    <color name="surface_elevation_plus_two">@*android:color/background_dark</color>
+    <color name="survey_disabled_state_color">@*android:color/ripple_material_dark</color>
+    <color name="survey_surface_color_elevation_2">@*android:color/background_dark</color>
+    <color name="survey_surface_color_elevation_3">@*android:color/background_dark</color>
+</resources>

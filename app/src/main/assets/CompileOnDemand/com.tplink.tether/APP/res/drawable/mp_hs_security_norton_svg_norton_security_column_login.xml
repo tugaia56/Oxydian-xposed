@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector android:height="32.0dip" android:width="33.0dip" android:viewportWidth="33.0" android:viewportHeight="32.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <group>
+        <clip-path android:pathData="M8.622,8h17.333v17.333h-17.333z" />
+        <path android:fillColor="@*android:color/accent_material_dark" android:pathData="M23.173,9.56H11.222C9.905,9.56 8.891,10.583 8.891,11.753V21.962C8.891,23.132 9.913,24.146 11.222,24.146H23.321C24.629,24.146 25.652,23.123 25.652,21.962V11.753C25.652,10.583 24.638,9.56 23.173,9.56ZM13.987,20.211C13.987,20.506 13.692,20.939 13.259,20.939C12.825,20.939 12.531,20.506 12.531,20.064V13.651C12.531,13.217 12.825,12.923 13.259,12.923C13.692,12.923 13.987,13.217 13.987,13.651V20.211ZM21.284,19.769C20.409,20.645 19.239,20.939 17.635,20.939H16.907C16.474,20.939 16.179,20.645 16.179,20.211V13.642C16.179,13.209 16.474,12.914 16.907,12.914C18.805,12.767 20.261,13.061 21.284,13.937C22.012,14.665 22.454,15.54 22.454,16.857C22.445,18.166 22.012,19.041 21.284,19.769Z" />
+        <path android:fillColor="@*android:color/accent_material_dark" android:pathData="M17.635,14.379V19.483C18.806,19.483 19.681,19.189 20.261,18.755C20.695,18.322 20.99,17.733 20.99,16.857C20.99,15.982 20.842,15.393 20.409,14.959C19.681,14.517 18.806,14.231 17.635,14.379Z" />
+    </group>
+    <path android:fillColor="@*android:color/accent_material_dark" android:pathData="M16.622,16m-16,0a16,16 0,1 1,32 0a16,16 0,1 1,-32 0" android:fillAlpha="0.1" />
+</vector>

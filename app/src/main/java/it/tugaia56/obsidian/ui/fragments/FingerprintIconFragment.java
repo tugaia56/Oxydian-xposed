@@ -77,6 +77,14 @@ public class FingerprintIconFragment extends Fragment {
             AppUtils.showRestartReminder(requireContext());
         };
 
+        SwitchWidgetAdapter.SwitchItem aodItem = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.lockscreen_fp_hide_aod), getString(R.string.lockscreen_fp_hide_aod_summary),
+                ObsidianPrefs.getBoolean("lockscreen_fp_hide_aod", false),
+                null);
+        aodItem.onChanged = () -> {
+            ObsidianPrefs.putBoolean("lockscreen_fp_hide_aod", aodItem.checked);
+        };
+
         SwitchWidgetAdapter.SwitchItem customItem = new SwitchWidgetAdapter.SwitchItem(
                 getString(R.string.lockscreen_fp_custom_icon), getString(R.string.lockscreen_fp_custom_icon_summary),
                 ObsidianPrefs.getBoolean("lockscreen_fp_custom_icon", false),
@@ -86,7 +94,7 @@ public class FingerprintIconFragment extends Fragment {
             AppUtils.showRestartReminder(requireContext());
         };
         List<RecyclerView.Adapter<?>> toggleChain = new ArrayList<>();
-        GroupUtils.addGroup(toggleChain, List.of(removeItem, customItem));
+        GroupUtils.addGroup(toggleChain, List.of(removeItem, aodItem, customItem));
 
         List<NavAdapter.NavItem> navItems = List.of(
                 new NavAdapter.NavItem(

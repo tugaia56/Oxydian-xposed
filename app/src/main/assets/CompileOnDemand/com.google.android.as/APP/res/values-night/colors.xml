@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="album_art_selected_background">@*android:color/white</color>
+    <color name="album_art_selected_icon">@*android:color/background_dark</color>
+    <color name="album_art_unselected_background">@*android:color/background_dark</color>
+    <color name="album_art_unselected_icon">@*android:color/accent_material_dark</color>
+    <color name="animation_text_overlay_color">#ffffffff</color>
+    <color name="banner_accent_attention_high">@*android:color/accent_material_dark</color>
+    <color name="banner_accent_attention_low">@*android:color/accent_material_dark</color>
+    <color name="banner_accent_attention_medium">@*android:color/accent_material_dark</color>
+    <color name="banner_background_attention_high">@*android:color/background_dark</color>
+    <color name="banner_background_attention_low">@*android:color/background_dark</color>
+    <color name="banner_background_attention_medium">@*android:color/background_dark</color>
+    <color name="bluechip_icon_tint_color">@*android:color/background_leanback_dark</color>
+    <color name="bottom_nav_background">@*android:color/background_dark</color>
+    <color name="bottom_nav_selected">@*android:color/white</color>
+    <color name="favorite_icon_color_full">@*android:color/accent_material_dark</color>
+    <color name="history_icon_tint">#ffbdc1c6</color>
+    <color name="history_toolbar_color">@*android:color/background_dark</color>
+    <color name="icon_tint_color">#b3ffffff</color>
+    <color name="multi_select_checkbox_color">@*android:color/accent_material_dark</color>
+    <color name="multi_select_empty_checkbox_color">@*android:color/accent_material_dark</color>
+    <color name="primary_button_text_color">@*android:color/background_dark</color>
+    <color name="selected_background">@*android:color/background_dark</color>
+    <color name="settingslib_accent_primary_variant">@*android:color/accent_material_dark</color>
+    <color name="settingslib_colorSurfaceHeader">@*android:color/background_dark</color>
+    <color name="settingslib_colorSurfaceVariant">@*android:color/background_dark</color>
+    <color name="settingslib_dialog_accent">@*android:color/white</color>
+    <color name="settingslib_dialog_colorError">@*android:color/accent_material_dark</color>
+    <color name="settingslib_protection_color">@*android:color/black</color>
+    <color name="settingslib_text_color_preference_category_title">@*android:color/white</color>
+    <color name="settingslib_text_color_primary_device_default">@*android:color/accent_material_dark</color>
+    <color name="settingslib_thumb_disabled_color">#ffffffff</color>
+    <color name="settingslib_thumb_off_color">#ffffffff</color>
+    <color name="settingslib_track_off_color">@*android:color/background_dark</color>
+    <color name="settingslib_track_on_color">@*android:color/accent_material_dark</color>
+    <color name="song_actions_dialog_background">@*android:color/background_dark</color>
+    <color name="song_group_title">@*android:color/accent_material_dark</color>
+    <color name="sys_pointer_background_color">@*android:color/button_material_dark</color>
+    <color name="settingslib_surface_dark">@*android:color/background_dark</color>
+</resources>
+

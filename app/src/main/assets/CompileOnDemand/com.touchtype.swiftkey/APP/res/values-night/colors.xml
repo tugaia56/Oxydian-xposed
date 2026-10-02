@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="popular_settings_border">@*android:color/accent_material_dark</color>
+    <color name="popular_settings_hint">#ff7f7f7f</color>
+    <color name="popular_settings_long_press_text">#ff999999</color>
+    <color name="sk_tint_40">@*android:color/background_dark</color>
+</resources>

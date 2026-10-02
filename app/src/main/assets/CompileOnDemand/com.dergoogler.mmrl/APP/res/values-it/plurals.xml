@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="hours">
+        <item quantity="other">%1$d ore</item>
+        <item quantity="one">%1$d ora</item>
+    </plurals>
+    <plurals name="module_count_explore_repo">
+        <item quantity="other">%1$s moduli memorizzati</item>
+        <item quantity="one">%1$s modulo memorizzato</item>
+    </plurals>
+    <plurals name="mtrl_badge_content_description">
+        <item quantity="other">%d nuove notifiche</item>
+        <item quantity="one">%d nuova notifica</item>
+    </plurals>
+    <plurals name="search_results">
+        <item quantity="other">"Abbiamo trovato [color=surface_tint]%1$s risultati[/color] che corrispondono alla tua ricerca"</item>
+        <item quantity="one">"Abbiamo trovato [color=surface_tint]%1$s risultato[/color] che corrisponde alla tua ricerca"</item>
+    </plurals>
+</resources>

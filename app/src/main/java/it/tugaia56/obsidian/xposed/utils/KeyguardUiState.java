@@ -45,6 +45,11 @@ public final class KeyguardUiState {
         }
     }
 
+    public static android.view.View getAodLayout() {
+        java.lang.ref.WeakReference<android.view.View> r = sAodLayout;
+        return r == null ? null : r.get();
+    }
+
     private static boolean aodLayoutVisible() {
         java.lang.ref.WeakReference<android.view.View> r = sAodLayout;
         android.view.View v = r == null ? null : r.get();

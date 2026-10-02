@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector android:height="72.0dip" android:width="72.0dip" android:viewportWidth="72.0" android:viewportHeight="72.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="#ffffffff" android:pathData="M-18,-18h108v108h-108z" />
+    <path android:fillColor="#ffffffff" android:pathData="M36,36.01m-36,0a36,36 0,1 1,72 0a36,36 0,1 1,-72 0" />
+    <path android:fillColor="@*android:color/accent_material_dark" android:pathData="M-18,-18h108v108h-108z" />
+    <path android:fillColor="#fff" android:pathData="M11.01,32.09l-7.69,7.84l1.71,0l7.69,-7.84l-1.71,0z" />
+    <path android:fillColor="#fff" android:pathData="M14.98,32.09l-7.69,7.84l1.71,0l7.69,-7.84l-1.71,0z" />
+    <path android:fillColor="#fff" android:pathData="M18.96,32.09l-7.69,7.84l1.69,0l7.69,-7.84l-1.69,0z" />
+    <path android:fillColor="#fff" android:pathData="M22.92,32.09l-7.69,7.84l1.71,0l7.69,-7.84l-1.71,0z" />
+    <path android:fillColor="#fff" android:pathData="M26.9,32.09l-7.7,7.84l1.7,0l7.7,-7.84l-1.7,0z" />
+    <path android:fillColor="#fff" android:pathData="M29.71,33.44l-6.3,6.49h2.29l6.07,-6.27v6.27L33.54,39.93v-7.84h-1.34a3.88,3.88 0,0 0,-2.45 1.35" />
+    <path android:fillColor="#fff" android:pathData="M35.78,32.09l-1.73,0l0,7.84l6.17,0l0,-1.52l-4.44,0l0,-6.32z" />
+    <path android:fillColor="#fff" android:pathData="M46.71,32.1h-6v7.83h1.72v-2.88L46.54,37.05a1.84,1.84 0,0 0,1.76 -1.62v-1.78a1.63,1.63 0,0 0,-1.62 -1.55m-0.6,3.46h-3.73v-2h3.71a0.62,0.62 0,0 1,0.62 0.62l0,0.78a0.59,0.59 0,0 1,-0.62 0.6" />
+    <path android:fillColor="#fff" android:pathData="M48.83,32.09h1.71v7.85h-1.71z" />
+    <path android:fillColor="#fff" android:pathData="M57.42,37.54l-3.54,-4.55a2.69,2.69 0,0 0,-0.39 -0.42,2.5 2.5,0 0,0 -1.69,-0.48h-0.65v7.84h1.68v-5.52l4.28,5.52h1.94v-7.84h-1.63Z" />
+    <path android:fillColor="#fff" android:pathData="M59.68,33.68v6.26h7.29v-1.53h-5.54v-1.76h4.76L66.19,35.23h-4.76v-1.75h5.54v-1.39h-5.62a1.69,1.69 0,0 0,-1.67 1.59" />
+</vector>

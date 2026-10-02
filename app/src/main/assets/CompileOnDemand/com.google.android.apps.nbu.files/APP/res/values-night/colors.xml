@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="blob_view_floor_color">@*android:color/background_dark</color>
+    <color name="cylinder_effect_center_color">@*android:color/transparent</color>
+    <color name="cylinder_effect_side_color">#ff353639</color>
+    <color name="disabled_selection_indicator_circle">#61ffffff</color>
+    <color name="fullscreen_progressbar_progress_background">@*android:color/ripple_material_dark</color>
+    <color name="fullscreen_progressbar_whole_screen_background">@*android:color/ripple_material_dark</color>
+    <color name="icon_background_color">@*android:color/ripple_material_dark</color>
+    <color name="request_app_usage_board_content_color">@*android:color/accent_material_dark</color>
+    <color name="request_app_usage_large_board_color">@*android:color/button_material_dark</color>
+    <color name="request_app_usage_search_icon_color">@*android:color/accent_material_dark</color>
+    <color name="request_app_usage_search_icon_shadow_color">@*android:color/background_dark</color>
+    <color name="request_app_usage_small_board_color">@*android:color/button_material_dark</color>
+    <color name="request_app_usage_star_color">@*android:color/button_material_dark</color>
+    <color name="selection_lock_overlay">#80000000</color>
+    <color name="settingslib_materialColorOnPrimary">#ff003730</color>
+    <color name="settingslib_materialColorOnPrimaryContainer">#ffa1f1e2</color>
+    <color name="settingslib_materialColorOnSurface">#ffe5e2e1</color>
+    <color name="settingslib_materialColorOnSurfaceVariant">#ffc7c7c7</color>
+    <color name="settingslib_materialColorOutline">#ff919191</color>
+    <color name="settingslib_materialColorPrimary">#ff83d6c7</color>
+    <color name="settingslib_materialColorPrimaryContainer">#ff005047</color>
+    <color name="settingslib_materialColorSecondaryContainer">#ff334c47</color>
+    <color name="settingslib_materialColorSurfaceContainer">#ff1f1f1f</color>
+    <color name="settingslib_materialColorSurfaceContainerHigh">#ff2a2a2a</color>
+    <color name="settingslib_materialColorSurfaceContainerHighest">#ff343434</color>
+    <color name="settingslib_materialColorSurfaceVariant">#ff474747</color>
+    <color name="snoozed_card_icon_background_color">#ff48494c</color>
+    <color name="survey_disabled_state_color">@*android:color/ripple_material_dark</color>
+    <color name="survey_surface_color_elevation_2">@*android:color/background_dark</color>
+    <color name="survey_surface_color_elevation_3">@*android:color/background_dark</color>
+</resources>

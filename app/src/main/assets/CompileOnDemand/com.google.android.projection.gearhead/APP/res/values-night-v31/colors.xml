@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="survey_alert_dialog_button_color">#c5cae9</color>
+    <color name="survey_alert_dialog_button_focused_color">#d50000</color>
+    <color name="settingslib_accent_primary_variant">#ff8a80</color>
+    <color name="settingslib_colorSurfaceHeader">@*android:color/background_dark</color>
+    <color name="settingslib_colorSurfaceVariant">@*android:color/background_dark</color>
+    <color name="settingslib_dialog_accent">#c5cae9</color>
+    <color name="settingslib_dialog_colorError">#c5cae9</color>
+    <color name="settingslib_list_divider_color">@*android:color/background_dark</color>
+    <color name="settingslib_text_color_preference_category_title">#c5cae9</color>
+    <color name="settingslib_text_color_primary_device_default">#ffffffff</color>
+    <color name="settingslib_text_color_secondary_device_default">#b71c1c</color>
+    <color name="settingslib_thumb_disabled_color">@*android:color/background_dark</color>
+    <color name="settingslib_thumb_off_color">#ef9a9a</color>
+    <color name="settingslib_track_off_color">@*android:color/background_dark</color>
+    <color name="settingslib_surface_dark">#d500f9</color>
+</resources>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="aag_widget_background_color">#dd2c00</color>
+    <color name="aag_widget_color_surface_variant">#ff3d00</color>
+    <color name="settingslib_materialColorOnPrimary">#ff6e40</color>
+    <color name="settingslib_materialColorOnPrimaryContainer">#ff9e80</color>
+    <color name="settingslib_materialColorOnSurface">#bf360c</color>
+    <color name="settingslib_materialColorOnSurfaceVariant">#d84315</color>
+    <color name="settingslib_materialColorOutline">#e64a19</color>
+    <color name="settingslib_materialColorPrimary">#f4511e</color>
+    <color name="settingslib_materialColorPrimaryContainer">#ff5722</color>
+    <color name="settingslib_materialColorSecondaryContainer">#ff7043</color>
+    <color name="settingslib_materialColorSurfaceVariant">#ff8a65</color>
+    <color name="sud_color_on_surface">#ffab91</color>
+    <color name="widget_button_borderless_icon_color">#ffccbc</color>
+    <color name="settingslib_colorSurfaceVariant">#ff6d00</color>
+    <color name="settingslib_dialog_accent">#ff9100</color>
+    <color name="settingslib_dialog_colorError">#fff28b82</color>
+    <color name="settingslib_list_divider_color">#ffab40</color>
+    <color name="settingslib_text_color_preference_category_title">#ffd180</color>
+    <color name="settingslib_text_color_primary_device_default">#e65100</color>
+    <color name="settingslib_text_color_secondary_device_default">#ef6c00</color>
+    <color name="settingslib_thumb_disabled_color">#f57c00</color>
+    <color name="settingslib_thumb_off_color">#fb8c00</color>
+    <color name="settingslib_track_off_color">#ff9800</color>
+    <color name="settingslib_surface_dark">#ffa726</color>
+</resources>

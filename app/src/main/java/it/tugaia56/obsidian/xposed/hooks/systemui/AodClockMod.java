@@ -125,7 +125,7 @@ public class AodClockMod extends XposedMods {
         XposedBridge.hookAllMethods(aodClockLayout, "performTimeUpdate", new XC_MethodHook() {
             @Override protected void afterHookedMethod(MethodHookParam param) {
                 it.tugaia56.obsidian.xposed.utils.KeyguardUiState.registerAodLayout(param.thisObject);
-                try { if (mEnabled) placeClockView(); } catch (Throwable t) { dbg("performTimeUpdate hook ERROR: " + t); }
+                try { if (mEnabled) { placeClockView(); centerAodBlock(); } } catch (Throwable t) { dbg("performTimeUpdate hook ERROR: " + t); }
             }
         });
         XposedBridge.hookAllConstructors(aodClockLayout, new XC_MethodHook() {
@@ -133,6 +133,15 @@ public class AodClockMod extends XposedMods {
                 it.tugaia56.obsidian.xposed.utils.KeyguardUiState.registerAodLayout(param.thisObject);
             }
         });
+        try {
+            XposedBridge.hookAllMethods(aodClockLayout, "showClock", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam param) {
+                    if (!mEnabled) return;
+                    android.os.Handler h = new android.os.Handler(android.os.Looper.getMainLooper());
+                    for (long d : new long[]{500, 1300, 2500, 4000}) h.postDelayed(() -> centerAodBlock(), d);
+                }
+            });
+        } catch (Throwable t) { dbg("hook showClock(center) failed: " + t); }
         // OOS 16.1: initForAodApk/performTimeUpdate non scattano a ogni AOD; questi sì.
         for (String m : new String[]{"setVisibility", "onAttachedToWindow", "showClock", "hideClock"}) {
             try {
@@ -169,6 +178,29 @@ public class AodClockMod extends XposedMods {
         placeClockView();
     }
 
+    /** Centra il blocco AOD (orologio + meteo) in verticale e lo fa oscillare di poco ogni minuto,
+     *  come la protezione anti-burn-in di OOS. Si usa translationY sul layout dell'AOD: la posizione
+     *  scelta da OOS (margine) resta com'è, qui si aggiunge solo lo scarto. */
+    private void centerAodBlock() {
+        try {
+            if (!mEnabled) return;
+            View layout = it.tugaia56.obsidian.xposed.utils.KeyguardUiState.getAodLayout();
+            if (layout == null || layout.getHeight() == 0) return;
+            layout.setTranslationY(0f);
+            int[] loc = new int[2];
+            layout.getLocationOnScreen(loc);
+            int screenH = layout.getResources().getDisplayMetrics().heightPixels;
+            int center = loc[1] + layout.getHeight() / 2;
+            int shift = center - screenH / 2;                       // >0: il blocco è più in basso del centro
+            shift = Math.max(-screenH / 8, Math.min(shift, screenH / 4));
+            int minute = (int) ((System.currentTimeMillis() / 60000L) % 5L);
+            int drift = (int) ((minute - 2) * 10 * layout.getResources().getDisplayMetrics().density / 2.75f);
+            layout.setTranslationY(-shift + drift);
+        } catch (Throwable t) {
+            dbg("centerAodBlock ERROR: " + t);
+        }
+    }
+
     private void placeClockView() {
         if (!mEnabled || mRootLayout == null) return;
         try {
@@ -199,6 +231,18 @@ public class AodClockMod extends XposedMods {
      *  inflazionata non ha ancora LayoutParams validi, vedi LockscreenClockMod. */
     private void applyMargins(View clockView) {
         ViewHelper.setMargins(clockView, mContext, 0, mTopMarginDp, 0, mBottomMarginDp);
+        // Alcuni stili (es. con robottino) sono più larghi del contenitore che li regge e
+        // sporgevano a sinistra, tagliando il fumetto: si usa tutta la larghezza e si centra.
+        try {
+            ViewGroup.LayoutParams lp = clockView.getLayoutParams();
+            if (lp != null && lp.width != ViewGroup.LayoutParams.MATCH_PARENT) {
+                lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                clockView.setLayoutParams(lp);
+            }
+            if (clockView instanceof android.widget.LinearLayout ll) {
+                ll.setGravity(android.view.Gravity.CENTER_HORIZONTAL);
+            }
+        } catch (Throwable t) { dbg("center horizontally ERROR: " + t); }
     }
 
     /** Stesso schema di LockscreenClockMod: risolve "lockscreen_clock_&lt;stile&gt;" per nome,

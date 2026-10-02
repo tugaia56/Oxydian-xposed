@@ -2,6 +2,7 @@ Aggiunto:
 - Crediti: ringraziamenti a Luigi (@LC9889), sviluppatore di Oxygen Customizer, e a Claude
 - Tocco sull'orologio della statusbar: apre direttamente Timer o Cronometro (Orologio & data > Stile Orologio)
 - Schermata "Stato Oxydian" (Impostazioni): mostra quali mod funzionano dopo un aggiornamento ROM, con esportazione del log
+- App Google e utente: nuova schermata in Oxydian Theme per temare le app Google e le altre app installate al posto di Substratum (elenco con nome app e package, Abilita/Disabilita tutte, Applica)
 
 Aggiornato:
 - Home: nome dispositivo e versione OOS letti dal telefono (prima era scritto a mano "OnePlus 12")
@@ -15,6 +16,8 @@ Aggiornato:
 - Log di Stato Oxydian: elenca anche i disegni Wi-Fi presenti nel SystemUI, per diagnosticare lo stile icone Wi-Fi
 - AOD: corretto il doppio orologio/meteo comparso con OxygenOS 16.1 (orologio, meteo e widget della lockscreen non si sovrappongono più all'AOD)
 - Trasparenza/sfocatura del pannello: non toglie più il nero all'AOD
+- AOD: orologio centrato e con piccola oscillazione periodica; il blocco con robottino non sporge più a sinistra
+- Always-On Display: nuovo interruttore per nascondere l'icona dell'impronta solo con lo schermo spento
 - Nuova icona dell'app
 - Titolo della release: Oxydian al posto del vecchio nome
 

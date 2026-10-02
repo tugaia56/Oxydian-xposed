@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="common_wear_switch_bar_end_gradient">#ff262523</color>
+    <color name="common_wear_switch_bar_start_gradient">#7fffffff</color>
+    <color name="wear_material_almond_dark">#ff262523</color>
+    <color name="wear_material_almond_mid">#ffcac5bc</color>
+    <color name="wear_material_pop">#ffe6ff7b</color>
+</resources>

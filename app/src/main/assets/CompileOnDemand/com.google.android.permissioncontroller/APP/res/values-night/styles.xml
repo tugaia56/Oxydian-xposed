@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="GrantPermissions" parent="@*android:style/Theme.DeviceDefault.Dialog.Alert">
+        <item name="android:windowBackground">@*android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+    <style name="PermissionDialog" parent="@*android:style/Theme.DeviceDefault.Dialog.NoActionBar" />
+    <style name="Theme.PermissionGrantDialog" parent="@*android:style/Theme.DeviceDefault.Dialog">
+        <item name="android:colorBackground">@*android:color/transparent</item>
+    </style>
+</resources>

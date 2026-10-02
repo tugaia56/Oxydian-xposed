@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="adsidentity_background_color">@*android:color/background_dark</color>
+    <color name="survey_disabled_state_color">#61e8eaed</color>
+    <color name="survey_surface_color_elevation_2">@*android:color/background_dark</color>
+    <color name="survey_surface_color_elevation_3">@*android:color/background_dark</color>
+    <color name="credentials_tv_focus_highlight">#26eeeeee</color>
+    <color name="credentials_tv_snackbar_background">@*android:color/background_dark</color>
+    <color name="credentials_tv_white_text_alpha_100">#ffeeeeee</color>
+    <color name="credentials_tv_white_text_alpha_70">#b2eeeeee</color>
+</resources>

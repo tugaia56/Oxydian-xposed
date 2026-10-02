@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="banner_background_attention_none">@*android:color/bright_foreground_light_disabled</color>
+    <color name="settingslib_state_on_color">#ffffffff</color>
+    <color name="settingslib_thumb_disabled_color">#ffffffff</color>
+    <color name="settingslib_thumb_off_color">#ffffffff</color>
+    <color name="settingslib_track_off_color">@*android:color/background_leanback_dark</color>
+    <color name="settingslib_track_on_color">@*android:color/accent_material_dark</color>
+    <color name="settingslib_thumb_on_color">#ffffffff</color>
+</resources>

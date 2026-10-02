@@ -149,6 +149,8 @@
     <string name="nav_fingerprint_icon_summary">Stile personalizzato icona impronta</string>
     <string name="lockscreen_fp_remove_icon">Rimuovi Icona Impronta Digitale</string>
     <string name="lockscreen_fp_remove_icon_summary">Nasconde l\'icona dell\'impronta digitale sulla schermata di blocco</string>
+    <string name="lockscreen_fp_hide_aod">Nascondi Icona Impronta in AOD</string>
+    <string name="lockscreen_fp_hide_aod_summary">Nasconde l icona solo con lo schermo spento (AOD); sulla schermata di blocco resta</string>
     <string name="lockscreen_fp_custom_icon">Icona Impronta Digitale Personalizzata</string>
     <string name="lockscreen_fp_custom_icon_summary">Sostituisce l\'icona nativa con una scelta tra i preset disponibili</string>
     <string name="lockscreen_fp_icon_title">Icone Impronta Digitale Predefinite</string>
@@ -954,6 +956,21 @@
 
     <!-- Oxydian CPB + RVD/SVD -->
     <string name="dark_shadow_preset_cpb">Barra Progresso Circolare</string>
+    <string name="app_themes_title">App Google e utente</string>
+    <string name="app_themes_card_desc">Temi per Messaggi, Firefox, Dropbox e altre app — al posto di Substratum</string>
+    <string name="app_themes_notice">Attiva le app da temare, poi tocca Applica. La prima volta che attivi una nuova app serve un riavvio; le modifiche successive sono immediate.</string>
+    <string name="app_themes_apply">Applica</string>
+    <string name="app_themes_apply_summary">Compila e attiva le app selezionate, disattiva le altre</string>
+    <string name="app_themes_working">In corso… servono alcuni secondi per ogni app</string>
+    <string name="app_themes_enable_all">Abilita tutte</string>
+    <string name="app_themes_enable_all_summary">Attiva tutte le app dell elenco — poi tocca Applica</string>
+    <string name="app_themes_disable_all">Disabilita tutte</string>
+    <string name="app_themes_disable_all_summary">Spegne il tema di tutte le app</string>
+    <string name="app_themes_section">App installate</string>
+    <string name="app_themes_none">Nessuna app con tema è installata su questo telefono</string>
+    <string name="app_themes_result_failed">%1$d temi non compilati</string>
+    <string name="app_themes_result_reboot">Applicato — riavvia una volta per attivare le app appena aggiunte</string>
+    <string name="app_themes_result_none">Nessuna app selezionata</string>
     <string name="dark_shadow_preset_rvd">Pannello volume</string>
     <string name="search_mods_hint">Cerca mod…</string>
     <string name="nav_cpb_summary">Preset stile animazione spinner</string>

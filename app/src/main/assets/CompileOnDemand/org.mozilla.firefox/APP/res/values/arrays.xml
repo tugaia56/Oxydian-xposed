@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="mozac_browser_icons_photon_palette">
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+    </array>
+    <array name="mozac_feature_prompts_default_colors">
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>#ffffffff</item>
+    </array>	
+</resources>

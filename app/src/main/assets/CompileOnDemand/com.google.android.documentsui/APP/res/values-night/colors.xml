@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="app_background_color">@*android:color/background_dark</color>
+    <color name="background_floating">@*android:color/background_floating_material_dark</color>
+    <color name="hairline">@*android:color/accent_material_dark</color>
+    <color name="nav_bar_translucent">#52000000</color>
+    <color name="primary">@*android:color/accent_material_dark</color>
+    <color name="secondary">@*android:color/holo_light_primary_dark</color>
+    <color name="briefcase_icon_color">@*android:color/accent_material_dark</color>
+    <color name="cross_profile_button_text_color">@*android:color/accent_material_dark</color>
+    <color name="doc_list_item_subtitle_disabled">#36ffffff</color>
+    <color name="doc_list_item_subtitle_enabled">#b3ffffff</color>
+    <color name="edge_effect">@*android:color/white</color>
+    <color name="empty_state_text">@*android:color/white</color>
+    <color name="error_image_color">@*android:color/white</color>
+    <color name="list_divider_color">#ffffffff</color>
+    <color name="tab_indicator_color">@*android:color/accent_material_dark</color>
+</resources>

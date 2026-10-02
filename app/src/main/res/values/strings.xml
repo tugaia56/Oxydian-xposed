@@ -152,6 +152,8 @@
     <string name="nav_fingerprint_icon_summary">Custom fingerprint icon style</string>
     <string name="lockscreen_fp_remove_icon">Remove Fingerprint Icon</string>
     <string name="lockscreen_fp_remove_icon_summary">Hides the fingerprint icon on the lock screen</string>
+    <string name="lockscreen_fp_hide_aod">Hide Fingerprint Icon in AOD</string>
+    <string name="lockscreen_fp_hide_aod_summary">Hides the icon only while the screen is off (Always-On Display); it stays on the lock screen</string>
     <string name="lockscreen_fp_custom_icon">Custom Fingerprint Icon</string>
     <string name="lockscreen_fp_custom_icon_summary">Replaces the native icon with one chosen from the available presets</string>
     <string name="lockscreen_fp_icon_title">Fingerprint Icons Presets</string>
@@ -953,6 +955,21 @@
 
     <!-- Oxydian CPB + RVD/SVD -->
     <string name="dark_shadow_preset_cpb">Circular Progress Bar</string>
+    <string name="app_themes_title">Google &amp; user apps</string>
+    <string name="app_themes_card_desc">Themes for Messages, Firefox, Dropbox and other apps — replaces Substratum</string>
+    <string name="app_themes_notice">Turn on the apps you want themed, then tap Apply. The first time you enable an app a reboot is needed; later changes apply right away.</string>
+    <string name="app_themes_apply">Apply</string>
+    <string name="app_themes_apply_summary">Builds and enables the selected apps, disables the others</string>
+    <string name="app_themes_working">Working… this takes a few seconds per app</string>
+    <string name="app_themes_enable_all">Select all</string>
+    <string name="app_themes_enable_all_summary">Switches on every app in the list — then tap Apply</string>
+    <string name="app_themes_disable_all">Disable all</string>
+    <string name="app_themes_disable_all_summary">Turns off every app theme</string>
+    <string name="app_themes_section">Installed apps</string>
+    <string name="app_themes_none">No themed app is installed on this device</string>
+    <string name="app_themes_result_failed">%1$d app theme(s) failed to build</string>
+    <string name="app_themes_result_reboot">Applied — reboot once to activate the newly added apps</string>
+    <string name="app_themes_result_none">No app selected</string>
     <string name="dark_shadow_preset_rvd">Volume Panel</string>
     <string name="search_mods_hint">Search mods…</string>
     <string name="nav_cpb_summary">Spinner animation style preset</string>

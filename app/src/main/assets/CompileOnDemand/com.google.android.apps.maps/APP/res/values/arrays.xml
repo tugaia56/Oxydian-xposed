@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+     <array name="avatar_bg_colors_default_array">
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+    </array>
+    <array name="dark_monogram_colors">
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+    </array>
+<array name="light_monogram_colors">
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+    </array>
+    <array name="material_google_colors">
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+        <item>@*android:color/accent_material_dark</item>
+    </array>	
+</resources>

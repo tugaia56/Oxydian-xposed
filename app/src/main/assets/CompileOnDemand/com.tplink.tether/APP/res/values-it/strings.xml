@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mp_ac_appearance">Apparenza</string>
+    <string name="appearance">Apparenza</string>
+    <string name="mp_ac_appearance_setting_dark">Scuro</string>
+    <string name="mp_ac_appearance_setting_follow_sys">Segui il Sistema</string>
+    <string name="mp_ac_appearance_setting_follow_system">Segui il Sistema</string>
+    <string name="mp_ac_appearance_setting_light">Chiaro</string>
+</resources>
