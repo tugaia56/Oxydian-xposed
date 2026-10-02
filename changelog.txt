@@ -13,6 +13,8 @@ Aggiornato:
 - Crediti: aggiunti LuckyTool, CorePatch e DisableFlagSecure
 - Menù Accensione > Riavvio Avanzato > Screenshot: usa lo screenshot nativo di OxygenOS (con anteprima e modifica)
 - Log di Stato Oxydian: elenca anche i disegni Wi-Fi presenti nel SystemUI, per diagnosticare lo stile icone Wi-Fi
+- AOD: corretto il doppio orologio/meteo comparso con OxygenOS 16.1 (orologio, meteo e widget della lockscreen non si sovrappongono più all'AOD)
+- Trasparenza/sfocatura del pannello: non toglie più il nero all'AOD
 - Nuova icona dell'app
 - Titolo della release: Oxydian al posto del vecchio nome
 

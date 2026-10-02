@@ -1,5 +1,6 @@
 package it.tugaia56.obsidian.xposed.hooks.systemui;
 
+import it.tugaia56.obsidian.xposed.utils.KeyguardUiState;
 import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
 import static de.robv.android.xposed.XposedBridge.hookAllMethods;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
@@ -333,19 +334,16 @@ public class LockscreenWidgetsMod extends XposedMods {
             }
         });
 
-        Class<?> uiStateClass = tryFindClass(lp, "com.oplus.keyguard.OplusKeyguardStyleClock");
-        if (uiStateClass != null) {
-            hookAllMethods(uiStateClass, "onUiStateChanged", new XC_MethodHook() {
-                @Override protected void afterHookedMethod(MethodHookParam p) {
-                    if (p.args.length == 0 || !(p.args[0] instanceof Integer)) return;
-                    mUiState = (Integer) p.args[0];
-                    refreshForCurrentState();
-                }
-            });
-        }
+        KeyguardUiState.hook(lp.classLoader, st -> { mUiState = st; refreshForCurrentState(); });
+        KeyguardUiState.watchScreen(mContext, this::refreshForCurrentState);
     }
 
     private int mUiState = UI_STATE_LS;
+
+    /** Stato effettivo: schermo non interattivo (AOD) vale AOD anche se OOS non ci ha notificato nulla. */
+    private int effState() {
+        return KeyguardUiState.effective(mContext, mUiState);
+    }
 
     private void onGetView(XC_MethodHook.MethodHookParam p) {
         if (p.args.length == 0 || !(p.args[0] instanceof Integer)) return;
@@ -364,7 +362,7 @@ public class LockscreenWidgetsMod extends XposedMods {
      *  sotto — ognuno mostrato solo se il proprio switch è acceso. */
     private void applyForState() {
         if (mContainer == null) return;
-        boolean show = (mEnabled || mDeviceEnabled) && mUiState == UI_STATE_LS;
+        boolean show = (mEnabled || mDeviceEnabled) && effState() == UI_STATE_LS;
 
         View existing = it.tugaia56.obsidian.xposed.utils.ViewHelper.findViewWithTag(mContainer, TAG_MARKER);
         if (!show) {

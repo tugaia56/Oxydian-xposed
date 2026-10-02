@@ -46,6 +46,27 @@ public class QsTransparencyMod extends XposedMods {
     private float mBlurAmount = 0.4f;
     private boolean mSolidBgOn = false;
 
+    /** ScrimController reale, catturato al primo updateScrimColor: serve a leggere lo stato
+     *  corrente anche dall'hook della sfocatura (che non ha accesso al controller). */
+    private static volatile Object sScrimController;
+
+    /** In AOD/pulsing lo sfondo deve restare nero pieno e senza sfocatura: ridurre l'opacità
+     *  degli scrim lì lascia vedere sfondo e contenuti della Schermata di Blocco dietro l'AOD
+     *  (segnalato da due utenti: sfondo visibile in AOD con trasparenza/sfocatura attive). */
+    private static boolean isAodLikeState(Object state) {
+        String name = String.valueOf(state);
+        return name.contains("AOD") || name.contains("PULSING") || name.contains("DOZ");
+    }
+
+    private static boolean isAodNow() {
+        try {
+            Object c = sScrimController;
+            return c != null && isAodLikeState(getObjectField(c, "mState"));
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
     public QsTransparencyMod(Context context) { super(context); }
 
     @Override
@@ -69,10 +90,13 @@ public class QsTransparencyMod extends XposedMods {
 
         hookAllMethods(scrimControllerClass, "updateScrimColor", new XC_MethodHook() {
             @Override protected void beforeHookedMethod(MethodHookParam param) {
+                sScrimController = param.thisObject;
                 if (!mTransparencyOn) return;
                 try {
                     int alphaIndex = param.args[2] instanceof Float ? 2 : 1;
-                    String scrimState = String.valueOf(getObjectField(param.thisObject, "mState"));
+                    Object stateObj = getObjectField(param.thisObject, "mState");
+                    if (isAodLikeState(stateObj)) return; // AOD: scrim originale, nero pieno
+                    String scrimState = String.valueOf(stateObj);
 
                     if (scrimState.contains("BOUNCER")) {
                         param.args[alphaIndex] = (Float) param.args[alphaIndex] * KEYGUARD_ALPHA;
@@ -93,7 +117,7 @@ public class QsTransparencyMod extends XposedMods {
             Class<?> scrimViewExImp = findClass("com.oplus.systemui.scrim.ScrimViewExImp", lp.classLoader);
             hookAllMethods(scrimViewExImp, "setBlurAmount", new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam param) {
-                    if (!mBlurOn || mSolidBgOn) return;
+                    if (!mBlurOn || mSolidBgOn || isAodNow()) return;
                     if (param.args.length > 0 && param.args[0] instanceof Float) {
                         param.args[0] = mBlurAmount;
                     }

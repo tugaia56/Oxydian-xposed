@@ -1,5 +1,6 @@
 package it.tugaia56.obsidian.xposed.hooks.systemui;
 
+import it.tugaia56.obsidian.xposed.utils.KeyguardUiState;
 import static de.robv.android.xposed.XposedBridge.hookAllMethods;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static it.tugaia56.obsidian.utils.Constants.Packages.SYSTEM_UI;
@@ -121,6 +122,11 @@ public class LockscreenWeather extends XposedMods {
     private boolean mAodColorUseAccent;
 
     private int mUiState = UI_STATE_LS;
+
+    /** Stato effettivo: schermo non interattivo (AOD) vale AOD anche se OOS non ci ha notificato nulla. */
+    private int effState() {
+        return KeyguardUiState.effective(mContext, mUiState);
+    }
     private ViewGroup mContainer;
     private LinearLayout mWidgetContainer;
     private CurrentWeatherView mWeatherView;
@@ -205,17 +211,8 @@ public class LockscreenWeather extends XposedMods {
             }
         });
 
-        Class<?> uiStateClass = tryFindClass(lp, "com.oplus.keyguard.OplusKeyguardStyleClock");
-        if (uiStateClass != null) {
-            hookAllMethods(uiStateClass, "onUiStateChanged", new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam p) {
-                    if (p.args.length == 0 || !(p.args[0] instanceof Integer)) return;
-                    mUiState = (Integer) p.args[0];
-                    refreshForCurrentState();
-                }
-            });
-        }
+        KeyguardUiState.hook(lp.classLoader, st -> { mUiState = st; refreshForCurrentState(); });
+        KeyguardUiState.watchScreen(mContext, this::refreshForCurrentState);
         XposedBridge.log("[ Obsidian ] LockscreenWeather: hooked OplusKeyguardStyleBaseClock.getView");
     }
 
@@ -224,14 +221,15 @@ public class LockscreenWeather extends XposedMods {
         if ((Integer) p.args[0] != 1) return; // 1 == slot orologio/AOD, come LockscreenClockMod
         if (!(p.getResult() instanceof ViewGroup container)) return;
         mContainer = container;
-        applyForState(mUiState);
+        applyForState(effState());
     }
 
     private void refreshForCurrentState() {
-        if (mContainer != null) applyForState(mUiState);
+        if (mContainer != null) applyForState(effState());
     }
 
     private boolean isEnabledForState(int state) {
+        if (state == KeyguardUiState.SUPPRESSED) return false;
         return state == UI_STATE_AOD ? mAodEnabled : mLsEnabled;
     }
 
@@ -354,7 +352,7 @@ public class LockscreenWeather extends XposedMods {
         int maxAgeMinutes = (mIntervalIdx >= 0 && mIntervalIdx < INTERVAL_MINUTES.length)
                 ? INTERVAL_MINUTES[mIntervalIdx] : 60;
         String cacheKey = useGps ? (mGpsLat + "," + mGpsLon + "|" + mProvider) : (mLocation + "|" + mProvider);
-        if (!WeatherCache.isStale(cacheKey, maxAgeMinutes)) { refreshView(mUiState); return; }
+        if (!WeatherCache.isStale(cacheKey, maxAgeMinutes)) { refreshView(effState()); return; }
         if (!WeatherCache.tryStartFetch()) return;
 
         final String city = mLocation;
@@ -395,7 +393,7 @@ public class LockscreenWeather extends XposedMods {
                         .format(new java.util.Date());
                 try { Xprefs.edit().putString(KEY_LAST_UPDATE, stamp).apply(); } catch (Throwable ignored) {}
             }
-            new Handler(Looper.getMainLooper()).post(() -> refreshView(mUiState));
+            new Handler(Looper.getMainLooper()).post(() -> refreshView(effState()));
         }).start();
     }
 

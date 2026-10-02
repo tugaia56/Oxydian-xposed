@@ -118,14 +118,31 @@ public class AodClockMod extends XposedMods {
 
         XposedBridge.hookAllMethods(aodClockLayout, "initForAodApk", new XC_MethodHook() {
             @Override protected void afterHookedMethod(MethodHookParam param) {
+                it.tugaia56.obsidian.xposed.utils.KeyguardUiState.registerAodLayout(param.thisObject);
                 try { onInit(param); } catch (Throwable t) { dbg("initForAodApk hook ERROR: " + t); }
             }
         });
         XposedBridge.hookAllMethods(aodClockLayout, "performTimeUpdate", new XC_MethodHook() {
             @Override protected void afterHookedMethod(MethodHookParam param) {
+                it.tugaia56.obsidian.xposed.utils.KeyguardUiState.registerAodLayout(param.thisObject);
                 try { if (mEnabled) placeClockView(); } catch (Throwable t) { dbg("performTimeUpdate hook ERROR: " + t); }
             }
         });
+        XposedBridge.hookAllConstructors(aodClockLayout, new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam param) {
+                it.tugaia56.obsidian.xposed.utils.KeyguardUiState.registerAodLayout(param.thisObject);
+            }
+        });
+        // OOS 16.1: initForAodApk/performTimeUpdate non scattano a ogni AOD; questi sì.
+        for (String m : new String[]{"setVisibility", "onAttachedToWindow", "showClock", "hideClock"}) {
+            try {
+                XposedBridge.hookAllMethods(aodClockLayout, m, new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam param) {
+                        it.tugaia56.obsidian.xposed.utils.KeyguardUiState.registerAodLayout(param.thisObject);
+                    }
+                });
+            } catch (Throwable t) { dbg("hook " + m + " failed: " + t); }
+        }
         dbg("hooked AodClockLayout.initForAodApk/performTimeUpdate");
     }
 

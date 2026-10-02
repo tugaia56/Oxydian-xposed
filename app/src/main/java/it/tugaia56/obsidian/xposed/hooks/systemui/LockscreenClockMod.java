@@ -1,5 +1,6 @@
 package it.tugaia56.obsidian.xposed.hooks.systemui;
 
+import it.tugaia56.obsidian.xposed.utils.KeyguardUiState;
 import static de.robv.android.xposed.XposedBridge.hookAllMethods;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static it.tugaia56.obsidian.utils.Constants.Packages.SYSTEM_UI;
@@ -113,6 +114,11 @@ public class LockscreenClockMod extends XposedMods {
      *  and getView(1) is typically first invoked for the lockscreen state. */
     private int mUiState = UI_STATE_LS;
 
+    /** Stato effettivo: schermo non interattivo (AOD) vale AOD anche se OOS non ci ha notificato nulla. */
+    private int effState() {
+        return KeyguardUiState.effective(mContext, mUiState);
+    }
+
     /** Obsidian's own package context — needed to inflate our own layouts/fonts/Lottie assets
      *  (mContext is SystemUI's context and can't resolve our resource IDs). */
     private Context appContext;
@@ -181,16 +187,8 @@ public class LockscreenClockMod extends XposedMods {
         // No setTime hook needed: the injected TextClock views tick themselves via Android's
         // own TIME_TICK-driven ticker, same as any other TextClock on screen.
 
-        Class<?> uiStateClass = tryFindClass(lp, "com.oplus.keyguard.OplusKeyguardStyleClock");
-        if (uiStateClass == null) {
-            dbg("OplusKeyguardStyleClock not found — AOD/lockscreen state tracking unavailable, defaulting to lockscreen-only behaviour");
-        } else {
-            hookAllMethods(uiStateClass, "onUiStateChanged", new XC_MethodHook() {
-                @Override protected void afterHookedMethod(MethodHookParam p) {
-                    try { onUiStateChanged(p); } catch (Throwable t) { dbg("onUiStateChanged hook failed: " + t); }
-                }
-            });
-        }
+        KeyguardUiState.hook(lp.classLoader, st -> { mUiState = st; refreshForCurrentState(); });
+        KeyguardUiState.watchScreen(mContext, this::refreshForCurrentState);
     }
 
     private void onUiStateChanged(XC_MethodHook.MethodHookParam p) {
@@ -258,17 +256,27 @@ public class LockscreenClockMod extends XposedMods {
 
         if (!(p.getResult() instanceof ViewGroup container)) return;
         mContainer = container;
-        applyForState(container, mUiState);
+        applyForState(container, effState());
     }
 
     /** Re-applies visibility/styling for the given UI state onto the last-known container,
      *  without waiting for a fresh getView() call — mirrors OC's LockscreenView, where the
      *  SAME injected view reacts to state changes instead of being torn down/rebuilt. */
     private void refreshForCurrentState() {
-        if (mContainer != null) applyForState(mContainer, mUiState);
+        if (mContainer != null) applyForState(mContainer, effState());
     }
 
     private void applyForState(ViewGroup container, int state) {
+        if (state == KeyguardUiState.SUPPRESSED) {
+            // AOD disegnato dal suo layout: via i nostri contenuti, senza toccare le view stock.
+            if (mInjectedClock != null) {
+                ViewGroup parent = (ViewGroup) mInjectedClock.getParent();
+                if (parent != null) parent.removeView(mInjectedClock);
+                mInjectedClock = null;
+                mInjectedStyle = -1;
+            }
+            return;
+        }
         boolean enabled = isEnabledForState(state);
         int style = styleForState(state);
 
