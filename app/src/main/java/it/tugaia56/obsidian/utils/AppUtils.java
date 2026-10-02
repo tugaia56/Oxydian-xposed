@@ -30,7 +30,9 @@ public class AppUtils {
     }
 
     public static void restartScope(String packageName) {
-        Shell.cmd("killall " + packageName).submit();
+        // Alcune configurazioni root (KernelSU/APatch, ROM diverse) non hanno killall nel PATH di su.
+        Shell.cmd("killall " + packageName + " || pkill -f " + packageName
+                + " || kill -9 $(pidof " + packageName + ")").submit();
     }
 
     /** Apre l'editor sfondi nativo di OxygenOS (Sfondi → Scegli da album → scheda
@@ -85,6 +87,12 @@ public class AppUtils {
             String[] splitLocations = info.splitSourceDirs;
             if (splitLocations == null) {
                 splitLocations = new String[]{info.sourceDir};
+            } else if (info.sourceDir != null) {
+                // app con split (es. Google): l'APK base non è dentro splitSourceDirs
+                String[] all = new String[splitLocations.length + 1];
+                all[0] = info.sourceDir;
+                System.arraycopy(splitLocations, 0, all, 1, splitLocations.length);
+                splitLocations = all;
             }
             return splitLocations;
         } catch (android.content.pm.PackageManager.NameNotFoundException ignored) {

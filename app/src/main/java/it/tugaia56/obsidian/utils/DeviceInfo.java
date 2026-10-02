@@ -22,6 +22,18 @@ public final class DeviceInfo {
         return os + " · " + market;
     }
 
+    /** Riepilogo per il log di diagnostica: modello, build ROM, Android, versione Oxydian. */
+    public static String diagnosticSummary() {
+        String nl = System.lineSeparator();
+        return "Dispositivo: " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL
+                + " (" + tagline() + ")" + nl
+                + "Build ROM: " + sysProp("ro.build.display.id") + nl
+                + "OxygenOS/ColorOS: " + sysProp("ro.build.version.oplusrom")
+                + "  Android " + android.os.Build.VERSION.RELEASE + " (SDK " + android.os.Build.VERSION.SDK_INT + ")" + nl
+                + "Oxydian: v" + it.tugaia56.obsidian.BuildConfig.VERSION_NAME
+                + " (" + it.tugaia56.obsidian.BuildConfig.VERSION_CODE + ")" + nl;
+    }
+
     /** Imposta la riga sotto al nome app nell'header home (item_home_header). */
     public static void applyTagline(View header) {
         TextView tv = header.findViewById(R.id.headerTagline);

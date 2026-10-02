@@ -184,6 +184,7 @@ public class ModHealthFragment extends Fragment {
             StringBuilder sb = new StringBuilder();
             sb.append("Oxydian - Stato Oxydian\n");
             sb.append("Generato: ").append(formatTimestamp(System.currentTimeMillis())).append("\n");
+            sb.append(it.tugaia56.obsidian.utils.DeviceInfo.diagnosticSummary());
             for (ProcessGroup g : groups()) {
                 long ts = ObsidianPrefs.getLong("mod_health_" + g.pkg() + "_ts", 0);
                 sb.append("\n== ").append(g.pkg()).append(" (").append(g.label()).append(") == ");

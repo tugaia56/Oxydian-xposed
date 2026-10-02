@@ -8,6 +8,8 @@ Aggiornato:
 - Tema Dark Shadow: nell'app Orologio la scheda attiva usa il colore accento
 - Widget Quick Settings: elenco riordinabile con trascinamento, nessun limite ai widget aggiunti (nel pannello se ne vedono i primi 4)
 - Menù Accensione > Riavvio Avanzato: conferma OK/Annulla prima di riavviare o spegnere (Lista e Riquadri)
+- Pulsante riavvio SystemUI più affidabile su configurazioni root diverse
+- Log di Stato Oxydian: include modello, versione OOS e versione di Oxydian
 - Nuova icona dell'app
 - Titolo della release: Oxydian al posto del vecchio nome
 
