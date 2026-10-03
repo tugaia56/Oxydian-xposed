@@ -55,12 +55,46 @@ public class BootReceiver extends BroadcastReceiver {
             reapplyRecentsBtn();
         }).start();
 
+        // Overlay delle icone Wi-Fi/segnale e dei temi app: al primo avvio dopo averli creati il
+        // sistema li conosce ma risultano spenti ("stock" finche non si riapplicano a mano).
+        // Qui si riaccendono da soli quelli che l'utente ha scelto.
+        final Context appCtx = context.getApplicationContext();
+        new Thread(() -> {
+            try { Thread.sleep(12000); } catch (InterruptedException ignored) {}
+            ensureStyleOverlaysEnabled(appCtx);
+        }).start();
+
         // DST ACCENT/BACKGROUND overlays (target: android) — OOS ThemeManager resets
         // them after boot, so we wait 15s to re-apply after ThemeManager finishes.
         new Thread(() -> {
             try { Thread.sleep(15000); } catch (InterruptedException ignored) {}
             DstFabricatedUtil.reapplyAll(null);
         }).start();
+    }
+
+    private static void ensureStyleOverlaysEnabled(Context ctx) {
+        try {
+            java.util.List<String> want = new java.util.ArrayList<>();
+            if (ObsidianPrefs.getBoolean("WIFI_STYLE_OVERLAY", false))
+                want.add(it.tugaia56.obsidian.utils.overlay.compiler.GenericAppThemeCompiler.namedOverlayPackage("WIFI1"));
+            if (ObsidianPrefs.getBoolean("SIGNAL_STYLE_OVERLAY", false))
+                want.add(it.tugaia56.obsidian.utils.overlay.compiler.GenericAppThemeCompiler.namedOverlayPackage("SIG1"));
+            String[] dirs = ctx.getAssets().list("CompileOnDemand");
+            if (dirs != null) for (String pkg : dirs) {
+                if (ObsidianPrefs.getBoolean("app_theme_enabled_" + pkg, false))
+                    want.add(it.tugaia56.obsidian.utils.overlay.compiler.GenericAppThemeCompiler.overlayPackage(pkg));
+            }
+            if (want.isEmpty()) return;
+            java.util.Set<String> disabled = new java.util.HashSet<>();
+            for (String line : Shell.cmd("cmd overlay list | grep -E 'ObsidianComponent(WIFI1|SIG1|GApp_)'").exec().getOut()) {
+                line = line.trim();
+                if (line.startsWith("[ ]")) disabled.add(line.substring(3).trim());
+            }
+            java.util.List<String> toEnable = new java.util.ArrayList<>();
+            for (String w : want) if (disabled.contains(w)) toEnable.add(w);
+            if (!toEnable.isEmpty())
+                it.tugaia56.obsidian.utils.overlay.OverlayUtil.enableOverlays(toEnable.toArray(new String[0]));
+        } catch (Throwable ignored) {}
     }
 
     private static void reapplyRecentsBtn() {

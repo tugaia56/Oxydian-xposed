@@ -189,7 +189,11 @@ public class WifiIconsFragment extends Fragment {
                         mCurrentPreset = preset.key;
                         ObsidianPrefs.putString(PREF_KEY,        preset.key);
                         ObsidianPrefs.putString(PREF_KEY_SIGNAL, preset.signalKey);
-                        applyBothAndRestart(preset.key, preset.signalKey);
+                        ObsidianPrefs.putBoolean("SIGNAL_STYLE_OVERLAY", true);
+                        ObsidianPrefs.putBoolean("WIFI_STYLE_OVERLAY", true);
+                        saveBootProp("signal", "");
+                        saveBootProp("wifi", "");
+                        it.tugaia56.obsidian.utils.overlay.SystemUiIconOverlays.apply(requireContext(), preset.key, preset.signalKey);
                         mExpandedPos = -1;
                         notifyDataSetChanged();
                     });

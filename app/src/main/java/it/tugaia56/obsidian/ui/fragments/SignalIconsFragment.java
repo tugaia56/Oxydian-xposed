@@ -183,6 +183,7 @@ public class SignalIconsFragment extends Fragment {
                     mCurrentPreset = null;
                     ObsidianPrefs.remove(PREF_KEY_SIGNAL);
                     saveBootProp("signal", "");
+                    it.tugaia56.obsidian.utils.overlay.SystemUiIconOverlays.removeSignal();
                     restartSystemUI();
                     mExpandedPos = -1;
                     notifyDataSetChanged();
@@ -194,8 +195,9 @@ public class SignalIconsFragment extends Fragment {
                 h.btnApply.setOnClickListener(v -> {
                     mCurrentPreset = preset.key;
                     ObsidianPrefs.putString(PREF_KEY_SIGNAL, preset.key);
-                    saveBootProp("signal", preset.key);
-                    restartSystemUI();
+                    ObsidianPrefs.putBoolean("SIGNAL_STYLE_OVERLAY", true);
+                    saveBootProp("signal", "");
+                    it.tugaia56.obsidian.utils.overlay.SystemUiIconOverlays.apply(requireContext(), null, preset.key);
                     mExpandedPos = -1;
                     notifyDataSetChanged();
                 });
@@ -206,7 +208,11 @@ public class SignalIconsFragment extends Fragment {
                         mCurrentPreset = preset.key;
                         ObsidianPrefs.putString(PREF_KEY_SIGNAL, preset.key);
                         ObsidianPrefs.putString(PREF_KEY_WIFI,   preset.wifiKey);
-                        applyBothAndRestart(preset.wifiKey, preset.key);
+                        ObsidianPrefs.putBoolean("SIGNAL_STYLE_OVERLAY", true);
+                        ObsidianPrefs.putBoolean("WIFI_STYLE_OVERLAY", true);
+                        saveBootProp("signal", "");
+                        saveBootProp("wifi", "");
+                        it.tugaia56.obsidian.utils.overlay.SystemUiIconOverlays.apply(requireContext(), preset.wifiKey, preset.key);
                         mExpandedPos = -1;
                         notifyDataSetChanged();
                     });

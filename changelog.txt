@@ -20,6 +20,7 @@ Aggiornato:
 - Always-On Display: nuovo interruttore per nascondere l'icona dell'impronta solo con lo schermo spento
 - Icona Wi-Fi: ora segue il colore della barra di stato (scura sulle schermate chiare, prima restava sempre bianca o nera)
 - Stili icone Wi-Fi: applicati come overlay di SystemUI, più leggeri e coerenti con le icone di sistema
+- Stili icone segnale mobile: applicati come overlay di SystemUI (come il Wi-Fi), con riaccensione automatica dopo il riavvio
 - Nuova icona dell'app
 - Titolo della release: Oxydian al posto del vecchio nome
 
