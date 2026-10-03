@@ -48,16 +48,25 @@ public class GenericAppThemeCompiler {
 
     /** @return true se la compilazione è fallita */
     public static boolean buildInBatch(String targetPackage) throws IOException {
-        String name = overlayName(targetPackage);
+        return buildNamedInBatch(targetPackage, ASSET_DIR, overlayName(targetPackage));
+    }
+
+    /** Nome completo (con prefisso e suffisso) di un overlay con nome libero, es. "WIFI1". */
+    public static String namedOverlayPackage(String name) {
+        return PREFIX + name + ".overlay";
+    }
+
+    /** Come buildInBatch ma con cartella sorgente e nome overlay scelti (overlay di SystemUI per le icone). */
+    public static boolean buildNamedInBatch(String targetPackage, String assetDir, String name) throws IOException {
         String cacheRoot = ModuleConstants.TEMP_CACHE_DIR + "/" + targetPackage;
         String source = cacheRoot + "/" + name;
 
-        copyAssets("CompileOnDemand/" + targetPackage + "/" + ASSET_DIR);
+        copyAssets("CompileOnDemand/" + targetPackage + "/" + assetDir);
         // @*android:color/accent_material_dark fuori dai processi hookati resta il teal di sistema:
         // si scrive l'accento reale (come per il pack icone di Impostazioni). Il prefisso "@*"
         // può comparire doppio in alcuni sorgenti Substratum.
         String accent = String.format("#%08X", ObsidianTheme.accentColor());
-        String moved = ModuleConstants.DATA_DIR + "/CompileOnDemand/" + targetPackage + "/" + ASSET_DIR;
+        String moved = ModuleConstants.DATA_DIR + "/CompileOnDemand/" + targetPackage + "/" + assetDir;
         Shell.cmd("mkdir -p \"" + cacheRoot + "\"",
                 "mv -f \"" + moved + "\" \"" + source + "\"",
                 "find \"" + source + "/res\" -type f -name '*.xml'"
@@ -117,6 +126,24 @@ public class GenericAppThemeCompiler {
         }
         mountRW();
         Shell.cmd(sb.toString().trim()).exec();
+        mountRO();
+    }
+
+    /** Chiude un giro con un overlay a nome libero: rimonta in sola lettura e, se compilato, lo riaccende. */
+    public static void finishNamed(String name, boolean ok) {
+        mountRO();
+        if (!ok) return;
+        disableOverlays(namedOverlayPackage(name));
+        enableOverlays(namedOverlayPackage(name));
+    }
+
+    /** Spegne e toglie dal telefono un overlay a nome libero. */
+    public static void removeNamed(String name) {
+        disableOverlays(namedOverlayPackage(name));
+        String apk = PREFIX + name + ".apk";
+        mountRW();
+        Shell.cmd("rm -f " + ModuleConstants.MODULE_SYSTEM_OVERLAY_DIR + "/" + apk + " "
+                + ModuleConstants.SYSTEM_OVERLAY_DIR + "/" + apk).exec();
         mountRO();
     }
 

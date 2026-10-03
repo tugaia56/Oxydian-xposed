@@ -395,10 +395,11 @@ public class StatusbarIcons extends XposedMods {
     // so use that instead of depending on the drawable loader firing.
 
     private static void applyWifiIconColor(android.view.ViewGroup vg) {
-        android.content.res.ColorStateList tint = DstWifiIconStyle.sColorOn
-                ? android.content.res.ColorStateList.valueOf(DstWifiIconStyle.sColor)
-                : null;
-        tintImageViews(vg, tint);
+        // Senza colore personalizzato non si tocca nulla: prima si passava tint=null, che
+        // CANCELLAVA il colore che SystemUI imposta (scuro sulle schermate chiare) lasciando
+        // l'icona Wi-Fi sempre del colore del disegno (nera quella stock, bianca la nostra).
+        if (!DstWifiIconStyle.sColorOn) return;
+        tintImageViews(vg, android.content.res.ColorStateList.valueOf(DstWifiIconStyle.sColor));
     }
 
     private static void tintImageViews(android.view.View v, android.content.res.ColorStateList tint) {

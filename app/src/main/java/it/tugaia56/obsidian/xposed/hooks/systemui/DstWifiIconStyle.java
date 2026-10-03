@@ -93,6 +93,8 @@ public class DstWifiIconStyle {
             while ((line = br.readLine()) != null) sb.append(line);
             br.close();
             sWifiPreset = parseStringContent(sb.toString(), PREF_PRESET);
+            // Stile Wi-Fi applicato come overlay di SystemUI: non sostituire anche i disegni con Xposed
+            if (parseBoolAttr(sb.toString(), "WIFI_STYLE_OVERLAY", false)) sWifiPreset = null;
             sIconScale  = parseFloatAttr(sb.toString(), PREF_ICON_SCALE, 1.0f);
             sColorOn    = parseBoolAttr(sb.toString(), PREF_COLOR_ON, false);
             sColor      = parseIntAttr(sb.toString(), PREF_COLOR, 0xFFFFFFFF);

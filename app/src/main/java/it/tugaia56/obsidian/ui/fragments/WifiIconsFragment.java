@@ -161,7 +161,9 @@ public class WifiIconsFragment extends Fragment {
                 h.btnApply.setOnClickListener(v -> {
                     mCurrentPreset = null;
                     ObsidianPrefs.remove(PREF_KEY);
+                    ObsidianPrefs.putBoolean("WIFI_STYLE_OVERLAY", false);
                     saveBootProp("wifi", "");
+                    new Thread(() -> it.tugaia56.obsidian.utils.overlay.compiler.GenericAppThemeCompiler.removeNamed("WIFI1")).start();
                     restartSystemUI();
                     mExpandedPos = -1;
                     notifyDataSetChanged();
@@ -173,8 +175,10 @@ public class WifiIconsFragment extends Fragment {
                 h.btnApply.setOnClickListener(v -> {
                     mCurrentPreset = preset.key;
                     ObsidianPrefs.putString(PREF_KEY, preset.key);
-                    saveBootProp("wifi", preset.key);
-                    restartSystemUI();
+                    // Stile Wi-Fi come overlay di SystemUI (si ricolora come l'icona di sistema)
+                    ObsidianPrefs.putBoolean("WIFI_STYLE_OVERLAY", true);
+                    saveBootProp("wifi", "");
+                    applyWifiOverlay(preset.key);
                     mExpandedPos = -1;
                     notifyDataSetChanged();
                 });
@@ -231,6 +235,36 @@ public class WifiIconsFragment extends Fragment {
                 "resetprop " + prop + " " + (value.isEmpty() ? "\"\"" : value)
             });
         } catch (Throwable ignored) {}
+    }
+
+    /** Compila e attiva lo stile Wi-Fi scelto come overlay di SystemUI (WIFI1). La prima volta
+     *  serve un riavvio perché il sistema conosca il nuovo overlay; poi i cambi sono immediati. */
+    private void applyWifiOverlay(String presetKey) {
+        String[] keys = it.tugaia56.obsidian.xposed.hooks.systemui.DstWifiIconStyle.getPresetKeys();
+        String[] names = it.tugaia56.obsidian.xposed.hooks.systemui.DstWifiIconStyle.getPresetNames();
+        String name = null;
+        for (int i = 0; i < keys.length; i++) if (keys[i].equals(presetKey)) name = names[i];
+        if (name == null) return;
+        final String presetName = name;
+        Toast.makeText(requireContext(), R.string.app_themes_working, Toast.LENGTH_SHORT).show();
+        new Thread(() -> {
+            boolean ok = false;
+            try {
+                it.tugaia56.obsidian.utils.overlay.compiler.GenericAppThemeCompiler.beginBatch();
+                ok = !it.tugaia56.obsidian.utils.overlay.compiler.GenericAppThemeCompiler
+                        .buildNamedInBatch("com.android.systemui", "WIFI_" + presetName, "WIFI1");
+            } catch (Throwable ignored) {
+            } finally {
+                it.tugaia56.obsidian.utils.overlay.compiler.GenericAppThemeCompiler.finishNamed("WIFI1", ok);
+            }
+            final boolean fOk = ok;
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(),
+                        fOk ? getString(R.string.toast_applied) : getString(R.string.toast_error),
+                        Toast.LENGTH_LONG).show();
+            });
+        }).start();
     }
 
     private void restartSystemUI() {
