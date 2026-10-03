@@ -861,8 +861,8 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
                 MiscFragment::new, getString(R.string.nav_misc),
                 "varie", "misc", "rotazione", "rotation", "usb"));
         all.add(new SearchEntry(
-                getString(R.string.nav_misc_power_menu), getString(R.string.nav_misc),
-                R.drawable.ic_settings, 0xFF795548, R.id.tab_mods,
+                getString(R.string.nav_misc_power_menu), getString(R.string.nav_misc_power_menu_summary),
+                R.drawable.ic_settings, 0xFFFF1744, R.id.tab_mods,
                 PowerMenuFragment::new, getString(R.string.nav_misc_power_menu),
                 "power menu", "accensione", "spegnimento", "menù accensione"));
 

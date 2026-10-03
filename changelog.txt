@@ -21,6 +21,7 @@ Aggiornato:
 - Icona Wi-Fi: ora segue il colore della barra di stato (scura sulle schermate chiare, prima restava sempre bianca o nera)
 - Stili icone Wi-Fi: applicati come overlay di SystemUI, più leggeri e coerenti con le icone di sistema
 - Stili icone segnale mobile: applicati come overlay di SystemUI (come il Wi-Fi), con riaccensione automatica dopo il riavvio
+- Home Mods: Menù Accensione è ora una categoria a sé (sotto Pannello volume) e Launcher si trova dopo Varie
 - Nuova icona dell'app
 - Titolo della release: Oxydian al posto del vecchio nome
 

@@ -111,13 +111,13 @@ public class GestioneModsTabFragment extends Fragment {
                         "posizione", "position", "colore", "color"),
 
                 new NavAdapter.NavItem(
-                        R.drawable.ic_recents,
-                        getString(R.string.nav_launcher),
-                        getString(R.string.nav_launcher_summary),
-                        () -> navigate(new LauncherFragment(),
-                                getString(R.string.nav_launcher)),
-                        0xFF009688, // teal
-                        "launcher", "recenti", "recents", "task switcher", "multitasking"),
+                        R.drawable.ic_settings,
+                        getString(R.string.nav_misc_power_menu),
+                        getString(R.string.nav_misc_power_menu_summary),
+                        () -> navigate(new PowerMenuFragment(),
+                                getString(R.string.nav_misc_power_menu)),
+                        0xFFFF1744, // red accent
+                        "power menu", "accensione", "spegnimento", "menù accensione", "riavvio"),
 
                 new NavAdapter.NavItem(
                         R.drawable.ic_settings,
@@ -128,6 +128,15 @@ public class GestioneModsTabFragment extends Fragment {
                         0xFFFF6E40, // deep orange accent (più brillante)
                         "varie", "misc", "rotazione", "rotation", "usb",
                         "accensione", "power menu", "impostazioni", "settings"),
+
+                new NavAdapter.NavItem(
+                        R.drawable.ic_recents,
+                        getString(R.string.nav_launcher),
+                        getString(R.string.nav_launcher_summary),
+                        () -> navigate(new LauncherFragment(),
+                                getString(R.string.nav_launcher)),
+                        0xFF009688, // teal
+                        "launcher", "recenti", "recents", "task switcher", "multitasking"),
 
                 new NavAdapter.NavItem(
                         R.drawable.ic_navbar_gesture,

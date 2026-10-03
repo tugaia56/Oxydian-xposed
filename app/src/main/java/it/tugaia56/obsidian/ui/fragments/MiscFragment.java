@@ -91,13 +91,6 @@ public class MiscFragment extends Fragment {
 
                 new NavAdapter.NavItem(
                         R.drawable.ic_settings,
-                        getString(R.string.nav_misc_power_menu),
-                        getString(R.string.nav_misc_power_menu_summary),
-                        () -> navigate(new PowerMenuFragment(),
-                                getString(R.string.nav_misc_power_menu))),
-
-                new NavAdapter.NavItem(
-                        R.drawable.ic_settings,
                         getString(R.string.nav_corepatch),
                         getString(R.string.nav_corepatch_summary),
                         () -> navigate(new CorePatchFragment(),
