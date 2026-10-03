@@ -958,6 +958,7 @@
     <string name="app_themes_title">Google &amp; user apps</string>
     <string name="app_themes_card_desc">Themes for Messages, Firefox, Dropbox and other apps — replaces Substratum</string>
     <string name="app_themes_notice">Turn on the apps you want themed, then tap Apply. The first time you enable an app a reboot is needed; later changes apply right away.</string>
+    <string name="app_themes_many_warning">Warning: %1$d apps selected. More than about 10 themed apps slow down the phone at every boot.</string>
     <string name="app_themes_apply">Apply</string>
     <string name="app_themes_apply_summary">Builds and enables the selected apps, disables the others</string>
     <string name="app_themes_working">Working… this takes a few seconds per app</string>

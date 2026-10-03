@@ -100,7 +100,11 @@ public class AppThemesFragment extends Fragment {
     private void rebuild() {
         List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
 
-        chain.add(new NoticeAdapter(getString(R.string.app_themes_notice)));
+        int selected = 0;
+        for (AppEntry e : mApps) if (ObsidianPrefs.getBoolean(KEY_PREFIX + e.pkg, false)) selected++;
+        String notice = getString(R.string.app_themes_notice);
+        if (selected > 10) notice += "\n\n" + getString(R.string.app_themes_many_warning, selected);
+        chain.add(new NoticeAdapter(notice));
 
         GroupUtils.addGroup(chain, List.of(
                 new ListWidgetAdapter.ListItem(getString(R.string.app_themes_apply),

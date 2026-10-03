@@ -157,6 +157,52 @@ public class FabricatedUtil {
         ).submit();
     }
 
+    /**
+     * Script di avvio del modulo: aspetta boot_completed e rilancia post-exec.sh, ma SOLO per gli
+     * overlay che non risultano gia' attivi. I FabricatedOverlay restano salvati tra un riavvio e
+     * l'altro: rifarli tutti (110+ comandi "cmd overlay", ognuno fa ricaricare le risorse a tutte
+     * le app) causava un minuto di freeze dopo lo sblocco.
+     */
+    private static final String BOOT_SCRIPT =
+            "MODDIR=${0%/*}\n"
+          + "while [ \"$(getprop sys.boot_completed | tr -d '\\r')\" != \"1\" ]; do sleep 1; done\n"
+          + "sleep 5\n"
+          + "OVL=$(cmd overlay list)\n"
+          + "FAB=\"\"\n"
+          + "while IFS= read -r line; do\n"
+          + "  case \"$line\" in\n"
+          + "    \"cmd overlay fabricate\"*) FAB=\"$line\" ;;\n"
+          + "    \"cmd overlay enable\"*)\n"
+          + "      full=${line##* }\n"
+          + "      if ! echo \"$OVL\" | grep -q \"^\\[x\\] $full\\$\"; then\n"
+          + "        [ -n \"$FAB\" ] && eval \"$FAB\"\n"
+          + "        eval \"$line\"\n"
+          + "      fi\n"
+          + "      FAB=\"\" ;;\n"
+          + "    \"\") ;;\n"
+          + "    *) eval \"$line\" ;;\n"
+          + "  esac\n"
+          + "done < \"$MODDIR/post-exec.sh\"\n";
+
+    /** Scrive (o aggiorna) service.sh nel modulo con la versione che salta gli overlay gia' attivi. */
+    public static void installBootScript() {
+        try {
+            java.io.File tmp = new java.io.File(it.tugaia56.obsidian.Obsidian.getAppContext().getCacheDir(), "service.sh.tmp");
+            try (java.io.FileOutputStream out = new java.io.FileOutputStream(tmp)) {
+                out.write(BOOT_SCRIPT.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            }
+            String d = MODULE_DIR;
+            Shell.cmd(
+                "mkdir -p " + d,
+                "cp -f " + tmp.getAbsolutePath() + " " + d + "/service.sh",
+                "chmod 755 " + d + "/service.sh",
+                "[ -f " + d + "/post-exec.sh ] || touch " + d + "/post-exec.sh",
+                "chmod 755 " + d + "/post-exec.sh"
+            ).exec();
+            tmp.delete();
+        } catch (Throwable ignored) {}
+    }
+
     /** Wraps a shell command in single quotes, escaping any internal single quotes. */
     private static String shellQuote(String s) {
         return "'" + s.replace("'", "'\\''") + "'";

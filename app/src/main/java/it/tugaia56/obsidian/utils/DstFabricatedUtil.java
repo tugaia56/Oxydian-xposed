@@ -70,6 +70,15 @@ public class DstFabricatedUtil {
      * Usato dopo il ripristino del backup.
      */
     public static void reapplyAll(Runnable onDone) {
+        reapplyAll(onDone, false);
+    }
+
+    /**
+     * @param onlyMissing true all'avvio: i FabricatedOverlay restano salvati tra i riavvii, quindi
+     *                    si rifanno solo quelli che il sistema ha lasciato spenti (rifarli tutti
+     *                    significa 100+ comandi che ricaricano le risorse di tutte le app).
+     */
+    public static void reapplyAll(Runnable onDone, boolean onlyMissing) {
         new Thread(() -> {
             try {
                 Context ctx = Obsidian.get();
@@ -77,6 +86,21 @@ public class DstFabricatedUtil {
                     List<String> allCmds = new ArrayList<>();
                     for (DarkShadowItem item : DarkShadowUtils.getItems(ctx)) {
                         if (item.isEnabled()) allCmds.addAll(buildApplyCommands(item));
+                    }
+                    if (onlyMissing && !allCmds.isEmpty()) {
+                        java.util.Set<String> on = new java.util.HashSet<>();
+                        for (String line : Shell.cmd("cmd overlay list | grep 'com.android.shell:Obsidian'").exec().getOut()) {
+                            line = line.trim();
+                            if (line.startsWith("[x]")) on.add(line.substring(3).trim());
+                        }
+                        List<String> missing = new ArrayList<>();
+                        // comandi a coppie: fabricate (2k), enable (2k+1)
+                        for (int k = 0; k + 1 < allCmds.size(); k += 2) {
+                            String enable = allCmds.get(k + 1);
+                            String full = enable.substring(enable.lastIndexOf(' ') + 1);
+                            if (!on.contains(full)) { missing.add(allCmds.get(k)); missing.add(enable); }
+                        }
+                        allCmds = missing;
                     }
                     if (!allCmds.isEmpty()) Shell.cmd(String.join("; ", allCmds)).exec();
                     saveBootProps();

@@ -959,6 +959,7 @@
     <string name="app_themes_title">App Google e utente</string>
     <string name="app_themes_card_desc">Temi per Messaggi, Firefox, Dropbox e altre app — al posto di Substratum</string>
     <string name="app_themes_notice">Attiva le app da temare, poi tocca Applica. La prima volta che attivi una nuova app serve un riavvio; le modifiche successive sono immediate.</string>
+    <string name="app_themes_many_warning">Attenzione: %1$d app selezionate. Più di circa 10 app con il tema rallentano l avvio del telefono a ogni riavvio.</string>
     <string name="app_themes_apply">Applica</string>
     <string name="app_themes_apply_summary">Compila e attiva le app selezionate, disattiva le altre</string>
     <string name="app_themes_working">In corso… servono alcuni secondi per ogni app</string>

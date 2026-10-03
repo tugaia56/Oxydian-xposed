@@ -68,7 +68,7 @@ public class BootReceiver extends BroadcastReceiver {
         // them after boot, so we wait 15s to re-apply after ThemeManager finishes.
         new Thread(() -> {
             try { Thread.sleep(15000); } catch (InterruptedException ignored) {}
-            DstFabricatedUtil.reapplyAll(null);
+            DstFabricatedUtil.reapplyAll(null, true);
         }).start();
     }
 

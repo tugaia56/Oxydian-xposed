@@ -16,6 +16,8 @@ public class Obsidian extends Application {
         super.onCreate();
         instance = this;
         appContext = createDeviceProtectedStorageContext();
+        // Aggiorna lo script di avvio del modulo (salta gli overlay gia' attivi)
+        new Thread(it.tugaia56.obsidian.utils.overlay.FabricatedUtil::installBootScript).start();
         // Prima dello sblocco (BFU, es. subito dopo un riavvio) WorkManager non è ancora
         // inizializzato — il suo androidx.startup.InitializationProvider non parte finché lo
         // storage credential-encrypted non è disponibile, e WorkManager.getInstance() lancia

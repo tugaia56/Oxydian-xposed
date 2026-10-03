@@ -22,6 +22,8 @@ Aggiornato:
 - Stili icone Wi-Fi: applicati come overlay di SystemUI, più leggeri e coerenti con le icone di sistema
 - Stili icone segnale mobile: applicati come overlay di SystemUI (come il Wi-Fi), con riaccensione automatica dopo il riavvio
 - Home Mods: Menù Accensione è ora una categoria a sé (sotto Pannello volume) e Launcher si trova dopo Varie
+- Avvio del telefono più leggero: i colori del tema non vengono più rifatti tutti a ogni riavvio, solo quelli che mancano
+- App Google e utente: avviso quando si attivano più di 10 app (rallentano l'avvio)
 - Nuova icona dell'app
 - Titolo della release: Oxydian al posto del vecchio nome
 
