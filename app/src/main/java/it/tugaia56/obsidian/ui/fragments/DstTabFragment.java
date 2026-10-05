@@ -79,15 +79,6 @@ public class DstTabFragment extends Fragment {
                         "radius", "dialogo", "dialog", "stile", "style"),
 
                 new NavAdapter.NavItem(
-                        R.drawable.obs_wifi_aurora_signal_4,
-                        getString(R.string.nav_icon_style),
-                        getString(R.string.nav_icon_style_summary),
-                        () -> navigate(new SignalStyleFragment(),
-                                getString(R.string.nav_icon_style)),
-                        0xFF4CAF50, // green
-                        "wifi", "mobile", "segnale", "signal", "icone", "icons"),
-
-                new NavAdapter.NavItem(
                         R.drawable.ic_battery,
                         getString(R.string.nav_battery_icons),
                         getString(R.string.nav_battery_icons_summary),

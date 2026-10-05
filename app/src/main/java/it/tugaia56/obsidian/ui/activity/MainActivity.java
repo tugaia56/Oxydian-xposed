@@ -58,7 +58,6 @@ import it.tugaia56.obsidian.ui.fragments.SettingsAboutFragment;
 import it.tugaia56.obsidian.ui.fragments.SettingsFragment;
 import it.tugaia56.obsidian.ui.fragments.SettingsGeneralFragment;
 import it.tugaia56.obsidian.ui.fragments.SettingsUpdateFragment;
-import it.tugaia56.obsidian.ui.fragments.SignalStyleFragment;
 import it.tugaia56.obsidian.ui.fragments.StatusbarFragment;
 import it.tugaia56.obsidian.ui.fragments.SystemColorsFragment;
 import it.tugaia56.obsidian.ui.fragments.ThemeStyleFragment;
@@ -603,13 +602,6 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
                 ThemeStyleFragment::new, getString(R.string.nav_theme_style),
                 "notifiche", "notifications", "toast", "angoli", "corners",
                 "radius", "dialogo", "dialog", "stile", "style"));
-
-        all.add(new SearchEntry(
-                getString(R.string.nav_icon_style),
-                getString(R.string.nav_icon_style_summary),
-                R.drawable.obs_wifi_aurora_signal_4, 0xFF4CAF50, R.id.tab_dst,
-                SignalStyleFragment::new, getString(R.string.nav_icon_style),
-                "wifi", "wi-fi", "mobile", "segnale", "signal", "icone", "icons"));
 
         all.add(new SearchEntry(
                 getString(R.string.nav_battery_icons),
