@@ -47,7 +47,7 @@ import it.tugaia56.obsidian.xposed.XposedMods;
  * Due hook ridondanti:
  *   1) COUIContextUtil.getAttrColor(...) — forza il valore la prima volta che init() lo calcola.
  *   2) COUICardListSelectedItemLayout.init(Context, boolean) — dopo che ritorna, richiama
- *      refreshCardBg(mCardColor) sull'istanza stessa (campo + invalidate in un colpo solo).
+ *      refreshCardBg(cardColor()) sull'istanza stessa (campo + invalidate in un colpo solo).
  *
  * 2026-09-04: estesa alle app OEM Oplus raggiungibili da dentro Impostazioni (WirelessSettings —
  * Wi-Fi/Bluetooth/Device Connect, HeyCast — Cast) su richiesta dell'utente. Verificato PRIMA di
@@ -142,6 +142,9 @@ public class SettingsCardBackgroundMod extends XposedMods {
     private static final String PREF_BG_ON = "DST_BACKGROUND_on";
     private static final String PREF_BG    = "DST_BACKGROUND";
     private int mCardColor = DEFAULT_CARD_COLOR;
+    // true quando NON c'e' un "Preset Sfondo" Oxydian attivo: il colore delle card segue allora lo
+    // sfondo di sistema (android:color/background_dark, cambiato da Oxydian Theme / OOS Theme).
+    private volatile boolean mCardFromSystem = true;
     // Bordo accento sul menu overflow (COUIPopupListWindow) — richiesto dall'utente 2026-09-05
     // per "I miei dispositivi", stesso stile accento+sfondo OBS già usato per i dialoghi in-app
     // (vedi ObsidianTheme.dialogBackground/themeDialog). Stesse chiavi/logica di MonetFreeze.
@@ -181,10 +184,22 @@ public class SettingsCardBackgroundMod extends XposedMods {
 
     public SettingsCardBackgroundMod(Context context) { super(context); }
 
+    /** Colore delle card: quello del Preset Sfondo se attivo, altrimenti lo sfondo di sistema. */
+    private int cardColor() {
+        int result = mCardColor;
+        if (mCardFromSystem && mContext != null) {
+            try {
+                result = mContext.getColor(android.R.color.background_dark) | 0xFF000000;
+            } catch (Throwable ignored) {}
+        }
+        return result;
+    }
+
     @Override
     public void updatePrefs(String... Key) {
         if (Xprefs == null) return;
         mThemeApplied = Xprefs.getBoolean("settings_theme_applied", false);
+        mCardFromSystem = true; // il colore card segue sempre lo sfondo di sistema (Colori sistema / OOS Theme)
         mCardColor = Xprefs.getBoolean(PREF_BG_ON, false)
                 ? (Xprefs.getInt(PREF_BG, DEFAULT_CARD_COLOR) | 0xFF000000)
                 : DEFAULT_CARD_COLOR;
@@ -210,6 +225,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
         try {
             mThemeApplied = "1".equals(readSysProp("persist.obsidian.dst.settings_theme_on", "0"));
             boolean bgOn = "1".equals(readSysProp("persist.obsidian.dst.bg_on", "0"));
+            mCardFromSystem = true;
             mCardColor = bgOn
                     ? (parseIntProp(readSysProp("persist.obsidian.dst.bg", ""), DEFAULT_CARD_COLOR) | 0xFF000000)
                     : DEFAULT_CARD_COLOR;
@@ -274,7 +290,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
             android.graphics.drawable.GradientDrawable bg =
                     new android.graphics.drawable.GradientDrawable();
             bg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
-            bg.setColor(mCardColor);
+            bg.setColor(cardColor());
             bg.setCornerRadius(radius);
             bg.setStroke((int) stroke, mAccentColor);
             v.setBackground(bg);
@@ -313,7 +329,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
         if (!mThemeApplied || !isNight()) return;
         try {
             View content = activity.findViewById(android.R.id.content);
-            if (content != null) content.setBackgroundColor(mCardColor);
+            if (content != null) content.setBackgroundColor(cardColor());
         } catch (Throwable ignored) {}
         // Fallback strutturale (com.oplus.uxdesign "Colori"/UxColorSettingActivity, 2026-09-07):
         // qui il figlio diretto di content che copre tutto lo schermo NON ha nome (un LinearLayout
@@ -327,7 +343,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
                 View onlyChild = contentGroup.getChildAt(0);
                 if (onlyChild.getWidth() >= contentGroup.getWidth()
                         && onlyChild.getHeight() >= contentGroup.getHeight()) {
-                    onlyChild.setBackgroundColor(mCardColor);
+                    onlyChild.setBackgroundColor(cardColor());
                 }
             }
         } catch (Throwable ignored) {}
@@ -439,7 +455,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
                         || "moreCardView".equals(cardId);
                 if (needsInnerFix && card instanceof android.view.ViewGroup cardGroup
                         && cardGroup.getChildCount() > 0) {
-                    cardGroup.getChildAt(0).setBackgroundColor(mCardColor);
+                    cardGroup.getChildAt(0).setBackgroundColor(cardColor());
                 }
             } catch (Throwable ignored) {}
         }
@@ -472,7 +488,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
         try {
             int id = activity.getResources().getIdentifier("list_container", "id", "android");
             View v = (id != 0) ? activity.findViewById(id) : null;
-            if (v != null) v.setBackgroundColor(mCardColor);
+            if (v != null) v.setBackgroundColor(cardColor());
         } catch (Throwable ignored) {}
         // Card SIM trasparenti con bordo accento — richiesta esplicita dell'utente 2026-09-05,
         // solo per com.android.phone (id specifici di questa schermata, non generici come sopra).
@@ -575,7 +591,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
         } catch (Throwable ignored) {}
     }
 
-    /** Come tintTransparentWithAccentBorder ma con riempimento navy (mCardColor) invece di
+    /** Come tintTransparentWithAccentBorder ma con riempimento navy (cardColor()) invece di
      *  trasparente — richiesto dall'utente 2026-09-07 per il pannello inferiore di com.oplus.
      *  uxdesign ("Colori"/"Illuminazione bordi": "bordo e navy", non solo bordo). Stesso stile
      *  di tintPopupWrapper (menu overflow), applicato per id invece che su un campo riflesso. */
@@ -605,7 +621,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
                     activity.getResources().getDisplayMetrics());
             android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
             bg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
-            bg.setColor(mCardColor);
+            bg.setColor(cardColor());
             bg.setCornerRadius(radius);
             v.setBackground(bg);
             android.graphics.drawable.GradientDrawable border = new android.graphics.drawable.GradientDrawable();
@@ -626,7 +642,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
             View v = (id != 0) ? activity.findViewById(id) : null;
             if (v instanceof android.widget.ImageView iv) {
                 iv.setImageDrawable(null);
-                iv.setBackgroundColor(mCardColor);
+                iv.setBackgroundColor(cardColor());
             }
         } catch (Throwable ignored) {}
     }
@@ -647,7 +663,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
      *  dall'utente 2026-09-05 per "I miei dispositivi". Il contenuto (mMainMenuWrapper/
      *  mSubMenuWrapper, entrambi RoundFrameLayout) prende il proprio sfondo dentro il metodo
      *  privato createContentView(), letto una sola volta da un attr tema — hook afterHooked per
-     *  sostituirlo con uno sfondo OBS (mCardColor) + bordo accento, stesso stile dei dialoghi
+     *  sostituirlo con uno sfondo OBS (cardColor()) + bordo accento, stesso stile dei dialoghi
      *  in-app (ObsidianTheme.dialogBackground). Nomi campo non offuscati nella build verificata;
      *  se un'altra build li offusca il try/catch fallisce silenziosamente, nessun crash. */
     private void installPopupMenuBorder(XC_LoadPackage.LoadPackageParam lp) {
@@ -739,7 +755,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
                 mContext.getResources().getDisplayMetrics());
         android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
         bg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
-        bg.setColor(mCardColor);
+        bg.setColor(cardColor());
         bg.setCornerRadius(radius);
         bg.setStroke((int) stroke, mAccentColor);
         v.setBackground(bg);
@@ -813,7 +829,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
                     try {
                         if (p.args.length < 1 || !(p.args[0] instanceof Integer)) return;
                         int id = (Integer) p.args[0];
-                        if (id == bg0 || id == bg1 || id == bg2) p.setResult(mCardColor);
+                        if (id == bg0 || id == bg1 || id == bg2) p.setResult(cardColor());
                     } catch (Throwable ignored) {}
                 }
             };
@@ -906,10 +922,10 @@ public class SettingsCardBackgroundMod extends XposedMods {
                         // stock/#262626, confermato dal vivo col color picker dell'utente).
                         boolean solidReplace = isSolidCardId(v);
                         if ("setBackgroundColor".equals(method) || "setBackgroundResource".equals(method)) {
-                            p.args[0] = solidReplace ? mCardColor : 0;
+                            p.args[0] = solidReplace ? cardColor() : 0;
                         } else {
                             p.args[0] = solidReplace
-                                    ? new android.graphics.drawable.ColorDrawable(mCardColor) : null;
+                                    ? new android.graphics.drawable.ColorDrawable(cardColor()) : null;
                         }
                     } catch (Throwable ignored) {}
                 }
@@ -934,7 +950,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
             // genitore sotto è già navy) NON basta qui: confermato dal vivo che resta grigio
             // (vedi isSolidCardId, sostituisce col navy vero invece di svuotare).
             // wallpaperCardView/fontCardView non sono in questa lista: il loro
-            // setBackgroundColor(mCardColor) diretto già funziona (color picker: #1B2029 giusto).
+            // setBackgroundColor(cardColor()) diretto già funziona (color picker: #1B2029 giusto).
             return "gridview".equals(name) || "uxcolor_setting_tab_layout".equals(name)
                     || "aodCardView".equals(name) || "iconCardView".equals(name)
                     || "moreCardView".equals(name);
@@ -964,7 +980,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
                     mContext.getResources().getDisplayMetrics());
             android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
             bg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
-            bg.setColor(mCardColor);
+            bg.setColor(cardColor());
             bg.setCornerRadius(radius);
             bg.setStroke((int) stroke, mAccentColor);
             v.setBackground(bg);
@@ -988,7 +1004,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
             // regressione netta. Rollback: qualcos'altro, ancora non identificato, ignora
             // setBackgroundColor() su questa view indipendentemente da force-dark. Vedi
             // [[project_settings_theme_header_gap]] — parcheggiato di nuovo, stesso esito di ieri.
-            v.setBackgroundColor(mCardColor);
+            v.setBackgroundColor(cardColor());
             // 2026-09-05: provato anche un OnPreDrawListener persistente (riapplica il colore ad
             // ogni frame, invece di un retry a tempo fisso) per "toolbar" — nessun effetto: il
             // readback confermava il colore Java-level già corretto in ogni istante, quindi non è
@@ -1006,7 +1022,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
                 continue;
             }
             try {
-                callMethod(card, "refreshCardBg", mCardColor);
+                callMethod(card, "refreshCardBg", cardColor());
             } catch (Throwable t) {
                 // Build offuscate (Wallpapers/Battery/Pantanal UMS, 2026-09-04): refreshCardBg
                 // non esiste in questa versione della libreria COUI — il colore arriva comunque
@@ -1045,8 +1061,8 @@ public class SettingsCardBackgroundMod extends XposedMods {
         tintViewById(activity, "searchView");
         // Sfondo della schermata risultati ricerca globale — id reale trovato dall'utente con
         // uiautomatorviewer (2026-09-03), stock nero puro invece del navy usato ovunque nel resto
-        // dell'app. Stesso valore di mCardColor: pagina e card dello stesso colore = card
-        // "invisibili" come nel resto dell'app (convenzione già in uso, vedi commento su mCardColor
+        // dell'app. Stesso valore di cardColor(): pagina e card dello stesso colore = card
+        // "invisibili" come nel resto dell'app (convenzione già in uso, vedi commento su cardColor()
         // in cima al file). Nella lista di applyHeaderTheme perché il listener sul layout globale
         // già presente in onResume ricontrolla tutto ad ogni apertura/chiusura della ricerca.
         tintViewById(activity, "search_bg_mask");
@@ -1069,7 +1085,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
             View search = (searchId != 0) ? activity.findViewById(searchId) : null;
             if (appBar == null) return;
             boolean searchExpanded = search != null && appBar.getHeight() > search.getHeight() + 8;
-            appBar.setBackgroundColor(searchExpanded ? 0 : mCardColor);
+            appBar.setBackgroundColor(searchExpanded ? 0 : cardColor());
         } catch (Throwable ignored) {}
     }
 
@@ -1133,7 +1149,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
                         try {
                             if (p.args.length < 2 || !(p.args[1] instanceof Integer)) return;
                             int v = (Integer) p.args[1];
-                            if (v == attrId || v == attrIdCard || v == attrIdCardPressed || v == attrIdBgWithCard) p.setResult(mCardColor);
+                            if (v == attrId || v == attrIdCard || v == attrIdCardPressed || v == attrIdBgWithCard) p.setResult(cardColor());
                         } catch (Throwable ignored) {}
                     }
                 });
@@ -1160,7 +1176,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
                             if (v != attrId && v != attrIdCard && v != attrIdCardPressed && v != attrIdBgWithCard) return;
                             TypedValue tv = (TypedValue) p.args[1];
                             tv.type = TypedValue.TYPE_INT_COLOR_ARGB8;
-                            tv.data = mCardColor;
+                            tv.data = cardColor();
                             p.setResult(true);
                         } catch (Throwable ignored) {}
                     }
@@ -1201,13 +1217,13 @@ public class SettingsCardBackgroundMod extends XposedMods {
                             // Consuma il flag SUBITO, una volta sola: Android RICICLA le istanze
                             // TypedArray (un pool interno, non garbage-collected finché vive nel
                             // pool) — lasciare il flag nella WeakHashMap continuava a forzare
-                            // mCardColor anche su chiamate successive scorrelate (testo/divider/
+                            // cardColor() anche su chiamate successive scorrelate (testo/divider/
                             // altri colori) che riusano lo STESSO oggetto dopo un recycle().
                             // Bug reale confermato dall'utente 2026-09-04: testo intere pagine di
                             // Impostazioni sparito (leggibile solo su ripple/pressed).
                             if (mFlaggedArrays.remove(p.thisObject) == null) return;
                             if (!mThemeApplied || !isNight()) return;
-                            p.setResult(mCardColor);
+                            p.setResult(cardColor());
                         } catch (Throwable ignored) {}
                     }
                 });
@@ -1240,7 +1256,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
                     mCardInstances.add(new WeakReference<>(p.thisObject));
                     if (!mThemeApplied || !isNight()) return;
                     try {
-                        callMethod(p.thisObject, "refreshCardBg", mCardColor);
+                        callMethod(p.thisObject, "refreshCardBg", cardColor());
                     } catch (Throwable ignored) {}
                 }
             });
@@ -1409,7 +1425,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
             // setBackgroundColor semplice, che a riposo (espansa E collassata) e' corretto,
             // confermato via screenshot; il flash durante il trascinamento resta un difetto
             // minore e transitorio, non un colore sbagliato fisso.
-            v.setBackgroundColor(mCardColor);
+            v.setBackgroundColor(cardColor());
         } catch (Throwable ignored) {}
     }
 

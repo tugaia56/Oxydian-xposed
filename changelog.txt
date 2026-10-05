@@ -26,6 +26,7 @@ Aggiornato:
 - App Google e utente: avviso quando si attivano più di 10 app (rallentano l'avvio)
 - Nuova icona dell'app
 - Titolo della release: Oxydian al posto del vecchio nome
+- Impostazioni: le card seguono ora lo sfondo di sistema scelto (prima restavano sempre sul navy fisso)
 
 Rimosso:
 -
