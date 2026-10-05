@@ -14,7 +14,7 @@ public final class ThemeOverride {
     private static final long TTL_MS = 3000;
 
     private static long sAt = -TTL_MS;
-    private static Integer sAccent, sBg;
+    private static Integer sAccent, sBg, sWifiIcon, sMobileIcon;
 
     private ThemeOverride() {}
 
@@ -30,12 +30,26 @@ public final class ThemeOverride {
         return sBg;
     }
 
+    /** Colore delle icone Wi-Fi scelto in Oxydian Theme, o null. */
+    public static synchronized Integer wifiIconColor() {
+        load();
+        return sWifiIcon;
+    }
+
+    /** Colore dell'icona del segnale mobile scelto in Oxydian Theme, o null. */
+    public static synchronized Integer mobileIconColor() {
+        load();
+        return sMobileIcon;
+    }
+
     private static void load() {
         long now = SystemClock.elapsedRealtime();
         if (now - sAt < TTL_MS) return;
         sAt = now;
         sAccent = parse(get(KEY_ACCENT));
         sBg = parse(get(KEY_BG));
+        sWifiIcon = parse(get("persist.oxytheme.wifi_icon_color"));
+        sMobileIcon = parse(get("persist.oxytheme.mobile_icon_color"));
     }
 
     private static Integer parse(String s) {

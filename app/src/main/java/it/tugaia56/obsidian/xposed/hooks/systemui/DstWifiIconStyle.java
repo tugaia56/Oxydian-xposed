@@ -98,6 +98,7 @@ public class DstWifiIconStyle {
             sIconScale  = parseFloatAttr(sb.toString(), PREF_ICON_SCALE, 1.0f);
             sColorOn    = parseBoolAttr(sb.toString(), PREF_COLOR_ON, false);
             sColor      = parseIntAttr(sb.toString(), PREF_COLOR, 0xFFFFFFFF);
+            applyOverrideColor();
             sPreloaded  = true;
             XposedBridge.log("[ Obsidian ] DstWifiIconStyle.preload(file): preset=" + sWifiPreset + " scale=" + sIconScale
                     + " colorOn=" + sColorOn + " color=" + Integer.toHexString(sColor));
@@ -105,6 +106,12 @@ public class DstWifiIconStyle {
             XposedBridge.log("[ Obsidian ] DstWifiIconStyle.preload(file) ERROR: " + t);
             preloadFromProps();
         }
+    }
+
+    /** Il colore scelto in Oxydian Theme (proprieta' di sistema) ha la precedenza su quello interno. */
+    private static void applyOverrideColor() {
+        Integer o = it.tugaia56.obsidian.utils.ThemeOverride.wifiIconColor();
+        if (o != null) { sColorOn = true; sColor = o; }
     }
 
     private static void preloadFromProps() {
@@ -120,10 +127,12 @@ public class DstWifiIconStyle {
                     "persist.obsidian.dst.wifi_icon_color_on", "");
             String colorHex = (String) XposedHelpers.callStaticMethod(sp, "get",
                     "persist.obsidian.dst.wifi_icon_color", "");
+            applyOverrideColor();
             if (!colorOn.isEmpty())  sColorOn = "true".equals(colorOn);
             if (!colorHex.isEmpty()) {
                 try { sColor = (int) Long.parseLong(colorHex, 16); } catch (NumberFormatException ignored) {}
             }
+            applyOverrideColor();
             String scaleStr = (String) XposedHelpers.callStaticMethod(sp, "get",
                     "persist.obsidian.dst.wifi_icon_scale", "");
             if (!scaleStr.isEmpty()) {

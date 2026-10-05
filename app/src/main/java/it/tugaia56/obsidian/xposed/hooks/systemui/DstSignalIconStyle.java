@@ -92,6 +92,7 @@ public class DstSignalIconStyle {
             sIconScale    = parseFloatAttr(sb.toString(), PREF_ICON_SCALE, 1.0f);
             sColorOn      = parseBoolAttr(sb.toString(), PREF_COLOR_ON, false);
             sColor        = parseIntAttr(sb.toString(), PREF_COLOR, 0xFFFFFFFF);
+            applyOverrideColor();
             sPreloaded    = true;
             XposedBridge.log("[ Obsidian ] DstSignalIconStyle.preload(file): preset=" + sSignalPreset + " scale=" + sIconScale
                     + " colorOn=" + sColorOn + " color=" + Integer.toHexString(sColor));
@@ -99,6 +100,11 @@ public class DstSignalIconStyle {
             XposedBridge.log("[ Obsidian ] DstSignalIconStyle.preload(file) ERROR: " + t);
             preloadFromProps();
         }
+    }
+
+    private static void applyOverrideColor() {
+        Integer o = it.tugaia56.obsidian.utils.ThemeOverride.mobileIconColor();
+        if (o != null) { sColorOn = true; sColor = o; }
     }
 
     private static void preloadFromProps() {
@@ -118,6 +124,7 @@ public class DstSignalIconStyle {
             if (!colorHex.isEmpty()) {
                 try { sColor = (int) Long.parseLong(colorHex, 16); } catch (NumberFormatException ignored) {}
             }
+            applyOverrideColor();
             String scaleStr = (String) XposedHelpers.callStaticMethod(sp, "get",
                     "persist.obsidian.dst.signal_icon_scale", "");
             if (!scaleStr.isEmpty()) {
