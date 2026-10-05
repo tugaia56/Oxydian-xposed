@@ -48,28 +48,10 @@ public final class DeviceInfo {
                 sb.append(c).append('=').append(shellLine("command -v " + c).isEmpty() ? "NO" : "ok").append(' ');
             sb.append(nl);
             sb.append("  prova killall inesistente: ").append(shellLine("killall oxydian_nonexistent_probe 2>&1; echo rc=$?")).append(nl);
-            sb.append(wifiDrawablesDiagnostics(nl));
         } catch (Throwable t) {
             sb.append("Root: errore diagnosi ").append(t.getClass().getSimpleName()).append(nl);
         }
         return sb.toString();
-    }
-
-    /** Nomi dei disegni Wi-Fi presenti nel SystemUI di questo telefono: lo stile icone Wi-Fi
-     *  sostituisce stat_signal_wifi_signal_0..4; se qui mancano o ce ne sono altri, su questo
-     *  OOS lo scambio non può funzionare. */
-    private static String wifiDrawablesDiagnostics(String nl) {
-        try {
-            it.tugaia56.obsidian.utils.helper.BinaryInstaller.symLinkBinaries();
-            String apk = shellLine("pm path com.android.systemui | head -1 | sed 's/package://'");
-            if (apk.isEmpty()) return "  SystemUI Wi-Fi: apk non trovato" + nl;
-            String aapt = it.tugaia56.obsidian.utils.Dynamic.AAPT2.getAbsolutePath();
-            String names = shellLine(aapt + " dump resources " + apk
-                    + " 2>/dev/null | grep -oE 'drawable/[A-Za-z0-9_]*wifi[A-Za-z0-9_]*' | sort -u | head -60 | tr '\n' ' '");
-            return "  SystemUI: " + apk + nl + "  disegni wifi: " + names + nl;
-        } catch (Throwable t) {
-            return "  SystemUI Wi-Fi: errore " + t.getClass().getSimpleName() + nl;
-        }
     }
 
     private static String shellLine(String cmd) {

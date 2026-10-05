@@ -29,4 +29,5 @@ Aggiornato:
 - Impostazioni: le card seguono ora lo sfondo di sistema scelto (prima restavano sempre sul navy fisso)
 
 Rimosso:
--
+- Temi overlay spostati nell'app Oxydian Theme (app separata): temi delle app, Dark Shadow (Impostazioni, SystemUI, Launcher, app OnePlus), icone Wi-Fi/segnale, icone barra di navigazione, icone Impostazioni, colori di sistema (accento e sfondo), tastierino PIN e barra di progresso circolare
+- Oxydian legge ora accento e sfondo scelti in Oxydian Theme (pannello rapido, dialoghi, volume, notifiche, card di Impostazioni)

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<shape android:shape="oval"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/coui_simple_lock_transparent_filled_rectangle_icon_color" />
-    <size android:height="10.0dp" android:width="10.0dp" />
-    <padding android:left="6.0dp" android:top="6.0dp" android:right="6.0dp" android:bottom="6.0dp" />
-    <corners android:radius="2.0dp" />
-</shape>

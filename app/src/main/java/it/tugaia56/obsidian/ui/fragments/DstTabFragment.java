@@ -60,13 +60,13 @@ public class DstTabFragment extends Fragment {
 
                 new NavAdapter.NavItem(
                         R.drawable.ic_drawing,
-                        getString(R.string.nav_dst_colors),
-                        getString(R.string.nav_dst_colors_summary),
-                        () -> navigate(new DarkShadowThemeFragment(),
-                                getString(R.string.nav_dst_colors)),
+                        getString(R.string.nav_oxytheme),
+                        getString(R.string.nav_oxytheme_summary),
+                        () -> it.tugaia56.obsidian.utils.OxydianThemeLauncher.open(requireContext()),
                         0xFF7C4DFF, // purple
                         "substratum", "tema", "theme", "accento", "accent",
-                        "sfondo", "background", "colore", "color", "impostazioni", "settings"),
+                        "sfondo", "background", "colore", "color", "impostazioni", "settings",
+                        "pin", "icone", "icons", "overlay"),
 
                 new NavAdapter.NavItem(
                         R.drawable.ic_ui_styles,
@@ -77,16 +77,6 @@ public class DstTabFragment extends Fragment {
                         0xFF00BCD4, // cyan
                         "notifiche", "notifications", "toast", "angoli", "corners",
                         "radius", "dialogo", "dialog", "stile", "style"),
-
-                // Solo anteprima — nessun overlay applicato ancora (vedi doc di SettingsIconsFragment)
-                new NavAdapter.NavItem(
-                        R.drawable.ic_settings,
-                        getString(R.string.nav_settings_icons),
-                        getString(R.string.nav_settings_icons_summary),
-                        () -> navigate(new SettingsIconsFragment(),
-                                getString(R.string.nav_settings_icons)),
-                        0xFFFF1744, // red accent — anteprima-only, ma non più grigio
-                        "pui", "oos", "icone", "icons", "impostazioni", "settings", "pack"),
 
                 new NavAdapter.NavItem(
                         R.drawable.obs_wifi_aurora_signal_4,

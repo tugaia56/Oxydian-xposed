@@ -1233,4 +1233,7 @@
     <string name="launcher_page_indicator_tap_summary">Apre un\u2019app a tua scelta quando tocchi la voce di ricerca sotto l\u2019indicatore di pagina della home (serve \u00abMostra Cerca sul fondo\u00bb attivo). Tocca per scegliere l\u2019app.</string>
     <string name="qs_big_icon_border_title">Bordo icone</string>
     <string name="qs_tiles_icon_border_summary">Aggiunge un bordo colorato attorno alle icone</string>
+    <string name="nav_oxytheme">Oxydian Theme</string>
+    <string name="nav_oxytheme_summary">Accento, sfondo, icone, tastierino PIN e temi delle app ora sono nell\'app Oxydian Theme</string>
+    <string name="oxytheme_not_installed">Oxydian Theme non è installata</string>
 </resources>

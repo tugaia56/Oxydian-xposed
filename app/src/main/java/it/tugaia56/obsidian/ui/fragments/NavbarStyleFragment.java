@@ -85,7 +85,7 @@ public class NavbarStyleFragment extends Fragment {
 
         ListWidgetAdapter.ListItem navbarIcons = new ListWidgetAdapter.ListItem(
                 getString(R.string.navbar_icons_title), getString(R.string.navbar_icons_summary),
-                () -> navigate(new NavbarIconsFragment(), getString(R.string.navbar_icons_title)));
+                () -> it.tugaia56.obsidian.utils.OxydianThemeLauncher.open(requireContext()));
 
         ListWidgetAdapter topRows = new ListWidgetAdapter(List.of(gestureNav, navbarIcons));
 

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <dimen name="red_horizontal_single_clock_date_size">20.0dip</dimen>	<!-- 16 stock -->
-    <dimen name="widget_big_font_size">89.0dip</dimen>					<!-- 54 stock -->
-    <dimen name="widget_icon_size">26.0dip</dimen>						<!-- 18 stock -->
-    <dimen name="widget_title_font_size">40.0dip</dimen>				<!-- 20 stock -->
-    <dimen name="keyguard_lock_height">0.0dip</dimen>
-    <dimen name="keyguard_lock_width">0.0dip</dimen>	
-</resources>

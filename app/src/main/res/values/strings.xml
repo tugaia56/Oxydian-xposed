@@ -1261,4 +1261,7 @@
     <string name="launcher_page_indicator_tap_summary">Opens a chosen app when you tap the search entry under the home page indicator (needs \u201cShow Search at the bottom\u201d on). Tap to choose the app.</string>
     <string name="qs_big_icon_border_title">Icon border</string>
     <string name="qs_tiles_icon_border_summary">Adds a colored border around the icons</string>
+    <string name="nav_oxytheme">Oxydian Theme</string>
+    <string name="nav_oxytheme_summary">Accent, background, icons, PIN keypad and app themes now live in the Oxydian Theme app</string>
+    <string name="oxytheme_not_installed">Oxydian Theme is not installed</string>
 </resources>

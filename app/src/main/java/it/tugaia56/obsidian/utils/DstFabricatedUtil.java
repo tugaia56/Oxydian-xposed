@@ -214,6 +214,11 @@ public class DstFabricatedUtil {
             int     a3   = ObsidianPrefs.getInt(    "DST_ACCENT3",        0);
             boolean bgOn = ObsidianPrefs.getBoolean("DST_BACKGROUND_on", false);
             int     bg   = ObsidianPrefs.getInt(    "DST_BACKGROUND",     0);
+            // I colori scelti in Oxydian Theme (proprieta' di sistema) hanno la precedenza sui preset interni
+            Integer ovAccent = it.tugaia56.obsidian.utils.ThemeOverride.accent();
+            if (ovAccent != null) { a1On = true; a1 = ovAccent; }
+            Integer ovBg = it.tugaia56.obsidian.utils.ThemeOverride.bg();
+            if (ovBg != null) { bgOn = true; bg = ovBg; }
             // 2026-09-05: serve a SettingsCardBackgroundMod.preloadFallback() — alcune app
             // (com.oneplus.account, com.oplus.games) non possono MAI vedere il ContentProvider
             // di Obsidian (filtro di visibilità pacchetti di Android, permanente, non un

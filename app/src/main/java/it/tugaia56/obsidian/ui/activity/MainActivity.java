@@ -45,29 +45,24 @@ import java.util.function.Supplier;
 
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.events.ColorSelectedEvent;
-import it.tugaia56.obsidian.ui.fragments.DarkShadowThemeFragment;
 import it.tugaia56.obsidian.ui.fragments.DstTabFragment;
 import it.tugaia56.obsidian.ui.fragments.GestioneModsTabFragment;
 import it.tugaia56.obsidian.ui.fragments.ImpostazioniTabFragment;
 import it.tugaia56.obsidian.ui.fragments.LockScreenOptionsFragment;
 import it.tugaia56.obsidian.ui.fragments.BatteryIconFragment;
 import it.tugaia56.obsidian.ui.fragments.ClockDateFragment;
-import it.tugaia56.obsidian.ui.fragments.PinStyleFragment;
 import it.tugaia56.obsidian.ui.fragments.NavbarStyleFragment;
 import it.tugaia56.obsidian.ui.fragments.QsFragment;
 import it.tugaia56.obsidian.ui.fragments.QuickSettingsFragment;
 import it.tugaia56.obsidian.ui.fragments.SettingsAboutFragment;
 import it.tugaia56.obsidian.ui.fragments.SettingsFragment;
 import it.tugaia56.obsidian.ui.fragments.SettingsGeneralFragment;
-import it.tugaia56.obsidian.ui.fragments.SettingsIconsFragment;
 import it.tugaia56.obsidian.ui.fragments.SettingsUpdateFragment;
-import it.tugaia56.obsidian.ui.fragments.SignalIconsFragment;
 import it.tugaia56.obsidian.ui.fragments.SignalStyleFragment;
 import it.tugaia56.obsidian.ui.fragments.StatusbarFragment;
 import it.tugaia56.obsidian.ui.fragments.SystemColorsFragment;
 import it.tugaia56.obsidian.ui.fragments.ThemeStyleFragment;
 import it.tugaia56.obsidian.ui.fragments.VolumeStyleFragment;
-import it.tugaia56.obsidian.ui.fragments.WifiIconsFragment;
 // ── Sotto-schermate: aggiunte per far comparire la destinazione ESATTA nella ricerca
 // (prima puntava solo alla card di primo livello, "cartella" invece di "file" — vedi
 // buildSearchItems()). ──────────────────────────────────────────────────────────────
@@ -87,8 +82,6 @@ import it.tugaia56.obsidian.ui.fragments.ClockStyleFragment;
 import it.tugaia56.obsidian.ui.fragments.ClockOraDataFragment;
 import it.tugaia56.obsidian.ui.fragments.ClockChipStyleFragment;
 import it.tugaia56.obsidian.ui.fragments.StatusbarNotifsFragment;
-import it.tugaia56.obsidian.ui.fragments.DstBackgroundFragment;
-import it.tugaia56.obsidian.ui.fragments.DstAccentFragment;
 import it.tugaia56.obsidian.ui.fragments.VolumePanelFragment;
 import it.tugaia56.obsidian.ui.fragments.VolumePanelColorsFragment;
 import it.tugaia56.obsidian.ui.fragments.LauncherFragment;
@@ -551,30 +544,12 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
 
         // ── DST tab ───────────────────────────────────────────────────────────
         all.add(new SearchEntry(
-                getString(R.string.nav_dst_colors),
-                getString(R.string.nav_dst_colors_summary),
-                R.drawable.ic_drawing, 0xFF7C4DFF, R.id.tab_dst,
-                DarkShadowThemeFragment::new, getString(R.string.nav_dst_colors),
-                "substratum", "tema", "theme", "accento", "accent",
-                "sfondo", "background", "colore", "color", "pin",
-                "icone", "notifica", "toast", "corner", "angolo",
-                "dialogo", "dialog", "cpb", "rvd", "preset", "dst"));
-
-        all.add(new SearchEntry(
                 getString(R.string.nav_system_colors),
                 getString(R.string.nav_system_colors_summary),
                 R.drawable.ic_palette, 0xFFE91E63, R.id.tab_dst,
                 SystemColorsFragment::new, getString(R.string.nav_system_colors),
                 "monet", "colore", "color", "accento", "accent",
                 "sistema", "system", "material you"));
-
-        all.add(new SearchEntry(
-                getString(R.string.section_pin_style),
-                getString(R.string.nav_lock_screen_summary),
-                R.drawable.ic_lock, 0xFF4CAF50, R.id.tab_dst,
-                PinStyleFragment::new, getString(R.string.section_pin_style),
-                "schermata di blocco", "lock screen", "codice",
-                "password", "numeri", "numbers", "puntini", "dots"));
 
         all.add(new SearchEntry(
                 getString(R.string.section_statusbar_icon_color),
@@ -637,20 +612,6 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
                 "wifi", "wi-fi", "mobile", "segnale", "signal", "icone", "icons"));
 
         all.add(new SearchEntry(
-                getString(R.string.nav_wifi_icons),
-                getString(R.string.nav_wifi_icons_summary),
-                R.drawable.obs_wifi_aurora_signal_4, 0xFF00BCD4, R.id.tab_dst,
-                WifiIconsFragment::new, getString(R.string.nav_wifi_icons),
-                "wifi", "wi-fi", "segnale", "signal", "icone", "icons"));
-
-        all.add(new SearchEntry(
-                getString(R.string.nav_signal_icons),
-                getString(R.string.nav_signal_icons_summary),
-                R.drawable.obs_signal_bars_3, 0xFF4CAF50, R.id.tab_dst,
-                SignalIconsFragment::new, getString(R.string.nav_signal_icons),
-                "mobile", "segnale", "signal", "icone", "icons"));
-
-        all.add(new SearchEntry(
                 getString(R.string.nav_battery_icons),
                 getString(R.string.nav_battery_icons_summary),
                 R.drawable.ic_battery, 0xFFFF9800, R.id.tab_dst,
@@ -661,27 +622,12 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
                 "carica", "charging", "risparmio energetico", "power save"));
 
         all.add(new SearchEntry(
-                getString(R.string.nav_settings_icons),
-                getString(R.string.nav_settings_icons_summary),
-                R.drawable.ic_settings, 0xFF673AB7, R.id.tab_dst,
-                SettingsIconsFragment::new, getString(R.string.nav_settings_icons),
-                "pui", "oos", "icone", "icons", "impostazioni", "settings", "pack"));
-
-        all.add(new SearchEntry(
                 getString(R.string.nav_navbar_style),
                 getString(R.string.nav_navbar_style_summary),
                 R.drawable.ic_nav_icon_bg, 0xFF546E7A, R.id.tab_mods,
                 NavbarStyleFragment::new, getString(R.string.nav_navbar_style),
                 "navbar", "barra di navigazione", "navigation bar", "gesture",
                 "pillola", "pill", "indietro", "back"));
-
-        all.add(new SearchEntry(
-                getString(R.string.dark_shadow_preset_cpb),
-                getString(R.string.nav_cpb_summary),
-                R.drawable.arc_progress, 0xFF4CAF50, R.id.tab_dst,
-                null, null,   // just switch to DST tab, user taps the card there
-                "barra", "caricamento", "loading", "spinner", "progress",
-                "progresso", "animazione", "circolare"));
 
         all.add(new SearchEntry(
                 getString(R.string.dark_shadow_preset_rvd),
@@ -821,17 +767,6 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
                 R.drawable.ic_notifications, 0xFF7C4DFF, R.id.tab_mods,
                 StatusbarNotifsFragment::new, getString(R.string.section_statusbar_notifs),
                 "notifiche", "notifications"));
-
-        all.add(new SearchEntry(
-                getString(R.string.dst_section_preset_sfondo), getString(R.string.nav_dst_colors),
-                R.drawable.ic_drawing, 0xFF7C4DFF, R.id.tab_dst,
-                DstBackgroundFragment::new, getString(R.string.dst_section_preset_sfondo),
-                "dst", "sfondo", "background"));
-        all.add(new SearchEntry(
-                getString(R.string.dst_section_preset_accent), getString(R.string.nav_dst_colors),
-                R.drawable.ic_drawing, 0xFF7C4DFF, R.id.tab_dst,
-                DstAccentFragment::new, getString(R.string.dst_section_preset_accent),
-                "dst", "accento", "accent", "colore", "color"));
 
         all.add(new SearchEntry(
                 getString(R.string.vol_panel_section), getString(R.string.dark_shadow_preset_rvd),

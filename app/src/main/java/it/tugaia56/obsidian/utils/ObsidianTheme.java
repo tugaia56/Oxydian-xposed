@@ -96,6 +96,8 @@ public class ObsidianTheme {
      * Uses DST ACCENT1 if the user enabled it; otherwise {@link #DEFAULT_ACCENT}.
      */
     public static int accentColor() {
+        Integer ov = ThemeOverride.accent();
+        if (ov != null) return ensureOpaque(ov);
         if (ObsidianPrefs.getBoolean("DST_ACCENT1_on", false))
             return ensureOpaque(ObsidianPrefs.getInt("DST_ACCENT1", DEFAULT_ACCENT));
         return DEFAULT_ACCENT;
@@ -118,6 +120,8 @@ public class ObsidianTheme {
      * the active Tema mode ({@link #isDarkMode()}).
      */
     public static int bgColor() {
+        Integer ovBg = ThemeOverride.bg();
+        if (ovBg != null) return ensureOpaque(ovBg);
         if (ObsidianPrefs.getBoolean("DST_BACKGROUND_on", false))
             return ensureOpaque(ObsidianPrefs.getInt("DST_BACKGROUND", DEFAULT_BG));
         return sDarkMode ? DEFAULT_BG : DEFAULT_BG_LIGHT;

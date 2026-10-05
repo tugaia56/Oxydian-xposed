@@ -13,10 +13,6 @@ import it.tugaia56.obsidian.utils.ObsidianPrefs;
 import it.tugaia56.obsidian.utils.ObsidianTheme;
 import it.tugaia56.obsidian.utils.overlay.FabricatedUtil;
 
-import static it.tugaia56.obsidian.utils.DarkShadowUtils.PREF_PIN;
-import static it.tugaia56.obsidian.utils.DarkShadowUtils.PREF_PIN_CUSTOM_COLOR;
-import static it.tugaia56.obsidian.utils.DarkShadowUtils.PREF_PIN_NUM;
-import static it.tugaia56.obsidian.utils.DarkShadowUtils.PREF_PIN_NUM_CUSTOM_COLOR;
 import static it.tugaia56.obsidian.utils.DarkShadowUtils.PREF_PREFIX;
 
 /**
@@ -41,27 +37,11 @@ public class BootReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if (!Intent.ACTION_BOOT_COMPLETED.equals(action) && !Intent.ACTION_USER_UNLOCKED.equals(action)) return;
 
-        // PIN overlays (target: com.android.systemui) — 5s is enough
-        new Thread(() -> {
-            try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
-            reapplyPinBg();
-            reapplyPinNum();
-        }).start();
-
         // Launcher Recents button color — re-applied from prefs (live accent) after the
         // launcher/OMS settle, so a boot-time same-target overlay race can't leave it off.
         new Thread(() -> {
             try { Thread.sleep(20000); } catch (InterruptedException ignored) {}
             reapplyRecentsBtn();
-        }).start();
-
-        // Overlay delle icone Wi-Fi/segnale e dei temi app: al primo avvio dopo averli creati il
-        // sistema li conosce ma risultano spenti ("stock" finche non si riapplicano a mano).
-        // Qui si riaccendono da soli quelli che l'utente ha scelto.
-        final Context appCtx = context.getApplicationContext();
-        new Thread(() -> {
-            try { Thread.sleep(12000); } catch (InterruptedException ignored) {}
-            ensureStyleOverlaysEnabled(appCtx);
         }).start();
 
         // DST ACCENT/BACKGROUND overlays (target: android) — OOS ThemeManager resets
@@ -70,31 +50,6 @@ public class BootReceiver extends BroadcastReceiver {
             try { Thread.sleep(15000); } catch (InterruptedException ignored) {}
             DstFabricatedUtil.reapplyAll(null, true);
         }).start();
-    }
-
-    private static void ensureStyleOverlaysEnabled(Context ctx) {
-        try {
-            java.util.List<String> want = new java.util.ArrayList<>();
-            if (ObsidianPrefs.getBoolean("WIFI_STYLE_OVERLAY", false))
-                want.add(it.tugaia56.obsidian.utils.overlay.compiler.GenericAppThemeCompiler.namedOverlayPackage("WIFI1"));
-            if (ObsidianPrefs.getBoolean("SIGNAL_STYLE_OVERLAY", false))
-                want.add(it.tugaia56.obsidian.utils.overlay.compiler.GenericAppThemeCompiler.namedOverlayPackage("SIG1"));
-            String[] dirs = ctx.getAssets().list("CompileOnDemand");
-            if (dirs != null) for (String pkg : dirs) {
-                if (ObsidianPrefs.getBoolean("app_theme_enabled_" + pkg, false))
-                    want.add(it.tugaia56.obsidian.utils.overlay.compiler.GenericAppThemeCompiler.overlayPackage(pkg));
-            }
-            if (want.isEmpty()) return;
-            java.util.Set<String> disabled = new java.util.HashSet<>();
-            for (String line : Shell.cmd("cmd overlay list | grep -E 'ObsidianComponent(WIFI1|SIG1|GApp_)'").exec().getOut()) {
-                line = line.trim();
-                if (line.startsWith("[ ]")) disabled.add(line.substring(3).trim());
-            }
-            java.util.List<String> toEnable = new java.util.ArrayList<>();
-            for (String w : want) if (disabled.contains(w)) toEnable.add(w);
-            if (!toEnable.isEmpty())
-                it.tugaia56.obsidian.utils.overlay.OverlayUtil.enableOverlays(toEnable.toArray(new String[0]));
-        } catch (Throwable ignored) {}
     }
 
     private static void reapplyRecentsBtn() {
@@ -109,82 +64,6 @@ public class BootReceiver extends BroadcastReceiver {
                     "toggle_bar_apply_btn_enabled_color", hex},
             new Object[]{Constants.LAUNCHER, "LAUNCHER_RECENTS_2", "drawable",
                     "recent_clear_circle", hex});
-    }
-
-    // ── PIN background ────────────────────────────────────────────────────────
-
-    private static void reapplyPinBg() {
-        String pinPref = ObsidianPrefs.getString(PREF_PIN, null);
-        if (pinPref == null || "default".equals(pinPref)) return;
-
-        int accent = ObsidianPrefs.getInt(PREF_PREFIX + "ACCENT1", 0xFFFFFFFF);
-        int color;
-        boolean shade;
-
-        if ("DSTPINCustom".equals(pinPref)) {
-            color = ObsidianPrefs.getInt(PREF_PIN_CUSTOM_COLOR, 0xFFFFFFFF);
-            shade = false;
-        } else {
-            color = accent;
-            shade = "DSTPINAccentShade".equals(pinPref);
-        }
-
-        int rgb    = color & 0x00FFFFFF;
-        int full   = 0xFF000000 | rgb;
-        int ripple = 0x80000000 | rgb;
-        int outer1 = 0xCC000000 | rgb;
-        int outer2 = 0x40000000 | rgb;
-        int outer3 = 0x21000000 | rgb;
-        int shadow = shade ? ripple : full;
-
-        FabricatedUtil.buildAndEnableOverlays(
-            new Object[]{Constants.SYSTEM_UI, "PIN_border",   "color",
-                    "coui_numeric_keyboard_border_color",                        fmt(full)},
-            new Object[]{Constants.SYSTEM_UI, "PIN_inner1",   "color",
-                    "coui_numeric_keyboard_inner_gradient_color_1",              fmt(ripple)},
-            new Object[]{Constants.SYSTEM_UI, "PIN_inner2",   "color",
-                    "coui_numeric_keyboard_inner_gradient_color_2",              fmt(ripple)},
-            new Object[]{Constants.SYSTEM_UI, "PIN_shadow",   "color",
-                    "coui_numeric_keyboard_upper_inner_shadow_color",            fmt(shadow)},
-            new Object[]{Constants.SYSTEM_UI, "PIN_outer1",   "color",
-                    "coui_numeric_keyboard_outer_gradient_color_1",              fmt(outer1)},
-            new Object[]{Constants.SYSTEM_UI, "PIN_outer2",   "color",
-                    "coui_numeric_keyboard_outer_gradient_color_2",              fmt(outer2)},
-            new Object[]{Constants.SYSTEM_UI, "PIN_outer3",   "color",
-                    "coui_numeric_keyboard_outer_gradient_color_3",              fmt(outer3)},
-            new Object[]{Constants.SYSTEM_UI, "PIN_dotfill",  "color",
-                    "coui_simple_lock_transparent_filled_rectangle_icon_color",  fmt(full)},
-            new Object[]{Constants.SYSTEM_UI, "PIN_dotout",   "color",
-                    "coui_simple_lock_transparent_outlined_rectangle_icon_color","0x33FFFFFF"},
-            new Object[]{Constants.SYSTEM_UI, "PIN_wordtxt",  "color",
-                    "coui_numeric_keyboard_dark_word_text_normal_color",         fmt(full)},
-            new Object[]{Constants.SYSTEM_UI, "PIN_wordtxtL", "color",
-                    "coui_numeric_keyboard_dark_word_text_normal_light_color",   fmt(full)}
-        );
-    }
-
-    // ── PIN number color ──────────────────────────────────────────────────────
-
-    private static void reapplyPinNum() {
-        String preset = ObsidianPrefs.getString(PREF_PIN_NUM, null);
-        if (preset == null || "default".equals(preset)) return;
-
-        int accent = ObsidianPrefs.getInt(PREF_PREFIX + "ACCENT1", 0xFFFFFFFF);
-        int color;
-
-        if ("DSTNUMPINCustom".equals(preset)) {
-            color = ObsidianPrefs.getInt(PREF_PIN_NUM_CUSTOM_COLOR, 0xFFFFFFFF);
-        } else if ("DSTNUMPINAccentShade".equals(preset)) {
-            color = 0x80000000 | (accent & 0x00FFFFFF);
-        } else { // DSTNUMPINAccent
-            color = accent;
-        }
-
-        FabricatedUtil.buildAndEnableOverlays(
-            new Object[]{Constants.SYSTEM_UI, "PIN_NUM_color", "color",
-                    "coui_numeric_keyboard_number_color",
-                    fmt(0xFF000000 | (color & 0x00FFFFFF))}
-        );
     }
 
     private static String fmt(int color) {

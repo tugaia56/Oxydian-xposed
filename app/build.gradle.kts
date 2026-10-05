@@ -111,7 +111,6 @@ dependencies {
     implementation(libs.android.documentfile)
     implementation(libs.android.biometric)
     implementation(libs.lottie)
-    implementation(libs.bcpkix)
     implementation(libs.work.runtime)
     implementation("com.vanniktech:android-image-cropper:4.7.0")
 }

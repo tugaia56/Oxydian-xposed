@@ -176,7 +176,7 @@ public class SignalStyleFragment extends Fragment {
             if (wifiItem.checked) {
                 // Acceso: apre il picker per scegliere lo stile (comportamento invariato).
                 wifiItem.checked = ObsidianPrefs.getString("DST_PRESET_WIFI_ICON", null) != null; // torna al vero stato
-                navigate(new WifiIconsFragment(), getString(R.string.nav_wifi_icons));
+                it.tugaia56.obsidian.utils.OxydianThemeLauncher.open(requireContext());
             } else {
                 // Spento: prima riapriva comunque il picker (nessun modo di disattivare da
                 // qui) — ora pulisce il preset come il pulsante DISABILITA dentro
@@ -208,7 +208,7 @@ public class SignalStyleFragment extends Fragment {
         mobileItem.onChanged = () -> {
             if (mobileItem.checked) {
                 mobileItem.checked = ObsidianPrefs.getString("DST_PRESET_SIGNAL_ICON", null) != null;
-                navigate(new SignalIconsFragment(), getString(R.string.nav_signal_icons));
+                it.tugaia56.obsidian.utils.OxydianThemeLauncher.open(requireContext());
             } else {
                 ObsidianPrefs.remove("DST_PRESET_SIGNAL_ICON");
                 try {

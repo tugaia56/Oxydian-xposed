@@ -63,10 +63,9 @@ public class HomeFragment extends Fragment {
 
                 new NavAdapter.NavItem(
                         R.drawable.ic_drawing,
-                        getString(R.string.nav_dst_colors),
-                        getString(R.string.nav_dst_colors_summary),
-                        () -> navigate(new DarkShadowThemeFragment(),
-                                getString(R.string.nav_dst_colors))),
+                        getString(R.string.nav_oxytheme),
+                        getString(R.string.nav_oxytheme_summary),
+                        () -> it.tugaia56.obsidian.utils.OxydianThemeLauncher.open(requireContext())),
 
                 new NavAdapter.NavItem(
                         R.drawable.ic_palette,
