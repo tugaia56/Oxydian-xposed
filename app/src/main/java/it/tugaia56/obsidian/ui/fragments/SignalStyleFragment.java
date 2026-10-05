@@ -235,13 +235,10 @@ public class SignalStyleFragment extends Fragment {
         // ── Hide in/out arrows switches ─────────────────────────────────────────
         SwitchWidgetAdapter switches = new SwitchWidgetAdapter(buildIconSwitches());
 
+        // Stile, dimensione e "nascondi attivita'" ora si scelgono in Oxydian Theme (overlay);
+        // qui resta solo il colore delle icone, che richiede ancora l'hook.
         List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
-        chain.add(wifiAdapter);
-        if (wifiColorAdapter != null) chain.add(wifiColorAdapter);
-        chain.add(mobileAdapter);
-        if (mobileColorAdapter != null) chain.add(mobileColorAdapter);
-        chain.add(mScaleAdapter);
-        chain.add(switches);
+        chain.add(mColorAdapter);
         mRecyclerView.setAdapter(new ConcatAdapter(chain));
     }
 
