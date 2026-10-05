@@ -1236,4 +1236,5 @@
     <string name="nav_oxytheme">Oxydian Theme</string>
     <string name="nav_oxytheme_summary">Accento, sfondo, icone, tastierino PIN e temi delle app ora sono nell\'app Oxydian Theme</string>
     <string name="oxytheme_not_installed">Oxydian Theme non è installata</string>
+    <string name="sbi_note">Un solo colore per tutte le icone della barra di stato, la batteria e la maniglia di navigazione. Le icone Wi-Fi e Segnale non sono coinvolte: i loro colori si scelgono nell\'app Oxydian Theme.</string>
 </resources>

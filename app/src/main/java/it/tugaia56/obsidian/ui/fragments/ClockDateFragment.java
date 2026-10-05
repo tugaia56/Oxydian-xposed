@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -147,10 +148,38 @@ public class ClockDateFragment extends Fragment {
                 new SectionTitleAdapter(List.of(getString(R.string.section_clock_date))),
                 styleNav,
                 new SectionTitleAdapter(List.of(getString(R.string.section_statusbar_icon_color))),
+                new NoteAdapter(getString(R.string.sbi_note)),
                 sbiAdapter,
                 new SectionTitleAdapter(List.of(getString(R.string.clock_color_title))),
                 clockColorAdapter
         ));
+    }
+
+    /** Riga di testo esplicativo (una breve descrizione sotto il titolo di una sezione). */
+    private static class NoteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        private final String text;
+
+        NoteAdapter(String text) { this.text = text; }
+
+        @NonNull @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            TextView t = new TextView(parent.getContext());
+            t.setLayoutParams(new RecyclerView.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            float d = parent.getResources().getDisplayMetrics().density;
+            t.setPadding((int) (16 * d), (int) (2 * d), (int) (16 * d), (int) (8 * d));
+            t.setTextSize(13);
+            return new RecyclerView.ViewHolder(t) {};
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder h, int pos) {
+            TextView t = (TextView) h.itemView;
+            t.setText(text);
+            t.setTextColor(ObsidianTheme.textColor(0x99));
+        }
+
+        @Override public int getItemCount() { return 1; }
     }
 
     private void navigate(Fragment fragment, String title) {
