@@ -5,6 +5,7 @@ Aggiunto:
 - App Google e utente: nuova schermata in Oxydian Theme per temare le app Google e le altre app installate al posto di Substratum (elenco con nome app e package, Abilita/Disabilita tutte, Applica)
 
 Aggiornato:
+- Rimossa la card "Stile barra di navigazione" (ora tutto in Oxydian Theme e Varie)
 - Stile icone batteria: Landscape Kim (e iOS16, K, L, M) ora hanno l'anteprima e funzionano (mancavano i font)
 - Colore icone barra di navigazione: si sceglie ora in Oxydian Theme (opzione tolta da qui)
 - "Navigazione con gesture" spostata in Varie

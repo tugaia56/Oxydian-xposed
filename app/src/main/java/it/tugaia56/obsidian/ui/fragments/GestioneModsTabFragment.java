@@ -30,7 +30,6 @@ import it.tugaia56.obsidian.ui.adapters.NavAdapter;
  *  5. Pannello Volume
  *  6. Launcher
  *  7. Varie
- *  8. Stile Barra di navigazione (NavbarStyleFragment — in fondo, uso occasionale)
  *
  * Tastierino PIN e Barra Progresso Circolare sono stati spostati in Home DST →
  * Dark Shadow Theme.
@@ -136,16 +135,7 @@ public class GestioneModsTabFragment extends Fragment {
                         () -> navigate(new LauncherFragment(),
                                 getString(R.string.nav_launcher)),
                         0xFF009688, // teal
-                        "launcher", "recenti", "recents", "task switcher", "multitasking"),
-
-                new NavAdapter.NavItem(
-                        R.drawable.ic_navbar_gesture,
-                        getString(R.string.nav_navbar_style),
-                        getString(R.string.nav_navbar_style_summary),
-                        () -> navigate(new NavbarStyleFragment(), getString(R.string.nav_navbar_style)),
-                        0xFFFFD600, // vivid yellow
-                        "navbar", "barra di navigazione", "navigation bar", "gesture",
-                        "pillola", "pill", "indietro", "back")
+                        "launcher", "recenti", "recents", "task switcher", "multitasking")
         );
 
         NavAdapter navAdapter = new NavAdapter(items);

@@ -51,7 +51,6 @@ import it.tugaia56.obsidian.ui.fragments.ImpostazioniTabFragment;
 import it.tugaia56.obsidian.ui.fragments.LockScreenOptionsFragment;
 import it.tugaia56.obsidian.ui.fragments.BatteryIconFragment;
 import it.tugaia56.obsidian.ui.fragments.ClockDateFragment;
-import it.tugaia56.obsidian.ui.fragments.NavbarStyleFragment;
 import it.tugaia56.obsidian.ui.fragments.QsFragment;
 import it.tugaia56.obsidian.ui.fragments.QuickSettingsFragment;
 import it.tugaia56.obsidian.ui.fragments.SettingsAboutFragment;
@@ -613,13 +612,6 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
                 "barra batteria", "battery bar", "barra", "bar",
                 "abilita", "enable", "critico", "critical", "avviso", "warning",
                 "carica", "charging", "risparmio energetico", "power save"));
-
-        all.add(new SearchEntry(
-                getString(R.string.nav_navbar_style),
-                getString(R.string.nav_navbar_style_summary),
-                R.drawable.ic_nav_icon_bg, 0xFF546E7A, R.id.tab_mods,
-                NavbarStyleFragment::new, getString(R.string.nav_navbar_style),
-                "navbar", "barra di navigazione", "navigation bar", "indietro", "back"));
 
         all.add(new SearchEntry(
                 getString(R.string.gesture_navigation_title),
