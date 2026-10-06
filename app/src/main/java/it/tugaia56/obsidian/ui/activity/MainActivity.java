@@ -85,6 +85,7 @@ import it.tugaia56.obsidian.ui.fragments.VolumePanelFragment;
 import it.tugaia56.obsidian.ui.fragments.VolumePanelColorsFragment;
 import it.tugaia56.obsidian.ui.fragments.LauncherFragment;
 import it.tugaia56.obsidian.ui.fragments.LauncherDockBackgroundFragment;
+import it.tugaia56.obsidian.ui.fragments.GestureNavigationFragment;
 import it.tugaia56.obsidian.ui.fragments.MiscFragment;
 import it.tugaia56.obsidian.ui.fragments.PowerMenuFragment;
 import it.tugaia56.obsidian.utils.AppUtils;
@@ -618,8 +619,14 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
                 getString(R.string.nav_navbar_style_summary),
                 R.drawable.ic_nav_icon_bg, 0xFF546E7A, R.id.tab_mods,
                 NavbarStyleFragment::new, getString(R.string.nav_navbar_style),
-                "navbar", "barra di navigazione", "navigation bar", "gesture",
-                "pillola", "pill", "indietro", "back"));
+                "navbar", "barra di navigazione", "navigation bar", "indietro", "back"));
+
+        all.add(new SearchEntry(
+                getString(R.string.gesture_navigation_title),
+                getString(R.string.gesture_navigation_summary),
+                R.drawable.ic_nav_icon_bg, 0xFFFF6E40, R.id.tab_mods,
+                GestureNavigationFragment::new, getString(R.string.gesture_navigation_title),
+                "gesture", "gesti", "navigazione", "pillola", "pill", "indietro", "back", "varie"));
 
         all.add(new SearchEntry(
                 getString(R.string.dark_shadow_preset_rvd),

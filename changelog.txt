@@ -5,6 +5,9 @@ Aggiunto:
 - App Google e utente: nuova schermata in Oxydian Theme per temare le app Google e le altre app installate al posto di Substratum (elenco con nome app e package, Abilita/Disabilita tutte, Applica)
 
 Aggiornato:
+- Stile icone batteria: Landscape Kim (e iOS16, K, L, M) ora hanno l'anteprima e funzionano (mancavano i font)
+- Colore icone barra di navigazione: si sceglie ora in Oxydian Theme (opzione tolta da qui)
+- "Navigazione con gesture" spostata in Varie
 - Home: nome dispositivo e versione OOS letti dal telefono (prima era scritto a mano "OnePlus 12")
 - Tema Dark Shadow: nell'app Orologio la scheda attiva usa il colore accento
 - Widget Quick Settings: elenco riordinabile con trascinamento, nessun limite ai widget aggiunti (nel pannello se ne vedono i primi 4)

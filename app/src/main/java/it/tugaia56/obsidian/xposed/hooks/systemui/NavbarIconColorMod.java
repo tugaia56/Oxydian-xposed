@@ -5,19 +5,18 @@ import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getIntField;
 import static de.robv.android.xposed.XposedHelpers.setIntField;
 import static it.tugaia56.obsidian.utils.Constants.Packages.SYSTEM_UI;
-import static it.tugaia56.obsidian.xposed.XPrefs.Xprefs;
 
 import android.content.Context;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import it.tugaia56.obsidian.utils.ThemeOverride;
 import it.tugaia56.obsidian.xposed.XposedMods;
 
 /**
- * Colore Icone Barra di Navigazione (Indietro/Home/Recenti) — le risorse sovrascritte da
- * NavbarStyleFragment (navigation_bar_home_handle_dark/light_color, navigation_bar_icon_color,
- * dark|light_mode_icon_color_single_tone) non bastano da sole: i tre tasti (KeyButtonDrawable,
+ * Colore Icone Barra di Navigazione (Indietro/Home/Recenti), scelto in Oxydian Theme. L'overlay
+ * (maniglia gesture, navigation_bar_icon_color) lo fa Oxydian Theme; qui restano i tre tasti: i tre tasti (KeyButtonDrawable,
  * via NavigationBarView.mLightIconColor/mDarkIconColor) leggono ?attr/singleToneColor, che
  * risolve sulle stesse due risorse single_tone lette ANCHE dalla barra di stato — overlay su
  * quelle risorse coloriva pure la statusbar, effetto indesiderato. Fix: hook diretto sui campi
@@ -27,12 +26,6 @@ import it.tugaia56.obsidian.xposed.XposedMods;
  * originale live, senza bisogno di riavviare SystemUI.
  */
 public class NavbarIconColorMod extends XposedMods {
-
-    private static final String PREF_ON = "DST_NAVCOLOR_on";
-    private static final String PREF_COLOR = "DST_NAVCOLOR";
-
-    private boolean enabled = false;
-    private int color = 0xFFFFFFFF;
 
     private Object mNavBarView = null;
     private int mStockLight = 0;
@@ -44,13 +37,7 @@ public class NavbarIconColorMod extends XposedMods {
 
     @Override
     public void updatePrefs(String... Key) {
-        if (Xprefs == null) return;
-        enabled = Xprefs.getBoolean(PREF_ON, false);
-        color = Xprefs.getInt(PREF_COLOR, 0xFFFFFFFF);
-
-        if (Key.length == 0 || PREF_ON.equals(Key[0]) || PREF_COLOR.equals(Key[0])) {
-            applyColor();
-        }
+        applyColor();
     }
 
     @Override
@@ -74,8 +61,10 @@ public class NavbarIconColorMod extends XposedMods {
     private void applyColor() {
         if (mNavBarView == null) return;
         try {
-            setIntField(mNavBarView, "mLightIconColor", enabled ? color : mStockLight);
-            setIntField(mNavBarView, "mDarkIconColor", enabled ? color : mStockDark);
+            // colore scelto in Oxydian Theme (proprieta' di sistema); vuoto = colori originali
+            Integer c = ThemeOverride.navIconColor();
+            setIntField(mNavBarView, "mLightIconColor", c != null ? c : mStockLight);
+            setIntField(mNavBarView, "mDarkIconColor", c != null ? c : mStockDark);
             callMethod(mNavBarView, "updateMainIcons");
         } catch (Throwable ignored) {}
     }

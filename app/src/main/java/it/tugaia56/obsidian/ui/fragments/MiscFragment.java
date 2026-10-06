@@ -91,6 +91,13 @@ public class MiscFragment extends Fragment {
 
                 new NavAdapter.NavItem(
                         R.drawable.ic_settings,
+                        getString(R.string.gesture_navigation_title),
+                        getString(R.string.gesture_navigation_summary),
+                        () -> navigate(new GestureNavigationFragment(),
+                                getString(R.string.gesture_navigation_title))),
+
+                new NavAdapter.NavItem(
+                        R.drawable.ic_settings,
                         getString(R.string.nav_corepatch),
                         getString(R.string.nav_corepatch_summary),
                         () -> navigate(new CorePatchFragment(),
