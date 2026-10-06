@@ -1265,4 +1265,8 @@
     <string name="nav_oxytheme_summary">Accent, background, icons, PIN keypad and app themes now live in the Oxydian Theme app</string>
     <string name="oxytheme_not_installed">Oxydian Theme is not installed</string>
     <string name="sbi_note">One color for all status bar icons, the battery and the navigation handle. Wi-Fi and Signal icons are not affected: choose their colors in the Oxydian Theme app.</string>
+    <string name="qs_separate_hide_settings">Hide settings button</string>
+    <string name="qs_separate_hide_settings_summary">Hides the gear button in the Separate panel</string>
+    <string name="hide_clear_all_notif">Hide clear-all button</string>
+    <string name="hide_clear_all_notif_summary">Removes the X at the bottom of the notifications</string>
 </resources>

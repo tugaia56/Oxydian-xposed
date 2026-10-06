@@ -174,7 +174,11 @@ public class StatusbarNotifsFragment extends Fragment {
                 prefSwitch(
                         getString(R.string.remove_dev_mode_notif),
                         getString(R.string.remove_dev_mode_notif_summary),
-                        "remove_dev_mode")
+                        "remove_dev_mode"),
+                prefSwitch(
+                        getString(R.string.hide_clear_all_notif),
+                        getString(R.string.hide_clear_all_notif_summary),
+                        "OBS_NOTIF_HIDE_CLEAR_ALL")
         );
     }
 

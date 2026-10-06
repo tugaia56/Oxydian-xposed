@@ -51,11 +51,13 @@ public class NotificationMods extends XposedMods {
     private static final String PREF_LINK_ICON_ACCENT  = "linkIconAccent";
     private static final String PREF_CLEAR_ICON_COLOR  = "clearButtonIconColor";
     private static final String PREF_ACCENT1           = "DST_ACCENT1";
+    private static final String PREF_HIDE_CLEAR_ALL    = "OBS_NOTIF_HIDE_CLEAR_ALL";
 
     private boolean mAppIconOn = false;
     private float mAppIconScale = 1f;
     private int mDefaultExpansion = DEFAULT;
     private boolean mCustomizeClear = false;
+    private boolean mHideClearAll = false;
     private boolean mLinkBgAccent = false;
     private boolean mLinkIconAccent = false;
     private int mClearBgColor = 0xFF8C8C8C;
@@ -82,6 +84,7 @@ public class NotificationMods extends XposedMods {
             mDefaultExpansion = (expansion == EXPAND_ALWAYS || expansion == COLLAPSE_ALWAYS) ? expansion : DEFAULT;
         } catch (Throwable ignored) { mDefaultExpansion = DEFAULT; }
 
+        mHideClearAll    = Xprefs.getBoolean(PREF_HIDE_CLEAR_ALL, false);
         mCustomizeClear  = Xprefs.getBoolean(PREF_CUSTOMIZE_CLEAR, false);
         mLinkBgAccent    = Xprefs.getBoolean(PREF_LINK_BG_ACCENT, false);
         mLinkIconAccent  = Xprefs.getBoolean(PREF_LINK_ICON_ACCENT, false);
@@ -204,7 +207,12 @@ public class NotificationMods extends XposedMods {
                     if (mDefaultClearIcon == null) mDefaultClearIcon = mClearAllButton.getDrawable();
                     if (mDefaultClearBg == null) mDefaultClearBg = mClearAllButton.getBackground();
                     updateClearButton();
+                    if (mHideClearAll) mClearAllButton.setVisibility(android.view.View.GONE);
                     mClearAllButton.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or_, ob) -> {
+                        if (mHideClearAll && v.getVisibility() != android.view.View.GONE) {
+                            v.setVisibility(android.view.View.GONE);   // il sistema lo rimostra di continuo
+                            return;
+                        }
                         if (v.getVisibility() == android.view.View.VISIBLE) updateClearButton();
                     });
                 }

@@ -1,4 +1,6 @@
 Aggiunto:
+- Impostazioni Rapide "Separati": nuovo "Nascondi pulsante impostazioni" (ingranaggio); matita e menu si avvicinano
+- Notifiche: nuovo "Nascondi pulsante cancella tutto" (la X in fondo alle notifiche)
 - Crediti: ringraziamenti a Luigi (@LC9889), sviluppatore di Oxygen Customizer, e a Claude
 - Tocco sull'orologio della statusbar: apre direttamente Timer o Cronometro (Orologio & data > Stile Orologio)
 - Schermata "Stato Oxydian" (Impostazioni): mostra quali mod funzionano dopo un aggiornamento ROM, con esportazione del log

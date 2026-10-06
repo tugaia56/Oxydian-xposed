@@ -37,6 +37,7 @@ public class QsSeparateMod extends XposedMods {
     // (schermata dedicata ora eliminata, opzioni portate dentro Personalizza Riquadri).
     private static final String PREF_HIDE_EDIT        = "OBS_QS_SEPARATE_HIDE_EDIT";
     private static final String PREF_HIDE_MENU        = "OBS_QS_SEPARATE_HIDE_MENU";
+    private static final String PREF_HIDE_SETTINGS    = "OBS_QS_SEPARATE_HIDE_SETTINGS";
     private static final String PREF_CUSTOM_WIDTH_ON  = "OBS_QS_SEPARATE_WIDTH_ON";
     private static final String PREF_CUSTOM_WIDTH_VAL = "OBS_QS_SEPARATE_WIDTH_VALUE";
     /** Master della sezione (switch+tap-nome in UI, 2026-08-20) — default true per non
@@ -65,6 +66,7 @@ public class QsSeparateMod extends XposedMods {
 
     private boolean mHideEdit;
     private boolean mHideMenu;
+    private boolean mHideSettings;
     private boolean mCustomWidthOn;
     private float   mCustomWidthFraction = 0.5f;
     private boolean mBtnBgOn;
@@ -92,6 +94,7 @@ public class QsSeparateMod extends XposedMods {
         if (Xprefs == null) return;
         mHideEdit = Xprefs.getBoolean(PREF_HIDE_EDIT, false);
         mHideMenu = Xprefs.getBoolean(PREF_HIDE_MENU, false);
+        mHideSettings = Xprefs.getBoolean(PREF_HIDE_SETTINGS, false);
         mCustomWidthOn = Xprefs.getBoolean(PREF_CUSTOM_WIDTH_ON, false);
         mCustomWidthFraction = Xprefs.getInt(PREF_CUSTOM_WIDTH_VAL, 50) / 100f;
         mBtnBgOn = Xprefs.getBoolean(PREF_BTN_BG_ON, false);
@@ -107,6 +110,7 @@ public class QsSeparateMod extends XposedMods {
         if (!Xprefs.getBoolean(PREF_MASTER_ON, true)) {
             mHideEdit = false;
             mHideMenu = false;
+            mHideSettings = false;
             mCustomWidthOn = false;
         }
         setupButtons();
@@ -228,6 +232,17 @@ public class QsSeparateMod extends XposedMods {
         }
         if (mMenuButton != null) {
             mMenuButton.setVisibility(mHideMenu ? View.GONE : View.VISIBLE);
+        }
+        if (mSettingsIconView != null) {
+            // si nasconde il contenitore (quicksettings_settings_button) e non solo l'icona, cosi'
+            // matita e menu si avvicinano invece di lasciare un buco al centro
+            View target = mSettingsIconView;
+            try {
+                if (mSettingsIconView.getParent() instanceof View p && p.getId() != View.NO_ID
+                        && "quicksettings_settings_button".equals(
+                                p.getResources().getResourceEntryName(p.getId()))) target = p;
+            } catch (Throwable ignored) {}
+            target.setVisibility(mHideSettings ? View.GONE : View.VISIBLE);
         }
         // Il colore si riapplica da sé al prossimo onStateChange (il drawable è già marcato in
         // mButtonDrawableOwner) — non serve invalidare qui: succede naturalmente ogni volta che

@@ -65,6 +65,7 @@ public class QsTilesMiscFragment extends Fragment {
     // ── Impostazioni Rapide Separati ─────────────────────────────────────────
     private static final String KEY_SEP_HIDE_EDIT  = "OBS_QS_SEPARATE_HIDE_EDIT";
     private static final String KEY_SEP_HIDE_MENU  = "OBS_QS_SEPARATE_HIDE_MENU";
+    private static final String KEY_SEP_HIDE_SETTINGS = "OBS_QS_SEPARATE_HIDE_SETTINGS";
     private static final String KEY_SEP_WIDTH_ON   = "OBS_QS_SEPARATE_WIDTH_ON";
     private static final String KEY_SEP_WIDTH_VAL  = "OBS_QS_SEPARATE_WIDTH_VALUE";
     private static final String KEY_SEP_ON         = "OBS_QS_SEPARATE_MASTER_ON";
@@ -178,7 +179,8 @@ public class QsTilesMiscFragment extends Fragment {
 
             GroupUtils.addGroup(chain, List.of(
                     prefSwitch(getString(R.string.qs_separate_hide_edit), getString(R.string.qs_separate_hide_edit_summary), KEY_SEP_HIDE_EDIT),
-                    prefSwitch(getString(R.string.qs_separate_hide_menu), getString(R.string.qs_separate_hide_menu_summary), KEY_SEP_HIDE_MENU)));
+                    prefSwitch(getString(R.string.qs_separate_hide_menu), getString(R.string.qs_separate_hide_menu_summary), KEY_SEP_HIDE_MENU),
+                    prefSwitch(getString(R.string.qs_separate_hide_settings), getString(R.string.qs_separate_hide_settings_summary), KEY_SEP_HIDE_SETTINGS)));
             boolean sepWidthOn = ObsidianPrefs.getBoolean(KEY_SEP_WIDTH_ON, false);
             List<Object> sepWidthRows = new ArrayList<>();
             sepWidthRows.add(gatingSwitch(getString(R.string.qs_separate_width_switch),
