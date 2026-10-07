@@ -1,4 +1,5 @@
 Aggiunto:
+- Barra di Stato > Opzioni Varie: "Nascondi icona SIM 1" e "Nascondi icona SIM 2" (la SIM resta attiva, senza spazio vuoto)
 - Impostazioni Rapide "Separati": nuovo "Nascondi pulsante impostazioni" (ingranaggio); matita e menu si avvicinano
 - Notifiche: nuovo "Nascondi pulsante cancella tutto" (la X in fondo alle notifiche)
 - Crediti: ringraziamenti a Luigi (@LC9889), sviluppatore di Oxygen Customizer, e a Claude
@@ -7,6 +8,7 @@ Aggiunto:
 - App Google e utente: nuova schermata in Oxydian Theme per temare le app Google e le altre app installate al posto di Substratum (elenco con nome app e package, Abilita/Disabilita tutte, Applica)
 
 Aggiornato:
+- Widget schermata di blocco: corretto un crash di SystemUI che poteva far riavviare l'interfaccia
 - Rimossa la card "Stile barra di navigazione" (ora tutto in Oxydian Theme e Varie)
 - Stile icone batteria: Landscape Kim (e iOS16, K, L, M) ora hanno l'anteprima e funzionano (mancavano i font)
 - Colore icone barra di navigazione: si sceglie ora in Oxydian Theme (opzione tolta da qui)

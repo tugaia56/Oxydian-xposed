@@ -409,8 +409,9 @@ public class LockscreenWidgetsMod extends XposedMods {
             // nuovo dopo il layout — altrimenti il contenitore OEM può ridisegnare sopra.
             mWidgetRow.bringToFront();
             final ViewGroup containerRef = mContainer;
-            mWidgetRow.post(() -> {
-                mWidgetRow.bringToFront();
+            final LinearLayout rowRef = mWidgetRow;   // il campo puo' tornare null prima che il post giri (crash di SystemUI)
+            rowRef.post(() -> {
+                rowRef.bringToFront();
                 containerRef.invalidate();
                 containerRef.requestLayout();
             });

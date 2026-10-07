@@ -98,11 +98,21 @@ public class StatusbarFragment extends Fragment {
                 getString(R.string.block_clipboard_overlay),
                 getString(R.string.block_clipboard_overlay_summary),
                 "block_clipboard_overlay");
+        SwitchWidgetAdapter.SwitchItem s5 = makePrefSwitch(
+                getString(R.string.hide_sim1_icon),
+                getString(R.string.hide_sim_icon_summary),
+                "OBS_STATUSBAR_HIDE_SIM1");
+        SwitchWidgetAdapter.SwitchItem s6 = makePrefSwitch(
+                getString(R.string.hide_sim2_icon),
+                getString(R.string.hide_sim_icon_summary),
+                "OBS_STATUSBAR_HIDE_SIM2");
         s1.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.TOP;
         s2.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.MIDDLE;
         s3.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.MIDDLE;
-        s4.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.BOTTOM;
-        return List.of(s1, s2, s3, s4);
+        s4.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.MIDDLE;
+        s5.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.MIDDLE;
+        s6.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.BOTTOM;
+        return List.of(s1, s2, s3, s4, s5, s6);
     }
 
     private SwitchWidgetAdapter.SwitchItem makePrefSwitch(String title, String summary,

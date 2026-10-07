@@ -31,6 +31,7 @@ import it.tugaia56.obsidian.xposed.hooks.systemui.AodClockMod;
 import it.tugaia56.obsidian.xposed.hooks.systemui.HoldBackGesture;
 import it.tugaia56.obsidian.xposed.hooks.systemui.GestureNavZones;
 import it.tugaia56.obsidian.xposed.hooks.systemui.NavbarIconColorMod;
+import it.tugaia56.obsidian.xposed.hooks.systemui.SimIconHideMod;
 import it.tugaia56.obsidian.xposed.hooks.systemui.QsTransparencyMod;
 import it.tugaia56.obsidian.xposed.hooks.systemui.QsPulldownMod;
 import it.tugaia56.obsidian.xposed.hooks.systemui.QsMyDeviceMod;
@@ -109,6 +110,7 @@ public class ModPacks {
             mods.add(HoldBackGesture.class);
             mods.add(GestureNavZones.class);
             mods.add(NavbarIconColorMod.class);
+            mods.add(SimIconHideMod.class);
             mods.add(QsTransparencyMod.class);
             mods.add(QsPulldownMod.class);
             mods.add(QsMyDeviceMod.class);

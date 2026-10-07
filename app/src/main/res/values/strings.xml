@@ -1269,4 +1269,7 @@
     <string name="qs_separate_hide_settings_summary">Hides the gear button in the Separate panel</string>
     <string name="hide_clear_all_notif">Hide clear-all button</string>
     <string name="hide_clear_all_notif_summary">Removes the X at the bottom of the notifications</string>
+    <string name="hide_sim1_icon">Hide SIM 1 icon</string>
+    <string name="hide_sim2_icon">Hide SIM 2 icon</string>
+    <string name="hide_sim_icon_summary">Removes the signal icon from the status bar, the SIM stays active</string>
 </resources>

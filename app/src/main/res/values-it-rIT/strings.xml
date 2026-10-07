@@ -1241,4 +1241,7 @@
     <string name="qs_separate_hide_settings_summary">Nasconde l\'ingranaggio nel pannello Separati</string>
     <string name="hide_clear_all_notif">Nascondi pulsante cancella tutto</string>
     <string name="hide_clear_all_notif_summary">Toglie la X in fondo alle notifiche</string>
+    <string name="hide_sim1_icon">Nascondi icona SIM 1</string>
+    <string name="hide_sim2_icon">Nascondi icona SIM 2</string>
+    <string name="hide_sim_icon_summary">Toglie il segnale dalla barra di stato, la SIM resta attiva</string>
 </resources>
