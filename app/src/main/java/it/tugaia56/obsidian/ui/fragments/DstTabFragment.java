@@ -56,17 +56,35 @@ public class DstTabFragment extends Fragment {
 
         // Header (icon + OBSIDIAN + tagline) is now in MainActivity's home_header_container.
 
+        // Ordine alfabetico; Oxydian Theme (app esterna) per ultimo.
         List<NavAdapter.NavItem> items = List.of(
 
                 new NavAdapter.NavItem(
-                        R.drawable.ic_drawing,
-                        getString(R.string.nav_oxytheme),
-                        getString(R.string.nav_oxytheme_summary),
-                        () -> it.tugaia56.obsidian.utils.OxydianThemeLauncher.open(requireContext()),
-                        0xFF7C4DFF, // purple
-                        "substratum", "tema", "theme", "accento", "accent",
-                        "sfondo", "background", "colore", "color", "impostazioni", "settings",
-                        "pin", "icone", "icons", "overlay"),
+                        R.drawable.ic_recents,
+                        getString(R.string.nav_launcher),
+                        getString(R.string.nav_launcher_summary),
+                        () -> navigate(new LauncherFragment(),
+                                getString(R.string.nav_launcher)),
+                        0xFF009688, // teal
+                        "launcher", "recenti", "recents", "task switcher", "multitasking"),
+
+                new NavAdapter.NavItem(
+                        R.drawable.ic_settings,
+                        getString(R.string.nav_misc_power_menu),
+                        getString(R.string.nav_misc_power_menu_summary),
+                        () -> navigate(new PowerMenuFragment(),
+                                getString(R.string.nav_misc_power_menu)),
+                        0xFFFF1744, // red accent
+                        "power menu", "accensione", "spegnimento", "menù accensione", "riavvio"),
+
+                new NavAdapter.NavItem(
+                        R.drawable.ic_battery,
+                        getString(R.string.nav_battery_icons),
+                        getString(R.string.nav_battery_icons_summary),
+                        () -> navigate(new BatteryIconFragment(),
+                                getString(R.string.nav_battery_icons)),
+                        0xFFFF9800, // orange
+                        "batteria", "battery", "icone", "icons"),
 
                 new NavAdapter.NavItem(
                         R.drawable.ic_ui_styles,
@@ -79,13 +97,24 @@ public class DstTabFragment extends Fragment {
                         "radius", "dialogo", "dialog", "stile", "style"),
 
                 new NavAdapter.NavItem(
-                        R.drawable.ic_battery,
-                        getString(R.string.nav_battery_icons),
-                        getString(R.string.nav_battery_icons_summary),
-                        () -> navigate(new BatteryIconFragment(),
-                                getString(R.string.nav_battery_icons)),
-                        0xFFFF9800, // orange
-                        "batteria", "battery", "icone", "icons")
+                        R.drawable.ic_settings,
+                        getString(R.string.nav_misc),
+                        getString(R.string.nav_misc_summary),
+                        () -> navigate(new MiscFragment(),
+                                getString(R.string.nav_misc)),
+                        0xFFFF6E40, // deep orange accent (più brillante)
+                        "varie", "misc", "rotazione", "rotation", "usb",
+                        "accensione", "power menu", "impostazioni", "settings"),
+
+                new NavAdapter.NavItem(
+                        R.drawable.ic_drawing,
+                        getString(R.string.nav_oxytheme),
+                        getString(R.string.nav_oxytheme_summary),
+                        () -> it.tugaia56.obsidian.utils.OxydianThemeLauncher.open(requireContext()),
+                        0xFF7C4DFF, // purple
+                        "substratum", "tema", "theme", "accento", "accent",
+                        "sfondo", "background", "colore", "color", "impostazioni", "settings",
+                        "pin", "icone", "icons", "overlay")
         );
 
         NavAdapter navAdapter = new NavAdapter(items);

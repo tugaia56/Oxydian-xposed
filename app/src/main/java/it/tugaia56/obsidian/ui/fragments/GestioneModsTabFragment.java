@@ -28,8 +28,6 @@ import it.tugaia56.obsidian.ui.adapters.NavAdapter;
  *  3. Schermata di Blocco
  *  4. Always On Display
  *  5. Pannello Volume
- *  6. Launcher
- *  7. Varie
  *
  * Tastierino PIN e Barra Progresso Circolare sono stati spostati in Home DST →
  * Dark Shadow Theme.
@@ -107,35 +105,7 @@ public class GestioneModsTabFragment extends Fragment {
                                 getString(R.string.dark_shadow_preset_rvd)),
                         0xFF536DFE, // indigo accent (più brillante)
                         "volume", "suono", "audio", "slider", "timeout",
-                        "posizione", "position", "colore", "color"),
-
-                new NavAdapter.NavItem(
-                        R.drawable.ic_settings,
-                        getString(R.string.nav_misc_power_menu),
-                        getString(R.string.nav_misc_power_menu_summary),
-                        () -> navigate(new PowerMenuFragment(),
-                                getString(R.string.nav_misc_power_menu)),
-                        0xFFFF1744, // red accent
-                        "power menu", "accensione", "spegnimento", "menù accensione", "riavvio"),
-
-                new NavAdapter.NavItem(
-                        R.drawable.ic_settings,
-                        getString(R.string.nav_misc),
-                        getString(R.string.nav_misc_summary),
-                        () -> navigate(new MiscFragment(),
-                                getString(R.string.nav_misc)),
-                        0xFFFF6E40, // deep orange accent (più brillante)
-                        "varie", "misc", "rotazione", "rotation", "usb",
-                        "accensione", "power menu", "impostazioni", "settings"),
-
-                new NavAdapter.NavItem(
-                        R.drawable.ic_recents,
-                        getString(R.string.nav_launcher),
-                        getString(R.string.nav_launcher_summary),
-                        () -> navigate(new LauncherFragment(),
-                                getString(R.string.nav_launcher)),
-                        0xFF009688, // teal
-                        "launcher", "recenti", "recents", "task switcher", "multitasking")
+                        "posizione", "position", "colore", "color")
         );
 
         NavAdapter navAdapter = new NavAdapter(items);

@@ -8,6 +8,7 @@ Aggiunto:
 - App Google e utente: nuova schermata in Oxydian Theme per temare le app Google e le altre app installate al posto di Substratum (elenco con nome app e package, Abilita/Disabilita tutte, Applica)
 
 Aggiornato:
+- Scheda Oxydian: ora contiene anche Launcher, Menù Accensione e Varie (spostati da Mods), in ordine alfabetico, con Oxydian Theme per ultimo
 - Widget schermata di blocco: corretto un crash di SystemUI che poteva far riavviare l'interfaccia
 - Rimossa la card "Stile barra di navigazione" (ora tutto in Oxydian Theme e Varie)
 - Stile icone batteria: Landscape Kim (e iOS16, K, L, M) ora hanno l'anteprima e funzionano (mancavano i font)
