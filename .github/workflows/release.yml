@@ -86,13 +86,16 @@ jobs:
           TG_TOKEN: ${{ secrets.TELEGRAM_TK }}
           TG_CHAT: ${{ secrets.OBSIDIAN_GROUP }}
         run: |
-          # Messaggio separato dal file: le didascalie dei documenti su Telegram sono
-          # limitate a 1024 caratteri, un changelog più lungo verrebbe troncato.
-          curl -X POST \
-            -F "chat_id=$TG_CHAT" \
-            -F "text=$(cat telegram.msg)" \
-            "https://api.telegram.org/bot$TG_TOKEN/sendMessage"
-          curl -X POST \
+          TG_TOKEN=$(printf %s "$TG_TOKEN" | grep -oE '[0-9]+:[A-Za-z0-9_-]{30,}' | head -1)
+          TG_CHAT=$(printf %s "$TG_CHAT" | grep -oE '[-]?[0-9]+' | head -1)
+          for f in $(ls telegram_*.msg | sort -V); do
+            curl -s -X POST \
+              -F "chat_id=$TG_CHAT" \
+              -F "text=<$f" \
+              "https://api.telegram.org/bot$TG_TOKEN/sendMessage"
+            echo
+          done
+          curl -s -X POST \
             -F "chat_id=$TG_CHAT" \
             -F "caption=${{ env.VName }}" \
             -F "document=@app/build/outputs/apk/release/${{ env.ApkName }}" \

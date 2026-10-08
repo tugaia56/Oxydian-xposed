@@ -1,0 +1,42 @@
+Added:
+- Status bar > Various Options: "Hide SIM 1 icon" and "Hide SIM 2 icon" (the SIM stays active, no empty gap)
+- Quick Settings "Separate": new "Hide settings button" (gear); the pencil and the menu move closer
+- Notifications: new "Hide clear-all button" (the X at the bottom of the notifications)
+- Credits: thanks to Luigi (@LC9889), developer of Oxygen Customizer, and to Claude
+- Tap on the status bar clock: opens Timer or Stopwatch directly (Clock & date > Clock style)
+- "Oxydian Status" screen (Settings): shows which mods work after a ROM update, with log export
+- Google and user apps: new screen in Oxydian Theme to theme Google apps and the other installed apps instead of Substratum (list with app name and package, Enable/Disable all, Apply)
+
+Changed:
+- Oxydian tab: now also contains Launcher, Power menu and Various (moved from Mods), in alphabetical order, with Oxydian Theme last
+- Lock screen widgets: fixed a SystemUI crash that could make the interface restart
+- Removed the "Navigation bar style" card (now everything is in Oxydian Theme and Various)
+- Battery icon style: Landscape Kim (and iOS16, K, L, M) now have a preview and work (the fonts were missing)
+- Navigation bar icon colour: now chosen in Oxydian Theme (option removed from here)
+- "Gesture navigation" moved to Various
+- Home: device name and OOS version are read from the phone (before it was hand-written "OnePlus 12")
+- Dark Shadow theme: in the Clock app the active tab uses the accent colour
+- Quick Settings widgets: list can be reordered by dragging, no limit on added widgets (the first 4 are shown in the panel)
+- Power menu > Advanced reboot: OK/Cancel confirmation before rebooting or shutting down (List and Tiles)
+- SystemUI restart button more reliable on different root setups
+- Oxydian Status log: includes model, OOS version, Oxydian version and root diagnosis; every export has a new name (before it did not overwrite the old file)
+- Credits: added LuckyTool, CorePatch and DisableFlagSecure
+- Power menu > Advanced reboot > Screenshot: uses the native OxygenOS screenshot (with preview and edit)
+- Oxydian Status log: also lists the Wi-Fi drawables found in SystemUI, to diagnose the Wi-Fi icon style
+- AOD: fixed the double clock/weather that appeared with OxygenOS 16.1 (lock screen clock, weather and widgets no longer overlap the AOD)
+- Panel transparency/blur: no longer removes the black from the AOD
+- AOD: centred clock with a small periodic shift; the block with the little robot no longer sticks out on the left
+- Always-On Display: new switch to hide the fingerprint icon only while the screen is off
+- Wi-Fi icon: now follows the status bar colour (dark on light screens, before it stayed always white or black)
+- Wi-Fi icon styles: applied as SystemUI overlays, lighter and consistent with the system icons
+- Mobile signal icon styles: applied as SystemUI overlays (like Wi-Fi), re-enabled automatically after reboot
+- Home Mods: Power menu is now a category of its own (under Volume panel) and Launcher comes after Various
+- Lighter phone startup: the theme colours are no longer rebuilt at every reboot, only the missing ones
+- Google and user apps: warning when more than 10 apps are enabled (they slow down startup)
+- New app icon
+- Release title: Oxydian instead of the old name
+- Settings: the cards now follow the chosen system background (before they always stayed on fixed navy)
+
+Removed:
+- Overlay themes moved to the Oxydian Theme app (separate app): app themes, Dark Shadow (Settings, SystemUI, Launcher, OnePlus apps), Wi-Fi/signal icons, navigation bar icons, Settings icons, system colours (accent and background), PIN keypad and circular progress bar
+- Oxydian now reads the accent and background chosen in Oxydian Theme (quick panel, dialogs, volume, notifications, Settings cards)
