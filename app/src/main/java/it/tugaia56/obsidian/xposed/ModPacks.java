@@ -28,7 +28,7 @@ import it.tugaia56.obsidian.xposed.hooks.systemui.LockScreenMiscMods;
 import it.tugaia56.obsidian.xposed.hooks.systemui.AlbumArtLockscreenMod;
 import it.tugaia56.obsidian.xposed.hooks.systemui.LockscreenClockMod;
 import it.tugaia56.obsidian.xposed.hooks.systemui.AodClockMod;
-import it.tugaia56.obsidian.xposed.hooks.systemui.HoldBackGesture;
+import it.tugaia56.obsidian.xposed.hooks.systemui.ScreenshotReceiverMod;
 import it.tugaia56.obsidian.xposed.hooks.systemui.GestureNavZones;
 import it.tugaia56.obsidian.xposed.hooks.systemui.NavbarIconColorMod;
 import it.tugaia56.obsidian.xposed.hooks.systemui.SimIconHideMod;
@@ -107,7 +107,7 @@ public class ModPacks {
             mods.add(LockscreenWidgetsMod.class);
             mods.add(QsWidgetsMod.class);
             mods.add(QsSeparateMod.class);
-            mods.add(HoldBackGesture.class);
+            mods.add(ScreenshotReceiverMod.class);
             mods.add(GestureNavZones.class);
             mods.add(NavbarIconColorMod.class);
             mods.add(SimIconHideMod.class);

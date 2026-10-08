@@ -1244,4 +1244,6 @@
     <string name="hide_sim1_icon">Nascondi icona SIM 1</string>
     <string name="hide_sim2_icon">Nascondi icona SIM 2</string>
     <string name="hide_sim_icon_summary">Toglie il segnale dalla barra di stato, la SIM resta attiva</string>
+    <string name="gesture_master_title">Personalizza gesto indietro</string>
+    <string name="gesture_master_summary">Spento: il gesto indietro resta quello del sistema, su entrambi i lati</string>
 </resources>

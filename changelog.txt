@@ -1,42 +1,5 @@
 Aggiunto:
-- Barra di Stato > Opzioni Varie: "Nascondi icona SIM 1" e "Nascondi icona SIM 2" (la SIM resta attiva, senza spazio vuoto)
-- Impostazioni Rapide "Separati": nuovo "Nascondi pulsante impostazioni" (ingranaggio); matita e menu si avvicinano
-- Notifiche: nuovo "Nascondi pulsante cancella tutto" (la X in fondo alle notifiche)
-- Crediti: ringraziamenti a Luigi (@LC9889), sviluppatore di Oxygen Customizer, e a Claude
-- Tocco sull'orologio della statusbar: apre direttamente Timer o Cronometro (Orologio & data > Stile Orologio)
-- Schermata "Stato Oxydian" (Impostazioni): mostra quali mod funzionano dopo un aggiornamento ROM, con esportazione del log
-- App Google e utente: nuova schermata in Oxydian Theme per temare le app Google e le altre app installate al posto di Substratum (elenco con nome app e package, Abilita/Disabilita tutte, Applica)
-
-Aggiornato:
-- Scheda Oxydian: ora contiene anche Launcher, Menù Accensione e Varie (spostati da Mods), in ordine alfabetico, con Oxydian Theme per ultimo
-- Widget schermata di blocco: corretto un crash di SystemUI che poteva far riavviare l'interfaccia
-- Rimossa la card "Stile barra di navigazione" (ora tutto in Oxydian Theme e Varie)
-- Stile icone batteria: Landscape Kim (e iOS16, K, L, M) ora hanno l'anteprima e funzionano (mancavano i font)
-- Colore icone barra di navigazione: si sceglie ora in Oxydian Theme (opzione tolta da qui)
-- "Navigazione con gesture" spostata in Varie
-- Home: nome dispositivo e versione OOS letti dal telefono (prima era scritto a mano "OnePlus 12")
-- Tema Dark Shadow: nell'app Orologio la scheda attiva usa il colore accento
-- Widget Quick Settings: elenco riordinabile con trascinamento, nessun limite ai widget aggiunti (nel pannello se ne vedono i primi 4)
-- Menù Accensione > Riavvio Avanzato: conferma OK/Annulla prima di riavviare o spegnere (Lista e Riquadri)
-- Pulsante riavvio SystemUI più affidabile su configurazioni root diverse
-- Log di Stato Oxydian: include modello, versione OOS, versione di Oxydian e diagnosi root; ogni esportazione ha un nome nuovo (prima non sovrascriveva il file vecchio)
-- Crediti: aggiunti LuckyTool, CorePatch e DisableFlagSecure
-- Menù Accensione > Riavvio Avanzato > Screenshot: usa lo screenshot nativo di OxygenOS (con anteprima e modifica)
-- Log di Stato Oxydian: elenca anche i disegni Wi-Fi presenti nel SystemUI, per diagnosticare lo stile icone Wi-Fi
-- AOD: corretto il doppio orologio/meteo comparso con OxygenOS 16.1 (orologio, meteo e widget della lockscreen non si sovrappongono più all'AOD)
-- Trasparenza/sfocatura del pannello: non toglie più il nero all'AOD
-- AOD: orologio centrato e con piccola oscillazione periodica; il blocco con robottino non sporge più a sinistra
-- Always-On Display: nuovo interruttore per nascondere l'icona dell'impronta solo con lo schermo spento
-- Icona Wi-Fi: ora segue il colore della barra di stato (scura sulle schermate chiare, prima restava sempre bianca o nera)
-- Stili icone Wi-Fi: applicati come overlay di SystemUI, più leggeri e coerenti con le icone di sistema
-- Stili icone segnale mobile: applicati come overlay di SystemUI (come il Wi-Fi), con riaccensione automatica dopo il riavvio
-- Home Mods: Menù Accensione è ora una categoria a sé (sotto Pannello volume) e Launcher si trova dopo Varie
-- Avvio del telefono più leggero: i colori del tema non vengono più rifatti tutti a ogni riavvio, solo quelli che mancano
-- App Google e utente: avviso quando si attivano più di 10 app (rallentano l'avvio)
-- Nuova icona dell'app
-- Titolo della release: Oxydian al posto del vecchio nome
-- Impostazioni: le card seguono ora lo sfondo di sistema scelto (prima restavano sempre sul navy fisso)
+- Navigazione con Gesture: nuovo interruttore "Personalizza gesto indietro". Spento (predefinito), il gesto indietro resta quello del sistema su entrambi i lati; acceso, si possono regolare lati e altezza
 
 Rimosso:
-- Temi overlay spostati nell'app Oxydian Theme (app separata): temi delle app, Dark Shadow (Impostazioni, SystemUI, Launcher, app OnePlus), icone Wi-Fi/segnale, icone barra di navigazione, icone Impostazioni, colori di sistema (accento e sfondo), tastierino PIN e barra di progresso circolare
-- Oxydian legge ora accento e sfondo scelti in Oxydian Theme (pannello rapido, dialoghi, volume, notifiche, card di Impostazioni)
+- "Sostituisci gesto indietro" (azione al tieni premuto durante il gesto indietro): tolto, il gesto indietro fa solo quello per cui è stato fatto

@@ -36,7 +36,7 @@ import it.tugaia56.obsidian.xposed.XposedMods;
  * rotazione schermo e presenza del launcher in foreground; (b) colore
  * accento e larghezza della pillola (OplusNavigationHandle/OplusNavigationBarInflaterView).
  *
- * L'override "tieni premuto Indietro" resta gestito da HoldBackGesture (già
+ * L'override "tieni premuto Indietro" e' stato rimosso (già
  * funzionante, non duplicato qui). Lo scambio icona durante il gesto fisico
  * (SideGestureNavView.setAppIcon in OC) NON è portato — richiede accesso alle
  * icone delle app dal processo SystemUI e non è collegato a nessuna UI
@@ -44,6 +44,7 @@ import it.tugaia56.obsidian.xposed.XposedMods;
  */
 public class GestureNavZones extends XposedMods {
 
+    private static final String PREF_MASTER         = "OBS_NAV_GESTURE_MASTER";
     private static final String PREF_LEFT_ON        = "OBS_NAV_GESTURE_LEFT";
     private static final String PREF_LEFT_MIN        = "OBS_NAV_GESTURE_LEFT_HEIGHT_MIN";
     private static final String PREF_LEFT_MAX        = "OBS_NAV_GESTURE_LEFT_HEIGHT_MAX";
@@ -80,6 +81,12 @@ public class GestureNavZones extends XposedMods {
         rightMin = Xprefs.getInt(PREF_RIGHT_MIN, 0);
         rightMax = Xprefs.getInt(PREF_RIGHT_MAX, 100);
         onRotateToo = Xprefs.getBoolean(PREF_ON_ROTATE, true);
+
+        // Interruttore generale spento: il gesto indietro resta quello del sistema (entrambi i lati, tutta l'altezza)
+        if (!Xprefs.getBoolean(PREF_MASTER, false)) {
+            leftEnabled = true; rightEnabled = true; onRotateToo = true;
+            leftMin = 0; leftMax = 100; rightMin = 0; rightMax = 100;
+        }
 
         pillColorAccent = Xprefs.getBoolean(PREF_PILL_ACCENT, false);
         widthFactor = Xprefs.getInt(PREF_PILL_WIDTH, 50) * .02f;

@@ -1272,4 +1272,6 @@
     <string name="hide_sim1_icon">Hide SIM 1 icon</string>
     <string name="hide_sim2_icon">Hide SIM 2 icon</string>
     <string name="hide_sim_icon_summary">Removes the signal icon from the status bar, the SIM stays active</string>
+    <string name="gesture_master_title">Customise back gesture</string>
+    <string name="gesture_master_summary">Off: the back gesture stays the system one, on both sides</string>
 </resources>

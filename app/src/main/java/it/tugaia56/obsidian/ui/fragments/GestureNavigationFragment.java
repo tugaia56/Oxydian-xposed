@@ -37,7 +37,7 @@ import it.tugaia56.obsidian.utils.ObsidianTheme;
 /**
  * Navigazione con Gesture — porting reale di OC's gesture_prefs.xml (zona gesto
  * Indietro con doppio cursore min/max per lato, sostituzione hold-back, pillola
- * di navigazione). Collegato al hook GestureNavZones + HoldBackGesture.
+ * di navigazione). Collegato al hook GestureNavZones.
  */
 public class GestureNavigationFragment extends Fragment {
 
@@ -49,16 +49,12 @@ public class GestureNavigationFragment extends Fragment {
     private static final String PREF_GESTURE_RIGHT_HEIGHT_MAX = "OBS_NAV_GESTURE_RIGHT_HEIGHT_MAX";
     private static final String PREF_GESTURE_ON_ROTATE        = "OBS_NAV_GESTURE_ON_ROTATE";
 
-    private static final String PREF_HOLDBACK_ON     = "OBS_NAV_HOLDBACK_ON";
-    private static final String PREF_HOLDBACK_MODE   = "OBS_NAV_HOLDBACK_MODE";   // "0".."1"
-    private static final String PREF_HOLDBACK_LEFT   = "OBS_NAV_HOLDBACK_LEFT";   // "0".."10"
-    private static final String PREF_HOLDBACK_RIGHT  = "OBS_NAV_HOLDBACK_RIGHT";  // "0".."10"
+    private static final String PREF_GESTURE_MASTER = "OBS_NAV_GESTURE_MASTER";
 
     private static final String PREF_PILL_ACCENT = "OBS_NAV_PILL_ACCENT";
     private static final String PREF_PILL_WIDTH  = "OBS_NAV_PILL_WIDTH";
 
     private RecyclerView mRv;
-    private boolean mHoldbackExpanded = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -84,38 +80,18 @@ public class GestureNavigationFragment extends Fragment {
 
         // ── Gesture Indietro ─────────────────────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.gesture_back_title))));
-        GroupUtils.addGroup(chain, List.of(
-                prefSwitch(getString(R.string.gesture_left_title), getString(R.string.gesture_left_summary), PREF_GESTURE_LEFT),
-                dualSliderItem(getString(R.string.gesture_height_title),
-                        PREF_GESTURE_LEFT_HEIGHT_MIN, PREF_GESTURE_LEFT_HEIGHT_MAX, 0, 100, "%", true),
-                prefSwitch(getString(R.string.gesture_right_title), getString(R.string.gesture_right_summary), PREF_GESTURE_RIGHT),
-                dualSliderItem(getString(R.string.gesture_height_title),
-                        PREF_GESTURE_RIGHT_HEIGHT_MIN, PREF_GESTURE_RIGHT_HEIGHT_MAX, 0, 100, "%", false),
-                prefSwitch(getString(R.string.gesture_back_on_rotate), getString(R.string.gesture_back_on_rotate_summary), PREF_GESTURE_ON_ROTATE)));
-
-        // ── Override Hold Back ──────────────────────────────────────────────────
-        SwitchWidgetAdapter.SwitchItem holdbackSwitch = gatingSwitch(
-                getString(R.string.gesture_override_back_hold), getString(R.string.gesture_override_back_hold_summary), PREF_HOLDBACK_ON);
-        holdbackSwitch.onChanged = () -> {
-            ObsidianPrefs.putBoolean(PREF_HOLDBACK_ON, holdbackSwitch.checked);
-            mHoldbackExpanded = holdbackSwitch.checked;
-            rebuild();
-        };
-        holdbackSwitch.onRowClick = () -> { mHoldbackExpanded = !mHoldbackExpanded; rebuild(); };
-        List<Object> holdbackRows = new ArrayList<>();
-        holdbackRows.add(holdbackSwitch);
-        if (mHoldbackExpanded) {
-            holdbackRows.add(singleChoiceItem(getString(R.string.gesture_override_back_hold_mode),
-                    PREF_HOLDBACK_MODE, R.array.gesture_holdback_mode_entries));
-            holdbackRows.add(commandChoiceItem(getString(R.string.gesture_override_back_hold_common),
-                    PREF_HOLDBACK_LEFT));
-            boolean perSide = "1".equals(ObsidianPrefs.getString(PREF_HOLDBACK_MODE, "0"));
-            if (perSide) {
-                holdbackRows.add(commandChoiceItem(getString(R.string.gesture_override_back_hold_right),
-                        PREF_HOLDBACK_RIGHT));
-            }
+        List<Object> backRows = new ArrayList<>();
+        backRows.add(gatingSwitch(getString(R.string.gesture_master_title), getString(R.string.gesture_master_summary), PREF_GESTURE_MASTER));
+        if (ObsidianPrefs.getBoolean(PREF_GESTURE_MASTER, false)) {
+            backRows.add(prefSwitch(getString(R.string.gesture_left_title), getString(R.string.gesture_left_summary), PREF_GESTURE_LEFT, true));
+            backRows.add(dualSliderItem(getString(R.string.gesture_height_title),
+                    PREF_GESTURE_LEFT_HEIGHT_MIN, PREF_GESTURE_LEFT_HEIGHT_MAX, 0, 100, "%", true));
+            backRows.add(prefSwitch(getString(R.string.gesture_right_title), getString(R.string.gesture_right_summary), PREF_GESTURE_RIGHT, true));
+            backRows.add(dualSliderItem(getString(R.string.gesture_height_title),
+                    PREF_GESTURE_RIGHT_HEIGHT_MIN, PREF_GESTURE_RIGHT_HEIGHT_MAX, 0, 100, "%", false));
+            backRows.add(prefSwitch(getString(R.string.gesture_back_on_rotate), getString(R.string.gesture_back_on_rotate_summary), PREF_GESTURE_ON_ROTATE, true));
         }
-        GroupUtils.addGroup(chain, holdbackRows);
+        GroupUtils.addGroup(chain, backRows);
 
         // ── Pillola di Navigazione ───────────────────────────────────────────────
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.gesture_nav_pill_cat))));
@@ -134,8 +110,12 @@ public class GestureNavigationFragment extends Fragment {
     // ── Generic row helpers ──────────────────────────────────────────────────────
 
     private SwitchWidgetAdapter.SwitchItem prefSwitch(String title, String summary, String key) {
+        return prefSwitch(title, summary, key, false);
+    }
+
+    private SwitchWidgetAdapter.SwitchItem prefSwitch(String title, String summary, String key, boolean def) {
         SwitchWidgetAdapter.SwitchItem item = new SwitchWidgetAdapter.SwitchItem(
-                title, summary, ObsidianPrefs.getBoolean(key, false), null);
+                title, summary, ObsidianPrefs.getBoolean(key, def), null);
         item.onChanged = () -> ObsidianPrefs.putBoolean(key, item.checked);
         return item;
     }
@@ -149,117 +129,6 @@ public class GestureNavigationFragment extends Fragment {
             rebuild();
         };
         return item;
-    }
-
-    private ListWidgetAdapter.ListItem singleChoiceItem(String title, String key, int entriesArrayRes) {
-        return new ListWidgetAdapter.ListItem(
-                title, choiceLabel(key, entriesArrayRes),
-                () -> showSingleChoiceDialog(title, key, entriesArrayRes));
-    }
-
-    private String choiceLabel(String key, int entriesArrayRes) {
-        String[] entries = getResources().getStringArray(entriesArrayRes);
-        int idx = 0;
-        try { idx = Integer.parseInt(ObsidianPrefs.getString(key, "0")); } catch (NumberFormatException ignored) {}
-        return (idx >= 0 && idx < entries.length) ? entries[idx] : entries[0];
-    }
-
-    private void showSingleChoiceDialog(String title, String key, int entriesArrayRes) {
-        String[] entries = getResources().getStringArray(entriesArrayRes);
-        int current = 0;
-        try { current = Integer.parseInt(ObsidianPrefs.getString(key, "0")); } catch (NumberFormatException ignored) {}
-        final int[] selected = {current};
-        AlertDialog dialog = new AlertDialog.Builder(requireContext())
-                .setTitle(title)
-                .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
-                .setPositiveButton(R.string.apply, (d, w) -> {
-                    ObsidianPrefs.putString(key, String.valueOf(selected[0]));
-                    rebuild();
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
-        ObsidianTheme.themeDialog(dialog);
-    }
-
-    // ── Comando tieni premuto — stessa lista di OC, con icona per voce ──────────
-
-    private static final int[] HOLDBACK_COMMAND_ICONS = {
-        R.drawable.ic_switch_app,
-        R.drawable.ic_kill,
-        R.drawable.ic_screenshot,
-        R.drawable.ic_screenshot_scroll,
-        R.drawable.ic_screenshot_area,
-        R.drawable.ic_quick_settings,
-        R.drawable.ic_one_hand,
-        R.drawable.ic_notifications,
-        R.drawable.ic_screen_off,
-        R.drawable.ic_circle_search,
-        R.drawable.ic_custom_app,
-    };
-
-    private ListWidgetAdapter.ListItem commandChoiceItem(String title, String key) {
-        return new ListWidgetAdapter.ListItem(
-                title, choiceLabel(key, R.array.gesture_holdback_commands_entries),
-                () -> showCommandChoiceDialog(title, key));
-    }
-
-    private void showCommandChoiceDialog(String title, String key) {
-        String[] entries = getResources().getStringArray(R.array.gesture_holdback_commands_entries);
-        int current = 0;
-        try { current = Integer.parseInt(ObsidianPrefs.getString(key, "0")); } catch (NumberFormatException ignored) {}
-        final int[] selected = {current};
-
-        ArrayAdapter<String> listAdapter = new ArrayAdapter<>(requireContext(), 0, entries) {
-            @NonNull @Override
-            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-                LinearLayout row = new LinearLayout(requireContext());
-                row.setOrientation(LinearLayout.HORIZONTAL);
-                row.setGravity(Gravity.CENTER_VERTICAL);
-                int padH = dp(16), padV = dp(12);
-                row.setPadding(padH, padV, padH, padV);
-
-                RadioButton radio = new RadioButton(requireContext());
-                radio.setChecked(position == selected[0]);
-                radio.setClickable(false);
-                radio.setFocusable(false);
-
-                ImageView icon = new ImageView(requireContext());
-                icon.setImageResource(HOLDBACK_COMMAND_ICONS[position]);
-                icon.setColorFilter(ObsidianTheme.systemDialogTextColor(requireContext()));
-                LinearLayout.LayoutParams iconLp = new LinearLayout.LayoutParams(dp(24), dp(24));
-                iconLp.setMarginStart(dp(16));
-                iconLp.setMarginEnd(dp(20));
-                icon.setLayoutParams(iconLp);
-
-                TextView text = new TextView(requireContext());
-                text.setText(entries[position]);
-                text.setTextColor(ObsidianTheme.systemDialogTextColor(requireContext()));
-                text.setTextSize(16);
-
-                row.addView(radio);
-                row.addView(icon);
-                row.addView(text);
-                return row;
-            }
-        };
-
-        ListView listView = new ListView(requireContext());
-        listView.setAdapter(listAdapter);
-        listView.setOnItemClickListener((parent, v, position, id) -> {
-            selected[0] = position;
-            listAdapter.notifyDataSetChanged();
-        });
-
-        AlertDialog dialog = new AlertDialog.Builder(requireContext())
-                .setTitle(title)
-                .setView(listView)
-                .setPositiveButton(R.string.apply, (d, w) -> {
-                    ObsidianPrefs.putString(key, String.valueOf(selected[0]));
-                    rebuild();
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
-        ObsidianTheme.themeDialog(dialog);
     }
 
     private int dp(int v) {
