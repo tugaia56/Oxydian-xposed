@@ -3,3 +3,6 @@ Added:
 
 Removed:
 - "Replace back gesture" (action on hold during the back gesture): removed, the back gesture only does what it was made for
+
+Fixed:
+- Notification style: the phone no longer freezes for several seconds on the PIN screen after a reboot

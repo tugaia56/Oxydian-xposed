@@ -3,3 +3,6 @@ Aggiunto:
 
 Rimosso:
 - "Sostituisci gesto indietro" (azione al tieni premuto durante il gesto indietro): tolto, il gesto indietro fa solo quello per cui è stato fatto
+
+Corretto:
+- Stile notifiche: il telefono non si blocca più per alcuni secondi alla schermata del PIN dopo un riavvio

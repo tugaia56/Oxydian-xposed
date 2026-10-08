@@ -136,10 +136,22 @@ public class DstNotifStyle {
 
     // ── Boot-time preload ────────────────────────────────────────────────────
 
+    // Cache: il file dei prefs si rilegge solo se e' cambiato (prima: ad ogni notifica, con log).
+    private static volatile long sFileMtime = -1, sFileLen = -1, sPropsAt = 0;
+    private static volatile String sBuiltKey;
+    private static volatile Drawable.ConstantState sBuiltState;
+
     public static void preloadFromFile() {
         try {
             java.io.File f = new java.io.File(PREFS_FILE);
-            if (!f.exists()) { preloadFromProps(); return; }
+            if (!f.exists()) {
+                long now = android.os.SystemClock.elapsedRealtime();
+                if (now - sPropsAt > 3000) { sPropsAt = now; preloadFromProps(); }
+                return;
+            }
+            long mt = f.lastModified(), ln = f.length();
+            if (mt == sFileMtime && ln == sFileLen) return;
+            sFileMtime = mt; sFileLen = ln;
             java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(f));
             StringBuilder sb = new StringBuilder();
             String line;
@@ -248,8 +260,22 @@ public class DstNotifStyle {
         preloadFromFile();
         if (sPreset == null) return null;
         if (density <= 0f) density = 3.0f;
-        return buildNotifBg(sPreset, sAccent, sBg, density, sCornerDp, sTexSizePct, sTexAlphaPct,
+        // Il preset "Immagine" dipende dal file foto: non si mette in cache
+        boolean cacheable = !"DSTNFNIMG".equals(sPreset);
+        String key = sPreset + "|" + sAccent + "|" + sBg + "|" + density + "|" + sCornerDp + "|"
+                + sTexSizePct + "|" + sTexAlphaPct + "|" + sTexColor + "|" + sTexBorderOn + "|"
+                + sTexBorderColor + "|" + sImgOffsetY;
+        if (cacheable && key.equals(sBuiltKey)) {
+            Drawable.ConstantState cs = sBuiltState;
+            if (cs != null) return cs.newDrawable();
+        }
+        Drawable d = buildNotifBg(sPreset, sAccent, sBg, density, sCornerDp, sTexSizePct, sTexAlphaPct,
                 sTexColor, sTexBorderOn, sTexBorderColor, sImgOffsetY);
+        if (cacheable && d != null && d.getConstantState() != null) {
+            sBuiltState = d.getConstantState();
+            sBuiltKey = key;
+        }
+        return d;
     }
 
     // ── Called from ResourceManager.handleInitPackageResources ───────────────
