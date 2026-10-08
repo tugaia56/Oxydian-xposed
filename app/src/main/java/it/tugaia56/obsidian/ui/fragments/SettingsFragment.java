@@ -53,7 +53,7 @@ import it.tugaia56.obsidian.utils.ObsidianTheme;
 /**
  * Settings screen — backup / restore / clear all preferences.
  *
- * Backup:   writes oxydian_backup_YYYY-MM-DD_HH-mm.json to the chosen folder
+ * Backup:   writes YYYY-MM-DD_HH-mm_oxydian_backup.json to the chosen folder
  *           (defaults to external app storage; user can pick any folder via SAF).
  * Restore:  opens a file picker for any .json file and merges preferences.
  * Clear:    removes all saved preferences after confirmation.
@@ -197,7 +197,7 @@ public class SettingsFragment extends Fragment {
 
             // Timestamped filename
             String ts       = new SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.US).format(new Date());
-            String filename = "oxydian_backup_" + ts + ".json";
+            String filename = ts + "_oxydian_backup.json";
 
             String folderUriStr = ObsidianPrefs.getString(PREF_BACKUP_FOLDER_URI, null);
             if (folderUriStr != null) {

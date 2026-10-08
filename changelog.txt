@@ -1,2 +1,5 @@
 Corretto:
 - Stile notifiche: il telefono non si blocca più per alcuni secondi alla schermata del PIN dopo un riavvio
+
+Cambiato:
+- Backup: il nome del file inizia con data e ora, così i backup sono in ordine di data
