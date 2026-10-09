@@ -3,3 +3,4 @@ Aggiunto:
 
 Cambiato:
 - Nuova icona dell'app: la tavolozza dentro l'ingranaggio ora è un martello con una chiave inglese, perché i colori ora stanno in Oxydian Theme
+- La riga Oxydian in Impostazioni resta ora visibile anche se la sua icona non si riesce a caricare (per esempio subito dopo aver cambiato lo stile delle icone, prima di un riavvio)

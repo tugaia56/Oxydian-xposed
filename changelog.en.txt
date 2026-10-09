@@ -3,3 +3,4 @@ Added:
 
 Changed:
 - New app icon: the palette in the gear is now a hammer and a wrench, because colours now live in Oxydian Theme
+- The Oxydian row in Settings now stays visible even if its icon cannot be loaded (for example right after changing the icon style, before a reboot)
