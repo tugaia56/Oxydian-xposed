@@ -47,6 +47,7 @@ import it.tugaia56.obsidian.xposed.hooks.settings.CustomShortcut;
 import it.tugaia56.obsidian.xposed.hooks.settings.SettingsCardBackgroundMod;
 import it.tugaia56.obsidian.xposed.hooks.launcher.LauncherMod;
 import it.tugaia56.obsidian.xposed.hooks.launcher.LauncherCardBackgroundMod;
+import it.tugaia56.obsidian.xposed.hooks.messages.MessagesBubbleMod;
 
 public class ModPacks {
     // 2026-09-05: elenco lungo fornito dall'utente (app di sistema già temate via Substratum),
@@ -126,6 +127,9 @@ public class ModPacks {
         // nel dex reale, vedi CARD_BG_PACKAGES sopra).
         if (CARD_BG_PACKAGES.contains(packageName)) {
             mods.add(SettingsCardBackgroundMod.class);
+        }
+        if (MessagesBubbleMod.PKG.equals(packageName)) {
+            mods.add(MessagesBubbleMod.class);
         }
         if (Constants.Packages.FRAMEWORK.equals(packageName)) {
             mods.add(LockScreenPowerMenuMod.class);

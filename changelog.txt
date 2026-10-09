@@ -1,2 +1,2 @@
-Cambiato:
-- Backup: il nome del file inizia con data e ora, così i backup sono in ordine di data
+Aggiunto:
+- Google Messaggi: nuovo aspetto delle bolle della chat. Le bolle inviate prendono il colore di accento al 50% di trasparenza (con testo chiaro) e ogni bolla ha un bordo sottile (bianco sulle ricevute, accento sulle inviate). Per usarlo, spunta Messaggi nell'ambito di Oxydian in LSPosed

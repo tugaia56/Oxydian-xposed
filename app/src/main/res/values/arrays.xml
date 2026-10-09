@@ -6,6 +6,7 @@
         <item>com.android.systemui</item>
         <item>com.android.settings</item>
         <item>com.android.launcher</item>
+        <item>com.google.android.apps.messaging</item>
         <item>it.simonesestito.ntiles</item>
         <item>com.oplus.appplatform</item>
         <item>com.oplus.multiapp</item>

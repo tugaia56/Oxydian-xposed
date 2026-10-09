@@ -1,2 +1,2 @@
-Changed:
-- Backup: the file name now starts with the date and time, so backups sort by date
+Added:
+- Google Messages: new look for chat bubbles. Sent bubbles take the accent colour at 50% transparency (with light text), and every bubble gets a thin border (white on received, accent on sent). To use it, tick Messages in the LSPosed scope of Oxydian
