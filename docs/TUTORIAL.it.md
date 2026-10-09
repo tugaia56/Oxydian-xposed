@@ -13,7 +13,7 @@ Una guida passo passo: dall'installazione alle prime personalizzazioni.
 - **LSPosed** (o un altro framework Xposed) installato e funzionante
 - Facoltativa ma consigliata: l'app compagna **[Oxydian Theme](https://github.com/tugaia56/Oxydian-Theme/releases/latest)**. Non richiede Xposed e si occupa dei veri temi overlay (colori di accento e sfondo, temi per le app, icone, tastierino del PIN…). Oxydian legge i colori scelti lì, quindi le due app danno il meglio insieme.
 
-> Oxydian è pensato per il **tema scuro**. Con il tema chiaro alcune mod dell'aspetto del sistema (stili notifica, toast, dialog) restano spente e l'aspetto originale non viene toccato. Vedi [Tema chiaro](#7-tema-chiaro).
+> Oxydian è pensato per il **tema scuro**. Con il tema chiaro alcune mod dell'aspetto del sistema (stili notifica, toast, dialog) restano spente e l'aspetto originale non viene toccato. Vedi [Tema chiaro](#8-tema-chiaro).
 
 ---
 
@@ -65,6 +65,7 @@ Il pulsante a forma di freccia circolare, in alto a destra in ogni pagina, è **
 | **Pannello Impostazioni Rapide** | Sfondo e forma dei riquadri, immagine e orologio dell'intestazione, widget, trasparenza e sfocatura |
 | **Schermata di Blocco** | Widget, orologio, meteo, copertina musicale, icona impronta, pulsanti |
 | **Always-On Display** | Orologio AOD, meteo, luce sui bordi |
+| **Google Messaggi** | Aspetto delle bolle della chat di Google Messaggi: colori, bordo, angolo a punta (vedi il [capitolo 5](#5-google-messaggi-bolle-della-chat)) |
 | **Pannello volume** | Colori e preset dei pulsanti |
 
 Esempio di pagina: **Barra di Stato**, con le opzioni varie (tra cui nascondi icona SIM 1 e SIM 2):
@@ -109,7 +110,31 @@ Cambiamo qualcosa che si vede subito.
 
 ---
 
-## 5. Colori: Oxydian + Oxydian Theme
+## 5. Google Messaggi: bolle della chat
+
+Oxydian può cambiare l'aspetto delle bolle della chat di **Google Messaggi**. È una mod Xposed, quindi serve un passaggio in più:
+
+1. In **LSPosed → Moduli → Oxydian**, spunta **Messaggi** (Google Messaggi) nell'ambito.
+2. Chiudi e riapri Messaggi.
+
+Poi apri **Mods → Google Messaggi**:
+
+<p align="center"><img src="img/it_10_messaggi.png" width="230" alt="Pagina Google Messaggi"></p>
+
+- **Bolle**
+  - *Colore delle bolle ricevute*: originale, oppure un colore a scelta.
+  - *Colore delle bolle inviate*: originale, scuro come le ricevute, il colore di accento al 50 % di trasparenza, oppure un colore a scelta (anche trasparente). Il testo diventa chiaro o scuro da solo per restare leggibile.
+- **Forma**
+  - *Bordo delle bolle*: un bordo sottile attorno a ogni bolla, con un colore diverso per ricevute e inviate (l'accento o un colore a scelta) e uno spessore regolabile.
+  - *Angolo a punta*: l'angolo in basso è a punta, a destra sulle bolle inviate e a sinistra su quelle ricevute. Anche gli angoli di unione tra bolle consecutive sono a punta.
+
+Le modifiche si vedono quando la chat viene ridisegnata: scorrila un po' o riaprila. Se non cambia niente, controlla che Messaggi sia spuntato in LSPosed e riavvia l'app.
+
+> La mod segue il modo in cui Google disegna oggi le bolle. Se un aggiornamento di Messaggi lo cambia, le bolle tornano semplicemente all'aspetto originale.
+
+---
+
+## 6. Colori: Oxydian + Oxydian Theme
 
 Oxydian non ridipinge da solo tutto il sistema. I colori di sistema (accento e sfondo) si scelgono in **Oxydian Theme**, che costruisce veri overlay; Oxydian usa poi lo stesso accento per le sue mod (bordi, riquadri, menù di accensione…).
 
@@ -120,7 +145,7 @@ Ordine consigliato:
 
 ---
 
-## 6. Backup e ripristino
+## 7. Backup e ripristino
 
 Prima di fare molte prove, salva le impostazioni.
 
@@ -136,7 +161,7 @@ Tieni una copia del backup fuori dal telefono (cloud o PC) prima di installare d
 
 ---
 
-## 7. Tema chiaro
+## 8. Tema chiaro
 
 Oxydian è compatibile al 100 % con il **tema scuro**. Con il sistema in tema chiaro:
 
@@ -147,7 +172,7 @@ Per il risultato migliore tieni Android in tema scuro.
 
 ---
 
-## 8. Se qualcosa non va
+## 9. Se qualcosa non va
 
 | Problema | Cosa fare |
 |---|---|
@@ -165,7 +190,7 @@ Per segnalare un bug, attiva **Impostazioni → Generale → Log aggiuntivi**, r
 
 ---
 
-## 9. Da sapere
+## 10. Da sapere
 
 - Oxydian nasce dal lavoro di **Oxygen Customizer** di Luigi (@LC9889); vedi i crediti nel README.
 - Ogni versione ha note di rilascio bilingue (inglese / italiano) nella pagina Releases.

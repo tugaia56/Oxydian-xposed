@@ -13,7 +13,7 @@ A step-by-step guide: from installation to your first customisations.
 - **LSPosed** (or another Xposed framework) installed and working
 - Optional but recommended: the companion app **[Oxydian Theme](https://github.com/tugaia56/Oxydian-Theme/releases/latest)**. It does not need Xposed and handles the real overlay themes (accent and background colours, app themes, icons, PIN keypad…). Oxydian reads the colours chosen there, so the two apps work best together.
 
-> Oxydian is designed for the **dark theme**. In light mode a few system-look mods (notification styles, toast, dialog) stay switched off and the stock look is left untouched. See [Light theme](#7-light-theme).
+> Oxydian is designed for the **dark theme**. In light mode a few system-look mods (notification styles, toast, dialog) stay switched off and the stock look is left untouched. See [Light theme](#8-light-theme).
 
 ---
 
@@ -65,6 +65,7 @@ The circular-arrow button at the top right of every page is **Restart SystemUI**
 | **Quick Settings Panel** | Tile background and shape, header image and clock, widgets, transparency and blur |
 | **Lock Screen** | Widgets, clock, weather, album art, fingerprint icon, buttons |
 | **Always-On Display** | AOD clock, weather, edge lighting |
+| **Google Messages** | Look of the chat bubbles in Google Messages: colours, border, pointed corner (see [chapter 5](#5-google-messages-chat-bubbles)) |
 | **Volume Panel** | Colours and button presets |
 
 Example page: **Status Bar**, with the miscellaneous options (including hide SIM 1 and SIM 2 icon):
@@ -109,7 +110,31 @@ Let's change something you can see right away.
 
 ---
 
-## 5. Colours: Oxydian + Oxydian Theme
+## 5. Google Messages: chat bubbles
+
+Oxydian can restyle the chat bubbles of **Google Messages**. It is a Xposed mod, so it needs one extra step:
+
+1. In **LSPosed → Modules → Oxydian**, tick **Messages** (Google Messages) in the scope.
+2. Close and reopen Messages.
+
+Then open **Mods → Google Messages**:
+
+<p align="center"><img src="img/en_10_messages.png" width="230" alt="Google Messages page"></p>
+
+- **Bubbles**
+  - *Colour of received bubbles*: original, or any colour you pick.
+  - *Colour of sent bubbles*: original, dark like the received ones, the accent colour at 50 % transparency, or any colour you pick (with transparency). The text turns light or dark by itself to stay readable.
+- **Shape**
+  - *Bubble border*: a thin border around every bubble, with a separate colour for received and sent bubbles (the accent, or any colour you pick) and an adjustable thickness.
+  - *Pointed corner*: the bottom corner is sharp, on the right for sent bubbles and on the left for received ones. The joining corners of consecutive bubbles are sharp too.
+
+Changes show up when the chat is redrawn: scroll it a little or reopen it. If nothing changes, check that Messages is ticked in LSPosed and restart the app.
+
+> The mod follows how Google draws the bubbles today. If a Messages update changes that, the bubbles simply go back to the original look.
+
+---
+
+## 6. Colours: Oxydian + Oxydian Theme
 
 Oxydian does not repaint the whole system by itself. The system colours (accent and background) are chosen in **Oxydian Theme**, which builds real overlays; Oxydian then uses the same accent for its own mods (borders, tiles, power menu…).
 
@@ -120,7 +145,7 @@ Suggested order:
 
 ---
 
-## 6. Backup and restore
+## 7. Backup and restore
 
 Before experimenting a lot, save your settings.
 
@@ -136,7 +161,7 @@ Keep a copy of the backup outside the phone (cloud or PC) before a clean ROM ins
 
 ---
 
-## 7. Light theme
+## 8. Light theme
 
 Oxydian is 100 % compatible with the **dark theme**. With the system in light mode:
 
@@ -147,7 +172,7 @@ For the best result keep Android in dark mode.
 
 ---
 
-## 8. If something goes wrong
+## 9. If something goes wrong
 
 | Problem | What to do |
 |---|---|
@@ -165,7 +190,7 @@ To report a bug, turn on **Settings → General → Extra Logs**, reproduce the 
 
 ---
 
-## 9. Good to know
+## 10. Good to know
 
 - Oxydian is built on the work of **Oxygen Customizer** by Luigi (@LC9889); see the credits in the README.
 - Every release comes with bilingual (English / Italian) release notes on the Releases page.
