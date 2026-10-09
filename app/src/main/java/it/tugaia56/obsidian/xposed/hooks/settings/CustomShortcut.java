@@ -149,8 +149,13 @@ public class CustomShortcut extends XposedMods {
                     // Icona completa per-pack (ic_obsidian_row): i pack icone la sovrascrivono
                     // (PUI pieno/contorno/ombra, HOS/OOS anello, OOS Stock rosso senza bordo).
                     // Il default ha dimensioni 0 -> nessun pack: anello + logo da codice.
-                    Drawable packIcon = ResourcesCompat.getDrawable(ResourceManager.modRes,
-                            R.drawable.ic_obsidian_row, mContext.getTheme());
+                    // Se il disegno del pack non si riesce a caricare (per esempio dopo un cambio stile a caldo, finche'
+                    // non si riavvia) la riga resta comunque: si usa l'icona di riserva anello + logo.
+                    Drawable packIcon = null;
+                    try {
+                        packIcon = ResourcesCompat.getDrawable(ResourceManager.modRes,
+                                R.drawable.ic_obsidian_row, mContext.getTheme());
+                    } catch (Throwable ignoredIcon) {}
                     if (packIcon != null && packIcon.getIntrinsicWidth() > 0) {
                         icon = packIcon;
                         // Pack PUI (1/2/4): glifo a contorno colorato con l'accento reale di Obsidian
