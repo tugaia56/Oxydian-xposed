@@ -1274,4 +1274,20 @@
     <string name="hide_sim_icon_summary">Removes the signal icon from the status bar, the SIM stays active</string>
     <string name="gesture_master_title">Customise back gesture</string>
     <string name="gesture_master_summary">Off: the back gesture stays the system one, on both sides</string>
+    <string name="nav_messages">Google Messages</string>
+    <string name="nav_messages_summary">Chat bubbles: sent colour, border, pointed corner</string>
+    <string name="msg_note">Works only in the Google Messages app and needs Messages ticked in the LSPosed scope of Oxydian. Changes appear when the chat is redrawn (scroll it or reopen it).</string>
+    <string name="msg_section_out">Sent bubbles</string>
+    <string name="msg_out_title">Colour of sent bubbles</string>
+    <string name="msg_section_shape">Shape</string>
+    <string name="msg_border_title">Bubble border</string>
+    <string name="msg_border_summary">Thin border around every bubble (white on received, accent on sent)</string>
+    <string name="msg_border_width">Border thickness</string>
+    <string name="msg_tail_title">Pointed corner</string>
+    <string name="msg_tail_summary">Sharp bottom corner: right on sent bubbles, left on received</string>
+    <string-array name="msg_out_entries">
+        <item>Original</item>
+        <item>Dark, like received</item>
+        <item>Accent at 50% transparency</item>
+    </string-array>
 </resources>

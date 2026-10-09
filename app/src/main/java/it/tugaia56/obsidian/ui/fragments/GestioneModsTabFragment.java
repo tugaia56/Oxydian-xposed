@@ -98,6 +98,15 @@ public class GestioneModsTabFragment extends Fragment {
                         "meteo", "weather", "bordi", "edge lighting"),
 
                 new NavAdapter.NavItem(
+                        R.drawable.ic_notifications,
+                        getString(R.string.nav_messages),
+                        getString(R.string.nav_messages_summary),
+                        () -> navigate(new MessagesBubblesFragment(), getString(R.string.nav_messages)),
+                        0xFF4CAF50, // green
+                        "messaggi", "messages", "bolle", "bubble", "chat", "bordo", "border",
+                        "angolo", "corner", "google"),
+
+                new NavAdapter.NavItem(
                         R.drawable.ic_sysui_volume,
                         getString(R.string.dark_shadow_preset_rvd),
                         getString(R.string.nav_volume_icon_summary),

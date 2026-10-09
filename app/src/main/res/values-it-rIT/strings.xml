@@ -1246,4 +1246,20 @@
     <string name="hide_sim_icon_summary">Toglie il segnale dalla barra di stato, la SIM resta attiva</string>
     <string name="gesture_master_title">Personalizza gesto indietro</string>
     <string name="gesture_master_summary">Spento: il gesto indietro resta quello del sistema, su entrambi i lati</string>
+    <string name="nav_messages">Google Messaggi</string>
+    <string name="nav_messages_summary">Bolle della chat: colore inviate, bordo, angolo a punta</string>
+    <string name="msg_note">Funziona solo nell\'app Google Messaggi e serve la spunta su Messaggi nell\'ambito di Oxydian in LSPosed. Le modifiche si vedono quando la chat viene ridisegnata (scorrila o riaprila).</string>
+    <string name="msg_section_out">Bolle inviate</string>
+    <string name="msg_out_title">Colore delle bolle inviate</string>
+    <string name="msg_section_shape">Forma</string>
+    <string name="msg_border_title">Bordo delle bolle</string>
+    <string name="msg_border_summary">Bordo sottile attorno a ogni bolla (bianco sulle ricevute, accento sulle inviate)</string>
+    <string name="msg_border_width">Spessore del bordo</string>
+    <string name="msg_tail_title">Angolo a punta</string>
+    <string name="msg_tail_summary">Angolo in basso senza arrotondamento: a destra sulle inviate, a sinistra sulle ricevute</string>
+    <string-array name="msg_out_entries">
+        <item>Originale</item>
+        <item>Scura, come le ricevute</item>
+        <item>Accento al 50% di trasparenza</item>
+    </string-array>
 </resources>

@@ -20,11 +20,12 @@ import it.tugaia56.obsidian.xposed.XposedMods;
  * passano dalle risorse (verificato provando oltre 140 colori con overlay: nessun effetto). Si
  * lavora a livello di disegno: Compose, alla fine, chiama Canvas.drawRoundRect/drawPath.
  *
- * Misurato sul telefono (diagnostica del 2026-10-09): le bolle sono forme riempite con angoli di
- * 20 dp; quelle ricevute (IN) hanno il colore scuro del tema, quelle inviate (OUT) un grigio chiaro.
+ * Misurato sul telefono: le bolle sono forme riempite con angoli di 20 dp; quelle ricevute (IN)
+ * hanno il colore scuro del tema, quelle inviate (OUT) un grigio chiaro.
  *
- *  - "Bolle inviate scure": le bolle OUT prendono il colore delle IN.
- *  - "Bordo bolle": un contorno sottile del colore di accento attorno a tutte le bolle.
+ *  - Colore delle bolle inviate: stock / scuro come le IN / accento al 50%.
+ *  - Bordo sottile attorno a tutte le bolle (bianco sulle IN, accento sulle OUT).
+ *  - Angolo a punta (0 dp): in basso a destra sulle OUT, in basso a sinistra sulle IN.
  *
  * Le scelte arrivano da proprieta' di sistema (persist.obsidian.msg_*), perche' l'app Messaggi non
  * vede le preferenze di Oxydian (stesso metodo usato dagli hook SystemUI per gli stili).
@@ -32,22 +33,24 @@ import it.tugaia56.obsidian.xposed.XposedMods;
 public class MessagesBubbleMod extends XposedMods {
 
     public static final String PKG = "com.google.android.apps.messaging";
-    public static final String PROP_OUT_DARK = "persist.obsidian.msg_out_dark";   // "0" stock, "1" scure come le IN, "2" accento al 50%
-    public static final String PROP_BORDER = "persist.obsidian.msg_border";       // "0" spento, "1".."4" spessore (dp/2)
+    public static final String PROP_OUT = "persist.obsidian.msg_out_dark";   // "0" stock, "1" scure come le IN, "2" accento al 50%
+    public static final String PROP_BORDER = "persist.obsidian.msg_border";  // "0" spento, "1".."8" spessore (mezzi dp)
+    public static final String PROP_TAIL = "persist.obsidian.msg_tail";      // "1" angolo a punta
 
     private static final int DEFAULT_IN_COLOR = 0xFF1C2029;
     private static final float BUBBLE_RADIUS_DP = 20f;
 
     private volatile int mInColor = DEFAULT_IN_COLOR;
     private volatile int mOutMode = 2;
-    private volatile int mBorderHalfDp = 0;
+    private volatile int mBorderHalfDp = 2;
+    private volatile boolean mTail = true;
     private long mPropsAt = 0;
     private Paint mStroke;
     private Paint mStrokeIn;
-    private int mStrokeColor = 0;
+    private int mStrokeColor = 0xFF908DFF;
     private float mDensity = 3f;
     private final ThreadLocal<Boolean> mBusy = new ThreadLocal<>();
-    // Testo delle bolle inviate: quando la bolla diventa scura, il testo (scuro) va reso chiaro.
+    // Testo delle bolle inviate: quando la bolla cambia colore, il testo (scuro) va reso chiaro.
     // mInOut = l'ultima forma grande disegnata e' una bolla OUT; mLastIn = e' una bolla IN.
     private volatile boolean mInOut = false;
     private volatile boolean mLastIn = false;
@@ -74,20 +77,21 @@ public class MessagesBubbleMod extends XposedMods {
         }
     }
 
+    private static int intProp(String key, int def, int min, int max) {
+        try {
+            return Math.max(min, Math.min(max, Integer.parseInt(prop(key, String.valueOf(def)))));
+        } catch (NumberFormatException e) {
+            return def;
+        }
+    }
+
     private void refreshProps() {
         long now = SystemClock.elapsedRealtime();
         if (now - mPropsAt < 2000) return;
         mPropsAt = now;
-        try {
-            mOutMode = Math.max(0, Math.min(2, Integer.parseInt(prop(PROP_OUT_DARK, "2"))));
-        } catch (NumberFormatException e) {
-            mOutMode = 2;
-        }
-        try {
-            mBorderHalfDp = Math.max(0, Math.min(8, Integer.parseInt(prop(PROP_BORDER, "2"))));
-        } catch (NumberFormatException e) {
-            mBorderHalfDp = 2;
-        }
+        mOutMode = intProp(PROP_OUT, 2, 0, 2);
+        mBorderHalfDp = intProp(PROP_BORDER, 2, 0, 8);
+        mTail = intProp(PROP_TAIL, 1, 0, 1) == 1;
         try {
             mDensity = Resources.getSystem().getDisplayMetrics().density;
             // Accento scelto dall'utente: Oxydian lo salva anche in questa proprieta' (leggibile da ogni processo)
@@ -154,6 +158,32 @@ public class MessagesBubbleMod extends XposedMods {
         return out;
     }
 
+    /** Rettangolo con raggi diversi per angolo (alto-sx, alto-dx, basso-dx, basso-sx). */
+    private static Path roundPath(float l, float t, float r, float b, float tl, float tr, float br, float bl) {
+        Path p = new Path();
+        p.addRoundRect(new RectF(l, t, r, b), new float[]{tl, tl, tr, tr, br, br, bl, bl}, Path.Direction.CW);
+        return p;
+    }
+
+    private void markBubble(boolean in) {
+        mInOut = !in;
+        mLastIn = in;
+    }
+
+    /** Disegna riempimento (eventualmente ricolorato) e bordo di una bolla gia' trasformata. */
+    private void drawBubble(Canvas canvas, Path shape, Path borderShape, Paint p, int origColor, boolean in) {
+        mBusy.set(Boolean.TRUE);
+        try {
+            int fillColor = (!in && mOutMode != 0) ? outFill() : origColor;
+            p.setColor(fillColor);
+            canvas.drawPath(shape, p);
+            p.setColor(origColor);
+            if (mBorderHalfDp > 0) canvas.drawPath(borderShape, stroke(in));
+        } finally {
+            mBusy.remove();
+        }
+    }
+
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         XC_MethodHook roundRect = new XC_MethodHook() {
@@ -164,75 +194,54 @@ public class MessagesBubbleMod extends XposedMods {
                     refreshProps();
                     Object[] a = param.args;
                     Paint p;
-                    float w, h, rx, ry;
+                    float l, t, r, b, rx, ry;
                     if (a.length == 7 && a[6] instanceof Paint) {
                         p = (Paint) a[6];
-                        w = (Float) a[2] - (Float) a[0];
-                        h = (Float) a[3] - (Float) a[1];
-                        rx = (Float) a[4];
-                        ry = (Float) a[5];
+                        l = (Float) a[0]; t = (Float) a[1]; r = (Float) a[2]; b = (Float) a[3];
+                        rx = (Float) a[4]; ry = (Float) a[5];
                     } else if (a.length == 4 && a[0] instanceof RectF && a[3] instanceof Paint) {
                         p = (Paint) a[3];
                         RectF rc = (RectF) a[0];
-                        w = rc.width();
-                        h = rc.height();
-                        rx = (Float) a[1];
-                        ry = (Float) a[2];
+                        l = rc.left; t = rc.top; r = rc.right; b = rc.bottom;
+                        rx = (Float) a[1]; ry = (Float) a[2];
                     } else return;
+                    float w = r - l, h = b - t;
                     boolean large = p.getStyle() == Paint.Style.FILL && p.getShader() == null && w >= 100 && h >= 50;
-                    if (!isBubbleRR(p, w, h, rx, ry)) {
+                    int c = p.getColor();
+                    if (!isBubbleRR(p, w, h, rx, ry) || (!isInColor(c) && !isOutColor(c))) {
                         if (large) { mInOut = false; mLastIn = false; }
                         return;
                     }
-                    int c = p.getColor();
-                    if (isInColor(c)) {
-                        mInColor = c;
-                        mInOut = false;
-                        mLastIn = true;
-                    } else if (isOutColor(c)) {
-                        mInOut = true;
-                        mLastIn = false;
-                        if (mOutMode != 0) {
-                            param.setObjectExtra("oc", c);
-                            p.setColor(outFill());
-                        }
-                    } else if (large) { mInOut = false; mLastIn = false; }
+                    boolean in = isInColor(c);
+                    if (in) mInColor = c;
+                    markBubble(in);
+                    boolean recolor = !in && mOutMode != 0;
+                    if (!mTail && mBorderHalfDp <= 0) {
+                        if (recolor) { param.setObjectExtra("oc", c); p.setColor(outFill()); }
+                        return;
+                    }
+                    // Forma propria: angolo a punta + bordo. Si disegna qui e si salta il disegno originale.
+                    float tail = mTail ? 0f : rx;
+                    float bl = in ? tail : rx, br = in ? rx : tail;
+                    Paint s = stroke(in);
+                    float inset = s.getStrokeWidth() / 2f;
+                    Path shape = roundPath(l, t, r, b, rx, rx, br, bl);
+                    Path border = roundPath(l + inset, t + inset, r - inset, b - inset,
+                            Math.max(0f, rx - inset), Math.max(0f, rx - inset),
+                            br == 0f ? 0f : Math.max(0f, br - inset), bl == 0f ? 0f : Math.max(0f, bl - inset));
+                    drawBubble((Canvas) param.thisObject, shape, border, p, c, in);
+                    param.setResult(null);
                 } catch (Throwable ignored) {}
             }
 
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
                 try {
-                    if (mBusy.get() != null) return;
-                    Object[] a = param.args;
-                    Paint p;
-                    if (a.length == 7 && a[6] instanceof Paint) p = (Paint) a[6];
-                    else if (a.length == 4 && a[3] instanceof Paint) p = (Paint) a[3];
-                    else return;
                     Object oc = param.getObjectExtra("oc");
-                    if (oc != null) p.setColor((Integer) oc);
-                    if (mBorderHalfDp <= 0) return;
-                    float l, t, r, b, rx, ry;
-                    if (a.length == 7) {
-                        l = (Float) a[0]; t = (Float) a[1]; r = (Float) a[2]; b = (Float) a[3];
-                        rx = (Float) a[4]; ry = (Float) a[5];
-                    } else {
-                        RectF rc = (RectF) a[0];
-                        l = rc.left; t = rc.top; r = rc.right; b = rc.bottom;
-                        rx = (Float) a[1]; ry = (Float) a[2];
-                    }
-                    if (!isBubbleRR(p, r - l, b - t, rx, ry)) return;
-                    int c = oc != null ? (Integer) oc : p.getColor();
-                    if (!isInColor(c) && !isOutColor(c)) return;
-                    Paint s = stroke(isInColor(c));
-                    float inset = s.getStrokeWidth() / 2f;
-                    mBusy.set(Boolean.TRUE);
-                    try {
-                        ((Canvas) param.thisObject).drawRoundRect(l + inset, t + inset, r - inset, b - inset,
-                                Math.max(0f, rx - inset), Math.max(0f, ry - inset), s);
-                    } finally {
-                        mBusy.remove();
-                    }
+                    if (oc == null) return;
+                    Object[] a = param.args;
+                    Paint p = a.length == 7 ? (Paint) a[6] : (Paint) a[3];
+                    p.setColor((Integer) oc);
                 } catch (Throwable ignored) {}
             }
         };
@@ -244,43 +253,45 @@ public class MessagesBubbleMod extends XposedMods {
                     refreshProps();
                     if (param.args.length != 2 || !(param.args[0] instanceof Path) || !(param.args[1] instanceof Paint))
                         return;
+                    Path path = (Path) param.args[0];
                     Paint p = (Paint) param.args[1];
-                    if (!isBubblePath(p, (Path) param.args[0])) return;
                     int c = p.getColor();
-                    if (isInColor(c)) {
-                        mInColor = c;
-                        mInOut = false;
-                        mLastIn = true;
-                    } else if (isOutColor(c)) {
-                        mInOut = true;
-                        mLastIn = false;
-                        if (mOutMode != 0) {
-                            param.setObjectExtra("oc", c);
-                            p.setColor(outFill());
+                    RectF b = new RectF();
+                    boolean bubble = isBubblePath(p, path, b);
+                    if (!bubble) {
+                        if (p.getStyle() == Paint.Style.FILL && p.getShader() == null) {
+                            path.computeBounds(b, true);
+                            if (b.width() >= 100 && b.height() >= 50) { mInOut = false; mLastIn = false; }
                         }
+                        return;
                     }
+                    boolean in = isInColor(c);
+                    if (in) mInColor = c;
+                    markBubble(in);
+                    boolean recolor = !in && mOutMode != 0;
+                    if (!mTail && mBorderHalfDp <= 0) {
+                        if (recolor) { param.setObjectExtra("oc", c); p.setColor(outFill()); }
+                        return;
+                    }
+                    Path shape = new Path(path);
+                    if (mTail) {
+                        float r = Math.min(BUBBLE_RADIUS_DP * mDensity, Math.min(b.width(), b.height()) / 2f);
+                        Path patch = new Path();
+                        if (in) patch.addRect(b.left, b.bottom - r, b.left + r, b.bottom, Path.Direction.CW);
+                        else patch.addRect(b.right - r, b.bottom - r, b.right, b.bottom, Path.Direction.CW);
+                        shape.op(patch, Path.Op.UNION);
+                    }
+                    drawBubble((Canvas) param.thisObject, shape, shape, p, c, in);
+                    param.setResult(null);
                 } catch (Throwable ignored) {}
             }
 
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
                 try {
-                    if (mBusy.get() != null) return;
-                    if (param.args.length != 2 || !(param.args[0] instanceof Path) || !(param.args[1] instanceof Paint))
-                        return;
-                    Paint p = (Paint) param.args[1];
                     Object oc = param.getObjectExtra("oc");
-                    if (oc != null) p.setColor((Integer) oc);
-                    if (mBorderHalfDp <= 0) return;
-                    if (!isBubblePath(p, (Path) param.args[0])) return;
-                    int c = oc != null ? (Integer) oc : p.getColor();
-                    if (!isInColor(c) && !isOutColor(c)) return;
-                    mBusy.set(Boolean.TRUE);
-                    try {
-                        ((Canvas) param.thisObject).drawPath((Path) param.args[0], stroke(isInColor(c)));
-                    } finally {
-                        mBusy.remove();
-                    }
+                    if (oc == null) return;
+                    ((Paint) param.args[1]).setColor((Integer) oc);
                 } catch (Throwable ignored) {}
             }
         };
@@ -328,13 +339,12 @@ public class MessagesBubbleMod extends XposedMods {
     }
 
     /** Percorso riempito, opaco, di dimensioni da bolla (le icone sono bianche pure e quadrate). */
-    private boolean isBubblePath(Paint p, Path path) {
+    private boolean isBubblePath(Paint p, Path path, RectF out) {
         if (p.getStyle() != Paint.Style.FILL || p.getShader() != null || Color.alpha(p.getColor()) != 255)
             return false;
         int c = p.getColor();
         if (!isInColor(c) && !isOutColor(c)) return false;
-        RectF b = new RectF();
-        path.computeBounds(b, true);
-        return b.width() >= 100 && b.height() >= 50 && b.height() < 1200;
+        path.computeBounds(out, true);
+        return out.width() >= 100 && out.height() >= 50 && out.height() < 1200;
     }
 }
