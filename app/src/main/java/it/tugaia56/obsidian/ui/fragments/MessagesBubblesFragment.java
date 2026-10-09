@@ -15,11 +15,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.topjohnwu.superuser.Shell;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import it.tugaia56.obsidian.R;
+import it.tugaia56.obsidian.ui.activity.MainActivity;
 import it.tugaia56.obsidian.ui.adapters.GroupUtils;
+import it.tugaia56.obsidian.ui.events.ColorSelectedEvent;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
@@ -40,7 +46,42 @@ public class MessagesBubblesFragment extends Fragment {
     private static final String PREF_BORDER_W = "msg_bubble_border_width";  // mezzi dp, 1..8
     private static final String PREF_TAIL = "msg_bubble_tail";
 
+    // Colore del bordo: 0 = accento, 1 = colore scelto (picker). Predefiniti: ricevute bianco, inviate accento.
+    private static final String PREF_BORDER_IN_MODE = "msg_bubble_border_in_mode";
+    private static final String PREF_BORDER_IN_COLOR = "msg_bubble_border_in_color";
+    private static final String PREF_BORDER_OUT_MODE = "msg_bubble_border_out_mode";
+    private static final String PREF_BORDER_OUT_COLOR = "msg_bubble_border_out_color";
+    private static final int DIALOG_IN = PREF_BORDER_IN_COLOR.hashCode();
+    private static final int DIALOG_OUT = PREF_BORDER_OUT_COLOR.hashCode();
+
     private RecyclerView mRv;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onColorSelected(ColorSelectedEvent event) {
+        if (event.dialogId() == DIALOG_IN) {
+            ObsidianPrefs.putInt(PREF_BORDER_IN_COLOR, event.color());
+            ObsidianPrefs.putInt(PREF_BORDER_IN_MODE, 1);
+        } else if (event.dialogId() == DIALOG_OUT) {
+            ObsidianPrefs.putInt(PREF_BORDER_OUT_COLOR, event.color());
+            ObsidianPrefs.putInt(PREF_BORDER_OUT_MODE, 1);
+        } else {
+            return;
+        }
+        applyProps();
+        rebuild();
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -75,6 +116,12 @@ public class MessagesBubblesFragment extends Fragment {
         List<Object> shapeRows = new ArrayList<>();
         shapeRows.add(borderSwitch());
         if (ObsidianPrefs.getBoolean(PREF_BORDER_ON, true)) {
+            shapeRows.add(new ListWidgetAdapter.ListItem(getString(R.string.msg_border_in_title),
+                    borderLabel(PREF_BORDER_IN_MODE, PREF_BORDER_IN_COLOR, 1, 0xFFFFFFFF),
+                    () -> showBorderDialog(PREF_BORDER_IN_MODE, PREF_BORDER_IN_COLOR, DIALOG_IN, 1, 0xFFFFFFFF, R.string.msg_border_in_title)));
+            shapeRows.add(new ListWidgetAdapter.ListItem(getString(R.string.msg_border_out_title),
+                    borderLabel(PREF_BORDER_OUT_MODE, PREF_BORDER_OUT_COLOR, 0, 0xFF908DFF),
+                    () -> showBorderDialog(PREF_BORDER_OUT_MODE, PREF_BORDER_OUT_COLOR, DIALOG_OUT, 0, 0xFF908DFF, R.string.msg_border_out_title)));
             shapeRows.add(new SliderWidgetAdapter.SliderItem(
                     getString(R.string.msg_border_width), ObsidianPrefs.getInt(PREF_BORDER_W, 2), 1, 8, "", 2,
                     value -> { ObsidianPrefs.putInt(PREF_BORDER_W, value); applyProps(); }));
@@ -104,6 +151,31 @@ public class MessagesBubblesFragment extends Fragment {
         return item;
     }
 
+    private String borderLabel(String modeKey, String colorKey, int defMode, int defColor) {
+        if (ObsidianPrefs.getInt(modeKey, defMode) == 0) return getString(R.string.msg_border_accent);
+        return String.format("#%06X", ObsidianPrefs.getInt(colorKey, defColor) & 0xFFFFFF);
+    }
+
+    private void showBorderDialog(String modeKey, String colorKey, int dialogId, int defMode, int defColor, int titleRes) {
+        String[] entries = {getString(R.string.msg_border_accent), getString(R.string.msg_border_custom)};
+        final int[] sel = {ObsidianPrefs.getInt(modeKey, defMode)};
+        ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(titleRes)
+                .setSingleChoiceItems(entries, sel[0], (d, which) -> sel[0] = which)
+                .setPositiveButton(R.string.apply, (d, w) -> {
+                    if (sel[0] == 0) {
+                        ObsidianPrefs.putInt(modeKey, 0);
+                        applyProps();
+                        rebuild();
+                    } else if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).showColorPickerDialog(dialogId,
+                                ObsidianPrefs.getInt(colorKey, defColor) | 0xFF000000, false, true, true);
+                    }
+                })
+                .setNegativeButton(R.string.close, null)
+                .show());
+    }
+
     private String outLabel() {
         String[] e = getResources().getStringArray(R.array.msg_out_entries);
         int m = ObsidianPrefs.getInt(PREF_OUT_MODE, 2);
@@ -130,9 +202,15 @@ public class MessagesBubblesFragment extends Fragment {
         final int out = ObsidianPrefs.getInt(PREF_OUT_MODE, 2);
         final int border = ObsidianPrefs.getBoolean(PREF_BORDER_ON, true) ? ObsidianPrefs.getInt(PREF_BORDER_W, 2) : 0;
         final int tail = ObsidianPrefs.getBoolean(PREF_TAIL, true) ? 1 : 0;
+        final String bIn = ObsidianPrefs.getInt(PREF_BORDER_IN_MODE, 1) == 0 ? "accent"
+                : String.valueOf(ObsidianPrefs.getInt(PREF_BORDER_IN_COLOR, 0xFFFFFFFF) | 0xFF000000);
+        final String bOut = ObsidianPrefs.getInt(PREF_BORDER_OUT_MODE, 0) == 0 ? "accent"
+                : String.valueOf(ObsidianPrefs.getInt(PREF_BORDER_OUT_COLOR, 0xFF908DFF) | 0xFF000000);
         new Thread(() -> Shell.cmd(
                 "setprop persist.obsidian.msg_out_dark " + out,
                 "setprop persist.obsidian.msg_border " + border,
-                "setprop persist.obsidian.msg_tail " + tail).exec()).start();
+                "setprop persist.obsidian.msg_tail " + tail,
+                "setprop persist.obsidian.msg_border_in " + bIn,
+                "setprop persist.obsidian.msg_border_out " + bOut).exec()).start();
     }
 }

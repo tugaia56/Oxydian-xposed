@@ -1290,4 +1290,8 @@
         <item>Dark, like received</item>
         <item>Accent at 50% transparency</item>
     </string-array>
+    <string name="msg_border_in_title">Border colour: received</string>
+    <string name="msg_border_out_title">Border colour: sent</string>
+    <string name="msg_border_accent">Accent</string>
+    <string name="msg_border_custom">Pick a colour…</string>
 </resources>

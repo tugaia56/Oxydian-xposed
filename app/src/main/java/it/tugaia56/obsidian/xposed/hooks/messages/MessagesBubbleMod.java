@@ -36,6 +36,8 @@ public class MessagesBubbleMod extends XposedMods {
     public static final String PROP_OUT = "persist.obsidian.msg_out_dark";   // "0" stock, "1" scure come le IN, "2" accento al 50%
     public static final String PROP_BORDER = "persist.obsidian.msg_border";  // "0" spento, "1".."8" spessore (mezzi dp)
     public static final String PROP_TAIL = "persist.obsidian.msg_tail";      // "1" angolo a punta
+    public static final String PROP_BORDER_IN = "persist.obsidian.msg_border_in";   // "accent" o colore ARGB (intero)
+    public static final String PROP_BORDER_OUT = "persist.obsidian.msg_border_out"; // "accent" o colore ARGB (intero)
 
     private static final int DEFAULT_IN_COLOR = 0xFF1C2029;
     private static final float BUBBLE_RADIUS_DP = 20f;
@@ -47,7 +49,9 @@ public class MessagesBubbleMod extends XposedMods {
     private long mPropsAt = 0;
     private Paint mStroke;
     private Paint mStrokeIn;
-    private int mStrokeColor = 0xFF908DFF;
+    private int mStrokeColor = 0xFF908DFF;      // accento dell'utente
+    private volatile int mBorderInColor = 0xFFFFFFFF;
+    private volatile int mBorderOutColor = 0xFF908DFF;
     private float mDensity = 3f;
     private final ThreadLocal<Boolean> mBusy = new ThreadLocal<>();
     // Testo delle bolle inviate: quando la bolla cambia colore, il testo (scuro) va reso chiaro.
@@ -107,9 +111,21 @@ public class MessagesBubbleMod extends XposedMods {
             }
             if (c != mStrokeColor) {
                 mStrokeColor = c;
-                mStroke = null;
             }
         } catch (Throwable ignored) {}
+        mBorderInColor = borderColor(prop(PROP_BORDER_IN, "-1"), 0xFFFFFFFF);
+        mBorderOutColor = borderColor(prop(PROP_BORDER_OUT, "accent"), mStrokeColor);
+    }
+
+    /** "accent" = colore di accento; altrimenti un colore ARGB scritto come intero. */
+    private int borderColor(String v, int def) {
+        if (v == null || v.isEmpty()) return def;
+        if ("accent".equals(v)) return mStrokeColor;
+        try {
+            return 0xFF000000 | Integer.parseInt(v);
+        } catch (NumberFormatException e) {
+            return def;
+        }
     }
 
     /** Colore con cui si disegna la bolla OUT: scuro come le IN, oppure accento al 50% di trasparenza. */
@@ -144,16 +160,15 @@ public class MessagesBubbleMod extends XposedMods {
         if (mStroke == null) {
             Paint s = new Paint(Paint.ANTI_ALIAS_FLAG);
             s.setStyle(Paint.Style.STROKE);
-            s.setColor(mStrokeColor);
             mStroke = s;
         }
         if (mStrokeIn == null) {
             Paint s = new Paint(Paint.ANTI_ALIAS_FLAG);
             s.setStyle(Paint.Style.STROKE);
-            s.setColor(0xFFFFFFFF);
             mStrokeIn = s;
         }
         Paint out = inBubble ? mStrokeIn : mStroke;
+        out.setColor(inBubble ? mBorderInColor : mBorderOutColor);
         out.setStrokeWidth(Math.max(1f, mBorderHalfDp * 0.5f * mDensity));
         return out;
     }

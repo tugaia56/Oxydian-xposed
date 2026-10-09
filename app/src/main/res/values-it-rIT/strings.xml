@@ -1262,4 +1262,8 @@
         <item>Scura, come le ricevute</item>
         <item>Accento al 50% di trasparenza</item>
     </string-array>
+    <string name="msg_border_in_title">Colore bordo: ricevute</string>
+    <string name="msg_border_out_title">Colore bordo: inviate</string>
+    <string name="msg_border_accent">Accento</string>
+    <string name="msg_border_custom">Scegli un colore…</string>
 </resources>
