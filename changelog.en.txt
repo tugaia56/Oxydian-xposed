@@ -1,2 +1,5 @@
 Added:
 - Google Messages: new look for chat bubbles, with its own page in Mods. You can pick the colour of received and sent bubbles (original, dark like received, accent at 50% transparency, or any colour), give every bubble a thin border with its own colour for received and sent, and make the bottom corner sharp (right on sent bubbles, left on received); the joining corners of consecutive bubbles are sharp too. To use it, tick Messages in the LSPosed scope of Oxydian
+
+Changed:
+- New app icon: the palette in the gear is now a hammer and a wrench, because colours now live in Oxydian Theme

@@ -23,39 +23,13 @@
     <group
         android:pivotX="0"
         android:pivotY="0"
-        android:scaleX="0.9"
-        android:scaleY="0.9"
-        android:translateX="51.4"
-        android:translateY="55.0">
+        android:scaleX="0.074"
+        android:scaleY="0.074"
+        android:translateX="64.5"
+        android:translateY="66.0">
         <path
-            android:pathData="M18,42 C22,20 46,12 66,16 C88,20 98,42 88,60 C80,74 62,66 54,72 C46,80 40,88 28,84 C10,78 14,58 18,42 Z"
-            android:strokeColor="#FFFFFF"
-            android:strokeWidth="5"
-            android:strokeLineJoin="round" />
-        <path
-            android:pathData="M22,68 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0"
-            android:strokeColor="#FFFFFF"
-            android:strokeWidth="3" />
-        <path
-            android:pathData="M27.5,34 a6.5,6.5 0 1,0 13,0 a6.5,6.5 0 1,0 -13,0"
-            android:fillColor="#FFFFFF"
-            android:fillAlpha="0.75" />
-        <path
-            android:pathData="M43.5,24 a6.5,6.5 0 1,0 13,0 a6.5,6.5 0 1,0 -13,0"
-            android:fillColor="#FFFFFF"
-            android:fillAlpha="0.75" />
-        <path
-            android:pathData="M61.5,26 a6.5,6.5 0 1,0 13,0 a6.5,6.5 0 1,0 -13,0"
-            android:fillColor="#FFFFFF"
-            android:fillAlpha="0.75" />
-        <path
-            android:pathData="M75.5,41 a6.5,6.5 0 1,0 13,0 a6.5,6.5 0 1,0 -13,0"
-            android:fillColor="#FFFFFF"
-            android:fillAlpha="0.75" />
-        <path
-            android:pathData="M72.5,57 a6.5,6.5 0 1,0 13,0 a6.5,6.5 0 1,0 -13,0"
-            android:fillColor="#FFFFFF"
-            android:fillAlpha="0.75" />
+            android:pathData="M754,879Q746,879 739,876.5Q732,874 726,868L522,664Q516,658 513.5,651Q511,644 511,636Q511,628 513.5,621Q516,614 522,608L607,523Q613,517 620,514.5Q627,512 635,512Q643,512 650,514.5Q657,517 663,523L867,727Q873,733 875.5,740Q878,747 878,755Q878,763 875.5,770Q873,777 867,783L782,868Q776,874 769,876.5Q762,879 754,879ZM754,784L783,755L636,608L607,637L754,784ZM205,880Q197,880 189.5,877Q182,874 176,868L92,784Q86,778 83,770.5Q80,763 80,755Q80,747 83,740Q86,733 92,727L304,515L389,515L423,481L258,316L201,316L80,195L193,82L314,203L314,260L479,425L595,309L552,266L608,210L495,210L467,182L609,40L637,68L637,181L693,125L835,267Q852,284 861,305.5Q870,327 870,351Q870,375 861,397Q852,419 835,436L750,351L694,407L652,365L445,572L445,656L233,868Q227,874 220,877Q213,880 205,880ZM205,784L375,614L375,585L346,585L176,755L205,784ZM205,784L176,755L176,755L191,769L205,784ZM754,784L754,784L783,755L783,755L754,784Z"
+            android:fillColor="#FFFFFF" />
     </group>
     </group>
 </vector>
