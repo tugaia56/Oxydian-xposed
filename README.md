@@ -27,6 +27,10 @@ Oxydian reads the accent and background chosen in Oxydian Theme, so the two apps
 - **Miscellaneous** — gesture navigation, screenshot enabler, CorePatch, and more
 - Automatic **update check**
 
+## Tutorial
+
+New to Oxydian? Follow the step-by-step **[Tutorial](docs/TUTORIAL.md)** (installation, app tour, first customisation, backup, troubleshooting).
+
 ## Requirements
 
 - OnePlus / OPPO device with **OxygenOS** (tested on OnePlus 12, OxygenOS 16.1), Android 12+

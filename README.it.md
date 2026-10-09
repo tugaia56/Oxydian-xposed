@@ -27,6 +27,10 @@ Oxydian legge accento e sfondo scelti in Oxydian Theme, quindi conviene installa
 - **Varie** — navigazione a gesture, abilita screenshot, CorePatch e altro
 - **Controllo aggiornamenti** automatico
 
+## Tutorial
+
+Prima volta con Oxydian? Segui il **[Tutorial](docs/TUTORIAL.it.md)** passo passo (installazione, giro dell'app, prima personalizzazione, backup, risoluzione dei problemi).
+
 ## Requisiti
 
 - Dispositivo OnePlus / OPPO con **OxygenOS** (testato su OnePlus 12, OxygenOS 16.1), Android 12+
