@@ -59,6 +59,9 @@ public class MessagesBubbleMod extends XposedMods {
     private volatile boolean mInOut = false;
     private volatile boolean mLastIn = false;
     private volatile int mInText = 0xFFEAEAFC;
+    // Colori scuri del testo visti dentro le bolle OUT: se l'app ridisegna solo il testo (senza la bolla),
+    // il testo con uno di questi colori va comunque schiarito.
+    private final java.util.Set<Integer> mOutText = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
     public MessagesBubbleMod(Context context) {
         super(context);
@@ -180,6 +183,42 @@ public class MessagesBubbleMod extends XposedMods {
         return p;
     }
 
+    /** Forma e bordo di una bolla con angoli uguali da rx; l'angolo a punta (se attivo) vale 0. */
+    private Path[] bubbleShapes(float l, float t, float r, float b, float rx, boolean in, boolean[] join) {
+        // angoli: alto-sx, alto-dx, basso-dx, basso-sx. "join" = angoli di unione tra bolle consecutive (0 dp)
+        float tl = join != null && join[0] ? 0f : rx;
+        float tr = join != null && join[1] ? 0f : rx;
+        float br = join != null && join[2] ? 0f : rx;
+        float bl = join != null && join[3] ? 0f : rx;
+        if (mTail) { if (in) bl = 0f; else br = 0f; }
+        float inset = stroke(in).getStrokeWidth() / 2f;
+        Path shape = roundPath(l, t, r, b, tl, tr, br, bl);
+        Path border = roundPath(l + inset, t + inset, r - inset, b - inset,
+                tl == 0f ? 0f : Math.max(0f, tl - inset), tr == 0f ? 0f : Math.max(0f, tr - inset),
+                br == 0f ? 0f : Math.max(0f, br - inset), bl == 0f ? 0f : Math.max(0f, bl - inset));
+        return new Path[]{shape, border};
+    }
+
+    /** Angoli "piccoli" (di serie, per le bolle consecutive) del percorso originale: alto-sx, alto-dx, basso-dx, basso-sx. */
+    private boolean[] smallCorners(Path path, RectF b) {
+        boolean[] out = new boolean[4];
+        float s = 3f * mDensity;
+        RectF[] sq = {
+                new RectF(b.left, b.top, b.left + s, b.top + s),
+                new RectF(b.right - s, b.top, b.right, b.top + s),
+                new RectF(b.right - s, b.bottom - s, b.right, b.bottom),
+                new RectF(b.left, b.bottom - s, b.left + s, b.bottom)};
+        for (int i = 0; i < 4; i++) {
+            try {
+                Path q = new Path();
+                q.addRect(sq[i], Path.Direction.CW);
+                Path inter = new Path();
+                out[i] = inter.op(path, q, Path.Op.INTERSECT) && !inter.isEmpty();
+            } catch (Throwable ignored) {}
+        }
+        return out;
+    }
+
     private void markBubble(boolean in) {
         mInOut = !in;
         mLastIn = in;
@@ -235,16 +274,9 @@ public class MessagesBubbleMod extends XposedMods {
                         if (recolor) { param.setObjectExtra("oc", c); p.setColor(outFill()); }
                         return;
                     }
-                    // Forma propria: angolo a punta + bordo. Si disegna qui e si salta il disegno originale.
-                    float tail = mTail ? 0f : rx;
-                    float bl = in ? tail : rx, br = in ? rx : tail;
-                    Paint s = stroke(in);
-                    float inset = s.getStrokeWidth() / 2f;
-                    Path shape = roundPath(l, t, r, b, rx, rx, br, bl);
-                    Path border = roundPath(l + inset, t + inset, r - inset, b - inset,
-                            Math.max(0f, rx - inset), Math.max(0f, rx - inset),
-                            br == 0f ? 0f : Math.max(0f, br - inset), bl == 0f ? 0f : Math.max(0f, bl - inset));
-                    drawBubble((Canvas) param.thisObject, shape, border, p, c, in);
+                    // Forma propria: angoli uguali + angolo a punta + bordo. Si disegna qui e si salta l'originale.
+                    Path[] sh = bubbleShapes(l, t, r, b, rx, in, null);
+                    drawBubble((Canvas) param.thisObject, sh[0], sh[1], p, c, in);
                     param.setResult(null);
                 } catch (Throwable ignored) {}
             }
@@ -288,15 +320,11 @@ public class MessagesBubbleMod extends XposedMods {
                         if (recolor) { param.setObjectExtra("oc", c); p.setColor(outFill()); }
                         return;
                     }
-                    Path shape = new Path(path);
-                    if (mTail) {
-                        float r = Math.min(BUBBLE_RADIUS_DP * mDensity, Math.min(b.width(), b.height()) / 2f);
-                        Path patch = new Path();
-                        if (in) patch.addRect(b.left, b.bottom - r, b.left + r, b.bottom, Path.Direction.CW);
-                        else patch.addRect(b.right - r, b.bottom - r, b.right, b.bottom, Path.Direction.CW);
-                        shape.op(patch, Path.Op.UNION);
-                    }
-                    drawBubble((Canvas) param.thisObject, shape, shape, p, c, in);
+                    // Bolle consecutive (forma "a percorso"): gli angoli piccoli di serie (unione) diventano 0 dp,
+                    // gli altri 20 dp, piu' l'angolo a punta.
+                    float rr = Math.min(BUBBLE_RADIUS_DP * mDensity, Math.min(b.width(), b.height()) / 2f);
+                    Path[] sh = bubbleShapes(b.left, b.top, b.right, b.bottom, rr, in, smallCorners(path, b));
+                    drawBubble((Canvas) param.thisObject, sh[0], sh[1], p, c, in);
                     param.setResult(null);
                 } catch (Throwable ignored) {}
             }
@@ -322,9 +350,12 @@ public class MessagesBubbleMod extends XposedMods {
                     if (Color.alpha(c) != 255) return;
                     if (mLastIn && !mInOut && luma(c) > 0.85f) {
                         mInText = c;                       // colore del testo delle bolle ricevute
-                    } else if (mOutMode != 0 && mInOut && luma(c) < 0.45f) {
-                        param.setObjectExtra("tc", c);     // testo scuro dentro una bolla OUT ormai scura
-                        p.setColor(mInText);
+                    } else if (mOutMode != 0 && luma(c) < 0.45f) {
+                        if (mInOut) mOutText.add(c);       // testo scuro dentro una bolla OUT: lo impariamo
+                        if (mInOut || mOutText.contains(c)) {
+                            param.setObjectExtra("tc", c);
+                            p.setColor(mInText);
+                        }
                     }
                 } catch (Throwable ignored) {}
             }
