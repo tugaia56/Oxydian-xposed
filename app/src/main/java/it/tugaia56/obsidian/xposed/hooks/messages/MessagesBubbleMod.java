@@ -33,7 +33,9 @@ import it.tugaia56.obsidian.xposed.XposedMods;
 public class MessagesBubbleMod extends XposedMods {
 
     public static final String PKG = "com.google.android.apps.messaging";
-    public static final String PROP_OUT = "persist.obsidian.msg_out_dark";   // "0" stock, "1" scure come le IN, "2" accento al 50%
+    public static final String PROP_OUT = "persist.obsidian.msg_out_dark";   // "0" stock, "1" scure come le IN, "2" accento al 50%, "3" colore scelto
+    public static final String PROP_OUT_COLOR = "persist.obsidian.msg_out_color";  // ARGB (intero), usato con modo 3
+    public static final String PROP_IN_COLOR = "persist.obsidian.msg_in_color";    // "0" = originale, altrimenti ARGB (intero)
     public static final String PROP_BORDER = "persist.obsidian.msg_border";  // "0" spento, "1".."8" spessore (mezzi dp)
     public static final String PROP_TAIL = "persist.obsidian.msg_tail";      // "1" angolo a punta
     public static final String PROP_BORDER_IN = "persist.obsidian.msg_border_in";   // "accent" o colore ARGB (intero)
@@ -44,6 +46,8 @@ public class MessagesBubbleMod extends XposedMods {
 
     private volatile int mInColor = DEFAULT_IN_COLOR;
     private volatile int mOutMode = 2;
+    private volatile int mOutCustom = 0xFF2B2F3A;
+    private volatile int mInCustom = 0;   // 0 = colore originale delle bolle ricevute
     private volatile int mBorderHalfDp = 2;
     private volatile boolean mTail = true;
     private long mPropsAt = 0;
@@ -96,7 +100,17 @@ public class MessagesBubbleMod extends XposedMods {
         long now = SystemClock.elapsedRealtime();
         if (now - mPropsAt < 2000) return;
         mPropsAt = now;
-        mOutMode = intProp(PROP_OUT, 2, 0, 2);
+        mOutMode = intProp(PROP_OUT, 2, 0, 3);
+        try {
+            int oc = Integer.parseInt(prop(PROP_OUT_COLOR, "0"));
+            if (oc != 0) mOutCustom = (oc >>> 24) == 0 ? (0xFF000000 | oc) : oc;
+        } catch (NumberFormatException ignored) {}
+        try {
+            int ic = Integer.parseInt(prop(PROP_IN_COLOR, "0"));
+            mInCustom = ic == 0 ? 0 : (0xFF000000 | ic);
+        } catch (NumberFormatException e) {
+            mInCustom = 0;
+        }
         mBorderHalfDp = intProp(PROP_BORDER, 2, 0, 8);
         mTail = intProp(PROP_TAIL, 1, 0, 1) == 1;
         try {
@@ -133,7 +147,25 @@ public class MessagesBubbleMod extends XposedMods {
 
     /** Colore con cui si disegna la bolla OUT: scuro come le IN, oppure accento al 50% di trasparenza. */
     private int outFill() {
-        return mOutMode == 2 ? ((0x80 << 24) | (mStrokeColor & 0xFFFFFF)) : mInColor;
+        if (mOutMode == 2) return (0x80 << 24) | (mStrokeColor & 0xFFFFFF);
+        if (mOutMode == 3) return mOutCustom;
+        return mInCustom != 0 ? mInCustom : mInColor;
+    }
+
+    /** Colore con cui disegnare una bolla (IN o OUT) data la sua tinta originale. */
+    private int fillFor(boolean in, int orig) {
+        if (in) return mInCustom != 0 ? mInCustom : orig;
+        return mOutMode != 0 ? outFill() : orig;
+    }
+
+    /** Luminosita' di un colore (anche semitrasparente) disegnato sopra lo sfondo scuro della chat. */
+    private static float effLuma(int c) {
+        float a = Color.alpha(c) / 255f;
+        int bg = 0xFF0F131D;
+        int r = Math.round(Color.red(c) * a + Color.red(bg) * (1 - a));
+        int g = Math.round(Color.green(c) * a + Color.green(bg) * (1 - a));
+        int b = Math.round(Color.blue(c) * a + Color.blue(bg) * (1 - a));
+        return luma(Color.rgb(r, g, b));
     }
 
     private static float luma(int c) {
@@ -228,7 +260,7 @@ public class MessagesBubbleMod extends XposedMods {
     private void drawBubble(Canvas canvas, Path shape, Path borderShape, Paint p, int origColor, boolean in) {
         mBusy.set(Boolean.TRUE);
         try {
-            int fillColor = (!in && mOutMode != 0) ? outFill() : origColor;
+            int fillColor = fillFor(in, origColor);
             p.setColor(fillColor);
             canvas.drawPath(shape, p);
             p.setColor(origColor);
@@ -269,9 +301,9 @@ public class MessagesBubbleMod extends XposedMods {
                     boolean in = isInColor(c);
                     if (in) mInColor = c;
                     markBubble(in);
-                    boolean recolor = !in && mOutMode != 0;
+                    int fill = fillFor(in, c);
                     if (!mTail && mBorderHalfDp <= 0) {
-                        if (recolor) { param.setObjectExtra("oc", c); p.setColor(outFill()); }
+                        if (fill != c) { param.setObjectExtra("oc", c); p.setColor(fill); }
                         return;
                     }
                     // Forma propria: angoli uguali + angolo a punta + bordo. Si disegna qui e si salta l'originale.
@@ -315,9 +347,9 @@ public class MessagesBubbleMod extends XposedMods {
                     boolean in = isInColor(c);
                     if (in) mInColor = c;
                     markBubble(in);
-                    boolean recolor = !in && mOutMode != 0;
+                    int fill = fillFor(in, c);
                     if (!mTail && mBorderHalfDp <= 0) {
-                        if (recolor) { param.setObjectExtra("oc", c); p.setColor(outFill()); }
+                        if (fill != c) { param.setObjectExtra("oc", c); p.setColor(fill); }
                         return;
                     }
                     // Bolle consecutive (forma "a percorso"): gli angoli piccoli di serie (unione) diventano 0 dp,
@@ -350,9 +382,15 @@ public class MessagesBubbleMod extends XposedMods {
                     if (Color.alpha(c) != 255) return;
                     if (mLastIn && !mInOut && luma(c) > 0.85f) {
                         mInText = c;                       // colore del testo delle bolle ricevute
+                        // bolla ricevuta con un colore scelto e chiaro: il testo chiaro diventa scuro
+                        if (mInCustom != 0 && effLuma(mInCustom) >= 0.6f) {
+                            param.setObjectExtra("tc", c);
+                            p.setColor(0xFF1B1B1F);
+                        }
                     } else if (mOutMode != 0 && luma(c) < 0.45f) {
                         if (mInOut) mOutText.add(c);       // testo scuro dentro una bolla OUT: lo impariamo
-                        if (mInOut || mOutText.contains(c)) {
+                        // se la bolla OUT e' scura il testo scuro originale diventa chiaro; se e' chiara resta com'e'
+                        if ((mInOut || mOutText.contains(c)) && effLuma(outFill()) < 0.5f) {
                             param.setObjectExtra("tc", c);
                             p.setColor(mInText);
                         }

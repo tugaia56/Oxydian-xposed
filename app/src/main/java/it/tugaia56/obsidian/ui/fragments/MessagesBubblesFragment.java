@@ -45,6 +45,11 @@ public class MessagesBubblesFragment extends Fragment {
     private static final String PREF_BORDER_ON = "msg_bubble_border_on";
     private static final String PREF_BORDER_W = "msg_bubble_border_width";  // mezzi dp, 1..8
     private static final String PREF_TAIL = "msg_bubble_tail";
+    private static final String PREF_OUT_COLOR = "msg_bubble_out_color";
+    private static final String PREF_IN_MODE = "msg_bubble_in_mode";        // 0 originale, 1 colore scelto
+    private static final String PREF_IN_COLOR = "msg_bubble_in_color";
+    private static final int DIALOG_OUT_FILL = PREF_OUT_COLOR.hashCode();
+    private static final int DIALOG_IN_FILL = PREF_IN_COLOR.hashCode();
 
     // Colore del bordo: 0 = accento, 1 = colore scelto (picker). Predefiniti: ricevute bianco, inviate accento.
     private static final String PREF_BORDER_IN_MODE = "msg_bubble_border_in_mode";
@@ -70,7 +75,13 @@ public class MessagesBubblesFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onColorSelected(ColorSelectedEvent event) {
-        if (event.dialogId() == DIALOG_IN) {
+        if (event.dialogId() == DIALOG_OUT_FILL) {
+            ObsidianPrefs.putInt(PREF_OUT_COLOR, event.color());
+            ObsidianPrefs.putInt(PREF_OUT_MODE, 3);
+        } else if (event.dialogId() == DIALOG_IN_FILL) {
+            ObsidianPrefs.putInt(PREF_IN_COLOR, event.color());
+            ObsidianPrefs.putInt(PREF_IN_MODE, 1);
+        } else if (event.dialogId() == DIALOG_IN) {
             ObsidianPrefs.putInt(PREF_BORDER_IN_COLOR, event.color());
             ObsidianPrefs.putInt(PREF_BORDER_IN_MODE, 1);
         } else if (event.dialogId() == DIALOG_OUT) {
@@ -107,10 +118,11 @@ public class MessagesBubblesFragment extends Fragment {
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.msg_note))));
 
-        chain.add(new SectionTitleAdapter(List.of(getString(R.string.msg_section_out))));
-        List<Object> outRows = new ArrayList<>();
-        outRows.add(new ListWidgetAdapter.ListItem(getString(R.string.msg_out_title), outLabel(), this::showOutDialog));
-        GroupUtils.addGroup(chain, outRows);
+        chain.add(new SectionTitleAdapter(List.of(getString(R.string.msg_section_bubbles))));
+        List<Object> bubbleRows = new ArrayList<>();
+        bubbleRows.add(new ListWidgetAdapter.ListItem(getString(R.string.msg_in_title), inLabel(), this::showInDialog));
+        bubbleRows.add(new ListWidgetAdapter.ListItem(getString(R.string.msg_out_title), outLabel(), this::showOutDialog));
+        GroupUtils.addGroup(chain, bubbleRows);
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.msg_section_shape))));
         List<Object> shapeRows = new ArrayList<>();
@@ -177,9 +189,35 @@ public class MessagesBubblesFragment extends Fragment {
     }
 
     private String outLabel() {
-        String[] e = getResources().getStringArray(R.array.msg_out_entries);
         int m = ObsidianPrefs.getInt(PREF_OUT_MODE, 2);
-        return e[Math.max(0, Math.min(e.length - 1, m))];
+        if (m == 3) return String.format("#%08X", ObsidianPrefs.getInt(PREF_OUT_COLOR, 0xFF2B2F3A));
+        String[] e = getResources().getStringArray(R.array.msg_out_entries);
+        return e[Math.max(0, Math.min(2, m))];
+    }
+
+    private String inLabel() {
+        if (ObsidianPrefs.getInt(PREF_IN_MODE, 0) == 0) return getString(R.string.msg_in_original);
+        return String.format("#%06X", ObsidianPrefs.getInt(PREF_IN_COLOR, 0xFF1C2029) & 0xFFFFFF);
+    }
+
+    private void showInDialog() {
+        String[] entries = {getString(R.string.msg_in_original), getString(R.string.msg_border_custom)};
+        final int[] sel = {ObsidianPrefs.getInt(PREF_IN_MODE, 0)};
+        ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.msg_in_title)
+                .setSingleChoiceItems(entries, sel[0], (d, which) -> sel[0] = which)
+                .setPositiveButton(R.string.apply, (d, w) -> {
+                    if (sel[0] == 0) {
+                        ObsidianPrefs.putInt(PREF_IN_MODE, 0);
+                        applyProps();
+                        rebuild();
+                    } else if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).showColorPickerDialog(DIALOG_IN_FILL,
+                                ObsidianPrefs.getInt(PREF_IN_COLOR, 0xFF1C2029) | 0xFF000000, false, true, true);
+                    }
+                })
+                .setNegativeButton(R.string.close, null)
+                .show());
     }
 
     private void showOutDialog() {
@@ -189,6 +227,13 @@ public class MessagesBubblesFragment extends Fragment {
                 .setTitle(R.string.msg_out_title)
                 .setSingleChoiceItems(entries, sel[0], (d, which) -> sel[0] = which)
                 .setPositiveButton(R.string.apply, (d, w) -> {
+                    if (sel[0] == 3) {
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).showColorPickerDialog(DIALOG_OUT_FILL,
+                                    ObsidianPrefs.getInt(PREF_OUT_COLOR, 0xFF2B2F3A), true, true, true);
+                        }
+                        return;
+                    }
                     ObsidianPrefs.putInt(PREF_OUT_MODE, sel[0]);
                     applyProps();
                     rebuild();
@@ -206,7 +251,12 @@ public class MessagesBubblesFragment extends Fragment {
                 : String.valueOf(ObsidianPrefs.getInt(PREF_BORDER_IN_COLOR, 0xFFFFFFFF) | 0xFF000000);
         final String bOut = ObsidianPrefs.getInt(PREF_BORDER_OUT_MODE, 0) == 0 ? "accent"
                 : String.valueOf(ObsidianPrefs.getInt(PREF_BORDER_OUT_COLOR, 0xFF908DFF) | 0xFF000000);
+        final int outColor = ObsidianPrefs.getInt(PREF_OUT_COLOR, 0xFF2B2F3A);
+        final String inColor = ObsidianPrefs.getInt(PREF_IN_MODE, 0) == 0 ? "0"
+                : String.valueOf(ObsidianPrefs.getInt(PREF_IN_COLOR, 0xFF1C2029) | 0xFF000000);
         new Thread(() -> Shell.cmd(
+                "setprop persist.obsidian.msg_out_color " + outColor,
+                "setprop persist.obsidian.msg_in_color " + inColor,
                 "setprop persist.obsidian.msg_out_dark " + out,
                 "setprop persist.obsidian.msg_border " + border,
                 "setprop persist.obsidian.msg_tail " + tail,

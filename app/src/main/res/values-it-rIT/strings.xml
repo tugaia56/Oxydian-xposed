@@ -1261,9 +1261,14 @@
         <item>Originale</item>
         <item>Scura, come le ricevute</item>
         <item>Accento al 50% di trasparenza</item>
+        <item>Scegli un colore…</item>
     </string-array>
     <string name="msg_border_in_title">Colore bordo: ricevute</string>
     <string name="msg_border_out_title">Colore bordo: inviate</string>
     <string name="msg_border_accent">Accento</string>
     <string name="msg_border_custom">Scegli un colore…</string>
+    <string name="msg_section_in">Bolle ricevute</string>
+    <string name="msg_in_title">Colore delle bolle ricevute</string>
+    <string name="msg_in_original">Originale</string>
+    <string name="msg_section_bubbles">Bolle</string>
 </resources>
