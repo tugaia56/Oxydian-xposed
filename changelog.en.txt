@@ -1,5 +1,2 @@
-Fixed:
-- Notification style: the phone no longer freezes for several seconds on the PIN screen after a reboot
-
 Changed:
 - Backup: the file name now starts with the date and time, so backups sort by date
