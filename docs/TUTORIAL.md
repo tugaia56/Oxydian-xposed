@@ -38,13 +38,11 @@ A step-by-step guide: from installation to your first customisations.
 At the bottom you find four tabs: **Oxydian**, **Mods**, **Search** and **Settings**.
 
 <p align="center">
-  <img src="img/it_01_oxydian.png" width="190" alt="Oxydian tab">
-  <img src="img/it_02_mods.png" width="190" alt="Mods tab">
-  <img src="img/it_03_cerca.png" width="190" alt="Search tab">
-  <img src="img/it_04_impostazioni.png" width="190" alt="Settings tab">
+  <img src="img/en_01_oxydian.png" width="190" alt="Oxydian tab">
+  <img src="img/en_02_mods.png" width="190" alt="Mods tab">
+  <img src="img/en_03_search.png" width="190" alt="Search tab">
+  <img src="img/en_04_settings.png" width="190" alt="Settings tab">
 </p>
-
-*(Screenshots are taken from the Italian interface; the layout is identical in English.)*
 
 The circular-arrow button at the top right of every page is **Restart SystemUI**: use it to apply changes (see below).
 
@@ -71,7 +69,7 @@ The circular-arrow button at the top right of every page is **Restart SystemUI**
 
 Example page: **Status Bar**, with the miscellaneous options (including hide SIM 1 and SIM 2 icon):
 
-<p align="center"><img src="img/it_07_barra_di_stato.png" width="230" alt="Status Bar page"></p>
+<p align="center"><img src="img/en_07_status_bar.png" width="230" alt="Status Bar page"></p>
 
 ### Search
 
@@ -99,8 +97,8 @@ Let's change something you can see right away.
 4. Swipe down the quick panel: the new look is there.
 
 <p align="center">
-  <img src="img/it_05_pannello_qs.png" width="230" alt="Quick Settings Panel">
-  <img src="img/it_09_sfondo_riquadri.png" width="230" alt="Tile Background">
+  <img src="img/en_05_qs_panel.png" width="230" alt="Quick Settings Panel">
+  <img src="img/en_09_tile_background.png" width="230" alt="Tile Background">
 </p>
 
 ### Applying changes
@@ -132,7 +130,7 @@ Before experimenting a lot, save your settings.
 4. **Restore** opens a file picker: select a backup and your preferences are brought back.
 5. **Reset all** removes all saved preferences.
 
-<p align="center"><img src="img/it_06_backup.png" width="230" alt="Backup page"></p>
+<p align="center"><img src="img/en_06_backup.png" width="230" alt="Backup page"></p>
 
 Keep a copy of the backup outside the phone (cloud or PC) before a clean ROM install.
 
@@ -161,7 +159,7 @@ For the best result keep Android in dark mode.
 
 **Oxydian Status** shows, for each process, how many mods started correctly (here: SystemUI 35/35, Settings 2/2, Launcher 2/2, System 1/1). There is also **Export log**, handy to attach to a bug report.
 
-<p align="center"><img src="img/it_08_stato.png" width="230" alt="Oxydian Status"></p>
+<p align="center"><img src="img/en_08_status.png" width="230" alt="Oxydian Status"></p>
 
 To report a bug, turn on **Settings → General → Extra Logs**, reproduce the problem and open an [issue](https://github.com/tugaia56/Oxydian-xposed/issues) describing what you did, your device and your OxygenOS version.
 
