@@ -35,7 +35,16 @@ Una guida passo passo: dall'installazione alle prime personalizzazioni.
 
 ## 3. Giro veloce dell'app
 
-In basso ci sono quattro schede.
+In basso ci sono quattro schede: **Oxydian**, **Mods**, **Cerca** e **Impostazioni**.
+
+<p align="center">
+  <img src="img/it_01_oxydian.png" width="190" alt="Scheda Oxydian">
+  <img src="img/it_02_mods.png" width="190" alt="Scheda Mods">
+  <img src="img/it_03_cerca.png" width="190" alt="Scheda Cerca">
+  <img src="img/it_04_impostazioni.png" width="190" alt="Scheda Impostazioni">
+</p>
+
+Il pulsante a forma di freccia circolare, in alto a destra in ogni pagina, è **Riavvia SystemUI**: serve per applicare le modifiche (vedi più avanti).
 
 ### Oxydian (prima scheda)
 
@@ -58,6 +67,10 @@ In basso ci sono quattro schede.
 | **Always-On Display** | Orologio AOD, meteo, luce sui bordi |
 | **Pannello volume** | Colori e preset dei pulsanti |
 
+Esempio di pagina: **Barra di Stato**, con le opzioni varie (tra cui nascondi icona SIM 1 e SIM 2):
+
+<p align="center"><img src="img/it_07_barra_di_stato.png" width="230" alt="Pagina Barra di Stato"></p>
+
 ### Cerca
 
 Scrivi una parola (per esempio *orologio* o *sfocatura*) e Oxydian trova tutte le opzioni corrispondenti in tutta l'app. Tocca un risultato per andarci direttamente.
@@ -71,7 +84,6 @@ Scrivi una parola (per esempio *orologio* o *sfocatura*) e Oxydian trova tutte l
 | **Aggiornamento** | Controlla se c'è una nuova versione (a mano o in automatico, solo con Wi-Fi) |
 | **Info** | Versione e crediti |
 | **Stato Oxydian** | Mostra quali mod si sono installate correttamente all'ultimo avvio di ogni processo (SystemUI, Impostazioni, Launcher, Framework) |
-| **Riavvia SystemUI** | Applica le modifiche che lo richiedono |
 
 ---
 
@@ -80,9 +92,14 @@ Scrivi una parola (per esempio *orologio* o *sfocatura*) e Oxydian trova tutte l
 Cambiamo qualcosa che si vede subito.
 
 1. Vai in **Mods → Pannello Impostazioni Rapide**.
-2. Apri **Personalizza Riquadri** e scorri fino a **Sfondo Riquadri**. Scegli un colore (puoi anche collegarlo al colore di accento).
-3. Tocca l'icona **Riavvia SystemUI** (nella barra in alto dell'app, oppure *Impostazioni → Riavvia SystemUI*).
+2. Apri **Personalizza Riquadri** e scorri fino a **Sfondo Riquadri**: qui scegli il colore dei riquadri (grandi, piccoli, Media…).
+3. Tocca l'icona **Riavvia SystemUI** (la freccia circolare in alto a destra).
 4. Scorri verso il basso il pannello rapido: il nuovo aspetto è lì.
+
+<p align="center">
+  <img src="img/it_05_pannello_qs.png" width="230" alt="Pannello Impostazioni Rapide">
+  <img src="img/it_09_sfondo_riquadri.png" width="230" alt="Sfondo Riquadri">
+</p>
 
 ### Applicare le modifiche
 
@@ -108,9 +125,12 @@ Ordine consigliato:
 Prima di fare molte prove, salva le impostazioni.
 
 1. Vai in **Impostazioni → Backup**.
-2. **Backup** salva un file `.json` nella cartella che scegli. Il nome del file contiene data e ora, così distingui i backup.
-3. **Ripristina** apre la scelta del file: seleziona un backup e le preferenze tornano come prima.
-4. **Azzera** riporta ogni preferenza al valore predefinito.
+2. **Cartella Backup** sceglie dove salvare i file.
+3. **Backup** esporta tutte le impostazioni in un file `.json`. Il nome del file contiene data e ora, così distingui i backup.
+4. **Ripristino** apre la scelta del file: seleziona un backup e le preferenze tornano come prima.
+5. **Cancella tutto** rimuove tutte le preferenze salvate.
+
+<p align="center"><img src="img/it_06_backup.png" width="230" alt="Pagina Backup"></p>
 
 Tieni una copia del backup fuori dal telefono (cloud o PC) prima di installare di nuovo una ROM da zero.
 
@@ -131,11 +151,15 @@ Per il risultato migliore tieni Android in tema scuro.
 
 | Problema | Cosa fare |
 |---|---|
-| Una mod non fa niente | Riavvia una volta. Poi apri **Impostazioni → Stato Oxydian** e controlla che la mod risulti funzionante. |
+| Una mod non fa niente | Riavvia una volta. Poi apri **Impostazioni → Stato Oxydian** (vedi sotto) e controlla che la mod risulti funzionante. |
 | Dopo un aggiornamento della ROM alcune mod non vanno più | OxygenOS può rinominare parti interne. Stato Oxydian mostra quali sono coinvolte; aggiorna Oxydian e segnala il problema con il log. |
 | L'interfaccia si riavvia in continuazione | In LSPosed **disattiva Oxydian** (o togli i suoi ambiti), riavvia, poi riattiva le mod un gruppo alla volta. |
 | Le opzioni sembrano invariate dopo aver installato una nuova versione di Oxydian | Fai un **riavvio** completo (non solo di SystemUI). |
 | La richiesta di root non compare | Controlla che Oxydian sia autorizzato nel gestore root (KernelSU / Magisk). |
+
+**Stato Oxydian** mostra, per ogni processo, quante mod sono partite correttamente (qui: SystemUI 35/35, Impostazioni 2/2, Launcher 2/2, Sistema 1/1). C'è anche **Esporta log**, utile da allegare a una segnalazione.
+
+<p align="center"><img src="img/it_08_stato.png" width="230" alt="Stato Oxydian"></p>
 
 Per segnalare un bug, attiva **Impostazioni → Generale → Log aggiuntivi**, riproduci il problema e apri una [segnalazione](https://github.com/tugaia56/Oxydian-xposed/issues) descrivendo cosa hai fatto, il dispositivo e la versione di OxygenOS.
 

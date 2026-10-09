@@ -35,7 +35,18 @@ A step-by-step guide: from installation to your first customisations.
 
 ## 3. A quick tour of the app
 
-At the bottom you find four tabs.
+At the bottom you find four tabs: **Oxydian**, **Mods**, **Search** and **Settings**.
+
+<p align="center">
+  <img src="img/it_01_oxydian.png" width="190" alt="Oxydian tab">
+  <img src="img/it_02_mods.png" width="190" alt="Mods tab">
+  <img src="img/it_03_cerca.png" width="190" alt="Search tab">
+  <img src="img/it_04_impostazioni.png" width="190" alt="Settings tab">
+</p>
+
+*(Screenshots are taken from the Italian interface; the layout is identical in English.)*
+
+The circular-arrow button at the top right of every page is **Restart SystemUI**: use it to apply changes (see below).
 
 ### Oxydian (first tab)
 
@@ -58,6 +69,10 @@ At the bottom you find four tabs.
 | **Always-On Display** | AOD clock, weather, edge lighting |
 | **Volume Panel** | Colours and button presets |
 
+Example page: **Status Bar**, with the miscellaneous options (including hide SIM 1 and SIM 2 icon):
+
+<p align="center"><img src="img/it_07_barra_di_stato.png" width="230" alt="Status Bar page"></p>
+
 ### Search
 
 Type a word (for example *clock* or *blur*) and Oxydian finds every option that matches, across the whole app. Tap a result to jump straight to it.
@@ -71,7 +86,6 @@ Type a word (for example *clock* or *blur*) and Oxydian finds every option that 
 | **Update** | Check for a new version (manually or automatically, on Wi-Fi only) |
 | **About** | Version and credits |
 | **Oxydian Status** | Shows which mods installed correctly at the last start of each process (SystemUI, Settings, Launcher, Framework) |
-| **Restart SystemUI** | Applies the changes that need it |
 
 ---
 
@@ -80,9 +94,14 @@ Type a word (for example *clock* or *blur*) and Oxydian finds every option that 
 Let's change something you can see right away.
 
 1. Go to **Mods → Quick Settings Panel**.
-2. Open **Customize Quick Settings Tiles** and scroll to **Tile Background**. Pick a colour (you can also link it to the accent colour).
-3. Tap the **Restart SystemUI** icon (top bar of the app, or *Settings → Restart SystemUI*).
+2. Open **Customize Quick Settings Tiles** and scroll to **Tile Background**: here you choose the colour of the tiles (large, small, Media…).
+3. Tap the **Restart SystemUI** icon (the circular arrow at the top right).
 4. Swipe down the quick panel: the new look is there.
+
+<p align="center">
+  <img src="img/it_05_pannello_qs.png" width="230" alt="Quick Settings Panel">
+  <img src="img/it_09_sfondo_riquadri.png" width="230" alt="Tile Background">
+</p>
 
 ### Applying changes
 
@@ -108,9 +127,12 @@ Suggested order:
 Before experimenting a lot, save your settings.
 
 1. Go to **Settings → Backup**.
-2. **Backup** saves a `.json` file in the folder you choose. The file name contains the date and time, so you can tell backups apart.
-3. **Restore** opens a file picker: select a backup and your preferences are brought back.
-4. **Clear** resets every preference to the default.
+2. **Backup Folder** chooses where the files are saved.
+3. **Backup** exports all your settings to a `.json` file. The file name contains the date and time, so you can tell backups apart.
+4. **Restore** opens a file picker: select a backup and your preferences are brought back.
+5. **Reset all** removes all saved preferences.
+
+<p align="center"><img src="img/it_06_backup.png" width="230" alt="Backup page"></p>
 
 Keep a copy of the backup outside the phone (cloud or PC) before a clean ROM install.
 
@@ -131,11 +153,15 @@ For the best result keep Android in dark mode.
 
 | Problem | What to do |
 |---|---|
-| A mod does nothing | Reboot once. Then open **Settings → Oxydian Status** and check that the mod is listed as working. |
+| A mod does nothing | Reboot once. Then open **Settings → Oxydian Status** (see below) and check that the mod is listed as working. |
 | After a ROM update some mods stopped | OxygenOS can rename internal parts. Oxydian Status shows which ones are affected; update Oxydian and report the problem with the log. |
 | The interface restarts in a loop | In LSPosed, switch **Oxydian** off (or remove its scopes), reboot, then re-enable the mods one group at a time. |
 | Options look unchanged after installing a new Oxydian version | Do a full **reboot** (not only a SystemUI restart). |
 | The root request never appears | Check that Oxydian is allowed in your root manager (KernelSU / Magisk). |
+
+**Oxydian Status** shows, for each process, how many mods started correctly (here: SystemUI 35/35, Settings 2/2, Launcher 2/2, System 1/1). There is also **Export log**, handy to attach to a bug report.
+
+<p align="center"><img src="img/it_08_stato.png" width="230" alt="Oxydian Status"></p>
 
 To report a bug, turn on **Settings → General → Extra Logs**, reproduce the problem and open an [issue](https://github.com/tugaia56/Oxydian-xposed/issues) describing what you did, your device and your OxygenOS version.
 
