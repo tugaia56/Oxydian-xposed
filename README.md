@@ -31,6 +31,10 @@ Oxydian reads the accent and background chosen in Oxydian Theme, so the two apps
 
 New to Oxydian? Follow the step-by-step **[Tutorial](docs/TUTORIAL.md)** (installation, app tour, first customisation, backup, troubleshooting).
 
+## Nothing changes by itself
+
+Installing Oxydian changes nothing. The mods start only after you enable the module in LSPosed, and only on **OxygenOS / ColorOS**: on any other ROM (AOSP, LineageOS, Matrixx…) Oxydian does nothing at all. On OxygenOS, once enabled, it applies its default dark look, and every option can be changed or turned off in the app.
+
 ## Requirements
 
 - OnePlus / OPPO device with **OxygenOS** (tested on OnePlus 12, OxygenOS 16.1), Android 12+

@@ -31,6 +31,10 @@ Oxydian legge accento e sfondo scelti in Oxydian Theme, quindi conviene installa
 
 Prima volta con Oxydian? Segui il **[Tutorial](docs/TUTORIAL.it.md)** passo passo (installazione, giro dell'app, prima personalizzazione, backup, risoluzione dei problemi).
 
+## Non cambia niente da solo
+
+Installare Oxydian non cambia niente. Le mod partono solo dopo che attivi il modulo in LSPosed, e solo su **OxygenOS / ColorOS**: su qualsiasi altra ROM (AOSP, LineageOS, Matrixx…) Oxydian non fa nulla. Su OxygenOS, una volta attivato, applica il suo aspetto scuro predefinito e ogni opzione si può cambiare o spegnere nell'app.
+
 ## Requisiti
 
 - Dispositivo OnePlus / OPPO con **OxygenOS** (testato su OnePlus 12, OxygenOS 16.1), Android 12+

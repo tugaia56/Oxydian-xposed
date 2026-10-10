@@ -31,6 +31,8 @@ A step-by-step guide: from installation to your first customisations.
 4. **Reboot** the phone. This is required the first time, and also after every update of the Oxydian APK: a SystemUI restart alone can keep running the old code.
 5. Open Oxydian and grant **root** access when asked.
 
+> Installing the app changes nothing: the mods start only after you enable the module in LSPosed. On ROMs other than OxygenOS / ColorOS the module does nothing at all.
+
 ---
 
 ## 3. A quick tour of the app
