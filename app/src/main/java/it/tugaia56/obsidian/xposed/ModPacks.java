@@ -44,6 +44,7 @@ import it.tugaia56.obsidian.xposed.hooks.systemui.QsWidgetsMod;
 import it.tugaia56.obsidian.xposed.hooks.systemui.QsSeparateMod;
 import it.tugaia56.obsidian.xposed.hooks.framework.LockScreenPowerMenuMod;
 import it.tugaia56.obsidian.xposed.hooks.settings.CustomShortcut;
+import it.tugaia56.obsidian.xposed.hooks.settings.FallbackHomeBarMod;
 import it.tugaia56.obsidian.xposed.hooks.settings.SettingsCardBackgroundMod;
 import it.tugaia56.obsidian.xposed.hooks.launcher.LauncherMod;
 import it.tugaia56.obsidian.xposed.hooks.launcher.LauncherCardBackgroundMod;
@@ -120,6 +121,7 @@ public class ModPacks {
         }
         if (Constants.Packages.SETTINGS.equals(packageName)) {
             mods.add(CustomShortcut.class);
+            mods.add(FallbackHomeBarMod.class);
             mods.add(SettingsCardBackgroundMod.class);
         }
         // 2026-09-04/05: card "invisibili" + sfondo pagina estesi alle app OEM raggiunte da
