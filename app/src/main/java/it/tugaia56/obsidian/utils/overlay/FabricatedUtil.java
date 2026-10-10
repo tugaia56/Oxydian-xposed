@@ -137,7 +137,7 @@ public class FabricatedUtil {
         // Module prop
         String prop = "id=Obsidian\\nname=Oxydian\\nversion=1.0\\n"
                     + "versionCode=1\\nauthor=tugaia56\\n"
-                    + "description=Oxydian DST fabricated overlay persistence";
+                    + "description=Oxydian DST fabricated overlay persistence\\nbanner=banner.png";
         // service.sh waits for boot_completed then runs post-exec.sh
         // Written via printf to avoid shell expansion of $() inside the script
         String svcCmd =
@@ -147,6 +147,16 @@ public class FabricatedUtil {
             + "'do' '  sleep 1' 'done' 'sleep 5' '' "
             + "'sh $MODDIR/post-exec.sh'"
             + " > " + d + "/service.sh";
+        // Banner mostrato dal gestore dei moduli (KernelSU / Magisk)
+        String bannerSrc = null;
+        try {
+            it.tugaia56.obsidian.utils.FileUtil.copyAssets("module_banner");
+            bannerSrc = ModuleConstants.DATA_DIR + "/module_banner/banner.png";
+        } catch (Throwable ignored) {}
+        if (bannerSrc != null) {
+            Shell.cmd("mkdir -p " + d, "cp -f " + bannerSrc + " " + d + "/banner.png",
+                    "[ -f " + d + "/module.prop ] && (grep -q '^banner=' " + d + "/module.prop || printf '\\nbanner=banner.png\\n' >> " + d + "/module.prop)").exec();
+        }
         Shell.cmd(
             "mkdir -p " + d,
             "[ -f " + d + "/module.prop ] || printf '" + prop + "' > " + d + "/module.prop",

@@ -4,3 +4,4 @@ Added:
 Fixed:
 - Some system apps (for example Smart Sidebar / assistant screen) no longer crash at boot when Oxydian settings are not reachable yet
 - On ROMs other than OxygenOS/ColorOS (AOSP, LineageOS, Matrixx...) the module now does nothing, instead of tinting Settings and other screens as soon as it was enabled
+- The Oxydian root module now has a banner in the module manager (KernelSU / Magisk)
