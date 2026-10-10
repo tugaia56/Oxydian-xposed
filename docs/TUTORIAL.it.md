@@ -180,6 +180,7 @@ Per il risultato migliore tieni Android in tema scuro.
 | Dopo un aggiornamento della ROM alcune mod non vanno più | OxygenOS può rinominare parti interne. Stato Oxydian mostra quali sono coinvolte; aggiorna Oxydian e segnala il problema con il log. |
 | L'interfaccia si riavvia in continuazione | In LSPosed **disattiva Oxydian** (o togli i suoi ambiti), riavvia, poi riattiva le mod un gruppo alla volta. |
 | Le opzioni sembrano invariate dopo aver installato una nuova versione di Oxydian | Fai un **riavvio** completo (non solo di SystemUI). |
+| Schermata lenta o a scatti subito dopo il PIN all'avvio | Gli overlay lasciati da altre app di temi (per esempio ColorBlendr, anche dopo averla disinstallata) possono restare attivi e far ricaricare al sistema le risorse di continuo. In un terminale con root, `cmd overlay list` li mostra; spegni quelli che non usi più con `cmd overlay disable --user 0 <nome>`. |
 | La richiesta di root non compare | Controlla che Oxydian sia autorizzato nel gestore root (KernelSU / Magisk). |
 
 **Stato Oxydian** mostra, per ogni processo, quante mod sono partite correttamente (qui: SystemUI 35/35, Impostazioni 2/2, Launcher 2/2, Sistema 1/1). C'è anche **Esporta log**, utile da allegare a una segnalazione.

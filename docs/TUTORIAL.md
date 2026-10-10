@@ -180,6 +180,7 @@ For the best result keep Android in dark mode.
 | After a ROM update some mods stopped | OxygenOS can rename internal parts. Oxydian Status shows which ones are affected; update Oxydian and report the problem with the log. |
 | The interface restarts in a loop | In LSPosed, switch **Oxydian** off (or remove its scopes), reboot, then re-enable the mods one group at a time. |
 | Options look unchanged after installing a new Oxydian version | Do a full **reboot** (not only a SystemUI restart). |
+| Slow or choppy screen right after typing the PIN at boot | Leftover overlays from other theme apps (for example ColorBlendr, even after uninstalling it) can stay active and make the system reload its resources again and again. In a terminal with root, `cmd overlay list` shows them; turn off the ones you no longer use with `cmd overlay disable --user 0 <name>`. |
 | The root request never appears | Check that Oxydian is allowed in your root manager (KernelSU / Magisk). |
 
 **Oxydian Status** shows, for each process, how many mods started correctly (here: SystemUI 35/35, Settings 2/2, Launcher 2/2, System 1/1). There is also **Export log**, handy to attach to a bug report.

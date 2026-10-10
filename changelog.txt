@@ -1,6 +1,2 @@
 Aggiunto:
-- Google Messaggi: nuovo aspetto delle bolle della chat, con una pagina dedicata in Mods. Puoi scegliere il colore delle bolle ricevute e inviate (originale, scuro come le ricevute, accento al 50% di trasparenza o un colore a scelta), dare a ogni bolla un bordo sottile con un colore diverso per ricevute e inviate e rendere a punta l'angolo in basso (a destra sulle inviate, a sinistra sulle ricevute); anche gli angoli di unione tra bolle consecutive sono a punta. Per usarlo, spunta Messaggi nell'ambito di Oxydian in LSPosed
-
-Cambiato:
-- Nuova icona dell'app: la tavolozza dentro l'ingranaggio ora è un martello con una chiave inglese, perché i colori ora stanno in Oxydian Theme
-- La riga Oxydian in Impostazioni resta ora visibile anche se la sua icona non si riesce a caricare (per esempio subito dopo aver cambiato lo stile delle icone, prima di un riavvio)
+- La barra di avanzamento della schermata "Avvio del telefono..." che compare dopo il PIN all'avvio ora usa il tuo colore di accento
