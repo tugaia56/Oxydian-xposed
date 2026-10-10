@@ -1,2 +1,5 @@
 Added:
 - The progress bar of the "Starting phone..." screen shown after typing the PIN at boot now uses your accent colour
+
+Fixed:
+- Some system apps (for example Smart Sidebar / assistant screen) no longer crash at boot when Oxydian settings are not reachable yet
