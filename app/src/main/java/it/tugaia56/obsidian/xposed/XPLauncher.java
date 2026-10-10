@@ -28,7 +28,37 @@ public class XPLauncher {
     public static ArrayList<XposedMods> runningMods = new ArrayList<>();
     @SuppressLint("StaticFieldLeak") public static Context mContext = null;
 
+    /**
+     * Oxydian e' pensato per OxygenOS / ColorOS: sulle altre ROM (AOSP, LineageOS, Matrixx, crDroid...)
+     * le sue mod di Impostazioni e SystemUI cambierebbero l'aspetto senza che l'utente abbia scelto niente.
+     * Quindi su ROM diverse non si installa nessun hook.
+     */
+    private static Boolean sOplusRom = null;
+
+    private static boolean isOplusRom() {
+        if (sOplusRom == null) {
+            boolean ok = false;
+            try {
+                Class<?> sp = Class.forName("android.os.SystemProperties");
+                for (String key : new String[]{"ro.build.version.oplusrom", "ro.build.version.opporom"}) {
+                    String v = (String) sp.getMethod("get", String.class, String.class).invoke(null, key, "");
+                    if (v != null && !v.isEmpty()) { ok = true; break; }
+                }
+            } catch (Throwable t) {
+                ok = true; // nel dubbio non si disattiva niente
+            }
+            sOplusRom = ok;
+        }
+        return sOplusRom;
+    }
+
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
+        if (!isOplusRom()) {
+            if (lpparam.packageName.equals(Constants.Packages.FRAMEWORK) && "android".equals(lpparam.processName)) {
+                log("[ Obsidian ] ROM diversa da OxygenOS/ColorOS: nessuna mod attiva");
+            }
+            return;
+        }
         log("[ Obsidian ] handleLoadPackage: " + lpparam.packageName);
         Log.d("ObsidianXP", "handleLoadPackage: " + lpparam.packageName);
 
