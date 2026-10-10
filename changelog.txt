@@ -1,7 +1,7 @@
 Aggiunto:
+- Il modulo root di Oxydian ha ora un banner nel gestore dei moduli (KernelSU / Magisk)
 - La barra di avanzamento della schermata "Avvio del telefono..." che compare dopo il PIN all'avvio ora usa il tuo colore di accento
 
 Corretto:
 - Alcune app di sistema (per esempio la schermata assistente) non vanno più in crash all'avvio quando le impostazioni di Oxydian non sono ancora raggiungibili
 - Sulle ROM diverse da OxygenOS/ColorOS (AOSP, LineageOS, Matrixx...) il modulo ora non fa niente, invece di colorare Impostazioni e altre schermate appena attivato
-- Il modulo root di Oxydian ha ora un banner nel gestore dei moduli (KernelSU / Magisk)
