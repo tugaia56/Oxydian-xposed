@@ -280,6 +280,21 @@ public class LockscreenClockMod extends XposedMods {
         boolean enabled = isEnabledForState(state);
         int style = styleForState(state);
 
+        // OOS 16: l'AOD (a schermo intero o "Workshop") non e' disegnato da questo contenitore, che
+        // resta visibile (scala 0.8). Con il nostro orologio AOD spento NON si
+        // devono rimettere VISIBLE i figli stock che avevamo nascosto per la lockscreen: sarebbe
+        // un secondo orologio sopra a quello dell'AOD.
+        if (state == UI_STATE_AOD && !enabled
+                && (KeyguardUiState.getAodLayout() != null || android.os.Build.VERSION.SDK_INT >= 36)) {
+            if (mInjectedClock != null) {
+                ViewGroup parent = (ViewGroup) mInjectedClock.getParent();
+                if (parent != null) parent.removeView(mInjectedClock);
+                mInjectedClock = null;
+                mInjectedStyle = -1;
+            }
+            return;
+        }
+
         // Hide whatever stock views are already there when our clock is enabled — restore
         // them when disabled, matching OC's "BY_OC" tag bookkeeping. Must also skip siblings
         // injected by other Obsidian hooks sharing this same container (e.g. LockscreenWeather's
