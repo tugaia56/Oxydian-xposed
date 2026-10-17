@@ -82,6 +82,8 @@ public class ViewHelper {
             }
         } else if (view instanceof ImageView imageView) {
             imageView.setColorFilter(color);
+        } else if (view instanceof android.widget.AnalogClock analogClock) {
+            analogClock.setDialTintList(ColorStateList.valueOf(color));
         } else if (view instanceof ProgressBar progressBar) {
             progressBar.setProgressTintList(ColorStateList.valueOf(color));
             progressBar.setProgressBackgroundTintList(ColorStateList.valueOf(color));

@@ -31,18 +31,24 @@ import it.tugaia56.obsidian.utils.ObsidianTheme;
 import it.tugaia56.obsidian.xposed.utils.ViewHelper;
 
 /**
- * Carosello orizzontale con anteprima live di tutti i 61 stili orologio, come il picker
+ * Carosello orizzontale con anteprima live di tutti gli 89 stili orologio, come il picker
  * reale di OC: cornice a schermo intero con lo sfondo (il wallpaper del telefono se
  * disponibile, altrimenti un colore) e bordo bianco/accento per lo stile selezionato.
  * Al tocco applica subito lo stile e torna indietro. Condivisa da Orologio SdB e Orologio AOD.
  */
 public class ClockStylePickerFragment extends Fragment {
 
-    private static final int STYLE_COUNT = 61;
+    private static final int STYLE_COUNT = 89;
+
+    /** Gli stili da 0 a ANALOG_FIRST-1 sono digitali, da ANALOG_FIRST in poi analogici. */
+    public static final int ANALOG_FIRST = 61;
+
+    /** Intervallo mostrato dal carosello: tutti gli stili, solo i digitali o solo gli analogici. */
+    public static final int RANGE_ALL = 0, RANGE_DIGITAL = 1, RANGE_ANALOG = 2;
 
     /** Il carosello è "circolare": moltiplichiamo gli stili reali per tante copie virtuali,
      *  cosi si può scorrere avanti/indietro senza mai incontrare una fine — es. dallo stile
-     *  61 avanti si torna subito all'1, senza dover tornare indietro fino in fondo. */
+     *  89 avanti si torna subito all'1, senza dover tornare indietro fino in fondo. */
     private static final int LOOP_MULTIPLIER = 200;
 
     /** Larghezza "di riferimento" a cui sono pensati i layout reali (schermo intero):
@@ -56,10 +62,17 @@ public class ClockStylePickerFragment extends Fragment {
     private static final String ARG_COLOR_TEXT1_KEY = "color_text1_key";
     private static final String ARG_DEFAULT_ACCENT_IS_THEME = "default_accent_is_theme";
     private static final String ARG_BG_COLOR = "bg_color";
+    private static final String ARG_RANGE = "range";
 
     public static ClockStylePickerFragment newInstance(String styleKey, String colorSwitchKey,
             String accentKey, String textKey, boolean defaultAccentIsTheme, int bgColor) {
+        return newInstance(styleKey, colorSwitchKey, accentKey, textKey, defaultAccentIsTheme, bgColor, RANGE_ALL);
+    }
+
+    public static ClockStylePickerFragment newInstance(String styleKey, String colorSwitchKey,
+            String accentKey, String textKey, boolean defaultAccentIsTheme, int bgColor, int range) {
         Bundle b = new Bundle();
+        b.putInt(ARG_RANGE, range);
         b.putString(ARG_STYLE_KEY, styleKey);
         b.putString(ARG_COLOR_SWITCH_KEY, colorSwitchKey);
         b.putString(ARG_COLOR_ACCENT1_KEY, accentKey);
@@ -74,6 +87,7 @@ public class ClockStylePickerFragment extends Fragment {
     private String styleKey, colorSwitchKey, accentKey, textKey;
     private boolean defaultAccentIsTheme;
     private int bgColor;
+    private int first = 0, count = STYLE_COUNT;     // intervallo di stili mostrato
     private Drawable wallpaper;
     private int frameW, frameH;
 
@@ -88,6 +102,9 @@ public class ClockStylePickerFragment extends Fragment {
             textKey = a.getString(ARG_COLOR_TEXT1_KEY);
             defaultAccentIsTheme = a.getBoolean(ARG_DEFAULT_ACCENT_IS_THEME, true);
             bgColor = a.getInt(ARG_BG_COLOR, 0xFF000000);
+            int range = a.getInt(ARG_RANGE, RANGE_ALL);
+            if (range == RANGE_DIGITAL) { first = 0; count = ANALOG_FIRST; }
+            else if (range == RANGE_ANALOG) { first = ANALOG_FIRST; count = STYLE_COUNT - ANALOG_FIRST; }
         }
         try {
             wallpaper = loadLockscreenWallpaper();
@@ -156,8 +173,9 @@ public class ClockStylePickerFragment extends Fragment {
                 currentStyle = Integer.parseInt(ObsidianPrefs.getString(styleKey, "0"));
             } catch (NumberFormatException ignored) {}
         }
-        int middleBlock = (LOOP_MULTIPLIER / 2) * STYLE_COUNT;
-        rv.scrollToPosition(middleBlock + currentStyle);
+        int middleBlock = (LOOP_MULTIPLIER / 2) * count;
+        int offset = currentStyle - first;
+        rv.scrollToPosition(middleBlock + (offset >= 0 && offset < count ? offset : 0));
 
         root.addView(rv);
 
@@ -175,7 +193,7 @@ public class ClockStylePickerFragment extends Fragment {
         }
 
         @Override public void onBindViewHolder(@NonNull VH h, int position) {
-            int style = position % STYLE_COUNT;
+            int style = first + position % count;
             LinearLayout col = (LinearLayout) h.itemView;
             col.removeAllViews();
             RecyclerView.LayoutParams colLp = new RecyclerView.LayoutParams(
@@ -243,7 +261,9 @@ public class ClockStylePickerFragment extends Fragment {
             col.addView(frame);
 
             TextView label = new TextView(requireContext());
-            label.setText(getString(R.string.lockscreen_clock_style_title) + " " + (style + 1));
+            label.setText(style >= ANALOG_FIRST && first == ANALOG_FIRST
+                    ? analogName(requireContext(), style)
+                    : getString(R.string.lockscreen_clock_style_title) + " " + (style + 1));
             label.setTextColor(selected ? ObsidianTheme.accentColor() : 0xCCFFFFFF);
             label.setTextSize(12);
             label.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -256,7 +276,14 @@ public class ClockStylePickerFragment extends Fragment {
             });
         }
 
-        @Override public int getItemCount() { return STYLE_COUNT * LOOP_MULTIPLIER; }
+        @Override public int getItemCount() { return count * LOOP_MULTIPLIER; }
+    }
+
+    /** Nome del quadrante analogico (array non tradotto, stile 62 = indice 0 dopo ANALOG_FIRST). */
+    public static String analogName(android.content.Context c, int style) {
+        String[] names = c.getResources().getStringArray(R.array.analog_clock_style_names);
+        int i = style - ANALOG_FIRST;
+        return i >= 0 && i < names.length ? names[i] : c.getString(R.string.aod_clock_style_analog_title) + " " + (i + 1);
     }
 
     private int accentColor() {

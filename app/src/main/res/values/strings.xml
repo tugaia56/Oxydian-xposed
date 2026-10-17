@@ -1299,4 +1299,12 @@
     <string name="msg_in_title">Colour of received bubbles</string>
     <string name="msg_in_original">Original</string>
     <string name="msg_section_bubbles">Bubbles</string>
+    <string name="aod_clock_style_digital_title">Digital Clock Style</string>
+    <string name="aod_clock_style_analog_title">Analog Clock Style</string>
+    <string name="clock_style_not_in_use">Not in use</string>
+    <string name="aod_analog_section">Analog Clock</string>
+    <string name="aod_analog_dial_color">Dial color</string>
+    <string name="aod_analog_hands_color">Hands color</string>
+    <string name="aod_analog_size">Clock size</string>
+    <string name="aod_analog_position">Vertical position</string>
 </resources>

@@ -1,6 +1,7 @@
 Aggiunto:
 - Il modulo root di Oxydian ha ora un banner nel gestore dei moduli (KernelSU / Magisk)
 - La barra di avanzamento della schermata "Avvio del telefono..." che compare dopo il PIN all'avvio ora usa il tuo colore di accento
+- Orologio AOD analogico: 28 quadranti (Drago, Lupo, Leone, quadranti OOS e altri), con colore del quadrante e delle lancette, dimensione e posizione verticale regolabili. In Orologio AOD ci sono ora due scelte, Stile Orologio Digitale e Stile Orologio Analogico: usarne una disattiva l'altra
 
 Corretto:
 - Alcune app di sistema (per esempio la schermata assistente) non vanno più in crash all'avvio quando le impostazioni di Oxydian non sono ancora raggiungibili

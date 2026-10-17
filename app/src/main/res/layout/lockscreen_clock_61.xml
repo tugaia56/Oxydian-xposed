@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- "Stile 62" — orologio analogico (quadrante Drago dal tema "Outher Out Stock 2"). Quadrante
+     tinto con l'accento (tag accent1, vedi ViewHelper), lancette bianche. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <AnalogClock
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        android:layout_marginVertical="10dp"
+        android:dial="@drawable/analog_dragon_dial"
+        android:hand_hour="@drawable/analog_dragon_hour"
+        android:hand_minute="@drawable/analog_dragon_min"
+        android:tag="accent1" />
+</LinearLayout>

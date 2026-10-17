@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Nomi dei quadranti analogici (stile 62 in poi), non tradotti. -->
+    <string-array name="analog_clock_style_names" translatable="false">
+        <item>Dragon</item>
+        <item>Alien</item>
+        <item>Apache</item>
+        <item>Atom</item>
+        <item>Bat</item>
+        <item>Bear Foot</item>
+        <item>Biohazard</item>
+        <item>Bull</item>
+        <item>Cat</item>
+        <item>Colorful</item>
+        <item>Deer</item>
+        <item>Dog</item>
+        <item>Eagle</item>
+        <item>Fenix</item>
+        <item>Horse Jump</item>
+        <item>Human Hand</item>
+        <item>Karate</item>
+        <item>Lion</item>
+        <item>Music Key</item>
+        <item>OOS Analog 1</item>
+        <item>OOS Analog 2</item>
+        <item>OOS Analog 3</item>
+        <item>OOS Minimalism 1</item>
+        <item>Robotic</item>
+        <item>Samurai</item>
+        <item>Shark</item>
+        <item>Tiger</item>
+        <item>Wolf</item>
+    </string-array>
+</resources>

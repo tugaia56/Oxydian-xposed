@@ -45,6 +45,13 @@ public class AodClockMod extends XposedMods {
     private static final String KEY_FORMAT       = "aod_clock_custom_format";
     private static final String KEY_CUSTOM_FONT  = "aod_custom_font";
 
+    private static final String KEY_ANALOG_DIAL  = "aod_analog_dial_color";
+    private static final String KEY_ANALOG_HANDS = "aod_analog_hands_color";
+    private static final String KEY_ANALOG_SIZE  = "aod_analog_size";
+    private static final String KEY_ANALOG_OFFSET = "aod_analog_offset";        // dp, + = più in basso rispetto al centro
+    /** Lato dell'orologio analogico al 100 %: le immagini dei quadranti sono da 840 px. */
+    private static final int ANALOG_BASE_DP = 196;
+
     private static final String COLOR_ACCENT1 = "aod_clock_color_code_accent1";
     private static final String COLOR_TEXT1   = "aod_clock_color_code_text1";
 
@@ -64,6 +71,10 @@ public class AodClockMod extends XposedMods {
     private int mLineHeightDp;
     private String mDateFormat = "";
     private boolean mCustomFont;
+    private boolean mDialOn, mHandsOn;
+    private int mDialColor = 0xFFFFFFFF, mHandsColor = 0xFFFFFFFF;
+    private float mAnalogSize = 1f;
+    private int mAnalogOffsetDp;
     private int mTopMarginDp;
     private int mBottomMarginDp = 40;
 
@@ -93,9 +104,16 @@ public class AodClockMod extends XposedMods {
         mLineHeightDp= Xprefs.getInt(KEY_LINE_HEIGHT, 0);
         mDateFormat  = Xprefs.getString(KEY_FORMAT, "");
         mCustomFont  = Xprefs.getBoolean(KEY_CUSTOM_FONT, false);
+        mDialOn      = Xprefs.getBoolean(KEY_ANALOG_DIAL + "_on", false);
+        mHandsOn     = Xprefs.getBoolean(KEY_ANALOG_HANDS + "_on", false);
+        mDialColor   = Xprefs.getInt(KEY_ANALOG_DIAL, mDialColor) | 0xFF000000;
+        mHandsColor  = Xprefs.getInt(KEY_ANALOG_HANDS, mHandsColor) | 0xFF000000;
+        mAnalogSize  = Xprefs.getInt(KEY_ANALOG_SIZE, 100) / 100f;
+        mAnalogOffsetDp = Xprefs.getInt(KEY_ANALOG_OFFSET, 0);
         mTopMarginDp    = Xprefs.getInt(KEY_TOP_MARGIN, 0);
         mBottomMarginDp = Xprefs.getInt(KEY_BOTTOM_MARGIN_AOD, 40);
         placeClockView();
+        if (mEnabled) new android.os.Handler(android.os.Looper.getMainLooper()).post(this::centerAodBlock);
     }
 
     private int parseInt(String s, int def) {
@@ -149,6 +167,15 @@ public class AodClockMod extends XposedMods {
                     @Override protected void beforeHookedMethod(MethodHookParam param) {
                         it.tugaia56.obsidian.xposed.utils.KeyguardUiState.registerAodLayout(param.thisObject);
                     }
+                    // Ogni volta che l'AOD compare si riapplica la posizione (orologio analogico):
+                    // senza questo la nuova "Posizione verticale" aspettava il giro successivo.
+                    @Override protected void afterHookedMethod(MethodHookParam param) {
+                        if (!mEnabled || mStyle < 61) return;
+                        if (m.equals("hideClock")) return;
+                        if (m.equals("setVisibility") && !(param.args.length > 0 && param.args[0] instanceof Integer i && i == View.VISIBLE)) return;
+                        android.os.Handler h = new android.os.Handler(android.os.Looper.getMainLooper());
+                        for (long d : new long[]{150, 600, 1500}) h.postDelayed(() -> centerAodBlock(), d);
+                    }
                 });
             } catch (Throwable t) { dbg("hook " + m + " failed: " + t); }
         }
@@ -195,7 +222,31 @@ public class AodClockMod extends XposedMods {
             shift = Math.max(-screenH / 8, Math.min(shift, screenH / 4));
             int minute = (int) ((System.currentTimeMillis() / 60000L) % 5L);
             int drift = (int) ((minute - 2) * 10 * layout.getResources().getDisplayMetrics().density / 2.75f);
-            layout.setTranslationY(-shift + drift);
+            // Orologio analogico: il blocco viene centrato come sopra, e il "margine inferiore"
+            // diventa uno spostamento verticale rispetto al centro (40 dp = nessuno spostamento,
+            // più alto = l'orologio sale, più basso = scende). Con gli stili digitali il margine
+            // continua a lavorare come prima.
+            float offset = 0f;
+            if (mStyle >= 61) offset = mAnalogOffsetDp * layout.getResources().getDisplayMetrics().density;
+            float ty = -shift + drift + offset;
+            if (mStyle >= 61) {
+                // L'orologio analogico non deve uscire dallo schermo né finire sopra al foro della
+                // telecamera: il blocco resta tra il bordo alto sicuro e il bordo basso.
+                float dens = layout.getResources().getDisplayMetrics().density;
+                int cutTop = 0;
+                try {
+                    android.view.WindowInsets wi = layout.getRootWindowInsets();
+                    if (wi != null && wi.getDisplayCutout() != null) cutTop = wi.getDisplayCutout().getSafeInsetTop();
+                    if (wi != null) cutTop = Math.max(cutTop, wi.getInsets(android.view.WindowInsets.Type.statusBars()).top);
+                } catch (Throwable ignored) {}
+                float minTop = Math.max(cutTop, 48 * dens) + 8 * dens;
+                float maxBottom = screenH - 100 * dens;      // sopra l'icona dell'impronta (orologio + meteo)
+                float top = loc[1] + ty, bottom = top + layout.getHeight();
+                if (top < minTop) ty += minTop - top;
+                top = loc[1] + ty; bottom = top + layout.getHeight();
+                if (bottom > maxBottom) ty -= bottom - maxBottom;
+            }
+            layout.setTranslationY(ty);
         } catch (Throwable t) {
             dbg("centerAodBlock ERROR: " + t);
         }
@@ -230,7 +281,9 @@ public class AodClockMod extends XposedMods {
     /** Va applicato DOPO che la view è agganciata a mRootLayout (addView) — appena
      *  inflazionata non ha ancora LayoutParams validi, vedi LockscreenClockMod. */
     private void applyMargins(View clockView) {
-        ViewHelper.setMargins(clockView, mContext, 0, mTopMarginDp, 0, mBottomMarginDp);
+        // Orologio analogico: margini standard, la posizione si regola con "Posizione verticale".
+        boolean analog = mStyle >= 61;
+        ViewHelper.setMargins(clockView, mContext, 0, analog ? 0 : mTopMarginDp, 0, analog ? 40 : mBottomMarginDp);
         // Alcuni stili (es. con robottino) sono più larghi del contenitore che li regge e
         // sporgevano a sinistra, tagliando il fumetto: si usa tutta la larghezza e si centra.
         try {
@@ -283,6 +336,8 @@ public class AodClockMod extends XposedMods {
         ViewHelper.findViewWithTagAndChangeColor(clockView, "accent3", accentColor);
         ViewHelper.findViewWithTagAndChangeColor(clockView, "text1", textColor);
 
+        applyAnalog(clockView);
+
         if (mScale != 1f) ViewHelper.applyTextScalingRecursively(group, mScale);
         if (mLineHeightDp != 0) ViewHelper.applyTextMarginRecursively(mContext, group, mLineHeightDp);
 
@@ -304,6 +359,33 @@ public class AodClockMod extends XposedMods {
         }
 
         injectLottie(clockView);
+    }
+
+    /** Orologio analogico: colori scelti di quadrante e lancette, e dimensione. Se i colori sono
+     *  spenti il quadrante resta tinto con l'accento (tag accent1) e le lancette come disegnate. */
+    private void applyAnalog(View root) {
+        android.widget.AnalogClock ac = findAnalog(root);
+        if (ac == null) return;
+        try {
+            if (mDialOn) ac.setDialTintList(android.content.res.ColorStateList.valueOf(mDialColor));
+            android.content.res.ColorStateList hands = mHandsOn ? android.content.res.ColorStateList.valueOf(mHandsColor) : null;
+            ac.setHourHandTintList(hands);
+            ac.setMinuteHandTintList(hands);
+            ViewGroup.LayoutParams lp = ac.getLayoutParams();
+            if (lp != null) {
+                int px = Math.round(ANALOG_BASE_DP * mAnalogSize * mContext.getResources().getDisplayMetrics().density);
+                if (lp.width != px || lp.height != px) { lp.width = px; lp.height = px; ac.setLayoutParams(lp); }
+            }
+        } catch (Throwable t) { dbg("applyAnalog ERROR: " + t); }
+    }
+
+    private static android.widget.AnalogClock findAnalog(View v) {
+        if (v instanceof android.widget.AnalogClock a) return a;
+        if (v instanceof ViewGroup g) for (int i = 0; i < g.getChildCount(); i++) {
+            android.widget.AnalogClock a = findAnalog(g.getChildAt(i));
+            if (a != null) return a;
+        }
+        return null;
     }
 
     /** Costruita in Java, non dichiarata in XML — LayoutInflater non risolve
