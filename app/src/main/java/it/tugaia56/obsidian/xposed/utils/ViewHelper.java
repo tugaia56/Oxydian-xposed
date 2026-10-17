@@ -66,6 +66,34 @@ public class ViewHelper {
         }
     }
 
+    /** Orologio analogico (AnalogClock): colore del quadrante e delle lancette (se attivi) e
+     *  dimensione (lato = baseDp * size). Colori spenti = disegno originale (quadrante: tag accent1). */
+    public static void applyAnalogOptions(View root, boolean dialOn, int dialColor, boolean handsOn, int handsColor,
+                                          float size, int baseDp) {
+        android.widget.AnalogClock ac = findAnalogClock(root);
+        if (ac == null) return;
+        try {
+            if (dialOn) ac.setDialTintList(ColorStateList.valueOf(dialColor));
+            ColorStateList hands = handsOn ? ColorStateList.valueOf(handsColor) : null;
+            ac.setHourHandTintList(hands);
+            ac.setMinuteHandTintList(hands);
+            ViewGroup.LayoutParams lp = ac.getLayoutParams();
+            if (lp != null) {
+                int px = Math.round(baseDp * size * ac.getResources().getDisplayMetrics().density);
+                if (lp.width != px || lp.height != px) { lp.width = px; lp.height = px; ac.setLayoutParams(lp); }
+            }
+        } catch (Throwable ignored) {}
+    }
+
+    private static android.widget.AnalogClock findAnalogClock(View v) {
+        if (v instanceof android.widget.AnalogClock a) return a;
+        if (v instanceof ViewGroup g) for (int i = 0; i < g.getChildCount(); i++) {
+            android.widget.AnalogClock a = findAnalogClock(g.getChildAt(i));
+            if (a != null) return a;
+        }
+        return null;
+    }
+
     private static void checkTagAndChangeColor(View view, String tagContains, int color) {
         Object tag = view.getTag();
         if (tag == null || !tag.toString().toLowerCase().contains(tagContains)) return;

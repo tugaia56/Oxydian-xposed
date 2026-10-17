@@ -31,14 +31,14 @@ import it.tugaia56.obsidian.utils.ObsidianTheme;
 import it.tugaia56.obsidian.xposed.utils.ViewHelper;
 
 /**
- * Carosello orizzontale con anteprima live di tutti gli 89 stili orologio, come il picker
+ * Carosello orizzontale con anteprima live di tutti i 132 stili orologio, come il picker
  * reale di OC: cornice a schermo intero con lo sfondo (il wallpaper del telefono se
  * disponibile, altrimenti un colore) e bordo bianco/accento per lo stile selezionato.
  * Al tocco applica subito lo stile e torna indietro. Condivisa da Orologio SdB e Orologio AOD.
  */
 public class ClockStylePickerFragment extends Fragment {
 
-    private static final int STYLE_COUNT = 89;
+    private static final int STYLE_COUNT = 132;
 
     /** Gli stili da 0 a ANALOG_FIRST-1 sono digitali, da ANALOG_FIRST in poi analogici. */
     public static final int ANALOG_FIRST = 61;
@@ -48,7 +48,7 @@ public class ClockStylePickerFragment extends Fragment {
 
     /** Il carosello è "circolare": moltiplichiamo gli stili reali per tante copie virtuali,
      *  cosi si può scorrere avanti/indietro senza mai incontrare una fine — es. dallo stile
-     *  89 avanti si torna subito all'1, senza dover tornare indietro fino in fondo. */
+     *  132 avanti si torna subito all'1, senza dover tornare indietro fino in fondo. */
     private static final int LOOP_MULTIPLIER = 200;
 
     /** Larghezza "di riferimento" a cui sono pensati i layout reali (schermo intero):

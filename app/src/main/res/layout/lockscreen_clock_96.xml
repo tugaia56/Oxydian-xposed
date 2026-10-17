@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Stile 97 — orologio analogico "Heart" (quadrante dal tema "Outher Out Stock 2"). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <AnalogClock
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        android:layout_marginVertical="10dp"
+        android:dial="@drawable/analog_heart_dial"
+        android:hand_hour="@drawable/analog_he0dd33_hour"
+        android:hand_minute="@drawable/analog_he0dd33_min"
+        android:tag="accent1" />
+</LinearLayout>

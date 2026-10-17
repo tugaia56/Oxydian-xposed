@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Stile 123 — orologio analogico "Zodiac Pisces 2" (quadrante dal tema "Outher Out Stock 2"). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <AnalogClock
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        android:layout_marginVertical="10dp"
+        android:dial="@drawable/analog_zodiac_pisces_2_dial"
+        android:hand_hour="@drawable/analog_h853f1f_hour"
+        android:hand_minute="@drawable/analog_h853f1f_min"
+        android:tag="accent1" />
+</LinearLayout>

@@ -61,6 +61,10 @@ public class LockscreenClockFragment extends Fragment {
     private static final String KEY_TOP_MARGIN   = "lockscreen_top_margin";               // 0..600 dp
     private static final String KEY_BOTTOM_MARGIN= "lockscreen_bottom_margin";            // -200..600 dp
 
+    private static final String KEY_ANALOG_DIAL  = "lockscreen_analog_dial_color";
+    private static final String KEY_ANALOG_HANDS = "lockscreen_analog_hands_color";
+    private static final String KEY_ANALOG_SIZE  = "lockscreen_analog_size";      // 50-150 %, default 75
+
     private static final String COLOR_ACCENT1 = "lockscreen_clock_color_code_accent1";
     private static final String COLOR_ACCENT2 = "lockscreen_clock_color_code_accent2";
     private static final String COLOR_ACCENT3 = "lockscreen_clock_color_code_accent3";
@@ -114,7 +118,24 @@ public class LockscreenClockFragment extends Fragment {
 
         GroupUtils.addGroup(chain, List.of(
                 gatingSwitch(getString(R.string.lockscreen_clock_switch), getString(R.string.lockscreen_clock_switch_summary), KEY_SWITCH),
-                clockStylePickerItem()));
+                clockStylePickerItem(false),
+                clockStylePickerItem(true)));
+
+        int currentStyle = 0;
+        try { currentStyle = Integer.parseInt(ObsidianPrefs.getString(KEY_STYLE, "0")); } catch (NumberFormatException ignored) {}
+        if (currentStyle >= ClockStylePickerFragment.ANALOG_FIRST) {
+            // Orologio analogico: colori e dimensione al posto delle opzioni del testo.
+            chain.add(new SectionTitleAdapter(List.of(getString(R.string.aod_analog_section))));
+            chain.add(analogColorsRow());
+            GroupUtils.addGroup(chain, List.of(
+                    sliderItem(getString(R.string.aod_analog_size), KEY_ANALOG_SIZE, 50, 150, 75, "%", false)));
+            chain.add(new SectionTitleAdapter(List.of(getString(R.string.lockscreen_clock_custom_margins))));
+            GroupUtils.addGroup(chain, List.of(
+                    sliderItem(getString(R.string.lockscreen_clock_top_margin_title), KEY_TOP_MARGIN, 0, 600, 0, "dp", true),
+                    sliderItem(getString(R.string.lockscreen_clock_bottom_margin_title), KEY_BOTTOM_MARGIN, -200, 600, 40, "dp", true)));
+            finishRebuild(chain);
+            return;
+        }
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.lockscreen_clock_prefs))));
         SwitchWidgetAdapter.SwitchItem colorSwitch = gatingSwitch(getString(R.string.lockscreen_clock_custom_color_title), getString(R.string.lockscreen_clock_custom_color_summary), KEY_COLOR_SWITCH);
@@ -150,6 +171,10 @@ public class LockscreenClockFragment extends Fragment {
                 sliderItem(getString(R.string.lockscreen_clock_top_margin_title), KEY_TOP_MARGIN, 0, 600, 0, "dp", true),
                 sliderItem(getString(R.string.lockscreen_clock_bottom_margin_title), KEY_BOTTOM_MARGIN, -200, 600, 40, "dp", true)));
 
+        finishRebuild(chain);
+    }
+
+    private void finishRebuild(List<RecyclerView.Adapter<?>> chain) {
         android.os.Parcelable scrollState = mRv.getLayoutManager() != null
                 ? mRv.getLayoutManager().onSaveInstanceState() : null;
         mRv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
@@ -171,6 +196,15 @@ public class LockscreenClockFragment extends Fragment {
         mClockColorsAdapter = new DarkShadowColorListener(
                 clockColors, this::onColorEnabled, this::onColorDisabled, this::onColorSwatch);
         return mClockColorsAdapter;
+    }
+
+    /** Colore quadrante e lancette dell'orologio analogico (spenti = disegno originale). */
+    private DarkShadowColorListener analogColorsRow() {
+        List<DarkShadowItem> items = List.of(
+                colorItem(getString(R.string.aod_analog_dial_color), KEY_ANALOG_DIAL, 0xFFFFFFFF),
+                colorItem(getString(R.string.aod_analog_hands_color), KEY_ANALOG_HANDS, 0xFFFFFFFF));
+        mColorItems.addAll(items);
+        return new DarkShadowColorListener(items, this::onColorEnabled, this::onColorDisabled, this::onColorSwatch);
     }
 
     private DarkShadowItem colorItem(String label, String key, int def) {
@@ -296,18 +330,26 @@ public class LockscreenClockFragment extends Fragment {
         return text.isEmpty() ? fallback : text;
     }
 
-    /** Riga "Stile orologio" — apre la griglia con anteprima live di tutti i 61 stili invece
-     *  di un elenco testuale, così si vede subito quale si sta scegliendo. */
-    private ListWidgetAdapter.ListItem clockStylePickerItem() {
+    /** Due righe, "Stile orologio digitale" e "Stile orologio analogico", sulla stessa preferenza
+     *  (KEY_STYLE): sceglierne uno in una riga disattiva l'altra ("Non in uso"). Come nell'AOD. */
+    private ListWidgetAdapter.ListItem clockStylePickerItem(boolean analog) {
+        int current = 0;
+        try { current = Integer.parseInt(ObsidianPrefs.getString(KEY_STYLE, "0")); } catch (NumberFormatException ignored) {}
+        boolean active = (current >= ClockStylePickerFragment.ANALOG_FIRST) == analog;
+        String value;
+        if (!active) value = getString(R.string.clock_style_not_in_use);
+        else if (analog) value = ClockStylePickerFragment.analogName(requireContext(), current);
+        else value = choiceLabel(KEY_STYLE, R.array.lockscreen_clock_style_entries);
+        int titleRes = analog ? R.string.aod_clock_style_analog_title : R.string.aod_clock_style_digital_title;
         return new ListWidgetAdapter.ListItem(
-                getString(R.string.lockscreen_clock_style_title),
-                choiceLabel(KEY_STYLE, R.array.lockscreen_clock_style_entries),
+                getString(titleRes), value,
                 () -> {
                     if (getActivity() instanceof MainActivity mainActivity) {
                         mainActivity.navigateTo(ClockStylePickerFragment.newInstance(
                                         KEY_STYLE, KEY_COLOR_SWITCH, COLOR_ACCENT1, COLOR_TEXT1,
-                                        true, ObsidianTheme.cardColor()),
-                                getString(R.string.lockscreen_clock_style_title));
+                                        true, ObsidianTheme.cardColor(),
+                                        analog ? ClockStylePickerFragment.RANGE_ANALOG : ClockStylePickerFragment.RANGE_DIGITAL),
+                                getString(titleRes));
                     }
                 });
     }
