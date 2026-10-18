@@ -1,8 +1,0 @@
-Added:
-- The Oxydian root module now has a banner in the module manager (KernelSU / Magisk)
-- The progress bar of the "Starting phone..." screen shown after typing the PIN at boot now uses your accent colour
-- Analog clock for AOD and Lock Screen: 71 faces (Dragon, Wolf, Lion, zodiac, OOS faces and more), with adjustable dial colour, hands colour, size and (on AOD) vertical position. The AOD Clock and Lock Screen Clock screens now have two choices, Digital Clock Style and Analog Clock Style: using one turns the other off
-
-Fixed:
-- Some system apps (for example Smart Sidebar / assistant screen) no longer crash at boot when Oxydian settings are not reachable yet
-- On ROMs other than OxygenOS/ColorOS (AOSP, LineageOS, Matrixx...) the module now does nothing, instead of tinting Settings and other screens as soon as it was enabled
