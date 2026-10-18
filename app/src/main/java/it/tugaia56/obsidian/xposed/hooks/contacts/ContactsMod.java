@@ -1,13 +1,18 @@
 package it.tugaia56.obsidian.xposed.hooks.contacts;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -20,10 +25,12 @@ import it.tugaia56.obsidian.xposed.XposedMods;
  * Google Contatti. L'app dichiara una sola risorsa "overlayable" (e non e' un colore), quindi gli
  * overlay di Oxydian Theme non possono cambiarla (STATE_NO_IDMAP: "no resources were overlaid").
  * Si lavora quindi da dentro l'app:
- *  - colori di sistema dell'app (sfondo Blue Gray Dark, pulsante + e scheda selezionata
- *    nell'accento) con le sostituzioni risorse di Xposed (applyResources);
- *  - card dell'elenco (ListItemContainmentView, una MaterialCardView): il sorgente e' offuscato,
- *    quindi non si chiamano i suoi metodi ma si disegna sopra: sfondo prima dei figli, bordo dopo.
+ *  - l'elenco dei contatti e' scritto in Compose: i colori non passano dalle risorse, quindi (come per
+ *    le bolle di Messaggi) si interviene sul disegno, Canvas.drawRoundRect/drawPath: le card larghe e
+ *    scure prendono lo sfondo scelto, e con "con bordo" un bordo nell'accento;
+ *  - pulsante +: View normale, si tinge con l'accento da un listener di layout; la pillola della scheda
+ *    selezionata si riconosce dal disegno (piena, 56 x 32 dp) e prende l'accento;
+ *  - sostituzioni risorse di Xposed per i colori dinamici dell'app (applyResources).
  *
  * La scelta delle card (con/senza bordo) arriva da una proprieta' di sistema, perche' Contatti non
  * vede le preferenze di Oxydian. Serve la spunta su Contatti nell'ambito di Oxydian in LSPosed.
@@ -32,21 +39,19 @@ public class ContactsMod extends XposedMods {
 
     public static final String PKG = "com.google.android.contacts";
     public static final String PROP_BORDER = "persist.obsidian.ct_border";   // "1" con bordo, "0" senza bordo (predefinito)
-    private static final String CARD = "com.google.android.apps.contacts.common.ui.containment.ListItemContainmentView";
     private static final int BLUE_GRAY_DARK = 0xFF1B2029;
-    private static final float CARD_RADIUS_DP = 4f;
 
     private volatile boolean mBorder = false;
     private volatile int mAccent = 0xFF908DFF;
     private volatile int mFillNoBorder = 0xFF2B2F3A;
     private long mPropsAt = 0;
-    private final Paint mFill = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint mStroke = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final RectF mRect = new RectF();
+    private float mDensity = 3f;
+    private float mScreenW = 1080f;
+    private Paint mStroke;
+    private final ThreadLocal<Boolean> mBusy = new ThreadLocal<>();
 
     public ContactsMod(Context context) {
         super(context);
-        mStroke.setStyle(Paint.Style.STROKE);
     }
 
     @Override
@@ -88,48 +93,198 @@ public class ContactsMod extends XposedMods {
         mAccent = accent();
         try {
             Resources r = Resources.getSystem();
+            mDensity = r.getDisplayMetrics().density;
+            mScreenW = r.getDisplayMetrics().widthPixels;
             int id = r.getIdentifier("button_material_dark", "color", "android");
             if (id != 0) mFillNoBorder = r.getColor(id, null);
         } catch (Throwable ignored) {}
     }
 
-    @Override
-    public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
-        final Class<?> card = XposedHelpers.findClassIfExists(CARD, lpparam.classLoader);
-        if (card == null) {
-            XposedBridge.log("[ Obsidian ] ContactsMod: " + CARD + " not found");
-            return;
-        }
-        java.lang.reflect.Method dispatchDraw = ViewGroup.class.getDeclaredMethod("dispatchDraw", Canvas.class);
-        XposedBridge.hookMethod(dispatchDraw, new XC_MethodHook() {
-            @Override protected void beforeHookedMethod(MethodHookParam param) {
-                if (param.thisObject.getClass() != card) return;
-                try { paint((View) param.thisObject, (Canvas) param.args[0], true); } catch (Throwable t) { XposedBridge.log("[ Obsidian ] ContactsMod fill: " + t); }
-            }
-            @Override protected void afterHookedMethod(MethodHookParam param) {
-                if (param.thisObject.getClass() != card) return;
-                try { paint((View) param.thisObject, (Canvas) param.args[0], false); } catch (Throwable t) { XposedBridge.log("[ Obsidian ] ContactsMod stroke: " + t); }
-            }
-        });
-        XposedBridge.log("[ Obsidian ] ContactsMod: hooked " + CARD);
+    private static float luma(int c) {
+        return (0.299f * ((c >> 16) & 0xFF) + 0.587f * ((c >> 8) & 0xFF) + 0.114f * (c & 0xFF)) / 255f;
     }
 
-    /** before=true: sfondo (sopra quello della card, sotto il contenuto); false: bordo sopra a tutto. */
-    private void paint(View v, Canvas c, boolean before) {
+    /** Card della lista: forma piena, opaca, larga (quasi tutto lo schermo), bassa, di colore scuro. */
+    private boolean isCard(Paint p, float w, float h) {
+        if (p.getStyle() != Paint.Style.FILL || p.getShader() != null) return false;
+        int c = p.getColor();
+        if ((c >>> 24) != 255) return false;
+        // niente barra di navigazione a tutta larghezza: le card dei contatti hanno un margine ai lati
+        if (w < mScreenW * 0.7f || w > mScreenW * 0.985f || h < 40 * mDensity || h > 160 * mDensity) return false;
+        float l = luma(c);
+        return l > 0.08f && l < 0.45f;
+    }
+
+    /** Riquadro della scheda selezionata nella barra in basso: pillola di circa 56 x 32 dp, piena e opaca. */
+    private boolean isPill(Paint p, float w, float h) {
+        if (p.getStyle() != Paint.Style.FILL || p.getShader() != null) return false;
+        if ((p.getColor() >>> 24) < 200) return false;
+        return w >= 48 * mDensity && w <= 72 * mDensity && h >= 28 * mDensity && h <= 38 * mDensity;
+    }
+
+    private int fill() {
+        return mBorder ? BLUE_GRAY_DARK : mFillNoBorder;
+    }
+
+    private Paint stroke() {
+        if (mStroke == null) {
+            mStroke = new Paint(Paint.ANTI_ALIAS_FLAG);
+            mStroke.setStyle(Paint.Style.STROKE);
+        }
+        mStroke.setStrokeWidth(Math.max(1f, mDensity));
+        mStroke.setColor(mAccent);
+        return mStroke;
+    }
+
+    @Override
+    public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
+        XC_MethodHook roundRect = new XC_MethodHook() {
+            @Override protected void beforeHookedMethod(MethodHookParam param) {
+                try {
+                    if (mBusy.get() != null) return;
+                    refreshProps();
+                    Object[] a = param.args;
+                    Paint p; float l, t, r, b;
+                    if (a.length == 7 && a[6] instanceof Paint) {
+                        p = (Paint) a[6];
+                        l = (Float) a[0]; t = (Float) a[1]; r = (Float) a[2]; b = (Float) a[3];
+                    } else if (a.length == 4 && a[0] instanceof RectF && a[3] instanceof Paint) {
+                        p = (Paint) a[3];
+                        RectF rc = (RectF) a[0];
+                        l = rc.left; t = rc.top; r = rc.right; b = rc.bottom;
+                    } else return;
+                    float w = r - l, h = b - t;
+                    if (isPill(p, w, h)) {
+                        param.setObjectExtra("oc", p.getColor());
+                        p.setColor(mAccent);
+                        return;
+                    }
+                    if (!isCard(p, w, h)) return;
+                    param.setObjectExtra("oc", p.getColor());
+                    param.setObjectExtra("card", Boolean.TRUE);
+                    p.setColor(fill());
+                } catch (Throwable ignored) {}
+            }
+
+            @Override protected void afterHookedMethod(MethodHookParam param) {
+                try {
+                    Object oc = param.getObjectExtra("oc");
+                    if (oc == null) return;
+                    Object[] a = param.args;
+                    Paint p = a.length == 7 ? (Paint) a[6] : (Paint) a[3];
+                    p.setColor((Integer) oc);
+                    if (!mBorder || param.getObjectExtra("card") == null) return;
+                    mBusy.set(Boolean.TRUE);
+                    try {
+                        Canvas cv = (Canvas) param.thisObject;
+                        if (a.length == 7) {
+                            float inset = Math.max(1f, mDensity) / 2f;
+                            cv.drawRoundRect((Float) a[0] + inset, (Float) a[1] + inset, (Float) a[2] - inset, (Float) a[3] - inset,
+                                    (Float) a[4], (Float) a[5], stroke());
+                        } else {
+                            cv.drawRoundRect((RectF) a[0], (Float) a[1], (Float) a[2], stroke());
+                        }
+                    } finally {
+                        mBusy.remove();
+                    }
+                } catch (Throwable ignored) {}
+            }
+        };
+        XC_MethodHook drawPath = new XC_MethodHook() {
+            @Override protected void beforeHookedMethod(MethodHookParam param) {
+                try {
+                    if (mBusy.get() != null) return;
+                    refreshProps();
+                    if (param.args.length != 2 || !(param.args[0] instanceof Path) || !(param.args[1] instanceof Paint)) return;
+                    Path path = (Path) param.args[0];
+                    Paint p = (Paint) param.args[1];
+                    if (p.getStyle() != Paint.Style.FILL || p.getShader() != null) return;
+                    RectF b = new RectF();
+                    path.computeBounds(b, true);
+                    if (isPill(p, b.width(), b.height())) {
+                        param.setObjectExtra("oc", p.getColor());
+                        p.setColor(mAccent);
+                        return;
+                    }
+                    if (!isCard(p, b.width(), b.height())) return;
+                    param.setObjectExtra("oc", p.getColor());
+                    param.setObjectExtra("card", Boolean.TRUE);
+                    p.setColor(fill());
+                } catch (Throwable ignored) {}
+            }
+
+            @Override protected void afterHookedMethod(MethodHookParam param) {
+                try {
+                    Object oc = param.getObjectExtra("oc");
+                    if (oc == null) return;
+                    Paint p = (Paint) param.args[1];
+                    p.setColor((Integer) oc);
+                    if (!mBorder || param.getObjectExtra("card") == null) return;
+                    mBusy.set(Boolean.TRUE);
+                    try {
+                        ((Canvas) param.thisObject).drawPath((Path) param.args[0], stroke());
+                    } finally {
+                        mBusy.remove();
+                    }
+                } catch (Throwable ignored) {}
+            }
+        };
+        for (String cls : new String[]{"android.graphics.Canvas", "android.graphics.BaseRecordingCanvas",
+                "android.graphics.RecordingCanvas"}) {
+            try {
+                Class<?> c = Class.forName(cls);
+                XposedBridge.hookAllMethods(c, "drawRoundRect", roundRect);
+                XposedBridge.hookAllMethods(c, "drawPath", drawPath);
+            } catch (Throwable ignored) {}
+        }
+
+        // Pulsante + e scheda selezionata: View normali, si tingono con l'accento a ogni layout.
+        // Quando l'activity compare: piu' punti di aggancio, perche' alcuni onResume sono "inlined" dal runtime.
+        XC_MethodHook onShow = new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam param) {
+                try {
+                    if (param.thisObject instanceof Activity) watch((Activity) param.thisObject);
+                } catch (Throwable t) { XposedBridge.log("[ Obsidian ] ContactsMod watch: " + t); }
+            }
+        };
+        for (String m : new String[]{"onStart", "onPostResume", "onWindowFocusChanged", "onResume"}) {
+            try { XposedBridge.hookAllMethods(Activity.class, m, onShow); } catch (Throwable ignored) {}
+        }
+        try {
+            Class<?> people = XposedHelpers.findClassIfExists("com.android.contacts.activities.PeopleActivity", lpparam.classLoader);
+            if (people != null) for (String m : new String[]{"onResume", "onStart", "onPostResume"}) {
+                try { XposedBridge.hookAllMethods(people, m, onShow); } catch (Throwable ignored) {}
+            }
+        } catch (Throwable ignored) {}
+        XposedBridge.log("[ Obsidian ] ContactsMod: canvas hooks installed");
+    }
+
+    private static final int TAG_WATCH = 0x4f787943;
+
+    private void watch(final Activity act) {
+        final View decor = act.getWindow().getDecorView();
+        if (decor.getTag(TAG_WATCH) != null) return;
+        decor.setTag(TAG_WATCH, Boolean.TRUE);
+        final long[] last = {0};
+        decor.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            long now = SystemClock.elapsedRealtime();
+            if (now - last[0] < 400) return;
+            last[0] = now;
+            try { tint(act, decor); } catch (Throwable t) { XposedBridge.log("[ Obsidian ] ContactsMod tint: " + t); }
+        });
+    }
+
+    private void tint(Activity act, View decor) {
         refreshProps();
-        float d = v.getResources().getDisplayMetrics().density;
-        float rad = CARD_RADIUS_DP * d;
-        if (before) {
-            mFill.setStyle(Paint.Style.FILL);
-            mFill.setColor(mBorder ? BLUE_GRAY_DARK : mFillNoBorder);
-            mRect.set(0, 0, v.getWidth(), v.getHeight());
-            c.drawRoundRect(mRect, rad, rad, mFill);
-        } else if (mBorder) {
-            float w = Math.max(1f, d);   // 1 dp
-            mStroke.setStrokeWidth(w);
-            mStroke.setColor(mAccent);
-            mRect.set(w / 2f, w / 2f, v.getWidth() - w / 2f, v.getHeight() - w / 2f);
-            c.drawRoundRect(mRect, rad, rad, mStroke);
+        Resources r = act.getResources();
+        int accent = mAccent;
+        int fabId = r.getIdentifier("floating_action_button", "id", PKG);
+        if (fabId != 0) {
+            View fab = decor.findViewById(fabId);
+            if (fab != null) {
+                fab.setBackgroundTintList(ColorStateList.valueOf(accent));
+                if (fab instanceof ImageView) ((ImageView) fab).setImageTintList(ColorStateList.valueOf(0xFFFFFFFF));
+            }
         }
     }
 
