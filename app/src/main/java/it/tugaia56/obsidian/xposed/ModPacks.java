@@ -48,6 +48,7 @@ import it.tugaia56.obsidian.xposed.hooks.settings.FallbackHomeBarMod;
 import it.tugaia56.obsidian.xposed.hooks.settings.SettingsCardBackgroundMod;
 import it.tugaia56.obsidian.xposed.hooks.launcher.LauncherMod;
 import it.tugaia56.obsidian.xposed.hooks.launcher.LauncherCardBackgroundMod;
+import it.tugaia56.obsidian.xposed.hooks.acalendar.ACalendarPlusMod;
 import it.tugaia56.obsidian.xposed.hooks.contacts.ContactsMod;
 import it.tugaia56.obsidian.xposed.hooks.messages.MessagesBubbleMod;
 
@@ -136,6 +137,9 @@ public class ModPacks {
         }
         if (ContactsMod.PKG.equals(packageName)) {
             mods.add(ContactsMod.class);
+        }
+        if (ACalendarPlusMod.PKG.equals(packageName)) {
+            mods.add(ACalendarPlusMod.class);
         }
         if (Constants.Packages.FRAMEWORK.equals(packageName)) {
             mods.add(LockScreenPowerMenuMod.class);
