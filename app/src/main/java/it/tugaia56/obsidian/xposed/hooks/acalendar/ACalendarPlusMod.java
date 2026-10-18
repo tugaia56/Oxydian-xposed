@@ -61,6 +61,8 @@ public class ACalendarPlusMod extends XposedMods {
 
     private final HashMap<Long, Integer> mMap = new HashMap<>();
     private volatile boolean mReady = false;
+    private volatile int mAccent = 0xFF908DFF;
+    private volatile int mRipple = 0x80908DFF;
 
     public ACalendarPlusMod(Context context) {
         super(context);
@@ -84,6 +86,10 @@ public class ACalendarPlusMod extends XposedMods {
             Resources sys = Resources.getSystem();
             int[] bg = new int[5];
             bg[4] = 0xFFFF0000;
+            int aid = sys.getIdentifier("accent_material_dark", "color", "android");
+            if (aid != 0) mAccent = appRes.getColor(aid, null);
+            int rid = sys.getIdentifier("ripple_material_dark", "color", "android");
+            if (rid != 0) mRipple = appRes.getColor(rid, null);
             String[] names = {"background_dark", "background_floating_material_dark", "button_material_dark", "ripple_material_dark"};
             for (int i = 0; i < 4; i++) {
                 int id = sys.getIdentifier(names[i], "color", "android");
@@ -174,6 +180,25 @@ public class ACalendarPlusMod extends XposedMods {
                 fixTypedArray((TypedArray) param.getResult(), attrs);
             }
         });
+        // Colori scritti nel codice dell'app (non passano dal tema): azzurro degli eventi (#4285f4) -> accento,
+        // blu del sabato nell'agenda (#2020f0) -> "Opacita' tocco". Si cambia solo il colore passato ai metodi di disegno.
+        XC_MethodHook recolor = new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                if (param.args.length == 0 || !(param.args[0] instanceof Integer)) return;
+                int c = (Integer) param.args[0];
+                int rgb = c & 0xFFFFFF;
+                if (rgb != 0x4285F4 && rgb != 0x2020F0) return;
+                if (!ensureReady()) return;
+                param.args[0] = rgb == 0x4285F4 ? ((c & 0xFF000000) | (mAccent & 0xFFFFFF)) : mRipple;
+            }
+        };
+        XposedBridge.hookAllMethods(android.graphics.Paint.class, "setColor", recolor);
+        XposedBridge.hookAllMethods(android.widget.TextView.class, "setTextColor", recolor);
+        XposedBridge.hookAllMethods(android.view.View.class, "setBackgroundColor", recolor);
+        XposedBridge.hookAllMethods(android.graphics.drawable.ColorDrawable.class, "setColor", recolor);
+        XposedBridge.hookAllConstructors(android.graphics.drawable.ColorDrawable.class, recolor);
+        XposedBridge.hookAllMethods(android.graphics.drawable.GradientDrawable.class, "setColor", recolor);
         log("hook aCalendar+ installati");
     }
 }
