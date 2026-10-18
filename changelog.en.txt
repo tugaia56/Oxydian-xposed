@@ -1,0 +1,2 @@
+Changed:
+- Automatic app updates are now on by default: the app checks for a new version by itself and sends a notification. On first launch it asks for the notification permission. Anyone who had already turned it off keeps it off

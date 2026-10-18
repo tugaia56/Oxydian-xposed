@@ -33,7 +33,7 @@ public class UpdateScheduler {
      *  l'auto-check è attivo (aggiornando i vincoli se "Solo Wi-Fi" è cambiato), cancel se è
      *  spento. Sicuro da richiamare quante volte si vuole (KEEP/REPLACE via policy corretta). */
     public static void reschedule(Context context) {
-        boolean autoCheck = ObsidianPrefs.getBoolean(KEY_AUTO_CHECK, false);
+        boolean autoCheck = ObsidianPrefs.getBoolean(KEY_AUTO_CHECK, true);   // acceso di serie
         if (!autoCheck) {
             cancel(context);
             return;

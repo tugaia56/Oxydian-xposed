@@ -1,0 +1,2 @@
+Aggiornato:
+- L'aggiornamento automatico dell'app ora è acceso di serie: l'app controlla da sola se c'è una nuova versione e manda una notifica. Alla prima apertura chiede il permesso per le notifiche. Chi lo aveva già spento lo ritrova spento

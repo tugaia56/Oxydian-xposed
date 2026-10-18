@@ -164,6 +164,19 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
 
         getSupportFragmentManager().addOnBackStackChangedListener(
                 () -> mBottomNav.setVisibility(View.VISIBLE));
+
+        // L'aggiornamento automatico è acceso di serie: una sola volta si chiede il permesso per le
+        // notifiche (Android 13+), altrimenti l'avviso di una nuova versione non potrebbe comparire.
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= 33
+                    && ObsidianPrefs.getBoolean("update_auto_check", true)
+                    && !ObsidianPrefs.getBoolean("update_notif_permission_asked", false)
+                    && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                            != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                ObsidianPrefs.putBoolean("update_notif_permission_asked", true);
+                requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 4711);
+            }
+        } catch (Throwable ignored) {}
     }
 
     // ── Options menu ──────────────────────────────────────────────────────────

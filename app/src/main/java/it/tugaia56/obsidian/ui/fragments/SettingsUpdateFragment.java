@@ -97,7 +97,7 @@ public class SettingsUpdateFragment extends Fragment {
         SwitchWidgetAdapter.SwitchItem autoUpdateItem = new SwitchWidgetAdapter.SwitchItem(
                 getString(R.string.settings_auto_update),
                 getString(R.string.settings_auto_update_summary),
-                ObsidianPrefs.getBoolean(KEY_AUTO_CHECK, false), null);
+                ObsidianPrefs.getBoolean(KEY_AUTO_CHECK, true), null);
         autoUpdateItem.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_AUTO_CHECK, autoUpdateItem.checked);
             UpdateScheduler.reschedule(requireContext());
