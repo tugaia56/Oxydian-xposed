@@ -1,0 +1,2 @@
+Aggiunto:
+- Google Contatti: card dell'elenco con bordo nell'accento (oppure senza bordo, predefinito), sfondo Blue Gray Dark, accento su pulsante + e scheda selezionata. Serve la spunta su Contatti nell'ambito di Oxydian in LSPosed

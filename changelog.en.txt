@@ -1,0 +1,2 @@
+Added:
+- Google Contacts: list cards with an accent-colour border (or no border, the default), Blue Gray Dark background, accent colour on the + button and the selected tab. Needs Contacts ticked in Oxydian's scope in LSPosed

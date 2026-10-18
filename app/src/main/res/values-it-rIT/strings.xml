@@ -1279,4 +1279,10 @@
     <string name="aod_analog_hands_color">Colore lancette</string>
     <string name="aod_analog_size">Dimensione orologio</string>
     <string name="aod_analog_position">Posizione verticale</string>
+    <string name="nav_contacts">Google Contatti</string>
+    <string name="nav_contacts_summary">Card dei contatti con o senza bordo, accento su pulsante + e scheda selezionata</string>
+    <string name="ct_note">Funziona solo nell\'app Google Contatti e serve la spunta su Contatti nell\'ambito di Oxydian in LSPosed. Chiudi e riapri Contatti per vedere le modifiche.</string>
+    <string name="ct_card_title">Card dei contatti</string>
+    <string name="ct_card_default">Predefinito (senza bordo)</string>
+    <string name="ct_card_border">Con bordo</string>
 </resources>

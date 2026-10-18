@@ -107,6 +107,14 @@ public class GestioneModsTabFragment extends Fragment {
                         "angolo", "corner", "google"),
 
                 new NavAdapter.NavItem(
+                        R.drawable.ic_notifications,
+                        getString(R.string.nav_contacts),
+                        getString(R.string.nav_contacts_summary),
+                        () -> navigate(new ContactsFragment(), getString(R.string.nav_contacts)),
+                        0xFF2196F3, // blue
+                        "contatti", "contacts", "rubrica", "card", "bordo", "border", "google"),
+
+                new NavAdapter.NavItem(
                         R.drawable.ic_sysui_volume,
                         getString(R.string.dark_shadow_preset_rvd),
                         getString(R.string.nav_volume_icon_summary),

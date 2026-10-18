@@ -1307,4 +1307,10 @@
     <string name="aod_analog_hands_color">Hands color</string>
     <string name="aod_analog_size">Clock size</string>
     <string name="aod_analog_position">Vertical position</string>
+    <string name="nav_contacts">Google Contacts</string>
+    <string name="nav_contacts_summary">Contact cards with or without a border, accent colour on the + button and the selected tab</string>
+    <string name="ct_note">Works only in the Google Contacts app and needs Contacts ticked in Oxydian\'s scope in LSPosed. Close and reopen Contacts to see the changes.</string>
+    <string name="ct_card_title">Contact cards</string>
+    <string name="ct_card_default">Default (no border)</string>
+    <string name="ct_card_border">With border</string>
 </resources>

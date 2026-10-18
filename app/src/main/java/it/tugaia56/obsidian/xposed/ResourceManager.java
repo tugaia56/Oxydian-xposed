@@ -71,6 +71,7 @@ public class ResourceManager implements IXposedHookInitPackageResources, IXposed
     public void handleInitPackageResources(XC_InitPackageResources.InitPackageResourcesParam resparam) {
         XposedBridge.log("[ Obsidian ] ResourceManager.handleInitPackageResources: " + resparam.packageName);
         resparams.put(resparam.packageName, resparam);
+        try { it.tugaia56.obsidian.xposed.hooks.contacts.ContactsMod.applyResources(resparam); } catch (Throwable t) { XposedBridge.log("[ Obsidian ] ContactsMod.apply ERROR: " + t); }
         try { MonetFreeze.applyPreloaded(resparam); } catch (Throwable t) { XposedBridge.log("[ Obsidian ] MonetFreeze.apply ERROR: " + t); }
         try { DstDialogStyle.applyPreloaded(resparam); } catch (Throwable t) { XposedBridge.log("[ Obsidian ] DstDialogStyle.apply ERROR: " + t); }
         try { DstCpbStyle.applyPreloaded(resparam); } catch (Throwable t) { XposedBridge.log("[ Obsidian ] DstCpbStyle.apply ERROR: " + t); }
