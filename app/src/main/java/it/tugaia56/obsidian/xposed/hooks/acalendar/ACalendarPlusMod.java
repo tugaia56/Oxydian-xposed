@@ -196,7 +196,9 @@ public class ACalendarPlusMod extends XposedMods {
                 int rgb = c & 0xFFFFFF;
                 boolean sunday = rgb == 0xFF5252 || rgb == 0xD95F5F || rgb == 0xFF5564;
                 boolean saturday = rgb == 0x2020F0 || rgb == 0x3030E0 || rgb == 0x6060E0 || rgb == 0x4040E0;
-                if (rgb != 0x4285F4 && !saturday && !sunday) return;
+                // cerchi "accento" nei selettori colore di Aspetto: viola chiaro della tavolozza e blu del Tema
+                boolean accentChoice = rgb == 0xBA68C8 || rgb == 0x0277BD || rgb == 0x0288D1;
+                if (rgb != 0x4285F4 && !saturday && !sunday && !accentChoice) return;
                 if (!ensureReady()) return;
                 if (sunday) { param.args[0] = (c & 0xFF000000) | 0xFF0000; return; }
                 param.args[0] = saturday ? (int) 0xFFFF9800 : ((c & 0xFF000000) | (mAccent & 0xFFFFFF));
@@ -221,6 +223,9 @@ public class ACalendarPlusMod extends XposedMods {
         XposedBridge.hookAllConstructors(android.graphics.drawable.ColorDrawable.class, recolor);
         XposedBridge.hookAllMethods(android.graphics.drawable.GradientDrawable.class, "setColor", recolor);
         XposedBridge.hookAllConstructors(android.text.style.ForegroundColorSpan.class, recolor);
+        XposedBridge.hookAllMethods(android.widget.ImageView.class, "setColorFilter", recolor);
+        XposedBridge.hookAllMethods(android.graphics.drawable.Drawable.class, "setColorFilter", recolor);
+        XposedBridge.hookAllMethods(android.graphics.drawable.Drawable.class, "setTint", recolor);
         log("hook aCalendar+ installati");
     }
 }
