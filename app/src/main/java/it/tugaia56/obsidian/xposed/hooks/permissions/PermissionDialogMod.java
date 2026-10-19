@@ -57,7 +57,9 @@ public class PermissionDialogMod extends XposedMods {
             g.setColor(sysColor(r, "background_dark", 0xFF1B2029));
             g.setStroke(Math.max(2, Math.round(2 * d)), sysColor(r, "accent_material_dark", 0xFF908DFF));
             g.setCornerRadius(28 * d);
-            v.setBackground(g);
+            // ai lati la finestra taglia qualche pixel: il disegno si restringe un po' per far vedere il bordo
+            int side = Math.round(4 * d);
+            v.setBackground(new android.graphics.drawable.InsetDrawable(g, side, 0, side, 0));
             v.setTag(TAG_DONE);
         } catch (Throwable t) {
             XposedBridge.log("[ Obsidian ] PermissionDialogMod ERROR: " + t);
