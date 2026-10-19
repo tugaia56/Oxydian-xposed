@@ -49,6 +49,7 @@ import it.tugaia56.obsidian.xposed.hooks.settings.SettingsCardBackgroundMod;
 import it.tugaia56.obsidian.xposed.hooks.launcher.LauncherMod;
 import it.tugaia56.obsidian.xposed.hooks.launcher.LauncherCardBackgroundMod;
 import it.tugaia56.obsidian.xposed.hooks.acalendar.ACalendarPlusMod;
+import it.tugaia56.obsidian.xposed.hooks.permissions.PermissionDialogMod;
 import it.tugaia56.obsidian.xposed.hooks.contacts.ContactsMod;
 import it.tugaia56.obsidian.xposed.hooks.messages.MessagesBubbleMod;
 
@@ -137,6 +138,9 @@ public class ModPacks {
         }
         if (ContactsMod.PKG.equals(packageName)) {
             mods.add(ContactsMod.class);
+        }
+        if (PermissionDialogMod.PKG.equals(packageName)) {
+            mods.add(PermissionDialogMod.class);
         }
         if (ACalendarPlusMod.PKG.equals(packageName)) {
             mods.add(ACalendarPlusMod.class);
