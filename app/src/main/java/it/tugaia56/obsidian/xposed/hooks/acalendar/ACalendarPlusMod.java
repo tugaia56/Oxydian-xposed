@@ -193,8 +193,10 @@ public class ACalendarPlusMod extends XposedMods {
                 if (param.args.length == 0 || !(param.args[0] instanceof Integer)) return;
                 int c = (Integer) param.args[0];
                 int rgb = c & 0xFFFFFF;
-                if (rgb != 0x4285F4 && rgb != 0x2020F0) return;
+                boolean sunday = rgb == 0xFF5252 || rgb == 0xD95F5F || rgb == 0xFF5564;
+                if (rgb != 0x4285F4 && rgb != 0x2020F0 && !sunday) return;
                 if (!ensureReady()) return;
+                if (sunday) { param.args[0] = (c & 0xFF000000) | 0xFF0000; return; }
                 param.args[0] = rgb == 0x4285F4 ? ((c & 0xFF000000) | (mAccent & 0xFFFFFF)) : mRipple;
             }
         };
