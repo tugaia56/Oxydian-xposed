@@ -52,7 +52,7 @@ public class ACalendarPlusMod extends XposedMods {
             {"colorPrimary", 0xFF161616, 0}, {"colorSidebar", 0xFF161616, 0},
             {"material_drawer_background", 0xFF202020, 1}, {"shadedBg", 0xFF161616, 0},
             {"@android:navigationBarColor", 0xFF000000, 0},
-            {"@android:statusBarColor", 0xFF000000, 1}, {"@android:statusBarColor", 0xFF212121, 1},
+            {"@android:statusBarColor", 0xFF000000, 0}, {"@android:statusBarColor", 0xFF212121, 0},
             // sabato (blu): arancione #ff9800
             {"colorSaturday", 0xFF2020F0, 5}, {"colorSaturday", 0xFF3030E0, 5},
             {"colorSaturdayOff", 0xFF6060E0, 5}, {"colorSaturdayOff", 0xFF4040E0, 5},
@@ -102,7 +102,7 @@ public class ACalendarPlusMod extends XposedMods {
             }
             HashMap<Long, Integer> map = new HashMap<>();
             mButton = bg[2];
-            mFloating = bg[1];
+            mFloating = bg[0];
             int b0 = bg[0];
             mWeekendDerived = 0xFF000000 | ((((b0 >> 16) & 0xFF) + ((255 - ((b0 >> 16) & 0xFF)) * 15) / 255) << 16) | ((((b0 >> 8) & 0xFF) + ((255 - ((b0 >> 8) & 0xFF)) * 15) / 255) << 8) | ((b0 & 0xFF) + ((255 - (b0 & 0xFF)) * 15) / 255);
             for (Object[] r : RULES) {
@@ -224,7 +224,7 @@ public class ACalendarPlusMod extends XposedMods {
         XposedBridge.hookAllMethods(android.view.View.class, "setBackgroundColor", recolor);
         XposedBridge.hookAllMethods(android.graphics.drawable.ColorDrawable.class, "setColor", recolor);
         XposedBridge.hookAllConstructors(android.graphics.drawable.ColorDrawable.class, recolor);
-        // intestazione (barra del titolo): grigio #212121 dello stile scuro -> background_floating_material_dark
+        // intestazione (barra del titolo): grigio #212121 dello stile scuro -> background_dark
         XC_MethodHook header = new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
