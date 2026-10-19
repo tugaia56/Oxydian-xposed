@@ -201,7 +201,8 @@ public class ACalendarPlusMod extends XposedMods {
                 boolean saturday = rgb == 0x2020F0 || rgb == 0x3030E0 || rgb == 0x6060E0 || rgb == 0x4040E0;
                 // cerchi "accento" nei selettori colore di Aspetto: viola chiaro della tavolozza e blu del Tema
                 boolean accentChoice = rgb == 0xBA68C8 || rgb == 0x0277BD || rgb == 0x0288D1;
-                if (rgb != 0x4285F4 && !saturday && !sunday && !accentChoice) return;
+                boolean pale = rgb == 0x9FC6E7 || rgb == 0x4CAF50;
+                if (rgb != 0x4285F4 && !saturday && !sunday && !accentChoice && !pale) return;
                 if (!ensureReady()) return;
                 if (sunday) { param.args[0] = (c & 0xFF000000) | 0xFF0000; return; }
                 param.args[0] = saturday ? (int) 0xFFFF9800 : ((c & 0xFF000000) | (mAccent & 0xFFFFFF));
