@@ -44,6 +44,16 @@ public class PermissionDialogMod extends XposedMods {
         return def;
     }
 
+    private static void tintButtons(View v, int color) {
+        if (v instanceof android.widget.Button) {
+            android.widget.Button b = (android.widget.Button) v;
+            if (b.getCurrentTextColor() != color) b.setTextColor(color);
+        } else if (v instanceof android.view.ViewGroup) {
+            android.view.ViewGroup g = (android.view.ViewGroup) v;
+            for (int i = 0; i < g.getChildCount(); i++) tintButtons(g.getChildAt(i), color);
+        }
+    }
+
     private static void style(Activity a) {
         try {
             Resources r = a.getResources();
@@ -51,7 +61,10 @@ public class PermissionDialogMod extends XposedMods {
             if (id == 0) id = r.getIdentifier("grant_dialog", "id", PKG);
             if (id == 0) return;
             View v = a.findViewById(id);
-            if (v == null || TAG_DONE.equals(v.getTag())) return;
+            if (v == null) return;
+            // testo dei pulsanti ("Consenti", "Non consentire"...) nell'accento
+            tintButtons(v, sysColor(r, "accent_material_dark", 0xFF908DFF));
+            if (TAG_DONE.equals(v.getTag())) return;
             float d = r.getDisplayMetrics().density;
             GradientDrawable g = new GradientDrawable();
             g.setColor(sysColor(r, "background_dark", 0xFF1B2029));
