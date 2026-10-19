@@ -63,6 +63,8 @@ public class ACalendarPlusMod extends XposedMods {
     private volatile boolean mReady = false;
     private volatile int mAccent = 0xFF908DFF;
     private volatile int mRipple = 0x80908DFF;
+    private volatile int mButton = 0xFF242832;
+    private volatile int mWeekendDerived = 0;
 
     public ACalendarPlusMod(Context context) {
         super(context);
@@ -96,6 +98,9 @@ public class ACalendarPlusMod extends XposedMods {
                 bg[i] = id != 0 ? appRes.getColor(id, null) : 0xFF1B2029;
             }
             HashMap<Long, Integer> map = new HashMap<>();
+            mButton = bg[2];
+            int b0 = bg[0];
+            mWeekendDerived = 0xFF000000 | ((((b0 >> 16) & 0xFF) + ((255 - ((b0 >> 16) & 0xFF)) * 15) / 255) << 16) | ((((b0 >> 8) & 0xFF) + ((255 - ((b0 >> 8) & 0xFF)) * 15) / 255) << 8) | ((b0 & 0xFF) + ((255 - (b0 & 0xFF)) * 15) / 255);
             for (Object[] r : RULES) {
                 String n = (String) r[0];
                 int attr = n.startsWith("@android:")
@@ -193,12 +198,25 @@ public class ACalendarPlusMod extends XposedMods {
                 param.args[0] = rgb == 0x4285F4 ? ((c & 0xFF000000) | (mAccent & 0xFFFFFF)) : mRipple;
             }
         };
+        // sfondo di sabato e domenica nell'agenda: l'app lo calcola come sfondo + bianco al 6% e lo applica con
+        // setBackgroundColor: si sostituisce con button_material_dark
+        XC_MethodHook weekend = new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                if (param.args.length == 0 || !(param.args[0] instanceof Integer)) return;
+                if (!ensureReady()) return;
+                if ((Integer) param.args[0] != mWeekendDerived) return;
+                param.args[0] = mButton;
+            }
+        };
+        XposedBridge.hookAllMethods(android.view.View.class, "setBackgroundColor", weekend);
         XposedBridge.hookAllMethods(android.graphics.Paint.class, "setColor", recolor);
         XposedBridge.hookAllMethods(android.widget.TextView.class, "setTextColor", recolor);
         XposedBridge.hookAllMethods(android.view.View.class, "setBackgroundColor", recolor);
         XposedBridge.hookAllMethods(android.graphics.drawable.ColorDrawable.class, "setColor", recolor);
         XposedBridge.hookAllConstructors(android.graphics.drawable.ColorDrawable.class, recolor);
         XposedBridge.hookAllMethods(android.graphics.drawable.GradientDrawable.class, "setColor", recolor);
+        XposedBridge.hookAllConstructors(android.text.style.ForegroundColorSpan.class, recolor);
         log("hook aCalendar+ installati");
     }
 }
