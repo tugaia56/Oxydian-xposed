@@ -1,2 +1,3 @@
 Aggiunto:
 - Google Contatti: card dell'elenco con bordo nell'accento (oppure senza bordo, predefinito), sfondo Blue Gray Dark, accento su pulsante + e scheda selezionata. Serve la spunta su Contatti nell'ambito di Oxydian in LSPosed
+- aCalendar+: mod nascosta e sempre attiva (nessuna impostazione), con i colori fissi dei temi scuro e nero: sfondi in Blue Gray Dark, barra di stato e intestazione, sabati arancioni, domeniche in rosso, eventi e cerchi dei selettori colore nell'accento. Serve la spunta su aCalendar+ nell'ambito di Oxydian in LSPosed
