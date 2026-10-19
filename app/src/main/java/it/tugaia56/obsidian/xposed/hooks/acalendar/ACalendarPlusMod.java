@@ -52,6 +52,7 @@ public class ACalendarPlusMod extends XposedMods {
             {"colorPrimary", 0xFF161616, 0}, {"colorSidebar", 0xFF161616, 0},
             {"material_drawer_background", 0xFF202020, 1}, {"shadedBg", 0xFF161616, 0},
             {"@android:navigationBarColor", 0xFF000000, 0},
+            {"@android:statusBarColor", 0xFF000000, 1}, {"@android:statusBarColor", 0xFF212121, 1},
             // sabato (blu): arancione #ff9800
             {"colorSaturday", 0xFF2020F0, 5}, {"colorSaturday", 0xFF3030E0, 5},
             {"colorSaturdayOff", 0xFF6060E0, 5}, {"colorSaturdayOff", 0xFF4040E0, 5},
@@ -64,6 +65,7 @@ public class ACalendarPlusMod extends XposedMods {
     private volatile int mAccent = 0xFF908DFF;
     private volatile int mRipple = 0x80908DFF;
     private volatile int mButton = 0xFF242832;
+    private volatile int mFloating = 0xFF22262F;
     private volatile int mWeekendDerived = 0;
 
     public ACalendarPlusMod(Context context) {
@@ -100,6 +102,7 @@ public class ACalendarPlusMod extends XposedMods {
             }
             HashMap<Long, Integer> map = new HashMap<>();
             mButton = bg[2];
+            mFloating = bg[1];
             int b0 = bg[0];
             mWeekendDerived = 0xFF000000 | ((((b0 >> 16) & 0xFF) + ((255 - ((b0 >> 16) & 0xFF)) * 15) / 255) << 16) | ((((b0 >> 8) & 0xFF) + ((255 - ((b0 >> 8) & 0xFF)) * 15) / 255) << 8) | ((b0 & 0xFF) + ((255 - (b0 & 0xFF)) * 15) / 255);
             for (Object[] r : RULES) {
@@ -221,11 +224,45 @@ public class ACalendarPlusMod extends XposedMods {
         XposedBridge.hookAllMethods(android.view.View.class, "setBackgroundColor", recolor);
         XposedBridge.hookAllMethods(android.graphics.drawable.ColorDrawable.class, "setColor", recolor);
         XposedBridge.hookAllConstructors(android.graphics.drawable.ColorDrawable.class, recolor);
+        // intestazione (barra del titolo): grigio #212121 dello stile scuro -> background_floating_material_dark
+        XC_MethodHook header = new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                if (param.args.length == 0 || !(param.args[0] instanceof Integer)) return;
+                if (((Integer) param.args[0] & 0xFFFFFF) != 0x212121) return;
+                if (!ensureReady()) return;
+                param.args[0] = (((Integer) param.args[0]) & 0xFF000000) | (mFloating & 0xFFFFFF);
+            }
+        };
+        XposedBridge.hookAllMethods(android.graphics.drawable.ColorDrawable.class, "setColor", header);
+        XposedBridge.hookAllConstructors(android.graphics.drawable.ColorDrawable.class, header);
+        XposedBridge.hookAllMethods(android.content.res.ColorStateList.class, "valueOf", header);
+        XposedBridge.hookAllMethods(android.graphics.Paint.class, "setColor", header);
+        XposedBridge.hookAllMethods(android.view.View.class, "setBackgroundColor", header);
         XposedBridge.hookAllMethods(android.graphics.drawable.GradientDrawable.class, "setColor", recolor);
         XposedBridge.hookAllConstructors(android.text.style.ForegroundColorSpan.class, recolor);
         XposedBridge.hookAllMethods(android.widget.ImageView.class, "setColorFilter", recolor);
-        XposedBridge.hookAllMethods(android.graphics.drawable.Drawable.class, "setColorFilter", recolor);
-        XposedBridge.hookAllMethods(android.graphics.drawable.Drawable.class, "setTint", recolor);
+        try { XposedBridge.hookAllMethods(android.graphics.drawable.Drawable.class, "setTint", recolor); } catch (Throwable ignored) {}
+        // intestazione con sfondo a Drawable (ColorDrawable / forma piena #212121)
+        XC_MethodHook headerBg = new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                try {
+                    if (param.args.length == 0 || !ensureReady()) return;
+                    Object d = param.args[0];
+                    if (d instanceof android.graphics.drawable.ColorDrawable) {
+                        android.graphics.drawable.ColorDrawable cd = (android.graphics.drawable.ColorDrawable) d;
+                        if ((cd.getColor() & 0xFFFFFF) == 0x212121) param.args[0] = new android.graphics.drawable.ColorDrawable(mFloating);
+                    } else if (d instanceof android.graphics.drawable.GradientDrawable) {
+                        android.graphics.drawable.GradientDrawable gd = (android.graphics.drawable.GradientDrawable) d;
+                        android.content.res.ColorStateList c = gd.getColor();
+                        if (c != null && (c.getDefaultColor() & 0xFFFFFF) == 0x212121) gd.setColor(mFloating);
+                    }
+                } catch (Throwable ignored) {}
+            }
+        };
+        XposedBridge.hookAllMethods(android.view.View.class, "setBackground", headerBg);
+        XposedBridge.hookAllMethods(android.view.View.class, "setBackgroundDrawable", headerBg);
         log("hook aCalendar+ installati");
     }
 }
