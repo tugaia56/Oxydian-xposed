@@ -47,7 +47,8 @@ public class PermissionDialogMod extends XposedMods {
     private static void style(Activity a) {
         try {
             Resources r = a.getResources();
-            int id = r.getIdentifier("grant_dialog", "id", PKG);
+            int id = r.getIdentifier("grant_dialog", "id", "com.android.permissioncontroller");
+            if (id == 0) id = r.getIdentifier("grant_dialog", "id", PKG);
             if (id == 0) return;
             View v = a.findViewById(id);
             if (v == null || TAG_DONE.equals(v.getTag())) return;
