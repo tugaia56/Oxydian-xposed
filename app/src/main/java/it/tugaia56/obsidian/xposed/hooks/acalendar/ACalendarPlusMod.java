@@ -37,7 +37,7 @@ public class ACalendarPlusMod extends XposedMods {
     private static final int STYLE_DATA = 1;
     private static final int TYPE_COLOR = TypedValue.TYPE_INT_COLOR_ARGB8;
 
-    // (nome attributo, colore originale) -> colore di sistema: 0 = background_dark, 1 = floating, 2 = button, 3 = ripple, 4 = rosso #ffff0000
+    // (nome attributo, colore originale) -> colore di sistema: 0 = background_dark, 1 = floating, 2 = button, 3 = ripple, 4 = rosso #ffff0000, 5 = arancione #ffff9800
     private static final Object[][] RULES = {
             // AppThemeDark
             {"colorBgAgenda", 0xFF3A3A3A, 0}, {"colorBgAgendaPast", 0xFF303030, 2},
@@ -52,9 +52,9 @@ public class ACalendarPlusMod extends XposedMods {
             {"colorPrimary", 0xFF161616, 0}, {"colorSidebar", 0xFF161616, 0},
             {"material_drawer_background", 0xFF202020, 1}, {"shadedBg", 0xFF161616, 0},
             {"@android:navigationBarColor", 0xFF000000, 0},
-            // sabato (blu): colore "Opacita' tocco" di Oxydian Theme (ripple_material_dark)
-            {"colorSaturday", 0xFF2020F0, 3}, {"colorSaturday", 0xFF3030E0, 3},
-            {"colorSaturdayOff", 0xFF6060E0, 3}, {"colorSaturdayOff", 0xFF4040E0, 3},
+            // sabato (blu): arancione #ff9800
+            {"colorSaturday", 0xFF2020F0, 5}, {"colorSaturday", 0xFF3030E0, 5},
+            {"colorSaturdayOff", 0xFF6060E0, 5}, {"colorSaturdayOff", 0xFF4040E0, 5},
             // domenica: rosso puro al posto dei rosa
             {"colorSunday", 0xFFFF5252, 4}, {"colorSundayOff", 0xFFD95F5F, 4}, {"colorSundayOff", 0xFFFF5564, 4},
     };
@@ -86,8 +86,9 @@ public class ACalendarPlusMod extends XposedMods {
             if (app == null) return false;
             Resources appRes = app.getResources();
             Resources sys = Resources.getSystem();
-            int[] bg = new int[5];
+            int[] bg = new int[6];
             bg[4] = 0xFFFF0000;
+            bg[5] = 0xFFFF9800;
             int aid = sys.getIdentifier("accent_material_dark", "color", "android");
             if (aid != 0) mAccent = appRes.getColor(aid, null);
             int rid = sys.getIdentifier("ripple_material_dark", "color", "android");
@@ -186,7 +187,7 @@ public class ACalendarPlusMod extends XposedMods {
             }
         });
         // Colori scritti nel codice dell'app (non passano dal tema): azzurro degli eventi (#4285f4) -> accento,
-        // blu del sabato nell'agenda (#2020f0) -> "Opacita' tocco". Si cambia solo il colore passato ai metodi di disegno.
+        // blu del sabato (blu) -> arancione. Si cambia solo il colore passato ai metodi di disegno.
         XC_MethodHook recolor = new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
@@ -194,10 +195,11 @@ public class ACalendarPlusMod extends XposedMods {
                 int c = (Integer) param.args[0];
                 int rgb = c & 0xFFFFFF;
                 boolean sunday = rgb == 0xFF5252 || rgb == 0xD95F5F || rgb == 0xFF5564;
-                if (rgb != 0x4285F4 && rgb != 0x2020F0 && !sunday) return;
+                boolean saturday = rgb == 0x2020F0 || rgb == 0x3030E0 || rgb == 0x6060E0 || rgb == 0x4040E0;
+                if (rgb != 0x4285F4 && !saturday && !sunday) return;
                 if (!ensureReady()) return;
                 if (sunday) { param.args[0] = (c & 0xFF000000) | 0xFF0000; return; }
-                param.args[0] = rgb == 0x4285F4 ? ((c & 0xFF000000) | (mAccent & 0xFFFFFF)) : mRipple;
+                param.args[0] = saturday ? (int) 0xFFFF9800 : ((c & 0xFF000000) | (mAccent & 0xFFFFFF));
             }
         };
         // sfondo di sabato e domenica nell'agenda: l'app lo calcola come sfondo + bianco al 6% e lo applica con
