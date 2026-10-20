@@ -88,6 +88,8 @@ public class ClockStylePickerFragment extends Fragment {
     private boolean defaultAccentIsTheme;
     private int bgColor;
     private int first = 0, count = STYLE_COUNT;     // intervallo di stili mostrato
+    /** Posizione nel carosello -> numero dello stile: per gli analogici e' in ordine alfabetico di nome. */
+    private int[] order;
     private Drawable wallpaper;
     private int frameW, frameH;
 
@@ -105,6 +107,15 @@ public class ClockStylePickerFragment extends Fragment {
             int range = a.getInt(ARG_RANGE, RANGE_ALL);
             if (range == RANGE_DIGITAL) { first = 0; count = ANALOG_FIRST; }
             else if (range == RANGE_ANALOG) { first = ANALOG_FIRST; count = STYLE_COUNT - ANALOG_FIRST; }
+            if (range == RANGE_ANALOG) {
+                final android.content.Context ctx = requireContext();
+                java.util.List<Integer> styles = new java.util.ArrayList<>();
+                for (int st = first; st < first + count; st++) styles.add(st);
+                final java.text.Collator collator = java.text.Collator.getInstance();
+                styles.sort((x, y) -> collator.compare(analogName(ctx, x), analogName(ctx, y)));
+                order = new int[count];
+                for (int i = 0; i < count; i++) order[i] = styles.get(i);
+            }
         }
         try {
             wallpaper = loadLockscreenWallpaper();
@@ -175,6 +186,10 @@ public class ClockStylePickerFragment extends Fragment {
         }
         int middleBlock = (LOOP_MULTIPLIER / 2) * count;
         int offset = currentStyle - first;
+        if (order != null) {
+            offset = -1;
+            for (int i = 0; i < order.length; i++) if (order[i] == currentStyle) { offset = i; break; }
+        }
         rv.scrollToPosition(middleBlock + (offset >= 0 && offset < count ? offset : 0));
 
         root.addView(rv);
@@ -193,7 +208,7 @@ public class ClockStylePickerFragment extends Fragment {
         }
 
         @Override public void onBindViewHolder(@NonNull VH h, int position) {
-            int style = first + position % count;
+            int style = order != null ? order[position % count] : first + position % count;
             LinearLayout col = (LinearLayout) h.itemView;
             col.removeAllViews();
             RecyclerView.LayoutParams colLp = new RecyclerView.LayoutParams(
