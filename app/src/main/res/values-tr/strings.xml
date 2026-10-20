@@ -1304,4 +1304,5 @@
     <string name="msg_in_original">Orijinal</string>
     <string name="msg_section_bubbles">Balonlar</string>
     <string name="color_mode_ripple">Dokunma saydamlığı</string>
+    <string name="lockscreen_fp_color_title">Simge rengi</string>
 </resources>

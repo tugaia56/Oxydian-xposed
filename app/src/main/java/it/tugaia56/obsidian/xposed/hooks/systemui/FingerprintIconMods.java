@@ -42,6 +42,13 @@ public class FingerprintIconMods extends XposedMods {
     public static final String CUSTOM_ICON_FILE =
             Environment.getExternalStorageDirectory() + "/.obsidian/lockscreen_fp_icon.png";
 
+    /** Colore dell'icona: 0 = spento (come prima), 1 = accento, 2 = opacita' tocco, 3 = personalizzato (PREF_COLOR). */
+    public static final String PREF_COLOR_MODE = "lockscreen_fp_color_mode";
+    public static final String PREF_COLOR      = "lockscreen_fp_color";
+
+    private int     mColorMode         = 0;
+    private int     mCustomColor       = Color.WHITE;
+
     private boolean mHideFingerprint   = false;
     private boolean mHideInAod         = false;
     private boolean mCustomFingerprint = false;
@@ -65,6 +72,8 @@ public class FingerprintIconMods extends XposedMods {
         mCustomFingerprint = Xprefs.getBoolean("lockscreen_fp_custom_icon", false);
         mFingerprintStyle  = Xprefs.getInt("lockscreen_fp_icon_custom", 0);
         mFpScale           = Xprefs.getFloat("lockscreen_fp_icon_scaling", 1.0f);
+        mColorMode         = Xprefs.getInt(PREF_COLOR_MODE, 0);
+        mCustomColor       = Xprefs.getInt(PREF_COLOR, Color.WHITE);
         updateDrawable();
     }
 
@@ -130,7 +139,10 @@ public class FingerprintIconMods extends XposedMods {
         if (Build.VERSION.SDK_INT >= 34) {
             hookAllMethods(cls, "updateFpColor", new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam p) {
-                    if (!mCustomFingerprint || mHideFingerprint) return;
+                    if (mHideFingerprint) return;
+                    int tint = chosenColor();
+                    if (tint != 0) { p.args[0] = tint; return; }
+                    if (!mCustomFingerprint) return;
                     p.args[0] = Color.TRANSPARENT;
                 }
             });
@@ -167,6 +179,21 @@ public class FingerprintIconMods extends XposedMods {
                 XposedBridge.log("[ Obsidian ] FingerprintIconMods handleOSCustomFPSwitchChage hook failed: " + t);
             }
         }
+    }
+
+    /** Colore scelto per l'icona, 0 se la scelta e' "disattivata" (resta il comportamento di prima). */
+    private int chosenColor() {
+        switch (mColorMode) {
+            case 1: return accentColor();
+            case 2: return it.tugaia56.obsidian.xposed.utils.AccentUtil.rippleColor();
+            case 3: return mCustomColor;
+            default: return 0;
+        }
+    }
+
+    private int accentColor() {
+        if (Xprefs.getBoolean("DST_ACCENT1_on", false)) return Xprefs.getInt("DST_ACCENT1", 0xFF908DFF) | 0xFF000000;
+        return it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
     }
 
     private void forceCustomFpIconFlag(Object switchHelper) {

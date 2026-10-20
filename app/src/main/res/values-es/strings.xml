@@ -1304,4 +1304,5 @@
     <string name="msg_in_original">Original</string>
     <string name="msg_section_bubbles">Burbujas</string>
     <string name="color_mode_ripple">Opacidad al tocar</string>
+    <string name="lockscreen_fp_color_title">Color del icono</string>
 </resources>

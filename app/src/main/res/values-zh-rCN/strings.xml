@@ -1304,4 +1304,5 @@
     <string name="msg_in_original">原始</string>
     <string name="msg_section_bubbles">气泡</string>
     <string name="color_mode_ripple">触摸不透明度</string>
+    <string name="lockscreen_fp_color_title">图标颜色</string>
 </resources>

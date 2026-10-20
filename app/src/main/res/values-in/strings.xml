@@ -1304,4 +1304,5 @@
     <string name="msg_in_original">Asli</string>
     <string name="msg_section_bubbles">Gelembung</string>
     <string name="color_mode_ripple">Opasitas sentuhan</string>
+    <string name="lockscreen_fp_color_title">Warna ikon</string>
 </resources>

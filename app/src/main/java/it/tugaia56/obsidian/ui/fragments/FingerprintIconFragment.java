@@ -17,6 +17,12 @@ import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -26,11 +32,14 @@ import java.util.List;
 import it.tugaia56.obsidian.R;
 import it.tugaia56.obsidian.ui.activity.MainActivity;
 import it.tugaia56.obsidian.ui.adapters.GroupUtils;
+import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.NavAdapter;
 import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
 import it.tugaia56.obsidian.utils.AppUtils;
+import it.tugaia56.obsidian.ui.events.ColorSelectedEvent;
 import it.tugaia56.obsidian.utils.ObsidianPrefs;
+import it.tugaia56.obsidian.utils.ObsidianTheme;
 import it.tugaia56.obsidian.xposed.hooks.systemui.FingerprintIconMods;
 
 /**
@@ -43,10 +52,14 @@ import it.tugaia56.obsidian.xposed.hooks.systemui.FingerprintIconMods;
 public class FingerprintIconFragment extends Fragment {
 
     private ActivityResultLauncher<String> mImagePicker;
+    private RecyclerView mRv;
+
+    private static final int COLOR_DIALOG_ID = 230;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
         mImagePicker = registerForActivityResult(
                 new ActivityResultContracts.GetContent(), this::onImagePicked);
     }
@@ -64,9 +77,20 @@ public class FingerprintIconFragment extends Fragment {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        RecyclerView rv = (RecyclerView) view;
+        mRv = (RecyclerView) view;
+        rebuild();
+    }
+
+    private void rebuild() {
+        RecyclerView rv = mRv;
 
         SwitchWidgetAdapter.SwitchItem removeItem = new SwitchWidgetAdapter.SwitchItem(
                 getString(R.string.lockscreen_fp_remove_icon), getString(R.string.lockscreen_fp_remove_icon_summary),
@@ -112,9 +136,52 @@ public class FingerprintIconFragment extends Fragment {
         SliderWidgetAdapter scaleAdapter = scaleRow();
 
         List<RecyclerView.Adapter<?>> chain = new ArrayList<>(toggleChain);
+        GroupUtils.addGroup(chain, List.of(colorRow()));
         chain.add(navAdapter);
         chain.add(scaleAdapter);
         rv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
+    }
+
+    // ── Colore icona ─────────────────────────────────────────────────────────
+
+    private String colorLabel() {
+        switch (ObsidianPrefs.getInt(FingerprintIconMods.PREF_COLOR_MODE, 0)) {
+            case 1: return getString(R.string.color_mode_accent);
+            case 2: return getString(R.string.color_mode_ripple);
+            case 3: return String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(FingerprintIconMods.PREF_COLOR, 0xFFFFFFFF));
+            default: return getString(R.string.disabled);
+        }
+    }
+
+    private ListWidgetAdapter.ListItem colorRow() {
+        return new ListWidgetAdapter.ListItem(getString(R.string.lockscreen_fp_color_title), colorLabel(), this::showColorDialog);
+    }
+
+    private void showColorDialog() {
+        String[] entries = { getString(R.string.disabled), getString(R.string.color_mode_accent),
+                getString(R.string.color_mode_ripple), getString(R.string.color_mode_custom) };
+        final int[] selected = { ObsidianPrefs.getInt(FingerprintIconMods.PREF_COLOR_MODE, 0) };
+        ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.lockscreen_fp_color_title)
+                .setSingleChoiceItems(entries, selected[0], (d, which) -> selected[0] = which)
+                .setPositiveButton(R.string.apply, (d, w) -> {
+                    ObsidianPrefs.putInt(FingerprintIconMods.PREF_COLOR_MODE, selected[0]);
+                    rebuild();
+                    if (selected[0] == 3 && getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).showColorPickerDialog(COLOR_DIALOG_ID,
+                                ObsidianPrefs.getInt(FingerprintIconMods.PREF_COLOR, 0xFFFFFFFF), true, true, true);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show());
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onColorSelected(ColorSelectedEvent event) {
+        if (event.dialogId() != COLOR_DIALOG_ID) return;
+        ObsidianPrefs.putInt(FingerprintIconMods.PREF_COLOR, event.color());
+        ObsidianPrefs.putInt(FingerprintIconMods.PREF_COLOR_MODE, 3);
+        rebuild();
     }
 
     // ── Custom image picker ─────────────────────────────────────────────────

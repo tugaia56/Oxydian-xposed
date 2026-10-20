@@ -1314,4 +1314,5 @@
     <string name="ct_card_default">Default (no border)</string>
     <string name="ct_card_border">With border</string>
     <string name="color_mode_ripple">Touch opacity</string>
+    <string name="lockscreen_fp_color_title">Icon colour</string>
 </resources>
