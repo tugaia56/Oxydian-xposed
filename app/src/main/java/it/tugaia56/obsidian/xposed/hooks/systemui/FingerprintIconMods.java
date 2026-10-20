@@ -148,6 +148,22 @@ public class FingerprintIconMods extends XposedMods {
             });
         }
 
+
+        // Colore scelto: dopo ogni aggiornamento dell'icona lo si applica direttamente a vista e disegno (il sistema ricolora
+        // per suo conto con piu' percorsi: animazione a gradiente, sfondo bianco, ecc.)
+        for (String name : new String[]{"updateFpColor", "updateFpIconColor", "updateFpColorForWhiteBackground",
+                "startFingerprintColorGradientsAnim", "startFadeInAnimation", "loadAnimDrawables"}) {
+            try {
+                hookAllMethods(cls, name, new XC_MethodHook() {
+                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                        applyChosenColor(p.thisObject, name);
+                    }
+                });
+            } catch (Throwable t) {
+                XposedBridge.log("[ Obsidian ] FingerprintIconMods colour hook " + name + " failed: " + t);
+            }
+        }
+
         // Con icona personalizzata attiva, ci spacciamo per la modalità "immagine
         // personalizzata" nativa (isCustomFpIcon) così OOS stesso salta la costruzione
         // di fadeInAnimDrawable/fadeOutAnimDrawable in loadAnimDrawables() — niente
@@ -188,6 +204,33 @@ public class FingerprintIconMods extends XposedMods {
             case 2: return it.tugaia56.obsidian.xposed.utils.AccentUtil.rippleColor();
             case 3: return mCustomColor;
             default: return 0;
+        }
+    }
+
+    private boolean mColorLogged;
+
+    private void applyChosenColor(Object mech, String source) {
+        int c = chosenColor();
+        if (c == 0 || mHideFingerprint) return;
+        try {
+            Object icon = mFpIconField != null ? getObjectField(mech, mFpIconField) : null;
+            if (icon instanceof android.widget.ImageView) {
+                android.widget.ImageView iv = (android.widget.ImageView) icon;
+                iv.setImageTintList(android.content.res.ColorStateList.valueOf(c));
+                iv.setImageTintMode(android.graphics.PorterDuff.Mode.SRC_IN);
+                iv.invalidate();
+            }
+            if (mImMobileDrawableField != null) {
+                Object d = getObjectField(mech, mImMobileDrawableField);
+                if (d instanceof Drawable) ((Drawable) d).setTint(c);
+            }
+            if (!mColorLogged) {
+                mColorLogged = true;
+                XposedBridge.log("[ Obsidian ] FingerprintIconMods colour 0x" + Integer.toHexString(c) + " applied via " + source
+                        + " icon=" + (icon == null ? "null" : icon.getClass().getName()));
+            }
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] FingerprintIconMods applyChosenColor: " + t);
         }
     }
 
