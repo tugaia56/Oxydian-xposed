@@ -577,7 +577,7 @@ public class MiscMods extends XposedMods {
 
     private int sharedAccentColor() {
         boolean accentOn = Xprefs != null && Xprefs.getBoolean("DST_ACCENT1_on", false);
-        return accentOn ? Xprefs.getInt("DST_ACCENT1", 0xFF908DFF) : 0xFF908DFF;
+        return accentOn ? Xprefs.getInt("DST_ACCENT1", 0xFF908DFF) : it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
     }
 
     /** Own independent Accento/Personalizzato choice — NOT tied to the gradient colour, so the

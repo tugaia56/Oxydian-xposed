@@ -1034,7 +1034,7 @@ public class StatusbarClock extends XposedMods {
         if (Xprefs.getBoolean("DST_ACCENT1_on", false)) {
             return Xprefs.getInt("DST_ACCENT1", 0xFF908DFF) | 0xFF000000;
         }
-        return 0xFF908DFF;
+        return it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
     }
 
     @Override

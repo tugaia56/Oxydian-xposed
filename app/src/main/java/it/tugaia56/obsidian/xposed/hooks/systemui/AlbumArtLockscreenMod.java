@@ -105,7 +105,7 @@ public class AlbumArtLockscreenMod extends XposedMods {
         mFilter       = parseFilter(Xprefs.getString(PREF_FILTER, "0"));
         mBlurRadius   = (Xprefs.getInt(PREF_BLUR, 30) / 100f) * 25f;
         boolean accentOn = Xprefs.getBoolean("DST_ACCENT1_on", false);
-        mAccentColor = accentOn ? (Xprefs.getInt("DST_ACCENT1", mAccentColor) | 0xFF000000) : 0xFF908DFF;
+        mAccentColor = accentOn ? (Xprefs.getInt("DST_ACCENT1", mAccentColor) | 0xFF000000) : it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
 
         // Re-render whatever's currently playing with the new filter/enabled state.
         applyArt();
