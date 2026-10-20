@@ -331,6 +331,13 @@ public class BatteryStyleManager extends XposedMods {
                 }
             });
 
+            // cambio overlay/accento → il sistema manda un cambio di configurazione: si ricolora il fulmine
+            hookAllMethods(sBMV, "onConfigurationChanged", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam param) {
+                    if (param.thisObject instanceof View v) v.post(() -> updateView(v));
+                }
+            });
+
             // onDarkChanged → update icon colour
             if (DarkIconDispatcher != null && DualToneHandler != null) {
                 final Class<?> dth = DualToneHandler;
@@ -495,6 +502,18 @@ public class BatteryStyleManager extends XposedMods {
         batteryIcon.setScaleType(ImageView.ScaleType.FIT_CENTER);
         batteryIcon.setVisibility(mHideBattery ? View.GONE : View.VISIBLE);
         scaleIcon(batteryIcon);
+
+        // il fulmine con l'accento va ricolorato anche quando cambia l'accento, non solo quando cambia lo stato di carica
+        if (mChargingIconEnabled && mChargingIconUseAccent) {
+            try {
+                View bolt = root.findViewById(mContext.getResources().getIdentifier(
+                        "battery_charge_icon", "id", mContext.getPackageName()));
+                if (bolt instanceof ImageView iv && iv.getDrawable() != null) {
+                    iv.getDrawable().mutate().setColorFilter(appAccentColor(), PorterDuff.Mode.SRC_IN);
+                    iv.invalidate();
+                }
+            } catch (Throwable ignored) {}
+        }
     }
 
     private void applyCustomization(BatteryDrawable d) {
