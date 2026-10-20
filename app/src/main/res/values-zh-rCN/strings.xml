@@ -1040,4 +1040,18 @@
     <string name="gesture_override_back_hold_command_notification_panel">打开通知面板</string>
     <string name="gesture_override_back_hold_command_screen_off">关闭屏幕</string>
     <string name="gesture_override_back_hold_command_circle_to_search">圈选搜索</string>
+    <string name="aod_clock_style_digital_title">数字时钟样式</string>
+    <string name="aod_clock_style_analog_title">指针时钟样式</string>
+    <string name="clock_style_not_in_use">未使用</string>
+    <string name="aod_analog_section">指针时钟</string>
+    <string name="aod_analog_dial_color">表盘颜色</string>
+    <string name="aod_analog_hands_color">指针颜色</string>
+    <string name="aod_analog_size">时钟大小</string>
+    <string name="aod_analog_position">垂直位置</string>
+    <string name="nav_contacts">Google 通讯录</string>
+    <string name="nav_contacts_summary">带边框或无边框的联系人卡片，加号按钮和所选标签页使用强调色</string>
+    <string name="ct_note">仅在 Google 通讯录应用中有效，并需要在 LSPosed 的 Oxydian 作用域中勾选通讯录。关闭并重新打开通讯录即可看到更改。</string>
+    <string name="ct_card_title">联系人卡片</string>
+    <string name="ct_card_default">默认（无边框）</string>
+    <string name="ct_card_border">带边框</string>
 </resources>

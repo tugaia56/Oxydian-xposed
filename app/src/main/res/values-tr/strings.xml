@@ -1040,4 +1040,18 @@
     <string name="gesture_override_back_hold_command_notification_panel">Bildirim Panelini Aç</string>
     <string name="gesture_override_back_hold_command_screen_off">Ekranı Kapat</string>
     <string name="gesture_override_back_hold_command_circle_to_search">Circle to Search</string>
+    <string name="aod_clock_style_digital_title">Dijital saat stili</string>
+    <string name="aod_clock_style_analog_title">Analog saat stili</string>
+    <string name="clock_style_not_in_use">Kullanılmıyor</string>
+    <string name="aod_analog_section">Analog saat</string>
+    <string name="aod_analog_dial_color">Kadran rengi</string>
+    <string name="aod_analog_hands_color">Akrep ve yelkovan rengi</string>
+    <string name="aod_analog_size">Saat boyutu</string>
+    <string name="aod_analog_position">Dikey konum</string>
+    <string name="nav_contacts">Google Kişiler</string>
+    <string name="nav_contacts_summary">Çerçeveli veya çerçevesiz kişi kartları, + düğmesinde ve seçili sekmede vurgu rengi</string>
+    <string name="ct_note">Yalnızca Google Kişiler uygulamasında çalışır ve LSPosed\'de Oxydian kapsamında Kişiler\'in işaretlenmesini gerektirir. Değişiklikleri görmek için Kişiler\'i kapatıp yeniden açın.</string>
+    <string name="ct_card_title">Kişi kartları</string>
+    <string name="ct_card_default">Varsayılan (çerçevesiz)</string>
+    <string name="ct_card_border">Çerçeveli</string>
 </resources>

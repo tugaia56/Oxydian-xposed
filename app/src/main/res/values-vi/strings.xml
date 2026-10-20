@@ -1050,4 +1050,18 @@
     <string name="gesture_override_back_hold_command_notification_panel">Mở bảng thông báo</string>
     <string name="gesture_override_back_hold_command_screen_off">Tắt màn hình</string>
     <string name="gesture_override_back_hold_command_circle_to_search">Circle to Search</string>
+    <string name="aod_clock_style_digital_title">Kiểu đồng hồ kỹ thuật số</string>
+    <string name="aod_clock_style_analog_title">Kiểu đồng hồ kim</string>
+    <string name="clock_style_not_in_use">Không sử dụng</string>
+    <string name="aod_analog_section">Đồng hồ kim</string>
+    <string name="aod_analog_dial_color">Màu mặt đồng hồ</string>
+    <string name="aod_analog_hands_color">Màu kim</string>
+    <string name="aod_analog_size">Kích thước đồng hồ</string>
+    <string name="aod_analog_position">Vị trí theo chiều dọc</string>
+    <string name="nav_contacts">Danh bạ Google</string>
+    <string name="nav_contacts_summary">Thẻ liên hệ có hoặc không có viền, màu nhấn trên nút + và tab đang chọn</string>
+    <string name="ct_note">Chỉ hoạt động trong ứng dụng Danh bạ Google và cần chọn Danh bạ trong phạm vi của Oxydian trong LSPosed. Đóng và mở lại Danh bạ để thấy thay đổi.</string>
+    <string name="ct_card_title">Thẻ liên hệ</string>
+    <string name="ct_card_default">Mặc định (không viền)</string>
+    <string name="ct_card_border">Có viền</string>
 </resources>

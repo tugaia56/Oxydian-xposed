@@ -1040,4 +1040,18 @@
     <string name="gesture_override_back_hold_command_notification_panel">Buka Panel Notifikasi</string>
     <string name="gesture_override_back_hold_command_screen_off">Matikan Layar</string>
     <string name="gesture_override_back_hold_command_circle_to_search">Circle to Search</string>
+    <string name="aod_clock_style_digital_title">Gaya jam digital</string>
+    <string name="aod_clock_style_analog_title">Gaya jam analog</string>
+    <string name="clock_style_not_in_use">Tidak digunakan</string>
+    <string name="aod_analog_section">Jam analog</string>
+    <string name="aod_analog_dial_color">Warna wajah jam</string>
+    <string name="aod_analog_hands_color">Warna jarum</string>
+    <string name="aod_analog_size">Ukuran jam</string>
+    <string name="aod_analog_position">Posisi vertikal</string>
+    <string name="nav_contacts">Kontak Google</string>
+    <string name="nav_contacts_summary">Kartu kontak dengan atau tanpa bingkai, warna aksen pada tombol + dan tab yang dipilih</string>
+    <string name="ct_note">Hanya berfungsi di aplikasi Kontak Google dan perlu mencentang Kontak di cakupan Oxydian di LSPosed. Tutup lalu buka kembali Kontak untuk melihat perubahan.</string>
+    <string name="ct_card_title">Kartu kontak</string>
+    <string name="ct_card_default">Default (tanpa bingkai)</string>
+    <string name="ct_card_border">Dengan bingkai</string>
 </resources>

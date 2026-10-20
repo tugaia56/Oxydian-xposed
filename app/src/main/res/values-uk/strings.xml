@@ -1050,4 +1050,18 @@
     <string name="gesture_override_back_hold_command_notification_panel">Відкрити панель сповіщень</string>
     <string name="gesture_override_back_hold_command_screen_off">Вимкнути екран</string>
     <string name="gesture_override_back_hold_command_circle_to_search">Обвести для пошуку</string>
+    <string name="aod_clock_style_digital_title">Стиль цифрового годинника</string>
+    <string name="aod_clock_style_analog_title">Стиль аналогового годинника</string>
+    <string name="clock_style_not_in_use">Не використовується</string>
+    <string name="aod_analog_section">Аналоговий годинник</string>
+    <string name="aod_analog_dial_color">Колір циферблата</string>
+    <string name="aod_analog_hands_color">Колір стрілок</string>
+    <string name="aod_analog_size">Розмір годинника</string>
+    <string name="aod_analog_position">Положення по вертикалі</string>
+    <string name="nav_contacts">Google Контакти</string>
+    <string name="nav_contacts_summary">Картки контактів з рамкою або без, акцентний колір на кнопці + та вибраній вкладці</string>
+    <string name="ct_note">Працює лише в застосунку Google Контакти та потребує, щоб Контакти були позначені в області дії Oxydian у LSPosed. Закрийте й знову відкрийте Контакти, щоб побачити зміни.</string>
+    <string name="ct_card_title">Картки контактів</string>
+    <string name="ct_card_default">Типово (без рамки)</string>
+    <string name="ct_card_border">З рамкою</string>
 </resources>

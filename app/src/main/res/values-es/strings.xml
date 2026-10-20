@@ -1040,4 +1040,18 @@
     <string name="gesture_override_back_hold_command_notification_panel">Abrir panel de notificaciones</string>
     <string name="gesture_override_back_hold_command_screen_off">Apagar pantalla</string>
     <string name="gesture_override_back_hold_command_circle_to_search">Circle to Search</string>
+    <string name="aod_clock_style_digital_title">Estilo del reloj digital</string>
+    <string name="aod_clock_style_analog_title">Estilo del reloj analógico</string>
+    <string name="clock_style_not_in_use">No se usa</string>
+    <string name="aod_analog_section">Reloj analógico</string>
+    <string name="aod_analog_dial_color">Color de la esfera</string>
+    <string name="aod_analog_hands_color">Color de las manecillas</string>
+    <string name="aod_analog_size">Tamaño del reloj</string>
+    <string name="aod_analog_position">Posición vertical</string>
+    <string name="nav_contacts">Contactos de Google</string>
+    <string name="nav_contacts_summary">Tarjetas de contactos con o sin borde, color de acento en el botón + y en la pestaña seleccionada</string>
+    <string name="ct_note">Solo funciona en la app Contactos de Google y requiere marcar Contactos en el ámbito de Oxydian en LSPosed. Cierra y vuelve a abrir Contactos para ver los cambios.</string>
+    <string name="ct_card_title">Tarjetas de contactos</string>
+    <string name="ct_card_default">Predeterminado (sin borde)</string>
+    <string name="ct_card_border">Con borde</string>
 </resources>

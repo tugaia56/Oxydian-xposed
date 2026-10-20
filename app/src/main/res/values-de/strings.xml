@@ -1040,4 +1040,18 @@
     <string name="gesture_override_back_hold_command_notification_panel">Benachrichtigungspanel öffnen</string>
     <string name="gesture_override_back_hold_command_screen_off">Bildschirm ausschalten</string>
     <string name="gesture_override_back_hold_command_circle_to_search">Circle to Search</string>
+    <string name="aod_clock_style_digital_title">Stil der digitalen Uhr</string>
+    <string name="aod_clock_style_analog_title">Stil der analogen Uhr</string>
+    <string name="clock_style_not_in_use">Nicht in Verwendung</string>
+    <string name="aod_analog_section">Analoguhr</string>
+    <string name="aod_analog_dial_color">Farbe des Zifferblatts</string>
+    <string name="aod_analog_hands_color">Farbe der Zeiger</string>
+    <string name="aod_analog_size">Uhrgröße</string>
+    <string name="aod_analog_position">Vertikale Position</string>
+    <string name="nav_contacts">Google Kontakte</string>
+    <string name="nav_contacts_summary">Kontaktkarten mit oder ohne Rahmen, Akzentfarbe auf der +-Schaltfläche und dem ausgewählten Tab</string>
+    <string name="ct_note">Funktioniert nur in der Google-Kontakte-App und erfordert, dass Kontakte im Oxydian-Bereich in LSPosed aktiviert ist. Kontakte schließen und neu öffnen, um die Änderungen zu sehen.</string>
+    <string name="ct_card_title">Kontaktkarten</string>
+    <string name="ct_card_default">Standard (ohne Rahmen)</string>
+    <string name="ct_card_border">Mit Rahmen</string>
 </resources>
