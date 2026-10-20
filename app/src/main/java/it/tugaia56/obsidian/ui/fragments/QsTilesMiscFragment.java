@@ -249,19 +249,24 @@ public class QsTilesMiscFragment extends Fragment {
     }
 
     private String colorModeLabel(String accentKey, String colorKey) {
+        if (ObsidianPrefs.getBoolean(colorKey + "_ripple", false)) return getString(R.string.color_mode_ripple);
         if (ObsidianPrefs.getBoolean(accentKey, true)) return getString(R.string.color_mode_accent);
         return String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(colorKey, 0xFFFFFFFF));
     }
 
     private void showColorModeDialog(String title, String accentKey, String colorKey, int dialogId) {
-        String[] entries = { getString(R.string.color_mode_accent), getString(R.string.color_mode_custom) };
-        int current = ObsidianPrefs.getBoolean(accentKey, true) ? 0 : 1;
+        String[] entries = { getString(R.string.color_mode_accent), getString(R.string.color_mode_ripple),
+                getString(R.string.color_mode_custom) };
+        int current = ObsidianPrefs.getBoolean(colorKey + "_ripple", false) ? 1
+                : (ObsidianPrefs.getBoolean(accentKey, true) ? 0 : 2);
         final int[] selected = {current};
         ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(title)
                 .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
                 .setPositiveButton(R.string.apply, (d, w) -> {
-                    boolean accent = selected[0] == 0;
+                    boolean ripple = selected[0] == 1;
+                    boolean accent = selected[0] != 2;
+                    ObsidianPrefs.putBoolean(colorKey + "_ripple", ripple);
                     ObsidianPrefs.putBoolean(accentKey, accent);
                     rebuild();
                     if (!accent && getActivity() instanceof MainActivity) {
@@ -306,6 +311,7 @@ public class QsTilesMiscFragment extends Fragment {
         String singleKey = mSingleColorKeys.get(event.dialogId());
         if (singleKey != null) {
             ObsidianPrefs.putBoolean(singleKey + "_use_accent", false); // picking a colour implies custom
+            ObsidianPrefs.putBoolean(singleKey + "_ripple", false);
             ObsidianPrefs.putInt(singleKey, event.color());
             rebuild();
         }

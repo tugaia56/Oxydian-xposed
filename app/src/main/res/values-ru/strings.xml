@@ -1303,4 +1303,5 @@
     <string name="msg_in_title">Цвет полученных пузырей</string>
     <string name="msg_in_original">Оригинал</string>
     <string name="msg_section_bubbles">Пузыри</string>
+    <string name="color_mode_ripple">Прозрачность касания</string>
 </resources>

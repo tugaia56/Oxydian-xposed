@@ -1303,4 +1303,5 @@
     <string name="msg_in_title">Màu bong bóng đã nhận</string>
     <string name="msg_in_original">Gốc</string>
     <string name="msg_section_bubbles">Bong bóng</string>
+    <string name="color_mode_ripple">Độ mờ khi chạm</string>
 </resources>

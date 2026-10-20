@@ -72,6 +72,7 @@ public class QsSeparateMod extends XposedMods {
     private boolean mBtnBgOn;
     private boolean mEditBgOn = true, mMenuBgOn = true, mSettingsBgOn = true;
     private boolean mEditBgAccent = true, mMenuBgAccent = true, mSettingsBgAccent = true;
+    private boolean mEditBgRipple, mMenuBgRipple, mSettingsBgRipple;
     private int mEditBgColor = 0xFFFFFFFF, mMenuBgColor = 0xFFFFFFFF, mSettingsBgColor = 0xFFFFFFFF;
 
     private View mEditButton;
@@ -101,12 +102,15 @@ public class QsSeparateMod extends XposedMods {
         mEditBgOn = Xprefs.getBoolean(PREF_EDIT_BG_ON, true);
         mEditBgAccent = Xprefs.getBoolean(PREF_EDIT_BG_ACCENT, true);
         mEditBgColor = Xprefs.getInt(PREF_EDIT_BG_COLOR, 0xFFFFFFFF);
+        mEditBgRipple = Xprefs.getBoolean(PREF_EDIT_BG_COLOR + "_ripple", false);
         mMenuBgOn = Xprefs.getBoolean(PREF_MENU_BG_ON, true);
         mMenuBgAccent = Xprefs.getBoolean(PREF_MENU_BG_ACCENT, true);
         mMenuBgColor = Xprefs.getInt(PREF_MENU_BG_COLOR, 0xFFFFFFFF);
+        mMenuBgRipple = Xprefs.getBoolean(PREF_MENU_BG_COLOR + "_ripple", false);
         mSettingsBgOn = Xprefs.getBoolean(PREF_SETTINGS_BG_ON, true);
         mSettingsBgAccent = Xprefs.getBoolean(PREF_SETTINGS_BG_ACCENT, true);
         mSettingsBgColor = Xprefs.getInt(PREF_SETTINGS_BG_COLOR, 0xFFFFFFFF);
+        mSettingsBgRipple = Xprefs.getBoolean(PREF_SETTINGS_BG_COLOR + "_ripple", false);
         if (!Xprefs.getBoolean(PREF_MASTER_ON, true)) {
             mHideEdit = false;
             mHideMenu = false;
@@ -177,14 +181,15 @@ public class QsSeparateMod extends XposedMods {
                         if (!mBtnBgOn) return;
                         String owner = mButtonDrawableOwner.get(p.thisObject);
                         if (owner == null) return;
-                        boolean on; boolean accent; int custom;
+                        boolean on; boolean accent; int custom; boolean ripple;
                         switch (owner) {
-                            case "edit":     on = mEditBgOn;     accent = mEditBgAccent;     custom = mEditBgColor;     break;
-                            case "menu":     on = mMenuBgOn;     accent = mMenuBgAccent;     custom = mMenuBgColor;     break;
-                            default:         on = mSettingsBgOn; accent = mSettingsBgAccent; custom = mSettingsBgColor; break;
+                            case "edit":     on = mEditBgOn;     accent = mEditBgAccent;     custom = mEditBgColor;     ripple = mEditBgRipple;     break;
+                            case "menu":     on = mMenuBgOn;     accent = mMenuBgAccent;     custom = mMenuBgColor;     ripple = mMenuBgRipple;     break;
+                            default:         on = mSettingsBgOn; accent = mSettingsBgAccent; custom = mSettingsBgColor; ripple = mSettingsBgRipple; break;
                         }
                         if (!on) return;
-                        int color = accent ? appAccentColor() : custom;
+                        int color = ripple ? it.tugaia56.obsidian.xposed.utils.AccentUtil.rippleColor()
+                                : (accent ? appAccentColor() : custom);
                         try {
                             Object stateListConfig = getObjectField(p.thisObject, "stateListConfig");
                             if (!(stateListConfig instanceof Map)) return;

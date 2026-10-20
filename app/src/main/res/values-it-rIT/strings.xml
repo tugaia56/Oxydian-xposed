@@ -1285,4 +1285,5 @@
     <string name="ct_card_title">Card dei contatti</string>
     <string name="ct_card_default">Predefinito (senza bordo)</string>
     <string name="ct_card_border">Con bordo</string>
+    <string name="color_mode_ripple">Opacità tocco</string>
 </resources>

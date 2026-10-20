@@ -1303,4 +1303,5 @@
     <string name="msg_in_title">Warna gelembung diterima</string>
     <string name="msg_in_original">Asli</string>
     <string name="msg_section_bubbles">Gelembung</string>
+    <string name="color_mode_ripple">Opasitas sentuhan</string>
 </resources>

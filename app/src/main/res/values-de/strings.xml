@@ -1303,4 +1303,5 @@
     <string name="msg_in_title">Farbe der empfangenen Blasen</string>
     <string name="msg_in_original">Original</string>
     <string name="msg_section_bubbles">Blasen</string>
+    <string name="color_mode_ripple">Touch-Deckkraft</string>
 </resources>

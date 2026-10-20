@@ -14,6 +14,19 @@ public final class AccentUtil {
 
     private AccentUtil() {}
 
+    /** Colore "Opacita' tocco" di Oxydian Theme (ripple_material_dark): accento con la trasparenza scelta. */
+    public static int rippleColor() {
+        try {
+            int id = Resources.getSystem().getIdentifier("ripple_material_dark", "color", "android");
+            if (id == 0) return (systemAccent() & 0xFFFFFF) | 0x80000000;
+            Application app = AndroidAppHelper.currentApplication();
+            Resources r = app != null ? app.getResources() : Resources.getSystem();
+            return r.getColor(id, null);
+        } catch (Throwable t) {
+            return (DEFAULT & 0xFFFFFF) | 0x80000000;
+        }
+    }
+
     public static int systemAccent() {
         try {
             int id = Resources.getSystem().getIdentifier("accent_material_dark", "color", "android");

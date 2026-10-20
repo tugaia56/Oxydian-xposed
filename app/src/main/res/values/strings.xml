@@ -1313,4 +1313,5 @@
     <string name="ct_card_title">Contact cards</string>
     <string name="ct_card_default">Default (no border)</string>
     <string name="ct_card_border">With border</string>
+    <string name="color_mode_ripple">Touch opacity</string>
 </resources>

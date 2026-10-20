@@ -1303,4 +1303,5 @@
     <string name="msg_in_title">Cor dos balões recebidos</string>
     <string name="msg_in_original">Original</string>
     <string name="msg_section_bubbles">Balões</string>
+    <string name="color_mode_ripple">Opacidade do toque</string>
 </resources>

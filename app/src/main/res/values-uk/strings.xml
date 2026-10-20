@@ -1303,4 +1303,5 @@
     <string name="msg_in_title">Колір отриманих бульбашок</string>
     <string name="msg_in_original">Оригінал</string>
     <string name="msg_section_bubbles">Бульбашки</string>
+    <string name="color_mode_ripple">Прозорість дотику</string>
 </resources>
