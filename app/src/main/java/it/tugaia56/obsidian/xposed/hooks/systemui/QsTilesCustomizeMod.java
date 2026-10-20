@@ -853,6 +853,28 @@ public class QsTilesCustomizeMod extends XposedMods {
      *  sulla forma scelta. */
     private final java.util.Set<View> mSmallTileOutlineSet = java.util.Collections.newSetFromMap(new WeakHashMap<>());
 
+    // Riquadri grandi: il riempimento nativo ha un raggio suo (piu' stretto di "Raggio" scelto, es. 40dp = pillola):
+    // i suoi angoli sporgono oltre il bordo. Si ritaglia il disegno nativo sul raggio scelto, come bordo e sfondo nostri.
+    private final java.util.Set<Object> mWideClipped = java.util.Collections.newSetFromMap(new WeakHashMap<>());
+
+    private void beginWideClip(Object drawable, android.graphics.Canvas canvas) {
+        try {
+            android.graphics.Rect b = ((Drawable) drawable).getBounds();
+            float r = dp(mTileRadiusBaseDp);
+            android.graphics.Path path = new android.graphics.Path();
+            path.addRoundRect(new android.graphics.RectF(b), r, r, android.graphics.Path.Direction.CW);
+            canvas.save();
+            canvas.clipPath(path);
+            mWideClipped.add(drawable);
+        } catch (Throwable t) { dbg("wide clip begin failed: " + t); }
+    }
+
+    private void endWideClip(Object drawable, android.graphics.Canvas canvas) {
+        try {
+            if (mWideClipped.remove(drawable)) canvas.restore();
+        } catch (Throwable t) { dbg("wide clip end failed: " + t); }
+    }
+
     private boolean isQuickEntranceView(Object view) {
         Object v = view;
         for (int i = 0; i < 8 && v != null; i++) {
@@ -1381,6 +1403,16 @@ public class QsTilesCustomizeMod extends XposedMods {
                     } catch (Throwable t) { dbg("tile border draw failed: " + t); }
                 }
             });
+            hookAllMethods(gradientTileDrawableCls, "draw", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    if (!OWNER_TILE.equals(mGradientOwner.get(p.thisObject))) return;
+                    android.graphics.Rect b = ((Drawable) p.thisObject).getBounds();
+                    if (b.width() > b.height() * 1.3f) beginWideClip(p.thisObject, (android.graphics.Canvas) p.args[0]);
+                }
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    endWideClip(p.thisObject, (android.graphics.Canvas) p.args[0]);
+                }
+            });
         } catch (Throwable t) { dbg("hookTileBgBase border install failed: " + t); }
     }
 
@@ -1576,6 +1608,18 @@ public class QsTilesCustomizeMod extends XposedMods {
                             }
                         }
                     } catch (Throwable t) { dbg("mixcolor tile border draw failed: " + t); }
+                }
+            });
+            // registrato DOPO il disegno del bordo: il suo "dopo" scatta per primo e chiude il ritaglio prima di bordo/sfondo nostri
+            hookAllMethods(mixColorCls, "draw", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    if (mQuickEntranceDrawable.containsKey(p.thisObject)) return;
+                    if (!OWNER_TILE.equals(mMixColorOwner.get(p.thisObject))) return;
+                    android.graphics.Rect b = ((Drawable) p.thisObject).getBounds();
+                    if (b.width() > b.height() * 1.3f) beginWideClip(p.thisObject, (android.graphics.Canvas) p.args[0]);
+                }
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    endWideClip(p.thisObject, (android.graphics.Canvas) p.args[0]);
                 }
             });
         } catch (Throwable t) { dbg("hookTileBgHighlight install failed: " + t); }
