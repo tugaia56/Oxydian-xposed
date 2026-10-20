@@ -62,6 +62,7 @@ public class LockscreenClockFragment extends Fragment {
     private static final String KEY_BOTTOM_MARGIN= "lockscreen_bottom_margin";            // -200..600 dp
 
     private static final String KEY_ANALOG_DIAL  = "lockscreen_analog_dial_color";
+    private static final String KEY_ANALOG_IMG   = "lockscreen_analog_img_color";
     private static final String KEY_ANALOG_HANDS = "lockscreen_analog_hands_color";
     private static final String KEY_ANALOG_SECONDS = "lockscreen_analog_seconds";
     private static final String KEY_ANALOG_SIZE  = "lockscreen_analog_size";      // 50-150 %, default 75
@@ -208,6 +209,7 @@ public class LockscreenClockFragment extends Fragment {
     private DarkShadowColorListener analogColorsRow() {
         List<DarkShadowItem> items = List.of(
                 colorItem(getString(R.string.aod_analog_dial_color), KEY_ANALOG_DIAL, 0xFFFFFFFF),
+                colorItem(getString(R.string.aod_analog_img_color), KEY_ANALOG_IMG, 0xFFFFFFFF),
                 colorItem(getString(R.string.aod_analog_hands_color), KEY_ANALOG_HANDS, 0xFFFFFFFF));
         mColorItems.addAll(items);
         return new DarkShadowColorListener(items, this::onColorEnabled, this::onColorDisabled, this::onColorSwatch);

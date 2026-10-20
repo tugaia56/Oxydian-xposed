@@ -1307,4 +1307,5 @@
     <string name="lockscreen_fp_color_title">Warna ikon</string>
     <string name="lockscreen_analog_seconds">Jarum detik</string>
     <string name="lockscreen_analog_seconds_summary">Tampilkan detik di layar kunci (tidak di AOD, untuk menghemat baterai)</string>
+    <string name="aod_analog_img_color">Warna gambar dial</string>
 </resources>

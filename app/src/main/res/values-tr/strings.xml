@@ -1307,4 +1307,5 @@
     <string name="lockscreen_fp_color_title">Simge rengi</string>
     <string name="lockscreen_analog_seconds">Saniye ibresi</string>
     <string name="lockscreen_analog_seconds_summary">Saniyeleri kilit ekranında gösterir (pil tasarrufu için AOD\'de değil)</string>
+    <string name="aod_analog_img_color">Kadran görseli rengi</string>
 </resources>

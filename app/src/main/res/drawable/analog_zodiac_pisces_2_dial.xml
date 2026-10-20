@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Quadrante a due livelli: [0] cerchio, numeri e tacche; [1] immagine interna (colori separati). -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/analog_zodiac_pisces_2_dial_ring" />
+    <item android:drawable="@drawable/analog_zodiac_pisces_2_dial_img" />
+</layer-list>

@@ -1307,4 +1307,5 @@
     <string name="lockscreen_fp_color_title">Màu biểu tượng</string>
     <string name="lockscreen_analog_seconds">Kim giây</string>
     <string name="lockscreen_analog_seconds_summary">Hiển thị giây trên màn hình khóa (không hiển thị trên AOD để tiết kiệm pin)</string>
+    <string name="aod_analog_img_color">Màu hình ảnh mặt đồng hồ</string>
 </resources>

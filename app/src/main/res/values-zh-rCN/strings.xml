@@ -1307,4 +1307,5 @@
     <string name="lockscreen_fp_color_title">图标颜色</string>
     <string name="lockscreen_analog_seconds">秒针</string>
     <string name="lockscreen_analog_seconds_summary">在锁屏上显示秒针（息屏显示时不显示，以节省电量）</string>
+    <string name="aod_analog_img_color">表盘图像颜色</string>
 </resources>

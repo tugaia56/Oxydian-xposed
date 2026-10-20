@@ -68,12 +68,12 @@ public class ViewHelper {
 
     /** Orologio analogico (AnalogClock): colore del quadrante e delle lancette (se attivi) e
      *  dimensione (lato = baseDp * size). Colori spenti = disegno originale (quadrante: tag accent1). */
-    public static void applyAnalogOptions(View root, boolean dialOn, int dialColor, boolean handsOn, int handsColor,
-                                          float size, int baseDp, boolean seconds) {
+    public static void applyAnalogOptions(View root, boolean dialOn, int dialColor, boolean imgOn, int imgColor,
+                                          boolean handsOn, int handsColor, float size, int baseDp, boolean seconds) {
         android.widget.AnalogClock ac = findAnalogClock(root);
         if (ac == null) return;
         try {
-            if (dialOn) ac.setDialTintList(ColorStateList.valueOf(dialColor));
+            applyDialColors(ac, dialOn, dialColor, imgOn, imgColor);
             ColorStateList hands = handsOn ? ColorStateList.valueOf(handsColor) : null;
             ac.setHourHandTintList(hands);
             ac.setMinuteHandTintList(hands);
@@ -86,6 +86,28 @@ public class ViewHelper {
                 if (lp.width != px || lp.height != px) { lp.width = px; lp.height = px; ac.setLayoutParams(lp); }
             }
         } catch (Throwable ignored) {}
+    }
+
+    /**
+     * Quadrante a due livelli (0 = cerchio, numeri e tacche; 1 = immagine interna): "Colore quadrante" tinge il primo,
+     * "Colore immagine quadrante" il secondo. I quadranti senza immagine (un solo livello) si tingono per intero
+     * con "Colore quadrante".
+     */
+    public static void applyDialColors(android.widget.AnalogClock ac, boolean dialOn, int dialColor, boolean imgOn, int imgColor) {
+        try {
+            Object dial = de.robv.android.xposed.XposedHelpers.getObjectField(ac, "mDial");
+            if (dial instanceof android.graphics.drawable.LayerDrawable ld && ld.getNumberOfLayers() == 2) {
+                Drawable ring = ld.getDrawable(0).mutate();
+                Drawable img = ld.getDrawable(1).mutate();
+                ring.setTintList(dialOn ? ColorStateList.valueOf(dialColor) : null);
+                img.setTintList(imgOn ? ColorStateList.valueOf(imgColor) : null);
+                ac.invalidate();
+            } else if (dialOn) {
+                ac.setDialTintList(ColorStateList.valueOf(dialColor));
+            }
+        } catch (Throwable t) {
+            if (dialOn) ac.setDialTintList(ColorStateList.valueOf(dialColor));
+        }
     }
 
     private static android.widget.AnalogClock findAnalogClock(View v) {
@@ -113,8 +135,8 @@ public class ViewHelper {
             }
         } else if (view instanceof ImageView imageView) {
             imageView.setColorFilter(color);
-        } else if (view instanceof android.widget.AnalogClock analogClock) {
-            analogClock.setDialTintList(ColorStateList.valueOf(color));
+        } else if (view instanceof android.widget.AnalogClock) {
+            // il quadrante resta com'e' (bianco): lo si colora solo con le scelte "Colore quadrante / immagine quadrante"
         } else if (view instanceof ProgressBar progressBar) {
             progressBar.setProgressTintList(ColorStateList.valueOf(color));
             progressBar.setProgressBackgroundTintList(ColorStateList.valueOf(color));

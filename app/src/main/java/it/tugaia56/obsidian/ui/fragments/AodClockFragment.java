@@ -57,6 +57,7 @@ public class AodClockFragment extends Fragment {
 
     // Orologio analogico: colore quadrante / lancette (stesso schema "<chiave>", "<chiave>_on") e dimensione.
     private static final String KEY_ANALOG_DIAL  = "aod_analog_dial_color";
+    private static final String KEY_ANALOG_IMG   = "aod_analog_img_color";
     private static final String KEY_ANALOG_HANDS = "aod_analog_hands_color";
     private static final String KEY_ANALOG_SIZE  = "aod_analog_size";             // 50-150 %
     private static final String KEY_ANALOG_OFFSET = "aod_analog_offset";         // -250..130 dp, + = più in basso
@@ -194,6 +195,7 @@ public class AodClockFragment extends Fragment {
     private DarkShadowColorListener analogColorsRow() {
         List<DarkShadowItem> items = List.of(
                 colorItem(getString(R.string.aod_analog_dial_color), KEY_ANALOG_DIAL, 0xFFFFFFFF),
+                colorItem(getString(R.string.aod_analog_img_color), KEY_ANALOG_IMG, 0xFFFFFFFF),
                 colorItem(getString(R.string.aod_analog_hands_color), KEY_ANALOG_HANDS, 0xFFFFFFFF));
         mColorItems.addAll(items);
         return new DarkShadowColorListener(items, this::onColorEnabled, this::onColorDisabled, this::onColorSwatch);

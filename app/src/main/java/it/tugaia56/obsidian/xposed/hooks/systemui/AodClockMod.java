@@ -47,6 +47,7 @@ public class AodClockMod extends XposedMods {
 
     private static final String KEY_ANALOG_DIAL  = "aod_analog_dial_color";
     private static final String KEY_ANALOG_HANDS = "aod_analog_hands_color";
+    private static final String KEY_ANALOG_IMG   = "aod_analog_img_color";
     private static final String KEY_ANALOG_SIZE  = "aod_analog_size";
     private static final String KEY_ANALOG_OFFSET = "aod_analog_offset";        // dp, + = più in basso rispetto al centro
     /** Lato dell'orologio analogico al 100 %: le immagini dei quadranti sono da 840 px. */
@@ -71,7 +72,8 @@ public class AodClockMod extends XposedMods {
     private int mLineHeightDp;
     private String mDateFormat = "";
     private boolean mCustomFont;
-    private boolean mDialOn, mHandsOn;
+    private boolean mDialOn, mHandsOn, mImgOn;
+    private int mImgColor = 0xFFFFFFFF;
     private int mDialColor = 0xFFFFFFFF, mHandsColor = 0xFFFFFFFF;
     private float mAnalogSize = 1f;
     private int mAnalogOffsetDp;
@@ -106,6 +108,8 @@ public class AodClockMod extends XposedMods {
         mCustomFont  = Xprefs.getBoolean(KEY_CUSTOM_FONT, false);
         mDialOn      = Xprefs.getBoolean(KEY_ANALOG_DIAL + "_on", false);
         mHandsOn     = Xprefs.getBoolean(KEY_ANALOG_HANDS + "_on", false);
+        mImgOn       = Xprefs.getBoolean(KEY_ANALOG_IMG + "_on", false);
+        mImgColor    = Xprefs.getInt(KEY_ANALOG_IMG, mImgColor) | 0xFF000000;
         mDialColor   = Xprefs.getInt(KEY_ANALOG_DIAL, mDialColor) | 0xFF000000;
         mHandsColor  = Xprefs.getInt(KEY_ANALOG_HANDS, mHandsColor) | 0xFF000000;
         mAnalogSize  = Xprefs.getInt(KEY_ANALOG_SIZE, 100) / 100f;
@@ -367,7 +371,7 @@ public class AodClockMod extends XposedMods {
         android.widget.AnalogClock ac = findAnalog(root);
         if (ac == null) return;
         try {
-            if (mDialOn) ac.setDialTintList(android.content.res.ColorStateList.valueOf(mDialColor));
+            ViewHelper.applyDialColors(ac, mDialOn, mDialColor, mImgOn, mImgColor);
             android.content.res.ColorStateList hands = mHandsOn ? android.content.res.ColorStateList.valueOf(mHandsColor) : null;
             ac.setHourHandTintList(hands);
             ac.setMinuteHandTintList(hands);

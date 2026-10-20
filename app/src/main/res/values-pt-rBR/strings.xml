@@ -1307,4 +1307,5 @@
     <string name="lockscreen_fp_color_title">Cor do ícone</string>
     <string name="lockscreen_analog_seconds">Ponteiro dos segundos</string>
     <string name="lockscreen_analog_seconds_summary">Mostra os segundos na tela de bloqueio (não no AOD, para economizar bateria)</string>
+    <string name="aod_analog_img_color">Cor da imagem do mostrador</string>
 </resources>

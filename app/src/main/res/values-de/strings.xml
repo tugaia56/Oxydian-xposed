@@ -1307,4 +1307,5 @@
     <string name="lockscreen_fp_color_title">Symbolfarbe</string>
     <string name="lockscreen_analog_seconds">Sekundenzeiger</string>
     <string name="lockscreen_analog_seconds_summary">Zeigt die Sekunden auf dem Sperrbildschirm (nicht im Always-on-Display, um Akku zu sparen)</string>
+    <string name="aod_analog_img_color">Farbe des Zifferblattbilds</string>
 </resources>

@@ -1307,4 +1307,5 @@
     <string name="lockscreen_fp_color_title">Color del icono</string>
     <string name="lockscreen_analog_seconds">Segundero</string>
     <string name="lockscreen_analog_seconds_summary">Muestra los segundos en la pantalla de bloqueo (no en la pantalla siempre activa, para ahorrar batería)</string>
+    <string name="aod_analog_img_color">Color de la imagen de la esfera</string>
 </resources>

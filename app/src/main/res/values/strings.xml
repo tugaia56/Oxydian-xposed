@@ -1317,4 +1317,5 @@
     <string name="lockscreen_fp_color_title">Icon colour</string>
     <string name="lockscreen_analog_seconds">Second hand</string>
     <string name="lockscreen_analog_seconds_summary">Shows the seconds on the lock screen (not on the always-on display, to save battery)</string>
+    <string name="aod_analog_img_color">Dial image color</string>
 </resources>
