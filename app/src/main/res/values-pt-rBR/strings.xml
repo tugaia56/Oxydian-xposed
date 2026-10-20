@@ -1305,4 +1305,6 @@
     <string name="msg_section_bubbles">Balões</string>
     <string name="color_mode_ripple">Opacidade do toque</string>
     <string name="lockscreen_fp_color_title">Cor do ícone</string>
+    <string name="lockscreen_analog_seconds">Ponteiro dos segundos</string>
+    <string name="lockscreen_analog_seconds_summary">Mostra os segundos na tela de bloqueio (não no AOD, para economizar bateria)</string>
 </resources>

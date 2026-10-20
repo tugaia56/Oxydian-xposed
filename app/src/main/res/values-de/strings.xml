@@ -1305,4 +1305,6 @@
     <string name="msg_section_bubbles">Blasen</string>
     <string name="color_mode_ripple">Touch-Deckkraft</string>
     <string name="lockscreen_fp_color_title">Symbolfarbe</string>
+    <string name="lockscreen_analog_seconds">Sekundenzeiger</string>
+    <string name="lockscreen_analog_seconds_summary">Zeigt die Sekunden auf dem Sperrbildschirm (nicht im Always-on-Display, um Akku zu sparen)</string>
 </resources>

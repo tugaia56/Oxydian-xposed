@@ -1287,4 +1287,6 @@
     <string name="ct_card_border">Con bordo</string>
     <string name="color_mode_ripple">Opacità tocco</string>
     <string name="lockscreen_fp_color_title">Colore icona</string>
+    <string name="lockscreen_analog_seconds">Lancetta dei secondi</string>
+    <string name="lockscreen_analog_seconds_summary">Mostra i secondi sulla schermata di blocco (non sull\'AOD, per risparmiare batteria)</string>
 </resources>

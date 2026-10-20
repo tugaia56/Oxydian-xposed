@@ -83,6 +83,7 @@ public class LockscreenClockMod extends XposedMods {
     private static final String AOD_ANALOG_DIAL  = "aod_analog_dial_color";
     private static final String AOD_ANALOG_HANDS = "aod_analog_hands_color";
     private static final String AOD_ANALOG_SIZE  = "aod_analog_size";
+    private static final String LS_ANALOG_SECONDS = "lockscreen_analog_seconds";
     private static final int ANALOG_BASE_DP = 196;
 
     private static final String AOD_KEY_SWITCH       = "aod_custom_clock_switch";
@@ -131,6 +132,7 @@ public class LockscreenClockMod extends XposedMods {
     private boolean mLsDialOn, mLsHandsOn, mAodDialOn, mAodHandsOn;
     private int mLsDial = 0xFFFFFFFF, mLsHands = 0xFFFFFFFF, mAodDial = 0xFFFFFFFF, mAodHands = 0xFFFFFFFF;
     private float mLsAnalogSize = 0.75f, mAodAnalogSize = 1f;
+    private boolean mLsSeconds = true;
 
     /** Obsidian's own package context — needed to inflate our own layouts/fonts/Lottie assets
      *  (mContext is SystemUI's context and can't resolve our resource IDs). */
@@ -164,6 +166,7 @@ public class LockscreenClockMod extends XposedMods {
         mLsDial     = Xprefs.getInt(LS_ANALOG_DIAL, 0xFFFFFFFF) | 0xFF000000;
         mLsHands    = Xprefs.getInt(LS_ANALOG_HANDS, 0xFFFFFFFF) | 0xFF000000;
         mLsAnalogSize = Xprefs.getInt(LS_ANALOG_SIZE, 75) / 100f;
+        mLsSeconds = Xprefs.getBoolean(LS_ANALOG_SECONDS, true);
         mAodDialOn  = Xprefs.getBoolean(AOD_ANALOG_DIAL + "_on", false);
         mAodHandsOn = Xprefs.getBoolean(AOD_ANALOG_HANDS + "_on", false);
         mAodDial    = Xprefs.getInt(AOD_ANALOG_DIAL, 0xFFFFFFFF) | 0xFF000000;
@@ -458,8 +461,8 @@ public class LockscreenClockMod extends XposedMods {
         ViewHelper.findViewWithTagAndChangeColor(clockView, "accent2", accentColor);
         ViewHelper.findViewWithTagAndChangeColor(clockView, "accent3", accentColor);
         ViewHelper.findViewWithTagAndChangeColor(clockView, "text1", textColor);
-        if (isAod) ViewHelper.applyAnalogOptions(clockView, mAodDialOn, mAodDial, mAodHandsOn, mAodHands, mAodAnalogSize, ANALOG_BASE_DP);
-        else ViewHelper.applyAnalogOptions(clockView, mLsDialOn, mLsDial, mLsHandsOn, mLsHands, mLsAnalogSize, ANALOG_BASE_DP);
+        if (isAod) ViewHelper.applyAnalogOptions(clockView, mAodDialOn, mAodDial, mAodHandsOn, mAodHands, mAodAnalogSize, ANALOG_BASE_DP, false);
+        else ViewHelper.applyAnalogOptions(clockView, mLsDialOn, mLsDial, mLsHandsOn, mLsHands, mLsAnalogSize, ANALOG_BASE_DP, mLsSeconds);
 
         if (scale != 1f) ViewHelper.applyTextScalingRecursively(group, scale);
         if (lineHeightDp != 0) ViewHelper.applyTextMarginRecursively(mContext, group, lineHeightDp);

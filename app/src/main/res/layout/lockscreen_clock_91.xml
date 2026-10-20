@@ -13,5 +13,6 @@
         android:dial="@drawable/analog_athomic_dial"
         android:hand_hour="@drawable/analog_hbcdd37_hour"
         android:hand_minute="@drawable/analog_hbcdd37_min"
+        android:hand_second="@drawable/analog_hbcdd37_sec"
         android:tag="accent1" />
 </LinearLayout>

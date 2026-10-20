@@ -13,5 +13,6 @@
         android:dial="@drawable/analog_samurai_2_dial"
         android:hand_hour="@drawable/analog_hb704e8_hour"
         android:hand_minute="@drawable/analog_hb704e8_min"
+        android:hand_second="@drawable/analog_hb704e8_sec"
         android:tag="accent1" />
 </LinearLayout>

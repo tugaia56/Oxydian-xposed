@@ -12,5 +12,6 @@
         android:layout_marginVertical="10dp"
         android:dial="@drawable/analog_oos_minimalism_1_dial"
         android:hand_hour="@drawable/analog_ha105bb_hour"
-        android:hand_minute="@drawable/analog_ha105bb_min" />
+        android:hand_minute="@drawable/analog_ha105bb_min"
+        android:hand_second="@drawable/analog_ha105bb_sec" />
 </LinearLayout>

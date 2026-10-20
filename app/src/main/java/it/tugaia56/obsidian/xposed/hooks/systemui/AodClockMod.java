@@ -371,6 +371,7 @@ public class AodClockMod extends XposedMods {
             android.content.res.ColorStateList hands = mHandsOn ? android.content.res.ColorStateList.valueOf(mHandsColor) : null;
             ac.setHourHandTintList(hands);
             ac.setMinuteHandTintList(hands);
+            ac.setSecondHand(null); // nessuna lancetta dei secondi sull'AOD: consumerebbe batteria
             ViewGroup.LayoutParams lp = ac.getLayoutParams();
             if (lp != null) {
                 int px = Math.round(ANALOG_BASE_DP * mAnalogSize * mContext.getResources().getDisplayMetrics().density);

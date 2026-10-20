@@ -13,5 +13,6 @@
         android:dial="@drawable/analog_bull_dial"
         android:hand_hour="@drawable/analog_he0dd33_hour"
         android:hand_minute="@drawable/analog_he0dd33_min"
+        android:hand_second="@drawable/analog_he0dd33_sec"
         android:tag="accent1" />
 </LinearLayout>

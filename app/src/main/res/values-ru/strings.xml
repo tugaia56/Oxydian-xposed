@@ -1305,4 +1305,6 @@
     <string name="msg_section_bubbles">Пузыри</string>
     <string name="color_mode_ripple">Прозрачность касания</string>
     <string name="lockscreen_fp_color_title">Цвет значка</string>
+    <string name="lockscreen_analog_seconds">Секундная стрелка</string>
+    <string name="lockscreen_analog_seconds_summary">Показывает секунды на экране блокировки (не на AOD, чтобы экономить заряд)</string>
 </resources>

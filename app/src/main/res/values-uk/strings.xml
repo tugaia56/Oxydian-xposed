@@ -1305,4 +1305,6 @@
     <string name="msg_section_bubbles">Бульбашки</string>
     <string name="color_mode_ripple">Прозорість дотику</string>
     <string name="lockscreen_fp_color_title">Колір значка</string>
+    <string name="lockscreen_analog_seconds">Секундна стрілка</string>
+    <string name="lockscreen_analog_seconds_summary">Показує секунди на екрані блокування (не на AOD, щоб заощадити заряд)</string>
 </resources>

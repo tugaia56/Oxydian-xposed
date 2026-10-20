@@ -12,5 +12,6 @@
         android:layout_marginVertical="10dp"
         android:dial="@drawable/analog_punisher_colorful_dial"
         android:hand_hour="@drawable/analog_hbc7b21_hour"
-        android:hand_minute="@drawable/analog_hbc7b21_min" />
+        android:hand_minute="@drawable/analog_hbc7b21_min"
+        android:hand_second="@drawable/analog_hbc7b21_sec" />
 </LinearLayout>

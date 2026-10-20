@@ -14,5 +14,6 @@
         android:dial="@drawable/analog_dragon_dial"
         android:hand_hour="@drawable/analog_dragon_hour"
         android:hand_minute="@drawable/analog_dragon_min"
+        android:hand_second="@drawable/analog_dragon_sec"
         android:tag="accent1" />
 </LinearLayout>

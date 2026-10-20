@@ -63,6 +63,7 @@ public class LockscreenClockFragment extends Fragment {
 
     private static final String KEY_ANALOG_DIAL  = "lockscreen_analog_dial_color";
     private static final String KEY_ANALOG_HANDS = "lockscreen_analog_hands_color";
+    private static final String KEY_ANALOG_SECONDS = "lockscreen_analog_seconds";
     private static final String KEY_ANALOG_SIZE  = "lockscreen_analog_size";      // 50-150 %, default 75
 
     private static final String COLOR_ACCENT1 = "lockscreen_clock_color_code_accent1";
@@ -127,8 +128,13 @@ public class LockscreenClockFragment extends Fragment {
             // Orologio analogico: colori e dimensione al posto delle opzioni del testo.
             chain.add(new SectionTitleAdapter(List.of(getString(R.string.aod_analog_section))));
             chain.add(analogColorsRow());
+            SwitchWidgetAdapter.SwitchItem secondsItem = new SwitchWidgetAdapter.SwitchItem(
+                    getString(R.string.lockscreen_analog_seconds), getString(R.string.lockscreen_analog_seconds_summary),
+                    ObsidianPrefs.getBoolean(KEY_ANALOG_SECONDS, true), null);
+            secondsItem.onChanged = () -> ObsidianPrefs.putBoolean(KEY_ANALOG_SECONDS, secondsItem.checked);
             GroupUtils.addGroup(chain, List.of(
-                    sliderItem(getString(R.string.aod_analog_size), KEY_ANALOG_SIZE, 50, 150, 75, "%", false)));
+                    sliderItem(getString(R.string.aod_analog_size), KEY_ANALOG_SIZE, 50, 150, 75, "%", false),
+                    secondsItem));
             chain.add(new SectionTitleAdapter(List.of(getString(R.string.lockscreen_clock_custom_margins))));
             GroupUtils.addGroup(chain, List.of(
                     sliderItem(getString(R.string.lockscreen_clock_top_margin_title), KEY_TOP_MARGIN, 0, 600, 0, "dp", true),

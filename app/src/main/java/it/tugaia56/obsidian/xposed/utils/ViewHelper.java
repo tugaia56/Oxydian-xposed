@@ -69,7 +69,7 @@ public class ViewHelper {
     /** Orologio analogico (AnalogClock): colore del quadrante e delle lancette (se attivi) e
      *  dimensione (lato = baseDp * size). Colori spenti = disegno originale (quadrante: tag accent1). */
     public static void applyAnalogOptions(View root, boolean dialOn, int dialColor, boolean handsOn, int handsColor,
-                                          float size, int baseDp) {
+                                          float size, int baseDp, boolean seconds) {
         android.widget.AnalogClock ac = findAnalogClock(root);
         if (ac == null) return;
         try {
@@ -77,6 +77,9 @@ public class ViewHelper {
             ColorStateList hands = handsOn ? ColorStateList.valueOf(handsColor) : null;
             ac.setHourHandTintList(hands);
             ac.setMinuteHandTintList(hands);
+            ac.setSecondHandTintList(hands);
+            // lancetta dei secondi: solo dove scelto (non sull'AOD, per non consumare batteria)
+            if (!seconds) ac.setSecondHand(null);
             ViewGroup.LayoutParams lp = ac.getLayoutParams();
             if (lp != null) {
                 int px = Math.round(baseDp * size * ac.getResources().getDisplayMetrics().density);
