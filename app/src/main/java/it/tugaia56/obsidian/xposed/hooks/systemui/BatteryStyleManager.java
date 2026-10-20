@@ -309,6 +309,7 @@ public class BatteryStyleManager extends XposedMods {
             hookAllConstructors(sBMV, new XC_MethodHook() {
                 @Override protected void afterHookedMethod(MethodHookParam param) {
                     ((View) param.thisObject).addOnAttachStateChangeListener(attachListener);
+                    registerAccentReceiver(((View) param.thisObject).getContext());
                     if (!mEnabled) return;
                     BatteryDrawable d = createDrawable(mContext);
                     if (d != null) setAdditionalInstanceField(param.thisObject, "mBatteryDrawable", d);
@@ -328,13 +329,6 @@ public class BatteryStyleManager extends XposedMods {
                     setAdditionalInstanceField(param.thisObject, "mBatteryDrawable", d);
                     iv.setImageDrawable(d);
                     iv.requestLayout();
-                }
-            });
-
-            // cambio overlay/accento → il sistema manda un cambio di configurazione: si ricolora il fulmine
-            hookAllMethods(sBMV, "onConfigurationChanged", new XC_MethodHook() {
-                @Override protected void afterHookedMethod(MethodHookParam param) {
-                    if (param.thisObject instanceof View v) v.post(() -> updateView(v));
                 }
             });
 
@@ -503,17 +497,7 @@ public class BatteryStyleManager extends XposedMods {
         batteryIcon.setVisibility(mHideBattery ? View.GONE : View.VISIBLE);
         scaleIcon(batteryIcon);
 
-        // il fulmine con l'accento va ricolorato anche quando cambia l'accento, non solo quando cambia lo stato di carica
-        if (mChargingIconEnabled && mChargingIconUseAccent) {
-            try {
-                View bolt = root.findViewById(mContext.getResources().getIdentifier(
-                        "battery_charge_icon", "id", mContext.getPackageName()));
-                if (bolt instanceof ImageView iv && iv.getDrawable() != null) {
-                    iv.getDrawable().mutate().setColorFilter(appAccentColor(), PorterDuff.Mode.SRC_IN);
-                    iv.invalidate();
-                }
-            } catch (Throwable ignored) {}
-        }
+        refreshChargingIcons();
     }
 
     private void applyCustomization(BatteryDrawable d) {
@@ -545,6 +529,33 @@ public class BatteryStyleManager extends XposedMods {
         return it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
     }
 
+    // le ImageView del fulmine viste finora: si ricolorano quando cambia l'accento (il sistema non le ricollega da solo)
+    private final java.util.Set<ImageView> mChargingIconViews =
+            java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
+
+    private boolean mAccentReceiverRegistered;
+
+    /** Cambio overlay/accento (Oxydian Theme): le icone gia' disegnate non si aggiornano da sole, si ricolorano qui. */
+    private void registerAccentReceiver(Context ctx) {
+        if (mAccentReceiverRegistered || ctx == null) return;
+        mAccentReceiverRegistered = true;
+        try {
+            final android.os.Handler h = new android.os.Handler(android.os.Looper.getMainLooper());
+            android.content.IntentFilter f = new android.content.IntentFilter(android.content.Intent.ACTION_CONFIGURATION_CHANGED);
+            f.addAction("android.intent.action.OVERLAY_CHANGED");
+            ctx.getApplicationContext().registerReceiver(new android.content.BroadcastReceiver() {
+                @Override public void onReceive(Context c, android.content.Intent i) {
+                    h.postDelayed(BatteryStyleManager.this::refreshChargingIcons, 1500);
+                    h.postDelayed(BatteryStyleManager.this::refreshChargingIcons, 6000);
+                }
+            }, f);
+        } catch (Throwable t) { mAccentReceiverRegistered = false; }
+    }
+
+    private void refreshChargingIcons() {
+        for (ImageView iv : new ArrayList<>(mChargingIconViews)) iv.post(() -> applyChargingIcon(iv));
+    }
+
     @SuppressWarnings("DiscouragedApi")
     private Drawable getNewChargingIcon() {
         if (mChargingIconStyle < 0 || mChargingIconStyle >= CHARGING_ICON_NAMES.length) return null;
@@ -568,6 +579,7 @@ public class BatteryStyleManager extends XposedMods {
     private void applyChargingIcon(ImageView chargingIcon) {
         if (chargingIcon == null) return;
         if (!mChargingIconEnabled) return;
+        mChargingIconViews.add(chargingIcon);
         Drawable icon = getNewChargingIcon();
         if (icon == null) return;
         chargingIcon.setImageDrawable(icon);
