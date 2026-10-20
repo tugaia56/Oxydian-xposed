@@ -205,7 +205,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
                 : DEFAULT_CARD_COLOR;
         mAccentColor = Xprefs.getBoolean(PREF_ACCENT_ON, false)
                 ? (Xprefs.getInt(PREF_ACCENT, DEFAULT_ACCENT_COLOR) | 0xFF000000)
-                : DEFAULT_ACCENT_COLOR;
+                : it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
         applyLive();
     }
 
@@ -232,7 +232,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
             boolean a1On = "1".equals(readSysProp("persist.obsidian.dst.a1_on", "0"));
             mAccentColor = a1On
                     ? (parseIntProp(readSysProp("persist.obsidian.dst.a1", ""), DEFAULT_ACCENT_COLOR) | 0xFF000000)
-                    : DEFAULT_ACCENT_COLOR;
+                    : it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
             applyLive();
         } catch (Throwable t) {
             XposedBridge.log("[ Obsidian ] SettingsCardBackgroundMod.preloadFallback failed: " + t);
@@ -623,13 +623,21 @@ public class SettingsCardBackgroundMod extends XposedMods {
             bg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
             bg.setColor(cardColor());
             bg.setCornerRadius(radius);
-            v.setBackground(bg);
             android.graphics.drawable.GradientDrawable border = new android.graphics.drawable.GradientDrawable();
             border.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
             border.setColor(0x00000000);
             border.setCornerRadius(radius);
             border.setStroke((int) stroke, mAccentColor);
-            v.setForeground(border);
+            if (radiusDp >= 40) {
+                // pannelli appoggiati al bordo inferiore dello schermo: si arrotondano solo gli angoli in alto,
+                // la parte bassa del disegno (angoli e bordo) viene spinta fuori dalla vista
+                int out = -(int) (radius + stroke * 2);
+                v.setBackground(new android.graphics.drawable.InsetDrawable(bg, 0, 0, 0, out));
+                v.setForeground(new android.graphics.drawable.InsetDrawable(border, 0, 0, 0, out));
+            } else {
+                v.setBackground(bg);
+                v.setForeground(border);
+            }
             if (v instanceof android.view.ViewGroup vg && vg.getChildCount() > 0) {
                 vg.getChildAt(0).setBackgroundColor(0x00000000);
             }
