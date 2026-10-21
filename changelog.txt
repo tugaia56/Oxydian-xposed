@@ -1,0 +1,15 @@
+Aggiunto:
+- Orologio analogico: lancetta dei secondi abbinata ai colori di ogni stile (sulla schermata di blocco, con un interruttore; non sull'AOD per risparmiare batteria)
+- Orologio analogico: nuovo "Colore immagine quadrante". "Colore quadrante" ora colora solo cerchio e numeri, il nuovo colore solo l'immagine interna (59 quadranti). Senza colori scelti il quadrante resta bianco
+- Orologio analogico: i quadranti nel selettore sono in ordine alfabetico; il quadrante "OnePlus 2" ha il logo OnePlus
+- Icona impronta digitale: scelta del colore (Disattivata, Accento, Opacità tocco, Personalizzata)
+- Pannello separato: colore "Opacità tocco" per i pulsanti Modifica, Menu e Impostazioni
+- Finestre dei permessi: mod nascosta con sfondo Blue Gray Dark e bordo nell'accento. Serve la spunta su Controller autorizzazioni nell'ambito di Oxydian in LSPosed
+- Traduzioni mancanti in tedesco, spagnolo, indonesiano, portoghese (Brasile), russo, turco, ucraino, vietnamita e cinese
+Aggiornato:
+- Accento: tutto Oxydian segue l'accento scelto in Oxy Theme (app, mod di SystemUI e Impostazioni, orologi, icona di ricarica, pulsante Chiudi dei recenti) invece del viola fisso. Le scelte "Accento" mostrano e usano sempre l'accento attuale
+- Orologi digitali (schermata di blocco e AOD): Accento 2, Accento 3 e Testo 2 sono indipendenti, se il loro selettore è acceso. Stili 17 e 24: ora in cima e spazi più stretti, così non si sovrappongono ai widget
+- Riquadri grandi del pannello rapido: lo sfondo non esce più dal bordo con "Raggio" grande
+- Icona di ricarica nella barra di stato: si ricolora subito quando cambia l'accento
+- Pagina Colori: pannello in basso arrotondato solo sopra
+- OOS 16.0.10: l'immagine in alto del pannello segue la dissolvenza dei pulsanti rapidi; il pulsante "cancella tutto" delle notifiche prende anche il colore della maschera
