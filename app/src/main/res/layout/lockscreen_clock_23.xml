@@ -16,6 +16,15 @@
     <TextClock
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:format12Hour="hh:mm"
+        android:format24Hour="HH:mm"
+        android:tag="text2"
+        android:textColor="#FFFFFF"
+        android:textSize="28sp" />
+
+    <TextClock
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:format12Hour="EEEE"
         android:format24Hour="EEEE"
         android:tag="text1"
@@ -31,19 +40,10 @@
     <TextClock
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:format12Hour="dd MMMM"
         android:format24Hour="dd MMMM"
         android:tag="text2|textClockDate"
-        android:textColor="#FFFFFF"
-        android:textSize="28sp" />
-
-    <TextClock
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:format12Hour="hh:mm"
-        android:format24Hour="HH:mm"
-        android:tag="text2"
         android:textColor="#FFFFFF"
         android:textSize="28sp" />
 
