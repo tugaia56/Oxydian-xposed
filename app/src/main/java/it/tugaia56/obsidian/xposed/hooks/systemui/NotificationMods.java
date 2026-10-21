@@ -230,6 +230,15 @@ public class NotificationMods extends XposedMods {
                     }
                 });
             } catch (Throwable ignored) {}
+            // OOS 16.0.10: sopra al fondo c'e' anche un colore "maschera" del pulsante, che va cambiato insieme
+            try {
+                hookAllMethods(clearAllController, "getClearAllMaskOverlayColor", new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam param) {
+                        if (!mCustomizeClear) return;
+                        param.setResult(mLinkBgAccent ? mAccent : mClearBgColor);
+                    }
+                });
+            } catch (Throwable ignored) {}
             try {
                 hookAllMethods(clearAllController, "updateClearAllBackground", new XC_MethodHook() {
                     @Override protected void afterHookedMethod(MethodHookParam param) { updateClearButton(); }

@@ -169,6 +169,35 @@ public class QsHeaderImage extends XposedMods {
             Log.e("OBS_QSH", "OplusQSRootView NOT found: " + t);
             XposedBridge.log("[ Obsidian ] QsHeaderImage: OplusQSRootView NOT found");
         }
+
+        // OOS 16.0.10 (da OC): l'immagine segue la dissolvenza/lo scorrimento dei pulsanti rapidi mentre il pannello
+        // si apre e si chiude, altrimenti resta con la trasparenza sbagliata.
+        try {
+            Class<?> entrance = findClass(
+                    "com.oplus.systemui.plugins.qs.quickentrance.OplusQSQuickEntranceComponent", lp.classLoader);
+            hookAllMethods(entrance, "resetEntranceState", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    for (FrameLayout c : new ArrayList<>(mContainers)) { c.setTranslationY(0f); c.setTransitionAlpha(0f); }
+                }
+            });
+            hookAllMethods(entrance, "updateQuickEntranceState", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    if (p.args.length == 0 || !(p.args[0] instanceof Float)) return;
+                    float a = (Float) p.args[0];
+                    for (FrameLayout c : new ArrayList<>(mContainers)) c.setTransitionAlpha(a);
+                }
+            });
+            hookAllMethods(entrance, "updateState", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    if (p.args.length < 3 || !(p.args[0] instanceof Integer) || !(p.args[1] instanceof Float)
+                            || !(p.args[2] instanceof Float)) return;
+                    for (FrameLayout c : new ArrayList<>(mContainers)) {
+                        c.setTranslationY((Float) p.args[2]);
+                        c.setTransitionAlpha((Float) p.args[1]);
+                    }
+                }
+            });
+        } catch (Throwable ignored) {}
     }
 
     /**
