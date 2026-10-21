@@ -241,7 +241,7 @@ public class ClockDateFragment extends Fragment {
                     boolean useAccent = selected[0] == 0;
                     ObsidianPrefs.putBoolean(colorKey + "_use_accent", useAccent);
                     if (useAccent) {
-                        item.setColor(ObsidianTheme.accentColor());
+                        item.setColor(ObsidianTheme.overlayAccent());
                         onEnabled.accept(item);
                         if (adapter != null) adapter.notifyDataSetChanged();
                     } else {

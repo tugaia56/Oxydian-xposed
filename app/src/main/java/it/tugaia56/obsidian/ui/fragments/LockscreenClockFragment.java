@@ -254,7 +254,7 @@ public class LockscreenClockFragment extends Fragment {
                     boolean useAccent = selected[0] == 0;
                     ObsidianPrefs.putBoolean(colorKey + "_use_accent", useAccent);
                     if (useAccent) {
-                        item.setColor(ObsidianTheme.accentColor());
+                        item.setColor(ObsidianTheme.overlayAccent());
                         onColorEnabled(item);
                     } else if (getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).showColorPickerDialog(dialogId, item.getColor(), true, true, true);

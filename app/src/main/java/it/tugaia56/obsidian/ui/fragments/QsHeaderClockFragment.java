@@ -452,7 +452,7 @@ public class QsHeaderClockFragment extends Fragment {
                     boolean useAccent = selected[0] == 0;
                     ObsidianPrefs.putBoolean(colorKey + "_use_accent", useAccent);
                     if (useAccent) {
-                        item.setColor(ObsidianTheme.accentColor());
+                        item.setColor(ObsidianTheme.overlayAccent());
                         onColorEnabled(item); // already calls rebuild()
                     } else if (getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).showColorPickerDialog(dialogId, item.getColor(), true, true, true);
@@ -534,7 +534,7 @@ public class QsHeaderClockFragment extends Fragment {
                     boolean useAccent = selected[0] == 0;
                     ObsidianPrefs.putBoolean(key + "_use_accent", useAccent);
                     if (useAccent) {
-                        ObsidianPrefs.putInt(key, ObsidianTheme.accentColor());
+                        ObsidianPrefs.putInt(key, ObsidianTheme.overlayAccent());
                         rebuild();
                     } else if (getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).showColorPickerDialog(dialogId, ObsidianPrefs.getInt(key, def), true, true, true);

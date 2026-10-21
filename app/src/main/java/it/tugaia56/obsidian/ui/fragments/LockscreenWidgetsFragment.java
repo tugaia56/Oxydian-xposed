@@ -310,7 +310,7 @@ public class LockscreenWidgetsFragment extends Fragment {
                     boolean useAccent = selected[0] == 0;
                     ObsidianPrefs.putBoolean(colorKey + "_use_accent", useAccent);
                     if (useAccent) {
-                        item.setColor(ObsidianTheme.accentColor());
+                        item.setColor(ObsidianTheme.overlayAccent());
                         onColorEnabled(item);
                         if (mBigColorAdapter != null) mBigColorAdapter.notifyDataSetChanged();
                         if (mMiniColorAdapter != null) mMiniColorAdapter.notifyDataSetChanged();

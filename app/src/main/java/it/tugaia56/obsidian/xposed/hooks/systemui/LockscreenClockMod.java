@@ -457,8 +457,7 @@ public class LockscreenClockMod extends XposedMods {
         String  dateFormat   = isAod ? mAodDateFormat   : mDateFormat;
 
         int systemAccent;
-        try { systemAccent = mContext.getColor(android.R.color.system_accent1_600); }
-        catch (Throwable t) { systemAccent = 0xFF908DFF; }
+        systemAccent = it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
 
         int accentColor = customColor ? accent1 : systemAccent;
         int textColor = customColor ? text1 : 0xFFFFFFFF;

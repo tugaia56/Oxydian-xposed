@@ -626,7 +626,7 @@ public class QsTilesCustomizeFragment extends Fragment {
                     boolean useAccent = selected[0] == 0;
                     ObsidianPrefs.putBoolean(key + "_use_accent", useAccent);
                     if (useAccent) {
-                        ObsidianPrefs.putInt(key, ObsidianTheme.accentColor());
+                        ObsidianPrefs.putInt(key, ObsidianTheme.overlayAccent());
                         rebuild();
                     } else if (getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).showColorPickerDialog(

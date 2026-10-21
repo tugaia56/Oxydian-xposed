@@ -289,7 +289,7 @@ public class QsTilesMiscFragment extends Fragment {
                     boolean useAccent = selected[0] == 0;
                     ObsidianPrefs.putBoolean(KEY_LABEL_COLOR + "_use_accent", useAccent);
                     if (useAccent) {
-                        ObsidianPrefs.putInt(KEY_LABEL_COLOR, ObsidianTheme.accentColor());
+                        ObsidianPrefs.putInt(KEY_LABEL_COLOR, ObsidianTheme.overlayAccent());
                         rebuild();
                     } else {
                         openColorPicker(205, KEY_LABEL_COLOR);

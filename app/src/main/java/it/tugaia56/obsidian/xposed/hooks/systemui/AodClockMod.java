@@ -94,14 +94,23 @@ public class AodClockMod extends XposedMods {
         } catch (PackageManager.NameNotFoundException ignored) {}
     }
 
+    /** "Accento" scelto: segue sempre l'accento attuale (Oxydian se impostato, altrimenti quello di Oxy Theme). */
+    private int resolveColor(String key, int def) {
+        if (Xprefs.getBoolean(key + "_use_accent", false)) {
+            if (Xprefs.getBoolean("DST_ACCENT1_on", false)) return Xprefs.getInt("DST_ACCENT1", 0xFF908DFF) | 0xFF000000;
+            return it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
+        }
+        return Xprefs.getInt(key, def);
+    }
+
     @Override
     public void updatePrefs(String... key) {
         if (Xprefs == null) return;
         mEnabled     = Xprefs.getBoolean(KEY_SWITCH, false);
         mStyle       = parseInt(Xprefs.getString(KEY_STYLE, "0"), 0);
         mCustomColor = Xprefs.getBoolean(KEY_COLOR_SWITCH, false);
-        mAccent1     = Xprefs.getInt(COLOR_ACCENT1, mAccent1) | 0xFF000000;
-        mText1       = Xprefs.getInt(COLOR_TEXT1, mText1) | 0xFF000000;
+        mAccent1     = resolveColor(COLOR_ACCENT1, mAccent1) | 0xFF000000;
+        mText1       = resolveColor(COLOR_TEXT1, mText1) | 0xFF000000;
         mScale       = Xprefs.getInt(KEY_TEXT_SCALING, 100) / 100f;
         mLineHeightDp= Xprefs.getInt(KEY_LINE_HEIGHT, 0);
         mDateFormat  = Xprefs.getString(KEY_FORMAT, "");
@@ -330,8 +339,7 @@ public class AodClockMod extends XposedMods {
         if (!(clockView instanceof ViewGroup group)) return;
 
         int systemAccent;
-        try { systemAccent = mContext.getColor(android.R.color.system_accent1_600); }
-        catch (Throwable t) { systemAccent = 0xFF908DFF; }
+        systemAccent = it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
 
         int accentColor = mCustomColor ? mAccent1 : systemAccent;
         int textColor = mCustomColor ? mText1 : 0xFFFFFFFF;

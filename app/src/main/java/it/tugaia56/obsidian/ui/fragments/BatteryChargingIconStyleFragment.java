@@ -128,7 +128,7 @@ public class BatteryChargingIconStyleFragment extends Fragment {
             if (d != null) {
                 d = d.mutate();
                 boolean useAccent = ObsidianPrefs.getBoolean(BatteryChargingIconFragment.PREF_USE_ACCENT, true);
-                int color = useAccent ? ObsidianTheme.accentColor()
+                int color = useAccent ? ObsidianTheme.overlayAccent()
                         : ObsidianPrefs.getInt(BatteryChargingIconFragment.PREF_CUSTOM_COLOR, 0xFFFFFFFF);
                 d.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             }

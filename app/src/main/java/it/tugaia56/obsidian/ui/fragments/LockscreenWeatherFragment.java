@@ -287,7 +287,7 @@ public class LockscreenWeatherFragment extends Fragment {
                     boolean useAccent = selected[0] == 0;
                     ObsidianPrefs.putBoolean(colorKey + "_use_accent", useAccent);
                     if (useAccent) {
-                        item.setColor(ObsidianTheme.accentColor());
+                        item.setColor(ObsidianTheme.overlayAccent());
                         onColorEnabled(item);
                         if (mColorAdapter != null) mColorAdapter.notifyDataSetChanged();
                     } else if (getActivity() instanceof MainActivity) {
