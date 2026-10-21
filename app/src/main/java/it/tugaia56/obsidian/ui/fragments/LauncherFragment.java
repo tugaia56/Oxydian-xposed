@@ -296,7 +296,7 @@ public class LauncherFragment extends Fragment {
 
     private static int currentRecentsColor() {
         return ObsidianPrefs.getBoolean(KEY_RECENTS_BTN_COLOR + "_use_accent", false)
-                ? ObsidianTheme.accentColor()
+                ? ObsidianTheme.overlayAccent()
                 : ObsidianPrefs.getInt(KEY_RECENTS_BTN_COLOR, 0xFF6200EE);
     }
 
@@ -322,7 +322,7 @@ public class LauncherFragment extends Fragment {
                     ObsidianPrefs.putBoolean(KEY_RECENTS_BTN_COLOR + "_use_accent", useAccent);
                     ObsidianPrefs.putBoolean(KEY_RECENTS_BTN_COLOR + "_on", true);
                     if (useAccent) {
-                        int color = ObsidianTheme.accentColor();
+                        int color = ObsidianTheme.overlayAccent();
                         ObsidianPrefs.putInt(KEY_RECENTS_BTN_COLOR, color);
                         new Thread(() -> applyRecentsBtnColor(color)).start();
                         rebuild();

@@ -56,7 +56,7 @@ public class BootReceiver extends BroadcastReceiver {
         String key = "LAUNCHER_RECENTS_BTN_COLOR";
         if (!ObsidianPrefs.getBoolean(key + "_on", false)) return;
         int color = ObsidianPrefs.getBoolean(key + "_use_accent", false)
-                ? ObsidianTheme.accentColor()
+                ? ObsidianTheme.overlayAccent()
                 : ObsidianPrefs.getInt(key, 0xFF6200EE);
         String hex = fmt(color);
         FabricatedUtil.buildAndEnableOverlays(

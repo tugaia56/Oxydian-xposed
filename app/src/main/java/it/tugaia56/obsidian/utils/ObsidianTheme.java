@@ -103,6 +103,28 @@ public class ObsidianTheme {
         return DEFAULT_ACCENT;
     }
 
+    /**
+     * Accento per le cose che si "cuociono" in un overlay (es. colore pulsante Recenti): se c'e' un accento di Oxydian
+     * quello, altrimenti l'accento di sistema scelto in Oxydian Theme (accent_material_dark).
+     */
+    public static int overlayAccent() {
+        if (ObsidianPrefs.getBoolean("DST_ACCENT1_on", false))
+            return ensureOpaque(ObsidianPrefs.getInt("DST_ACCENT1", DEFAULT_ACCENT));
+        // Oxydian Theme scrive l'accento scelto in questa proprieta' di sistema (8 cifre esadecimali, vuota = predefinito)
+        try {
+            String v = "";
+            try {
+                Class<?> sp = Class.forName("android.os.SystemProperties");
+                v = String.valueOf(sp.getMethod("get", String.class, String.class).invoke(null, "persist.oxytheme.accent", ""));
+            } catch (Throwable ignored) {}
+            if (v == null || v.trim().isEmpty()) {
+                v = String.join("", com.topjohnwu.superuser.Shell.cmd("getprop persist.oxytheme.accent").exec().getOut()).trim();
+            }
+            if (v.length() >= 6) return ensureOpaque((int) Long.parseLong(v.substring(v.length() - 6), 16));
+        } catch (Throwable ignored) {}
+        return DEFAULT_ACCENT;
+    }
+
     /** Default — indaco, come ACCENT2 di DarkShadowUtils. */
     public static final int DEFAULT_ACCENT2 = 0xFF3700B3;
 
