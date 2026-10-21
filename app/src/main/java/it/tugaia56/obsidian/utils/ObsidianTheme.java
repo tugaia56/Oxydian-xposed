@@ -125,6 +125,12 @@ public class ObsidianTheme {
         return DEFAULT_ACCENT;
     }
 
+    /** Colore salvato per una voce: se e' scelto "Accento" si mostra/usa l'accento attuale, non quello salvato allora. */
+    public static int colorPref(String key, int def) {
+        if (ObsidianPrefs.getBoolean(key + "_use_accent", false)) return overlayAccent();
+        return ObsidianPrefs.getInt(key, def);
+    }
+
     /** Default — indaco, come ACCENT2 di DarkShadowUtils. */
     public static final int DEFAULT_ACCENT2 = 0xFF3700B3;
 

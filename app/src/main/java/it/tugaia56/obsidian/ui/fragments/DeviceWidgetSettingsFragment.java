@@ -281,7 +281,7 @@ public class DeviceWidgetSettingsFragment extends Fragment {
         for (int i = 0; i < keys.length; i++) {
             mColorItems.add(new DarkShadowItem(labels[i], keys[i],
                     Collections.emptyList(), Collections.emptyList(), null,
-                    ObsidianPrefs.getInt(keys[i], 0xFFFFFFFF),
+                    ObsidianTheme.colorPref(keys[i], 0xFFFFFFFF),
                     ObsidianPrefs.getBoolean(keys[i] + "_on", false)));
         }
         mColorAdapter = new DarkShadowColorListener(mColorItems, this::onColorEnabled, this::onColorDisabled, this::onColorSwatch);

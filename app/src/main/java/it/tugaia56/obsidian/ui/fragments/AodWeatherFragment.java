@@ -240,7 +240,7 @@ public class AodWeatherFragment extends Fragment {
     private DarkShadowColorListener colorRow() {
         DarkShadowItem item = new DarkShadowItem(getString(R.string.weather_custom_color), KEY_COLOR,
                 java.util.Collections.emptyList(), java.util.Collections.emptyList(), null,
-                ObsidianPrefs.getInt(KEY_COLOR, 0xFFFFFFFF), ObsidianPrefs.getBoolean(KEY_COLOR + "_on", false));
+                ObsidianTheme.colorPref(KEY_COLOR, 0xFFFFFFFF), ObsidianPrefs.getBoolean(KEY_COLOR + "_on", false));
         mColorItems.add(item);
         mColorAdapter = new DarkShadowColorListener(List.of(item), this::onColorEnabled, this::onColorDisabled, this::onColorSwatch);
         return mColorAdapter;

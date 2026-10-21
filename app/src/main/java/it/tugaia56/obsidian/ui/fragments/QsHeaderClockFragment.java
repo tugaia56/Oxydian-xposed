@@ -417,7 +417,7 @@ public class QsHeaderClockFragment extends Fragment {
 
     private DarkShadowItem colorItem(String label, String key, int def) {
         return new DarkShadowItem(label, key, Collections.emptyList(), Collections.emptyList(), null,
-                ObsidianPrefs.getInt(key, def), ObsidianPrefs.getBoolean(key + "_on", false));
+                ObsidianTheme.colorPref(key, def), ObsidianPrefs.getBoolean(key + "_on", false));
     }
 
     private void onColorEnabled(DarkShadowItem item) {

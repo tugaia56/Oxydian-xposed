@@ -261,7 +261,7 @@ public class LockscreenWidgetsFragment extends Fragment {
         for (int i = 0; i < keys.length; i++) {
             items.add(new DarkShadowItem(labels[i], keys[i],
                     java.util.Collections.emptyList(), java.util.Collections.emptyList(), null,
-                    ObsidianPrefs.getInt(keys[i], 0xFFFFFFFF),
+                    ObsidianTheme.colorPref(keys[i], 0xFFFFFFFF),
                     ObsidianPrefs.getBoolean(keys[i] + "_on", false)));
         }
         DarkShadowColorListener adapter = new DarkShadowColorListener(items, this::onColorEnabled, this::onColorDisabled, this::onColorSwatch);
