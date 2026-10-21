@@ -48,10 +48,75 @@ public final class ThemeOverride {
         return sNavIcon;
     }
 
+    private static volatile Runnable sOnChange;
+    private static boolean sRootBusy, sRootSeeded;
+
+    /** Chiamato (sul thread principale) quando nell'app cambia l'accento o lo sfondo scelti in Oxydian Theme. */
+    public static void setOnChange(Runnable r) { sOnChange = r; }
+
+    private static boolean inApp() {
+        try { return it.tugaia56.obsidian.Obsidian.get() != null; } catch (Throwable t) { return false; }
+    }
+
+    /**
+     * Nell'app Oxydian le proprieta' di sistema "persist.oxytheme.*" non si possono leggere (SELinux): si leggono da root,
+     * in secondo piano, e l'ultimo valore resta salvato per il prossimo avvio.
+     */
+    private static void refreshViaRoot() {
+        if (sRootBusy) return;
+        sRootBusy = true;
+        new Thread(() -> {
+            try {
+                java.util.List<String> out = com.topjohnwu.superuser.Shell.cmd(
+                        "for k in accent bg wifi_icon_color mobile_icon_color nav_icon_color; do echo \"$k=$(getprop persist.oxytheme.$k)\"; done")
+                        .exec().getOut();
+                java.util.Map<String, String> m = new java.util.HashMap<>();
+                for (String l : out) { int i = l.indexOf('='); if (i > 0) m.put(l.substring(0, i), l.substring(i + 1)); }
+                if (m.isEmpty()) return;
+                Integer a = parse(m.get("accent")), b = parse(m.get("bg"));
+                boolean changed;
+                synchronized (ThemeOverride.class) {
+                    changed = !java.util.Objects.equals(a, sAccent) || !java.util.Objects.equals(b, sBg);
+                    sAccent = a; sBg = b;
+                    sWifiIcon = parse(m.get("wifi_icon_color"));
+                    sMobileIcon = parse(m.get("mobile_icon_color"));
+                    sNavIcon = parse(m.get("nav_icon_color"));
+                    sRootSeeded = true;
+                }
+                try {
+                    ObsidianPrefs.putString("theme_override_cache", m.get("accent") + "|" + m.get("bg") + "|" + m.get("wifi_icon_color")
+                            + "|" + m.get("mobile_icon_color") + "|" + m.get("nav_icon_color"));
+                } catch (Throwable ignored) {}
+                Runnable r = sOnChange;
+                if (changed && r != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(r);
+            } catch (Throwable ignored) {
+            } finally {
+                sRootBusy = false;
+            }
+        }).start();
+    }
+
     private static void load() {
         long now = SystemClock.elapsedRealtime();
         if (now - sAt < TTL_MS) return;
         sAt = now;
+        if (inApp()) {
+            if (!sRootSeeded) {
+                // primo uso dopo l'avvio: l'ultimo valore salvato, in attesa della lettura da root
+                try {
+                    String c = ObsidianPrefs.getString("theme_override_cache", "");
+                    if (!c.isEmpty()) {
+                        String[] p = c.split("[|]", -1);
+                        if (p.length >= 5) {
+                            sAccent = parse(p[0]); sBg = parse(p[1]); sWifiIcon = parse(p[2]); sMobileIcon = parse(p[3]); sNavIcon = parse(p[4]);
+                            sRootSeeded = true;
+                        }
+                    }
+                } catch (Throwable ignored) {}
+            }
+            refreshViaRoot();
+            return;
+        }
         sAccent = parse(get(KEY_ACCENT));
         sBg = parse(get(KEY_BG));
         sWifiIcon = parse(get("persist.oxytheme.wifi_icon_color"));

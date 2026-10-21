@@ -140,7 +140,7 @@ public class FingerprintPresetFragment extends Fragment {
             }
             h.label.setText(label);
             h.label.setTextColor(active
-                    ? ContextCompat.getColor(requireContext(), R.color.obs_primary)
+                    ? ObsidianTheme.accentColor()
                     : ObsidianTheme.textColor());
 
             h.itemView.setOnClickListener(v -> applyStyle(index));

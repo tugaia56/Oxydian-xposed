@@ -122,6 +122,9 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
         setContentView(R.layout.activity_main);
 
         mBottomNav             = findViewById(R.id.bottom_nav);
+        applyAccentChrome();
+        // l'accento di Oxy Theme si legge da root in secondo piano: quando cambia, titolo e barra si aggiornano
+        it.tugaia56.obsidian.utils.ThemeOverride.setOnChange(this::applyAccentChrome);
         mNavDivider            = findViewById(R.id.nav_divider);
         mHomeHeaderContainer   = findViewById(R.id.home_header_container);
         mGlobalSearchContainer = findViewById(R.id.global_search_container);
@@ -235,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
     @Override
     protected void onResume() {
         super.onResume();
+        applyAccentChrome();
         // Segui il Sistema: re-check the system's current dark/light state on every resume
         // (not just cold start) so it keeps tracking day/night transitions that happened
         // while the app wasn't open, without needing a live configuration-change listener.
@@ -385,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
         handleLp.bottomMargin = p4;
         handle.setLayoutParams(handleLp);
         try {
-            handle.setBackgroundColor(getColor(R.color.obs_primary));
+            handle.setBackgroundColor(ObsidianTheme.accentColor());
             handle.setAlpha(0.4f);
         } catch (Throwable t) {
             handle.setBackgroundColor(Color.argb(102, 124, 77, 255)); // fallback
@@ -820,6 +824,27 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
 
     // ── Helpers ────────────────────────────────────────────────────────────────
 
+    /** Titolo della home e barra in basso: seguono l'accento attuale (quello di Oxy Theme, o di Oxydian se impostato). */
+    private void applyAccentChrome() {
+        int accent = ObsidianTheme.accentColor();
+        try {
+            if (mHomeHeaderContainer != null) {
+                TextView title = mHomeHeaderContainer.findViewById(R.id.headerTitle);
+                if (title != null) title.setTextColor(accent);
+            }
+            if (mBottomNav != null) {
+                android.content.res.ColorStateList old = mBottomNav.getItemIconTintList();
+                int off = old != null ? old.getDefaultColor() : 0xFF9A9CA8;
+                android.content.res.ColorStateList csl = new android.content.res.ColorStateList(
+                        new int[][]{{android.R.attr.state_checked}, {}}, new int[]{accent, off});
+                mBottomNav.setItemIconTintList(csl);
+                mBottomNav.setItemTextColor(csl);
+                mBottomNav.setItemActiveIndicatorColor(android.content.res.ColorStateList.valueOf(
+                        (accent & 0x00FFFFFF) | 0x40000000));
+            }
+        } catch (Throwable ignored) {}
+    }
+
     private void applyNavBarColor() {
         boolean bgOn = ObsidianPrefs.getBoolean("DST_BACKGROUND_on", false);
         if (!bgOn) return;
@@ -885,6 +910,7 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
             mHomeHeaderContainer.removeAllViews();
             getLayoutInflater().inflate(R.layout.item_home_header, mHomeHeaderContainer, true);
             it.tugaia56.obsidian.utils.DeviceInfo.applyTagline(mHomeHeaderContainer);
+            applyAccentChrome();
             mHomeHeaderContainer.setVisibility(View.VISIBLE);
         }
         // Search now lives only on its own dedicated "Cerca" tab (see showSearchTab()) — the
