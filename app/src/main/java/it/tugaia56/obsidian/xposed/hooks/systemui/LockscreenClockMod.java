@@ -74,6 +74,9 @@ public class LockscreenClockMod extends XposedMods {
     private static final String KEY_BOTTOM_MARGIN_AOD  = "lockscreen_bottom_margin_aod";
 
     private static final String COLOR_ACCENT1 = "lockscreen_clock_color_code_accent1";
+    private static final String COLOR_ACCENT2 = "lockscreen_clock_color_code_accent2";
+    private static final String COLOR_ACCENT3 = "lockscreen_clock_color_code_accent3";
+    private static final String COLOR_TEXT2   = "lockscreen_clock_color_code_text2";
     private static final String COLOR_TEXT1   = "lockscreen_clock_color_code_text1";
 
     // Orologio analogico: colori e dimensione (Schermata di Blocco / AOD a schermo intero)
@@ -97,6 +100,9 @@ public class LockscreenClockMod extends XposedMods {
     private static final String AOD_KEY_CUSTOM_FONT  = "aod_custom_font";
 
     private static final String AOD_COLOR_ACCENT1 = "aod_clock_color_code_accent1";
+    private static final String AOD_COLOR_ACCENT2 = "aod_clock_color_code_accent2";
+    private static final String AOD_COLOR_ACCENT3 = "aod_clock_color_code_accent3";
+    private static final String AOD_COLOR_TEXT2   = "aod_clock_color_code_text2";
     private static final String AOD_COLOR_TEXT1   = "aod_clock_color_code_text1";
 
     private static final String TAG_MARKER = "obsidian_lockscreen_clock";
@@ -105,6 +111,8 @@ public class LockscreenClockMod extends XposedMods {
     private int mStyle;
     private boolean mCustomColor;
     private int mAccent1 = 0xFF908DFF, mText1 = 0xFFFFFFFF;
+    // 0 = selettore spento: si usa il colore dell'accento 1 (accenti 2/3) o il disegno originale (testo 2)
+    private int mAccent2, mAccent3, mText2;
     private float mScale = 1f;
     private int mLineHeightDp;
     private String mDateFormat = "";
@@ -117,6 +125,7 @@ public class LockscreenClockMod extends XposedMods {
     private int mAodStyle;
     private boolean mAodCustomColor;
     private int mAodAccent1 = 0xFF908DFF, mAodText1 = 0xFFFFFFFF;
+    private int mAodAccent2, mAodAccent3, mAodText2;
     private float mAodScale = 1f;
     private int mAodLineHeightDp;
     private String mAodDateFormat = "";
@@ -156,6 +165,9 @@ public class LockscreenClockMod extends XposedMods {
         mStyle       = parseInt(Xprefs.getString(KEY_STYLE, "0"), 0);
         mCustomColor = Xprefs.getBoolean(KEY_COLOR_SWITCH, false);
         mAccent1     = resolveColor(COLOR_ACCENT1, mAccent1) | 0xFF000000;
+        mAccent2     = optColor(COLOR_ACCENT2);
+        mAccent3     = optColor(COLOR_ACCENT3);
+        mText2       = optColor(COLOR_TEXT2);
         mText1       = resolveColor(COLOR_TEXT1, mText1) | 0xFF000000;
         mScale       = Xprefs.getInt(KEY_TEXT_SCALING, 100) / 100f;
         mLineHeightDp= Xprefs.getInt(KEY_LINE_HEIGHT, 0);
@@ -185,6 +197,9 @@ public class LockscreenClockMod extends XposedMods {
         mAodStyle       = parseInt(Xprefs.getString(AOD_KEY_STYLE, "0"), 0);
         mAodCustomColor = Xprefs.getBoolean(AOD_KEY_COLOR_SWITCH, false);
         mAodAccent1     = resolveColor(AOD_COLOR_ACCENT1, mAodAccent1) | 0xFF000000;
+        mAodAccent2     = optColor(AOD_COLOR_ACCENT2);
+        mAodAccent3     = optColor(AOD_COLOR_ACCENT3);
+        mAodText2       = optColor(AOD_COLOR_TEXT2);
         mAodText1       = resolveColor(AOD_COLOR_TEXT1, mAodText1) | 0xFF000000;
         mAodScale       = Xprefs.getInt(AOD_KEY_TEXT_SCALING, 100) / 100f;
         mAodLineHeightDp= Xprefs.getInt(AOD_KEY_LINE_HEIGHT, 0);
@@ -465,9 +480,11 @@ public class LockscreenClockMod extends XposedMods {
         // Alcuni stili (es. 61) hanno un secondo/terzo elemento decorativo taggato
         // accent2/accent3 (OC li ricolora sempre, non solo accent1) — senza questo
         // restano nel colore di default del drawable invece che nell'accento del tema.
-        ViewHelper.findViewWithTagAndChangeColor(clockView, "accent2", accentColor);
-        ViewHelper.findViewWithTagAndChangeColor(clockView, "accent3", accentColor);
+        int acc2 = isAod ? mAodAccent2 : mAccent2, acc3 = isAod ? mAodAccent3 : mAccent3, txt2 = isAod ? mAodText2 : mText2;
+        ViewHelper.findViewWithTagAndChangeColor(clockView, "accent2", customColor && acc2 != 0 ? acc2 : accentColor);
+        ViewHelper.findViewWithTagAndChangeColor(clockView, "accent3", customColor && acc3 != 0 ? acc3 : accentColor);
         ViewHelper.findViewWithTagAndChangeColor(clockView, "text1", textColor);
+        if (customColor && txt2 != 0) ViewHelper.findViewWithTagAndChangeColor(clockView, "text2", txt2);
         if (isAod) ViewHelper.applyAnalogOptions(clockView, mAodDialOn, mAodDial, mAodImgOn, mAodImg, mAodHandsOn, mAodHands, mAodAnalogSize, ANALOG_BASE_DP, false);
         else ViewHelper.applyAnalogOptions(clockView, mLsDialOn, mLsDial, mLsImgOn, mLsImg, mLsHandsOn, mLsHands, mLsAnalogSize, ANALOG_BASE_DP, mLsSeconds);
 
@@ -531,6 +548,12 @@ public class LockscreenClockMod extends XposedMods {
     private static void dbg(String msg) {
         Log.d("ObsidianLockscreenClock", msg);
         XposedBridge.log("[ Obsidian ] LockscreenClockMod: " + msg);
+    }
+
+    /** Colore di un selettore solo se e' acceso, altrimenti 0. */
+    private int optColor(String key) {
+        if (!Xprefs.getBoolean(key + "_on", false)) return 0;
+        return resolveColor(key, 0xFFFFFFFF) | 0xFF000000;
     }
 
     private int resolveColor(String key, int def) {

@@ -54,6 +54,9 @@ public class AodClockMod extends XposedMods {
     private static final int ANALOG_BASE_DP = 196;
 
     private static final String COLOR_ACCENT1 = "aod_clock_color_code_accent1";
+    private static final String COLOR_ACCENT2 = "aod_clock_color_code_accent2";
+    private static final String COLOR_ACCENT3 = "aod_clock_color_code_accent3";
+    private static final String COLOR_TEXT2   = "aod_clock_color_code_text2";
     private static final String COLOR_TEXT1   = "aod_clock_color_code_text1";
 
     // Stessi cursori "Margine superiore/inferiore AOD" esposti nella schermata SdB — un solo
@@ -68,6 +71,7 @@ public class AodClockMod extends XposedMods {
     private int mStyle;
     private boolean mCustomColor;
     private int mAccent1 = 0xFF908DFF, mText1 = 0xFFFFFFFF;
+    private int mAccent2, mAccent3, mText2;   // 0 = selettore spento
     private float mScale = 1f;
     private int mLineHeightDp;
     private String mDateFormat = "";
@@ -95,6 +99,12 @@ public class AodClockMod extends XposedMods {
     }
 
     /** "Accento" scelto: segue sempre l'accento attuale (Oxydian se impostato, altrimenti quello di Oxy Theme). */
+    /** Colore di un selettore solo se e' acceso, altrimenti 0. */
+    private int optColor(String key) {
+        if (!Xprefs.getBoolean(key + "_on", false)) return 0;
+        return resolveColor(key, 0xFFFFFFFF) | 0xFF000000;
+    }
+
     private int resolveColor(String key, int def) {
         if (Xprefs.getBoolean(key + "_use_accent", false)) {
             if (Xprefs.getBoolean("DST_ACCENT1_on", false)) return Xprefs.getInt("DST_ACCENT1", 0xFF908DFF) | 0xFF000000;
@@ -110,6 +120,9 @@ public class AodClockMod extends XposedMods {
         mStyle       = parseInt(Xprefs.getString(KEY_STYLE, "0"), 0);
         mCustomColor = Xprefs.getBoolean(KEY_COLOR_SWITCH, false);
         mAccent1     = resolveColor(COLOR_ACCENT1, mAccent1) | 0xFF000000;
+        mAccent2     = optColor(COLOR_ACCENT2);
+        mAccent3     = optColor(COLOR_ACCENT3);
+        mText2       = optColor(COLOR_TEXT2);
         mText1       = resolveColor(COLOR_TEXT1, mText1) | 0xFF000000;
         mScale       = Xprefs.getInt(KEY_TEXT_SCALING, 100) / 100f;
         mLineHeightDp= Xprefs.getInt(KEY_LINE_HEIGHT, 0);
@@ -344,9 +357,10 @@ public class AodClockMod extends XposedMods {
         int accentColor = mCustomColor ? mAccent1 : systemAccent;
         int textColor = mCustomColor ? mText1 : 0xFFFFFFFF;
         ViewHelper.findViewWithTagAndChangeColor(clockView, "accent1", accentColor);
-        ViewHelper.findViewWithTagAndChangeColor(clockView, "accent2", accentColor);
-        ViewHelper.findViewWithTagAndChangeColor(clockView, "accent3", accentColor);
+        ViewHelper.findViewWithTagAndChangeColor(clockView, "accent2", mCustomColor && mAccent2 != 0 ? mAccent2 : accentColor);
+        ViewHelper.findViewWithTagAndChangeColor(clockView, "accent3", mCustomColor && mAccent3 != 0 ? mAccent3 : accentColor);
         ViewHelper.findViewWithTagAndChangeColor(clockView, "text1", textColor);
+        if (mCustomColor && mText2 != 0) ViewHelper.findViewWithTagAndChangeColor(clockView, "text2", mText2);
 
         applyAnalog(clockView);
 
