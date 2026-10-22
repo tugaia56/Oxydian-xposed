@@ -140,7 +140,7 @@ public class ModPacks {
         if (ContactsMod.PKG.equals(packageName)) {
             mods.add(ContactsMod.class);
         }
-        if (GarminConnectMod.PKG.equals(packageName)) {
+        if (GarminConnectMod.PKG.equals(packageName) || GarminConnectMod.PKG_IQ.equals(packageName)) {
             mods.add(GarminConnectMod.class);
         }
         if (PermissionDialogMod.PKG.equals(packageName)) {

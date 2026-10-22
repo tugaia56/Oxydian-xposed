@@ -26,7 +26,7 @@ import it.tugaia56.obsidian.xposed.XposedMods;
 public class GarminConnectMod extends XposedMods {
 
     public static final String PKG = "com.garmin.android.apps.connectmobile";
-    private static final String COLOR_CLASS = "o4.f0";
+    public static final String PKG_IQ = "com.garmin.connectiq";
     private static final int BLUE_GRAY_DARK = 0xFF1B2029;
 
     private volatile int mAccent = 0xFF908DFF;
@@ -42,14 +42,18 @@ public class GarminConnectMod extends XposedMods {
 
     @Override
     public boolean listensTo(String packageName) {
-        return PKG.equals(packageName);
+        return PKG.equals(packageName) || PKG_IQ.equals(packageName);
     }
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lp) throws Throwable {
-        if (!PKG.equals(lp.packageName)) return;
+        // classe offuscata di Compose (ColorKt) con le funzioni Color(long) e Color(int), per app e versione
+        final String colorClass, fnLong, fnInt;
+        if (PKG.equals(lp.packageName)) { colorClass = "o4.f0"; fnLong = "d"; fnInt = "b"; }          // Garmin Connect 5.30.1
+        else if (PKG_IQ.equals(lp.packageName)) { colorClass = "nkb"; fnLong = "e"; fnInt = "d"; }  // Connect IQ 2.50
+        else return;
         try {
-            Class<?> cls = XposedHelpers.findClass(COLOR_CLASS, lp.classLoader);
+            Class<?> cls = XposedHelpers.findClass(colorClass, lp.classLoader);
             XC_MethodHook asLong = new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam p) {
                     try {
@@ -67,11 +71,11 @@ public class GarminConnectMod extends XposedMods {
                     } catch (Throwable ignored) {}
                 }
             };
-            XposedHelpers.findAndHookMethod(cls, "d", long.class, asLong);
-            XposedHelpers.findAndHookMethod(cls, "b", int.class, asInt);
-            XposedBridge.log("[ Obsidian ] GarminConnectMod: hooked " + COLOR_CLASS + ".d(long) / .b(int)");
+            XposedHelpers.findAndHookMethod(cls, fnLong, long.class, asLong);
+            XposedHelpers.findAndHookMethod(cls, fnInt, int.class, asInt);
+            XposedBridge.log("[ Obsidian ] GarminConnectMod: hooked " + colorClass + "." + fnLong + "(long) / ." + fnInt + "(int) in " + lp.packageName);
         } catch (Throwable t) {
-            XposedBridge.log("[ Obsidian ] GarminConnectMod: colour class " + COLOR_CLASS
+            XposedBridge.log("[ Obsidian ] GarminConnectMod: colour class " + colorClass
                     + " not found (app version changed?): " + t);
         }
     }
