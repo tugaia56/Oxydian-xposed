@@ -282,6 +282,11 @@ public class StatusbarIcons extends XposedMods {
                     // chasing the exact internal setter method.
                     if (mHideWifiActivity) hideWifiActivityViews(vg);
                     applyWifiIconColor(vg);
+                    // un solo listener per vista: bindEx viene richiamato di continuo e prima ne aggiungeva
+                    // uno nuovo ogni volta, mai tolto (ognuno percorre tutto l'albero a ogni layout)
+                    synchronized (sWifiListenerViews) {
+                        if (!sWifiListenerViews.add(vg)) return;
+                    }
                     vg.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
                         if (mHideWifiActivity) hideWifiActivityViews(vg);
                         applyWifiIconColor(vg);
@@ -367,18 +372,35 @@ public class StatusbarIcons extends XposedMods {
      * Walk the view tree of the WiFi indicator and hide any view whose resource-entry
      * name contains "activity", "inout", or "arrow" — those are the data-direction arrows.
      */
+    private static final java.util.Set<android.view.ViewGroup> sWifiListenerViews =
+            java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
+    /** id risorsa -> e' una freccia di attivita'; il nome si cerca una volta sola (e' lento, e qui si passa a ogni layout). */
+    private static final android.util.SparseBooleanArray sIdIsActivity = new android.util.SparseBooleanArray();
+    private static final android.util.SparseBooleanArray sIdChecked = new android.util.SparseBooleanArray();
+
+    private static boolean isActivityId(android.view.View child, int id) {
+        synchronized (sIdChecked) {
+            if (sIdChecked.get(id)) return sIdIsActivity.get(id);
+        }
+        boolean act = false;
+        try {
+            String name = child.getContext().getResources().getResourceEntryName(id);
+            act = name.contains("activity") || name.contains("inout") || name.contains("arrow");
+        } catch (Throwable ignored) {}
+        synchronized (sIdChecked) {
+            sIdChecked.put(id, true);
+            sIdIsActivity.put(id, act);
+        }
+        return act;
+    }
+
     private static void hideWifiActivityViews(android.view.ViewGroup vg) {
         for (int i = 0; i < vg.getChildCount(); i++) {
             android.view.View child = vg.getChildAt(i);
             int id = child.getId();
-            if (id != android.view.View.NO_ID) {
-                try {
-                    String name = child.getContext().getResources().getResourceEntryName(id);
-                    if (name.contains("activity") || name.contains("inout") || name.contains("arrow")) {
-                        child.setVisibility(android.view.View.GONE);
-                        continue;
-                    }
-                } catch (Throwable ignored) {}
+            if (id != android.view.View.NO_ID && isActivityId(child, id)) {
+                if (child.getVisibility() != android.view.View.GONE) child.setVisibility(android.view.View.GONE);
+                continue;
             }
             if (child instanceof android.view.ViewGroup) {
                 hideWifiActivityViews((android.view.ViewGroup) child);
@@ -404,7 +426,11 @@ public class StatusbarIcons extends XposedMods {
 
     private static void tintImageViews(android.view.View v, android.content.res.ColorStateList tint) {
         if (v instanceof android.widget.ImageView) {
-            ((android.widget.ImageView) v).setImageTintList(tint);
+            android.widget.ImageView iv = (android.widget.ImageView) v;
+            android.content.res.ColorStateList cur = iv.getImageTintList();
+            // gia' del colore giusto: non si ritocca (ogni set invalida e ridisegna)
+            if (cur != null && tint != null && cur.getDefaultColor() == tint.getDefaultColor()) return;
+            iv.setImageTintList(tint);
         } else if (v instanceof android.view.ViewGroup) {
             android.view.ViewGroup vg = (android.view.ViewGroup) v;
             for (int i = 0; i < vg.getChildCount(); i++) tintImageViews(vg.getChildAt(i), tint);

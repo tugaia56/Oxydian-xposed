@@ -8,13 +8,18 @@ import static it.tugaia56.obsidian.utils.Constants.Packages.SYSTEM_UI;
 import static it.tugaia56.obsidian.xposed.XPrefs.Xprefs;
 
 import android.content.Context;
+import android.os.SystemClock;
+import android.util.SparseIntArray;
 import android.view.View;
+
+import java.lang.reflect.Method;
 
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import it.tugaia56.obsidian.xposed.XposedMods;
 
@@ -67,11 +72,35 @@ public class SimIconHideMod extends XposedMods {
         });
     }
 
+    /** getSubId() per classe e slot per subId, in cache: shouldHide gira a ogni misura/layout delle icone
+     *  e la ricerca per riflessione (XposedHelpers.callMethod) saturava il thread principale di SystemUI. */
+    private final Map<Class<?>, Method> mGetSubId = new java.util.HashMap<>();
+    private final SparseIntArray mSlots = new SparseIntArray();
+    private long mSlotsAt;
+
     private boolean shouldHide(View v) {
         if (!mHideSim1 && !mHideSim2) return false;
         try {
-            int subId = (Integer) callMethod(v, "getSubId");
-            int slot = (Integer) callStaticMethod(android.telephony.SubscriptionManager.class, "getSlotIndex", subId);
+            Method m;
+            synchronized (mGetSubId) {
+                m = mGetSubId.get(v.getClass());
+                if (m == null && !mGetSubId.containsKey(v.getClass())) {
+                    m = XposedHelpers.findMethodExactIfExists(v.getClass(), "getSubId");
+                    mGetSubId.put(v.getClass(), m);
+                }
+            }
+            if (m == null) return false;
+            int subId = (Integer) m.invoke(v);
+            int slot;
+            synchronized (mSlots) {
+                long now = SystemClock.elapsedRealtime();
+                if (now - mSlotsAt > 5000) { mSlots.clear(); mSlotsAt = now; }
+                slot = mSlots.get(subId, -2);
+                if (slot == -2) {
+                    slot = (Integer) callStaticMethod(android.telephony.SubscriptionManager.class, "getSlotIndex", subId);
+                    mSlots.put(subId, slot);
+                }
+            }
             return (slot == 0 && mHideSim1) || (slot == 1 && mHideSim2);
         } catch (Throwable t) {
             return false;
