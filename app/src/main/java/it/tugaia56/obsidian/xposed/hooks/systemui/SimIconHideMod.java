@@ -17,6 +17,7 @@ import java.util.WeakHashMap;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import it.tugaia56.obsidian.xposed.XposedMods;
 
@@ -52,21 +53,22 @@ public class SimIconHideMod extends XposedMods {
                     final View v = e.getKey();
                     final int state = e.getValue();
                     v.post(() -> {
-                        try { callMethod(v, "setVisibleState", state); } catch (Throwable ignored) {}
+                        try {
+                            callMethod(v, "setVisibleState", state);
+                            // opzione spenta: la vista non e' piu' da tenere nascosta
+                            if (!shouldHide(v) && state != STATE_HIDDEN && v.getVisibility() == View.GONE) v.setVisibility(View.VISIBLE);
+                        } catch (Throwable ignored) {}
                     });
                 }
             }
         }
     }
 
-    /** Il sistema puo' rimostrare la vista (o lasciarla INVISIBLE con la sua larghezza): la si
-     *  tiene GONE a ogni layout finche' la SIM va nascosta, cosi' non resta lo spazio vuoto. */
+    /** Segna la vista come gestita da questa mod: da quel momento setVisibility() la tiene GONE finche' la SIM va nascosta
+     *  (vedi l'aggancio a View.setVisibility). Niente listener di layout: rimettere GONE a ogni layout mentre il sistema
+     *  la rimostrava produceva un ciclo di misura/layout a ogni frame (SystemUI al 65% di CPU, blocco del PIN). */
     private void ensureCollapsed(View v) {
-        if (v.getTag(TAG_KEY) != null) return;
-        v.setTag(TAG_KEY, Boolean.TRUE);
-        v.addOnLayoutChangeListener((view, l, t, r, b, ol, ot, or_, ob) -> {
-            if (shouldHide(view) && view.getVisibility() != View.GONE) view.setVisibility(View.GONE);
-        });
+        if (v.getTag(TAG_KEY) == null) v.setTag(TAG_KEY, Boolean.TRUE);
     }
 
     /** subId di ogni icona (ricordato per 2 secondi) e slot per subId (5 secondi): shouldHide gira a ogni misura/layout
@@ -131,6 +133,21 @@ public class SimIconHideMod extends XposedMods {
                 } catch (Throwable ignored) {}
             }
         };
+        // Le viste gestite restano GONE: ogni setVisibility() del sistema su di loro viene riportato a GONE prima di
+        // essere applicato (GONE su GONE non cambia nulla, quindi nessun nuovo layout).
+        try {
+            XposedHelpers.findAndHookMethod(View.class, "setVisibility", int.class, new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    try {
+                        View v = (View) param.thisObject;
+                        if (v.getTag(TAG_KEY) == null) return;
+                        if ((Integer) param.args[0] != View.GONE && shouldHide(v)) param.args[0] = View.GONE;
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] SimIconHideMod: hook su View.setVisibility fallito: " + t);
+        }
         // Si aggancia la classe base: le sottoclassi (Oplus) non vengono intercettate da sole.
         try {
             hookAllMethods(findClass("com.android.systemui.statusbar.pipeline.shared.ui.view.ModernStatusBarView",
