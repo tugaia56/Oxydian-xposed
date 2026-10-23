@@ -52,6 +52,7 @@ import it.tugaia56.obsidian.xposed.hooks.acalendar.ACalendarPlusMod;
 import it.tugaia56.obsidian.xposed.hooks.permissions.PermissionDialogMod;
 import it.tugaia56.obsidian.xposed.hooks.contacts.ContactsMod;
 import it.tugaia56.obsidian.xposed.hooks.garmin.GarminConnectMod;
+import it.tugaia56.obsidian.xposed.hooks.soundprofile.SoundProfileMod;
 import it.tugaia56.obsidian.xposed.hooks.messages.MessagesBubbleMod;
 
 public class ModPacks {
@@ -142,6 +143,9 @@ public class ModPacks {
         }
         if (GarminConnectMod.PKG.equals(packageName) || GarminConnectMod.PKG_IQ.equals(packageName)) {
             mods.add(GarminConnectMod.class);
+        }
+        if (SoundProfileMod.PKG.equals(packageName)) {
+            mods.add(SoundProfileMod.class);
         }
         if (PermissionDialogMod.PKG.equals(packageName)) {
             mods.add(PermissionDialogMod.class);
