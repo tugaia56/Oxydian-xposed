@@ -12,14 +12,11 @@ import android.os.SystemClock;
 import android.util.SparseIntArray;
 import android.view.View;
 
-import java.lang.reflect.Method;
-
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import it.tugaia56.obsidian.xposed.XposedMods;
 
@@ -72,25 +69,28 @@ public class SimIconHideMod extends XposedMods {
         });
     }
 
-    /** getSubId() per classe e slot per subId, in cache: shouldHide gira a ogni misura/layout delle icone
-     *  e la ricerca per riflessione (XposedHelpers.callMethod) saturava il thread principale di SystemUI. */
-    private final Map<Class<?>, Method> mGetSubId = new java.util.HashMap<>();
+    /** subId di ogni icona (ricordato per 2 secondi) e slot per subId (5 secondi): shouldHide gira a ogni misura/layout
+     *  delle icone e la ricerca per riflessione (XposedHelpers.callMethod) a ogni chiamata saturava il thread principale di SystemUI. */
+    private final Map<View, long[]> mSubIds = new WeakHashMap<>();
     private final SparseIntArray mSlots = new SparseIntArray();
     private long mSlotsAt;
+    private boolean mLoggedFail;
+
+    private int subIdOf(View v) {
+        long now = SystemClock.elapsedRealtime();
+        synchronized (mSubIds) {
+            long[] c = mSubIds.get(v);
+            if (c != null && now - c[1] < 2000) return (int) c[0];
+        }
+        int subId = (Integer) callMethod(v, "getSubId");
+        synchronized (mSubIds) { mSubIds.put(v, new long[]{subId, now}); }
+        return subId;
+    }
 
     private boolean shouldHide(View v) {
         if (!mHideSim1 && !mHideSim2) return false;
         try {
-            Method m;
-            synchronized (mGetSubId) {
-                m = mGetSubId.get(v.getClass());
-                if (m == null && !mGetSubId.containsKey(v.getClass())) {
-                    m = XposedHelpers.findMethodExactIfExists(v.getClass(), "getSubId");
-                    mGetSubId.put(v.getClass(), m);
-                }
-            }
-            if (m == null) return false;
-            int subId = (Integer) m.invoke(v);
+            int subId = subIdOf(v);
             int slot;
             synchronized (mSlots) {
                 long now = SystemClock.elapsedRealtime();
@@ -103,6 +103,7 @@ public class SimIconHideMod extends XposedMods {
             }
             return (slot == 0 && mHideSim1) || (slot == 1 && mHideSim2);
         } catch (Throwable t) {
+            if (!mLoggedFail) { mLoggedFail = true; XposedBridge.log("[ Obsidian ] SimIconHideMod.shouldHide failed: " + t); }
             return false;
         }
     }
