@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
@@ -268,6 +269,9 @@ public class LockscreenWeather extends XposedMods {
         requestWeatherIfStale();
     }
 
+    private View mLastSigView;
+    private int mLastSig;
+
     private void refreshView(int state) {
         if (mWeatherView == null) return;
         boolean isAod = state == UI_STATE_AOD;
@@ -286,6 +290,15 @@ public class LockscreenWeather extends XposedMods {
         int     marginLeft    = isAod ? mAodMarginLeft    : mLsMarginLeft;
 
         WeatherInfo data = WeatherCache.get();
+        // Questo metodo gira a ogni getView() del blocco schermo (a ogni frame, con l'orologio animato): se nulla e'
+        // cambiato rispetto all'ultima volta non si tocca la vista (ogni setText/setImage rilancia un layout).
+        int sig = java.util.Objects.hash(state, showLocation, showCondition, showHumidity, showWind, textSize, imageSize,
+                colorOn, color, centered, marginsOn, marginTop, marginLeft, System.identityHashCode(data),
+                System.identityHashCode(mIconPack), mMetric, isAod ? 0 : mLsBackground, appAccentColor(), appAccent2Color(),
+                System.identityHashCode(mWidgetContainer));
+        if (mWeatherView == mLastSigView && sig == mLastSig) return;
+        mLastSigView = mWeatherView;
+        mLastSig = sig;
         mWeatherView.updateIconPack(mIconPack);
         mWeatherView.updateData(data, mMetric, showLocation, showCondition, showHumidity, showWind);
         mWeatherView.updateSizes(textSize, imageSize);
@@ -314,8 +327,13 @@ public class LockscreenWeather extends XposedMods {
                 int topPx = calibratedTop != null
                         ? calibratedTop * density
                         : safeBasePx + (marginsOn ? marginTop * density : 0);
-                mlp.setMargins(marginsOn ? marginLeft * density : 20 * density, topPx, 0, 0);
-                mWidgetContainer.setLayoutParams(mlp);
+                int leftPx = marginsOn ? marginLeft * density : 20 * density;
+                // niente setLayoutParams se i margini sono gia' questi: ogni assegnazione rilancia un layout, e questo
+                // metodo gira a ogni getView del blocco schermo (era un ciclo di layout continuo)
+                if (mlp.leftMargin != leftPx || mlp.topMargin != topPx || mlp.rightMargin != 0 || mlp.bottomMargin != 0) {
+                    mlp.setMargins(leftPx, topPx, 0, 0);
+                    mWidgetContainer.setLayoutParams(mlp);
+                }
             }
         }
     }

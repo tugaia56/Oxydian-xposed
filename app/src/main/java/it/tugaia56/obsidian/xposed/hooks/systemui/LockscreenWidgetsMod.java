@@ -1012,8 +1012,11 @@ public class LockscreenWidgetsMod extends XposedMods {
 
         ViewGroup.LayoutParams lpRaw = mWidgetRow.getLayoutParams();
         if (lpRaw instanceof ViewGroup.MarginLayoutParams mlp) {
-            mlp.setMargins(0, topMargin, 0, 0);
-            mWidgetRow.setLayoutParams(mlp);
+            // stessi margini di prima: niente setLayoutParams (rilancia un layout, e qui si passa a ogni getView)
+            if (mlp.leftMargin != 0 || mlp.topMargin != topMargin || mlp.rightMargin != 0 || mlp.bottomMargin != 0) {
+                mlp.setMargins(0, topMargin, 0, 0);
+                mWidgetRow.setLayoutParams(mlp);
+            }
         } else {
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);

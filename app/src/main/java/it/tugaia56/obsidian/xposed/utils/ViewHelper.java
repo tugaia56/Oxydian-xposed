@@ -31,6 +31,10 @@ public class ViewHelper {
 
     public static void setMargins(View view, Context context, int left, int top, int right, int bottom) {
         ViewGroup.LayoutParams params = view.getLayoutParams();
+        // margini gia' uguali: non si riassegna (ogni setLayoutParams rilancia un layout)
+        if (params instanceof ViewGroup.MarginLayoutParams m
+                && m.leftMargin == dp2px(context, left) && m.topMargin == dp2px(context, top)
+                && m.rightMargin == dp2px(context, right) && m.bottomMargin == dp2px(context, bottom)) return;
         if (params instanceof LinearLayout.LayoutParams lp) {
             lp.setMargins(dp2px(context, left), dp2px(context, top), dp2px(context, right), dp2px(context, bottom));
         } else if (params instanceof FrameLayout.LayoutParams lp) {

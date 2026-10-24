@@ -7,7 +7,11 @@ import it.tugaia56.obsidian.BuildConfig;
 import it.tugaia56.obsidian.xposed.utils.ExtendedRemotePreferences;
 public class XPrefs {
     @SuppressLint("StaticFieldLeak") public static ExtendedRemotePreferences Xprefs;
-    private static final SharedPreferences.OnSharedPreferenceChangeListener listener = (sp, key) -> loadEverything(key);
+    private static final SharedPreferences.OnSharedPreferenceChangeListener listener = (sp, key) -> {
+        // le letture sono in cache per qualche secondo: al cambio di una preferenza la copia si azzera prima di rileggere
+        if (Xprefs != null) Xprefs.invalidateCache();
+        loadEverything(key);
+    };
     private static volatile boolean sListenerRegistered = false;
     public static void init(Context context) {
         Xprefs = new ExtendedRemotePreferences(context, BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID + "_preferences", true);
