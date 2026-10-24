@@ -841,6 +841,17 @@
     <string name="settings_clear_summary">Remove all saved preferences</string>
     <string name="settings_clear_confirm">Remove all saved preferences? This cannot be undone.</string>
     <string name="settings_restore_not_found">Backup file not found — run a backup first</string>
+    <string name="settings_backup_date">Backup date format</string>
+    <string name="settings_backup_time">Backup time format</string>
+    <string name="bf_dmy">day-month-year</string>
+    <string name="bf_dmy_short">day-month-year, short year</string>
+    <string name="bf_ymd">year-month-day</string>
+    <string name="bf_ymd_compact">year month day, no dashes</string>
+    <string name="bf_hm">hours:minutes, 24-hour</string>
+    <string name="bf_hms">hours:minutes:seconds</string>
+    <string name="bf_hm_compact">hours and minutes, no dash</string>
+    <string name="bf_hm12">12-hour with AM/PM</string>
+    <string name="settings_backup_time_none">No time (date only)</string>
     <string name="settings_folder">Backup Folder</string>
     <string name="settings_folder_default">App storage (default)</string>
     <string name="settings_folder_summary_fmt">Folder: %s</string>

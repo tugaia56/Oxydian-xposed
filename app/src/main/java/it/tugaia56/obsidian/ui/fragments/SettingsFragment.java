@@ -131,6 +131,19 @@ public class SettingsFragment extends Fragment {
                 getFolderSummary(),
                 () -> mFolderPickerLauncher.launch(null));
 
+        // ── Data e ora nel nome del file ──────────────────────────────────────
+        ListWidgetAdapter.ListItem dateItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.settings_backup_date),
+                it.tugaia56.obsidian.utils.BackupName.example(it.tugaia56.obsidian.utils.BackupName.date()),
+                () -> chooseNameFormat(true, rv));
+        ListWidgetAdapter.ListItem timeItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.settings_backup_time),
+                it.tugaia56.obsidian.utils.BackupName.time().isEmpty() ? getString(R.string.settings_backup_time_none)
+                        : it.tugaia56.obsidian.utils.BackupName.example(it.tugaia56.obsidian.utils.BackupName.time()),
+                () -> chooseNameFormat(false, rv));
+        dateItem.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.TOP;
+        timeItem.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.BOTTOM;
+
         ListWidgetAdapter.ListItem backupItem = new ListWidgetAdapter.ListItem(
                 getString(R.string.settings_backup),
                 getString(R.string.settings_backup_summary),
@@ -163,9 +176,33 @@ public class SettingsFragment extends Fragment {
         rv.setAdapter(new ConcatAdapter(
                 new SectionTitleAdapter(List.of(getString(R.string.settings_section))),
                 mFolderAdapter,
+                new ListWidgetAdapter(List.of(dateItem)),
+                new ListWidgetAdapter(List.of(timeItem)),
                 new ListWidgetAdapter(List.of(backupItem)),
                 new ListWidgetAdapter(List.of(restoreItem)),
                 new ListWidgetAdapter(List.of(clearItem))));
+    }
+
+    // ── Formato data / ora del nome file ──────────────────────────────────────
+
+    private void chooseNameFormat(boolean date, RecyclerView rv) {
+        String[] values = date ? it.tugaia56.obsidian.utils.BackupName.DATES : it.tugaia56.obsidian.utils.BackupName.TIMES;
+        String[] names = new String[values.length];
+        for (int i = 0; i < values.length; i++)
+            names[i] = it.tugaia56.obsidian.utils.BackupName.label(requireContext(), values[i]);
+        String cur = date ? it.tugaia56.obsidian.utils.BackupName.date() : it.tugaia56.obsidian.utils.BackupName.time();
+        int idx = java.util.Arrays.asList(values).indexOf(cur);
+        final int[] sel = {Math.max(0, idx)};
+        ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(date ? R.string.settings_backup_date : R.string.settings_backup_time)
+                .setSingleChoiceItems(names, sel[0], (d, w) -> sel[0] = w)
+                .setPositiveButton(R.string.apply, (d, w) -> {
+                    ObsidianPrefs.putString(date ? it.tugaia56.obsidian.utils.BackupName.PREF_DATE
+                            : it.tugaia56.obsidian.utils.BackupName.PREF_TIME, values[sel[0]]);
+                    onViewCreated(rv, null);
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show());
     }
 
     // ── Backup ────────────────────────────────────────────────────────────────
@@ -196,7 +233,7 @@ public class SettingsFragment extends Fragment {
             String json = root.toString(2);
 
             // Timestamped filename
-            String ts       = new SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.US).format(new Date());
+            String ts       = it.tugaia56.obsidian.utils.BackupName.stamp();
             String filename = ts + "_oxydian_backup.json";
 
             String folderUriStr = ObsidianPrefs.getString(PREF_BACKUP_FOLDER_URI, null);

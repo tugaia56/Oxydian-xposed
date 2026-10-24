@@ -842,6 +842,17 @@
     <string name="settings_clear_summary">Rimuovi tutte le preferenze salvate</string>
     <string name="settings_clear_confirm">Rimuovere tutte le preferenze salvate? L\'operazione non è reversibile.</string>
     <string name="settings_restore_not_found">File di backup non trovato — esegui prima un backup</string>
+    <string name="settings_backup_date">Formato data del backup</string>
+    <string name="settings_backup_time">Formato ora del backup</string>
+    <string name="bf_dmy">giorno-mese-anno</string>
+    <string name="bf_dmy_short">giorno-mese-anno, anno corto</string>
+    <string name="bf_ymd">anno-mese-giorno</string>
+    <string name="bf_ymd_compact">anno mese giorno, senza trattini</string>
+    <string name="bf_hm">ore:minuti, 24 ore</string>
+    <string name="bf_hms">ore:minuti:secondi</string>
+    <string name="bf_hm_compact">ore e minuti, senza trattino</string>
+    <string name="bf_hm12">12 ore con AM/PM</string>
+    <string name="settings_backup_time_none">Nessuna ora (solo data)</string>
     <string name="settings_folder">Cartella Backup</string>
     <string name="settings_folder_default">Spazio app (predefinito)</string>
     <string name="settings_folder_summary_fmt">Cartella: %s</string>
