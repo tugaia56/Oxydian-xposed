@@ -330,27 +330,21 @@ public class CouiSwitchMod extends XposedMods {
             }
             case "solo_punto": {
                 float mx = (left + right) / 2f;
-                float rr = rad * 0.62f;
-                if (on) {
-                    float gr = Math.max(h / 2f, rr * 2f);
-                    p.setStyle(Paint.Style.FILL);
-                    p.setColor(0xFF000000);
-                    p.setShader(new RadialGradient(mx, cy, gr,
-                            new int[]{(0xE6 << 24) | (accent & 0xFFFFFF), (0x80 << 24) | (accent & 0xFFFFFF),
-                                    (0x30 << 24) | (accent & 0xFFFFFF), (accent & 0xFFFFFF)},
-                            new float[]{0f, 0.35f, 0.7f, 1f}, Shader.TileMode.CLAMP));
-                    c.drawCircle(mx, cy, gr, p);
-                    p.setShader(null);
-                    p.setColor(accent);
-                    c.drawCircle(mx, cy, rr, p);
-                    p.setColor(0xAAFFFFFF);
-                    c.drawCircle(mx - rr * 0.3f, cy - rr * 0.3f, rr * 0.32f, p);
-                } else {
-                    p.setStyle(Paint.Style.STROKE);
-                    p.setStrokeWidth(2 * d);
-                    p.setColor((0xB0 << 24) | (fg & 0xFFFFFF));
-                    c.drawCircle(mx, cy, rr, p);
-                }
+                float rr = rad * 0.55f;
+                float gr = Math.max(h / 2f, rr * 2f);
+                int base = on ? accent : fg;
+                p.setStyle(Paint.Style.FILL);
+                p.setColor(0xFF000000);
+                // alone morbido (accento da acceso, grigio da spento) e cerchio vuoto
+                p.setShader(new RadialGradient(mx, cy, gr,
+                        new int[]{(on ? 0xB0 : 0x50) << 24 | (base & 0xFFFFFF), (on ? 0x66 : 0x30) << 24 | (base & 0xFFFFFF), (base & 0xFFFFFF)},
+                        new float[]{0.3f, 0.7f, 1f}, Shader.TileMode.CLAMP));
+                c.drawCircle(mx, cy, gr, p);
+                p.setShader(null);
+                p.setStyle(Paint.Style.STROKE);
+                p.setStrokeWidth((on ? 2.5f : 2f) * d);
+                p.setColor(on ? accent : ((0xD0 << 24) | (fg & 0xFFFFFF)));
+                c.drawCircle(mx, cy, rr, p);
                 break;
             }
             case "quadrato": {
