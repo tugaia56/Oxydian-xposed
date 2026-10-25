@@ -142,9 +142,9 @@ public class CouiSwitchMod extends XposedMods {
         canvas.save();
         canvas.scale(scale, scale, cx, cy);
         boolean full = "pallino_pieno".equals(var);
-        int fill = checked ? alpha(accent, full ? 0xFF : 0x59) : alpha(fg, full ? 0x99 : 0x22);
-        int stroke = checked ? accent : alpha(fg, 0x99);
-        if (classic) fill = alpha(accent, 0x59);
+        int fill = checked ? alpha(accent, full ? 0xFF : 0x59) : full ? fg : alpha(fg, 0x22);
+        int stroke = checked ? accent : full ? fg : alpha(fg, 0x99);
+        if (classic) fill = checked ? alpha(accent, 0x59) : alpha(fg, 0x4D);
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setColor(alpha(fill, Math.round(Color_a(fill) * dis)));
         canvas.drawCircle(cx, cy, r, mPaint);
@@ -193,17 +193,9 @@ public class CouiSwitchMod extends XposedMods {
             mPaint.setStyle(Paint.Style.FILL);
             mPaint.setColor(0xFFFFFFFF);
             canvas.drawCircle(cx, cy, rad - 1f * d, mPaint);
-            mPaint.setStyle(Paint.Style.STROKE);
-            mPaint.setStrokeWidth(1f * d);
-            mPaint.setColor(0xFFB0B0B0);
-            canvas.drawCircle(cx, cy, rad - 1f * d, mPaint);
         } else {
             mPaint.setStyle(Paint.Style.FILL);
             mPaint.setColor(checked ? accent : 0xFF8A8F99);
-            canvas.drawCircle(cx, cy, rad - 3f * d, mPaint);
-            mPaint.setStyle(Paint.Style.STROKE);
-            mPaint.setStrokeWidth(1.5f * d);
-            mPaint.setColor(alpha(fg, 0x66));
             canvas.drawCircle(cx, cy, rad - 3f * d, mPaint);
         }
         canvas.restore();
