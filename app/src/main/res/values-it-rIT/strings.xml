@@ -414,6 +414,8 @@
     <string name="advanced_reboot_confirm_message">Vuoi procedere?</string>
     <string name="nav_misc_settings_entry">Mostra Voce nelle Impostazioni</string>
     <string name="nav_misc_settings_entry_summary">Aggiunge la voce Oxydian nelle Impostazioni di sistema</string>
+    <string name="nav_misc_search_border">Bordo nel campo Cerca di Impostazioni</string>
+    <string name="nav_misc_search_border_summary">Contorno colore accento attorno al campo Cerca nella pagina principale di Impostazioni</string>
     <string name="nav_screenshot_enabler">Abilita Screenshot</string>
     <string name="nav_screenshot_enabler_summary">Consente screenshot e registrazione schermo nelle app che normalmente li bloccano</string>
     <string name="nav_corepatch">Core Patch</string>

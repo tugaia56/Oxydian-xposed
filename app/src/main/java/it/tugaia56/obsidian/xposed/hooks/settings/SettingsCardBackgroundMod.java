@@ -152,6 +152,11 @@ public class SettingsCardBackgroundMod extends XposedMods {
     private static final String PREF_ACCENT_ON = "DST_ACCENT1_on";
     private static final String PREF_ACCENT = "DST_ACCENT1";
     private int mAccentColor = DEFAULT_ACCENT_COLOR;
+    /** Bordo accento attorno alla pillola "Cerca" della Home di Impostazioni (scelta in Oxydian > Varie). */
+    private static final String PREF_SEARCH_BORDER = "settings_search_border";
+    private volatile boolean mSearchBorder = false;
+    /** Chiave per View.setTag(int, Object): il byte alto deve essere >= 2. */
+    private static final int TAG_SEARCH_BORDER = 0x21430001;
 
     // Card costruite (COUICardListSelectedItemLayout.init()) PRIMA che Xprefs consegnasse
     // updatePrefs() la prima volta: mThemeApplied era ancora false in quel momento, quindi
@@ -199,6 +204,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
     public void updatePrefs(String... Key) {
         if (Xprefs == null) return;
         mThemeApplied = Xprefs.getBoolean("settings_theme_applied", false);
+        mSearchBorder = Xprefs.getBoolean(PREF_SEARCH_BORDER, false);
         mCardFromSystem = true; // il colore card segue sempre lo sfondo di sistema (Colori sistema / OOS Theme)
         mCardColor = Xprefs.getBoolean(PREF_BG_ON, false)
                 ? (Xprefs.getInt(PREF_BG, DEFAULT_CARD_COLOR) | 0xFF000000)
@@ -1044,7 +1050,6 @@ public class SettingsCardBackgroundMod extends XposedMods {
     }
 
     private void reapplyHeaderColors() {
-        if (!mThemeApplied || !isNight()) return;
         for (WeakReference<Activity> ref : mHomepageActivities) {
             Activity activity = ref.get();
             if (activity == null) {
@@ -1055,7 +1060,67 @@ public class SettingsCardBackgroundMod extends XposedMods {
         }
     }
 
+    /** Accento di Oxydian Theme (stesso viola dei cerchi delle icone): prop di sistema, perche' l'attributo
+     *  accent_material_dark dentro Impostazioni risolve un altro colore (accento di sistema). */
+    private int themeAccent() {
+        try {
+            String v = readSysProp("persist.oxytheme.accent", "");
+            if (!v.isEmpty()) return (int) Long.parseLong(v, 16) | 0xFF000000;
+        } catch (Throwable ignored) {}
+        return mAccentColor;
+    }
+
+    /** Pillola "Cerca" della Home di Impostazioni con bordo accento e sfondo uguale a quello della pagina
+     *  (come i cerchi delle icone): il bordo e' un foreground sul contenitore searchView, lo sfondo
+     *  sostituisce quello grigio della prima vista figlia (originale salvato nel tag e rimesso se spento).
+     *  Margini della pillola stock: 16dp ai lati, 5dp sopra/sotto (misurati dal vivo). Indipendente dal
+     *  tema Settings. Idempotente: il listener di layout chiama questo metodo di continuo. */
+    private void applySearchBorder(Activity activity) {
+        try {
+            int id = activity.getResources().getIdentifier("searchView", "id", SETTINGS);
+            View sv = (id != 0) ? activity.findViewById(id) : null;
+            if (!(sv instanceof android.view.ViewGroup)) return;
+            android.view.ViewGroup g = (android.view.ViewGroup) sv;
+            View pill = g.getChildCount() > 0 && g.getChildAt(0).getClass() == View.class ? g.getChildAt(0) : null;
+            Object current = sv.getTag(TAG_SEARCH_BORDER);
+            if (!mSearchBorder) {
+                if (current != null) {
+                    Object orig = sv.getTag(TAG_SEARCH_BORDER + 1);
+                    if (pill != null && orig instanceof android.graphics.drawable.Drawable) pill.setBackground((android.graphics.drawable.Drawable) orig);
+                    sv.setTag(TAG_SEARCH_BORDER, null);
+                    sv.setTag(TAG_SEARCH_BORDER + 1, null);
+                }
+                return;
+            }
+            int accent = themeAccent();
+            int fill = cardColor();
+            float d = activity.getResources().getDisplayMetrics().density;
+            int l = Math.round(16 * d), t = Math.round(5 * d), r = l;
+            // Ricerca aperta: la pillola stock si accorcia per lasciare posto ad "Annulla" (TextView visibile)
+            for (int i = 0; i < g.getChildCount(); i++) {
+                View c = g.getChildAt(i);
+                if (c.getClass() == android.widget.TextView.class && c.getVisibility() == View.VISIBLE && c.getWidth() > 0) {
+                    r = Math.max(l, g.getWidth() - c.getLeft() + Math.round(8 * d));
+                }
+            }
+            int key = (accent * 31 + fill) * 31 + r;
+            if (current instanceof Integer && (Integer) current == key) return;
+            if (pill != null) {
+                if (sv.getTag(TAG_SEARCH_BORDER + 1) == null && pill.getBackground() != null) {
+                    sv.setTag(TAG_SEARCH_BORDER + 1, pill.getBackground());
+                }
+                android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+                bg.setCornerRadius(100 * d);
+                bg.setColor(fill);
+                bg.setStroke(Math.round(1.5f * d), accent);
+                pill.setBackground(new android.graphics.drawable.InsetDrawable(bg, l, t, r, t));
+            }
+            sv.setTag(TAG_SEARCH_BORDER, key);
+        } catch (Throwable ignored) {}
+    }
+
     private void applyHeaderTheme(Activity activity) {
+        applySearchBorder(activity);
         if (!mThemeApplied || !isNight()) return;
         // app_bar_layout e' il diretto genitore di collapsingToolbarLayout (trovato via
         // uiautomator dump dal vivo, non "app_bar" — id sbagliato di un tentativo precedente).
