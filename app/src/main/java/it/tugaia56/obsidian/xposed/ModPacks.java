@@ -135,6 +135,11 @@ public class ModPacks {
         if (CARD_BG_PACKAGES.contains(packageName)) {
             mods.add(SettingsCardBackgroundMod.class);
         }
+        // interruttori OnePlus (COUISwitch) nello stile "barra stretta" di Oxydian Theme (spento di serie)
+        if (CARD_BG_PACKAGES.contains(packageName) || Constants.Packages.SETTINGS.equals(packageName)
+                || Constants.Packages.SYSTEM_UI.equals(packageName)) {
+            mods.add(it.tugaia56.obsidian.xposed.hooks.settings.CouiSwitchMod.class);
+        }
         if (MessagesBubbleMod.PKG.equals(packageName)) {
             mods.add(MessagesBubbleMod.class);
         }
