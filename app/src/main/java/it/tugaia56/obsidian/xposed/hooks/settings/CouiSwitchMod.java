@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.RadialGradient;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import android.os.SystemClock;
 import android.util.TypedValue;
 import android.view.View;
@@ -157,16 +159,131 @@ public class CouiSwitchMod extends XposedMods {
 
     private final Paint mText = new Paint(Paint.ANTI_ALIAS_FLAG);
 
+    /** Stili "di carattere": levetta, led, tacche, neon. cx = centro del pallino, rad = suo raggio, h = altezza della barra. */
+    static void special(Canvas c, Paint p, RectF r, String var, boolean on, float left, float right, float cy, float h,
+                        float cx, float rad, int fg, int accent, float d) {
+        p.setShader(null);
+        switch (var) {
+            case "levetta": {
+                p.setStyle(Paint.Style.FILL);
+                p.setColor(0xFF2A2D33);
+                float bl = left + 4 * d, br = right - 4 * d, bt = cy - h / 2f + 2 * d, bb = cy + h / 2f - 2 * d;
+                r.set(bl, bt, br, bb);
+                c.drawRoundRect(r, 5 * d, 5 * d, p);
+                p.setStyle(Paint.Style.STROKE);
+                p.setStrokeWidth(1.5f * d);
+                p.setColor((0x66 << 24) | (fg & 0xFFFFFF));
+                r.inset(0.75f * d, 0.75f * d);
+                c.drawRoundRect(r, 5 * d, 5 * d, p);
+                float kw = (br - bl) / 2f - 3 * d, kh = bb - bt - 4 * d;
+                float kx = Math.max(bl + 2 * d + kw / 2f, Math.min(br - 2 * d - kw / 2f, cx));
+                r.set(kx - kw / 2f, cy - kh / 2f, kx + kw / 2f, cy + kh / 2f);
+                p.setStyle(Paint.Style.FILL);
+                p.setColor(on ? accent : 0xFF8A8F99);
+                c.drawRoundRect(r, 4 * d, 4 * d, p);
+                p.setColor(0x55FFFFFF);
+                r.set(kx - kw / 2f + 3 * d, cy - kh / 2f + 1.5f * d, kx + kw / 2f - 3 * d, cy - kh / 2f + 3f * d);
+                c.drawRect(r, p);
+                break;
+            }
+            case "led": {
+                p.setStyle(Paint.Style.STROKE);
+                p.setStrokeWidth(1.5f * d);
+                p.setColor((0x44 << 24) | (fg & 0xFFFFFF));
+                r.set(left + 0.75f * d, cy - 4 * d, right - 0.75f * d, cy + 4 * d);
+                c.drawRoundRect(r, 4 * d, 4 * d, p);
+                float rr = rad * 0.55f;
+                p.setStyle(Paint.Style.FILL);
+                if (on) {
+                    p.setShader(new RadialGradient(cx, cy, rr * 2.4f,
+                            new int[]{(0x99 << 24) | (accent & 0xFFFFFF), (accent & 0xFFFFFF)}, null, Shader.TileMode.CLAMP));
+                    c.drawCircle(cx, cy, rr * 2.4f, p);
+                    p.setShader(null);
+                }
+                p.setColor(on ? accent : 0xFF4A4E56);
+                c.drawCircle(cx, cy, rr, p);
+                p.setColor(on ? 0x88FFFFFF : 0x22FFFFFF);
+                c.drawCircle(cx - rr * 0.3f, cy - rr * 0.3f, rr * 0.3f, p);
+                break;
+            }
+            case "tacche": {
+                int n = 9;
+                float tw = 3 * d, th = 12 * d;
+                float l0 = left + 3 * d + tw / 2f, r0 = right - 3 * d - tw / 2f;
+                p.setStyle(Paint.Style.FILL);
+                for (int i = 0; i < n; i++) {
+                    float x = l0 + (r0 - l0) * i / (n - 1);
+                    boolean act = x <= cx + 0.5f * d;
+                    p.setColor(act ? accent : ((0x44 << 24) | (fg & 0xFFFFFF)));
+                    r.set(x - tw / 2f, cy - th / 2f, x + tw / 2f, cy + th / 2f);
+                    c.drawRoundRect(r, tw / 2f, tw / 2f, p);
+                }
+                float bw = 4 * d, bh = h - 2 * d;
+                p.setColor(on ? 0xFFFFFFFF : ((0xCC << 24) | (fg & 0xFFFFFF)));
+                r.set(cx - bw / 2f, cy - bh / 2f, cx + bw / 2f, cy + bh / 2f);
+                c.drawRoundRect(r, bw / 2f, bw / 2f, p);
+                break;
+            }
+            case "neon": {
+                float ph = h - 8 * d;
+                r.set(left + 4 * d, cy - ph / 2f, right - 4 * d, cy + ph / 2f);
+                p.setStyle(Paint.Style.STROKE);
+                if (on) {
+                    float[] sw = {8 * d, 5 * d, 2 * d};
+                    int[] al = {0x22, 0x44, 0xFF};
+                    for (int i = 0; i < 3; i++) {
+                        p.setStrokeWidth(sw[i]);
+                        p.setColor((al[i] << 24) | (accent & 0xFFFFFF));
+                        c.drawRoundRect(r, ph / 2f, ph / 2f, p);
+                    }
+                } else {
+                    p.setStrokeWidth(1.5f * d);
+                    p.setColor((0x66 << 24) | (fg & 0xFFFFFF));
+                    c.drawRoundRect(r, ph / 2f, ph / 2f, p);
+                }
+                float rr = rad - 4 * d;
+                if (on) {
+                    p.setStyle(Paint.Style.FILL);
+                    p.setColor((0x22 << 24) | (accent & 0xFFFFFF));
+                    c.drawCircle(cx, cy, rr, p);
+                    p.setStyle(Paint.Style.STROKE);
+                    float[] sw = {7 * d, 4.5f * d, 2.5f * d};
+                    int[] al = {0x22, 0x44, 0xFF};
+                    for (int i = 0; i < 3; i++) {
+                        p.setStrokeWidth(sw[i]);
+                        p.setColor((al[i] << 24) | (accent & 0xFFFFFF));
+                        c.drawCircle(cx, cy, rr, p);
+                    }
+                } else {
+                    p.setStyle(Paint.Style.STROKE);
+                    p.setStrokeWidth(1.5f * d);
+                    p.setColor((0x66 << 24) | (fg & 0xFFFFFF));
+                    c.drawCircle(cx, cy, rr, p);
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+
     /** Stili "a forma": pillola con anello, ON/OFF, pulsante. Stessa geometria dell'interruttore OnePlus. */
     private boolean drawForm(Canvas canvas, String var, boolean checked, boolean enabled, int pad, int minW,
                              RectF o, float scale, int barH, int fg, int accent, float d) {
         boolean ring = "anello".equals(var), onoff = var.startsWith("on_off"), btn = "pulsante".equals(var);
-        if (!(ring || onoff || btn)) return false;
+        boolean sp = "levetta".equals(var) || "led".equals(var) || "tacche".equals(var) || "neon".equals(var);
+        if (!(ring || onoff || btn || sp)) return false;
         float cy = o.centerY(), h = barH > 0 ? barH : o.height() + 6 * d;
         float left = pad, right = pad + minW;
         int on = accent, off = alpha(fg, 0x55);
         if ("on_off_verde_rosso".equals(var)) { on = 0xFF34A853; off = 0xFFD93025; }
         int save = enabled ? -1 : canvas.saveLayerAlpha(null, 97);
+        if (sp) {
+            special(canvas, mPaint, mRect, var, checked, left, right, cy, h, o.centerX(), o.height() / 2f, fg, accent, d);
+            if (save >= 0) canvas.restoreToCount(save);
+            return true;
+        }
         mPaint.setStyle(Paint.Style.FILL);
         mRect.set(left, cy - h / 2f, right, cy + h / 2f);
         if (btn) {
