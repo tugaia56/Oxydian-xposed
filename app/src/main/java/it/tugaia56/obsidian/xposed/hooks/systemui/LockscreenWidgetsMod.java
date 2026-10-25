@@ -692,10 +692,7 @@ public class LockscreenWidgetsMod extends XposedMods {
         fab.setText(res.label);
         fab.setTextColor(iconColor);
         fab.setAllCaps(false);
-        // parola lunga (es. "Cronometro") = testo un po' piu' piccolo, altrimenti va a capo a meta' parola
-        int longestWord = 0;
-        for (String w : String.valueOf(res.label).split("[ \n]+")) longestWord = Math.max(longestWord, w.length());
-        fab.setTextSize(longestWord >= 10 ? 11 : 12);
+        fab.setTextSize(12);
         fab.setSingleLine(false);
         fab.setMaxLines(3);
         fab.setLineSpacing(0, 0.95f);
@@ -704,7 +701,9 @@ public class LockscreenWidgetsMod extends XposedMods {
         // pulsante — è il LinearLayout a distribuire lo spazio in parti uguali, garantito.
         fab.setMaxWidth(dp(MAIN_WIDTH_DP));
         int vPad = dp(10);
-        fab.setPadding(fab.getPaddingLeft(), vPad, fab.getPaddingRight(), vPad);
+        // meno spazio ai lati e tra icona e testo: le parole lunghe (es. "Cronometro") non vanno a capo a meta' parola
+        fab.setIconPadding(dp(8));
+        fab.setPadding(dp(14), vPad, dp(10), vPad);
         fab.extend();
         fab.setOnClickListener(res.onClick);
         if (res.onLongClick != null) fab.setOnLongClickListener(res.onLongClick);
