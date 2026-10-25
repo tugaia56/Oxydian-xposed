@@ -578,13 +578,13 @@
         <item>Torcia</item>
         <item>Meteo</item>
         <item>Wi-Fi</item>
-        <item>Dati Mobili (in costruzione)</item>
+        <item>Dati Mobili</item>
         <item>Suoneria</item>
         <item>Bluetooth</item>
         <item>Controlli Casa</item>
         <item>Fotocamera</item>
         <item>Wallet</item>
-        <item>Hotspot (in costruzione)</item>
+        <item>Hotspot</item>
         <item>Cronometro</item>
         <item>Sveglia</item>
     </string-array>

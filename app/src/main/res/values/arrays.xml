@@ -699,13 +699,13 @@
         <item>Flashlight</item>
         <item>Weather</item>
         <item>Wi-Fi</item>
-        <item>Mobile Data (in progress)</item>
+        <item>Mobile Data</item>
         <item>Ringtone</item>
         <item>Bluetooth</item>
         <item>Home Controls</item>
         <item>Camera</item>
         <item>Wallet</item>
-        <item>Hotspot (in progress)</item>
+        <item>Hotspot</item>
         <item>Stopwatch</item>
         <item>Alarm</item>
     </string-array>

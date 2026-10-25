@@ -529,9 +529,23 @@ public class LockscreenWidgetsFragment extends Fragment {
         int current = 0;
         try { current = Integer.parseInt(ObsidianPrefs.getString(key, "0")); } catch (NumberFormatException ignored) {}
         final int[] selected = {current};
+        // Elenco dei widget in ordine alfabetico ("Nessuno" resta in cima); gli indici salvati non cambiano.
+        final Integer[] order = new Integer[entries.length];
+        for (int i = 0; i < order.length; i++) order[i] = i;
+        if (entriesArrayRes == R.array.lockscreen_widget_entries) {
+            final java.text.Collator collator = java.text.Collator.getInstance(java.util.Locale.getDefault());
+            final String[] all = entries;
+            java.util.Arrays.sort(order, 1, order.length, (a, b) -> collator.compare(all[a], all[b]));
+        }
+        final String[] shown = new String[entries.length];
+        int shownCurrent = 0;
+        for (int i = 0; i < order.length; i++) {
+            shown[i] = entries[order[i]];
+            if (order[i] == current) shownCurrent = i;
+        }
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setTitle(title)
-                .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
+                .setSingleChoiceItems(shown, shownCurrent, (d, which) -> selected[0] = order[which])
                 .setPositiveButton(R.string.apply, (d, w) -> {
                     ObsidianPrefs.putString(key, String.valueOf(selected[0]));
                     if (entriesArrayRes == R.array.lockscreen_widget_entries && selected[0] == TYPE_CUSTOM_APP) {

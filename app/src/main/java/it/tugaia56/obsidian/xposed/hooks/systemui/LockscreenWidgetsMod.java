@@ -183,6 +183,7 @@ public class LockscreenWidgetsMod extends XposedMods {
     private AudioManager mAudioManager;
     private WifiManager mWifiManager;
     private BluetoothAdapter mBluetoothAdapter;
+    private android.telephony.TelephonyManager mTelephonyManager;
     /** Il riquadro QS "Controlli Casa" stesso (OplusDeviceControlsTile/DeviceControlsTile) — qui
      *  non serve un controller separato, si richiama direttamente il suo handleClick(Expandable),
      *  che apre l'Activity giusta da solo. Resta null (widget nascosto) se il riquadro non esiste
@@ -277,6 +278,9 @@ public class LockscreenWidgetsMod extends XposedMods {
         try {
             mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         } catch (Throwable t) { dbg("BluetoothAdapter init failed: " + t); }
+        try {
+            mTelephonyManager = (android.telephony.TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+        } catch (Throwable t) { dbg("TelephonyManager init failed: " + t); }
 
         // Controlli Casa — a differenza di Wi-Fi/Bluetooth non esiste un servizio di sistema
         // pubblico equivalente: l'unico modo è agganciare l'istanza già viva del vero riquadro
@@ -870,6 +874,22 @@ public class LockscreenWidgetsMod extends XposedMods {
                 r.label = wifiOn ? "Wi-Fi attivo" : "Wi-Fi disattivo";
                 r.onClick = v -> toggleWifi();
             }
+            case 8 -> { // Dati mobili — TelephonyManager (SystemUI ha MODIFY_PHONE_STATE)
+                if (mTelephonyManager == null) { return null; }
+                boolean dataOn = isMobileDataOn();
+                r.icon = resolveDrawable("ic_widget_mobile_data");
+                r.active = dataOn;
+                r.label = dataOn ? "Dati mobili attivi" : "Dati mobili disattivi";
+                r.onClick = v -> toggleMobileData();
+            }
+            case 14 -> { // Hotspot — TetheringManager (via reflection: e' un'API di sistema)
+                if (mWifiManager == null) { return null; }
+                boolean apOn = isHotspotOn();
+                r.icon = resolveDrawable("ic_widget_hotspot");
+                r.active = apOn;
+                r.label = apOn ? "Hotspot attivo" : "Hotspot disattivo";
+                r.onClick = v -> toggleHotspot(apOn);
+            }
             case 10 -> { // Bluetooth — stessa cosa: API pubblica ma deprecata/ristretta.
                 if (mBluetoothAdapter == null) { return null; }
                 boolean btOn = mBluetoothAdapter.isEnabled();
@@ -986,6 +1006,63 @@ public class LockscreenWidgetsMod extends XposedMods {
         } catch (Throwable t) {
             dbg("toggleBluetooth failed: " + t);
         }
+    }
+
+    private boolean isMobileDataOn() {
+        try { return mTelephonyManager != null && mTelephonyManager.isDataEnabled(); }
+        catch (Throwable t) { return false; }
+    }
+
+    private void toggleMobileData() {
+        if (mTelephonyManager == null) return;
+        try {
+            boolean on = isMobileDataOn();
+            callMethod(mTelephonyManager, "setDataEnabled", !on);
+            refreshSoon();
+        } catch (Throwable t) {
+            dbg("toggleMobileData failed: " + t);
+        }
+    }
+
+    /** WIFI_AP_STATE_ENABLED = 13 (WifiManager.getWifiApState e' nascosta). */
+    private boolean isHotspotOn() {
+        try { return mWifiManager != null && ((Integer) callMethod(mWifiManager, "getWifiApState")) == 13; }
+        catch (Throwable t) { return false; }
+    }
+
+    /** Accende/spegne l'hotspot Wi-Fi con il TetheringManager di sistema (TETHERING_WIFI = 0). */
+    private void toggleHotspot(boolean currentlyOn) {
+        try {
+            Object tm = mContext.getSystemService("tethering");
+            if (tm == null) { dbg("toggleHotspot: no tethering service"); return; }
+            if (currentlyOn) {
+                callMethod(tm, "stopTethering", 0);
+            } else {
+                Class<?> reqCls = Class.forName("android.net.TetheringManager$TetheringRequest$Builder");
+                Object builder = reqCls.getConstructor(int.class).newInstance(0);
+                Object req = callMethod(builder, "build");
+                Class<?> cbCls = Class.forName("android.net.TetheringManager$StartTetheringCallback");
+                Object cb = java.lang.reflect.Proxy.newProxyInstance(cbCls.getClassLoader(), new Class<?>[]{cbCls},
+                        (proxy, m, a) -> {
+                            dbg("startTethering cb: " + m.getName() + (a != null && a.length > 0 ? " " + a[0] : ""));
+                            return null;
+                        });
+                java.util.concurrent.Executor ex = Runnable::run;
+                callMethod(tm, "startTethering", req, ex, cb);
+            }
+            refreshSoon();
+        } catch (Throwable t) {
+            dbg("toggleHotspot failed: " + t);
+        }
+    }
+
+    /** L'accensione di dati/hotspot e' asincrona: ridisegna subito e ancora dopo un attimo. */
+    private void refreshSoon() {
+        mRowDirty = true;
+        refreshForCurrentState();
+        android.os.Handler h = new android.os.Handler(android.os.Looper.getMainLooper());
+        h.postDelayed(() -> { mRowDirty = true; refreshForCurrentState(); }, 1500);
+        h.postDelayed(() -> { mRowDirty = true; refreshForCurrentState(); }, 4000);
     }
 
     private void launchDeviceControls() {
