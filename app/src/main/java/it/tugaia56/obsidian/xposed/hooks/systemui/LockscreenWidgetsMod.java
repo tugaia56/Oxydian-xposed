@@ -850,19 +850,19 @@ public class LockscreenWidgetsMod extends XposedMods {
             }
             case 4 -> { // Timer — apre la pagina Timer dell'app Orologio
                 r.icon = resolveDrawable("ic_clock");
-                r.label = "Apri Timer";
+                r.label = "Timer";
                 r.onClick = v -> { if (mLauncher != null) mLauncher.launchTimer(); };
             }
             case 15 -> { // Cronometro — apre l'app Orologio
                 r.icon = resolveDrawable("ic_widget_stopwatch");
-                r.label = "Apri Cronometro";
+                r.label = "Cronometro";
                 r.onClick = v -> { if (mLauncher != null) mLauncher.launchStopwatch(); };
             }
             case 16 -> { // Sveglia — apre l'app scelta (o l'app Orologio); etichetta = prossima sveglia
                 r.icon = resolveDrawable("ic_widget_alarm");
                 String next = nextAlarmLabel();
                 r.active = next != null;
-                r.label = next != null ? "Sveglia " + next : "Apri Sveglia";
+                r.label = next != null ? "Sveglia " + next : "Sveglia";
                 final String alarmApp = appPackage;
                 r.onClick = v -> { if (mLauncher != null) mLauncher.launchAlarm(alarmApp); };
             }
