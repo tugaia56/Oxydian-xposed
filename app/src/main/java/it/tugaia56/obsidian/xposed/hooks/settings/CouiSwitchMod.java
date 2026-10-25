@@ -23,7 +23,8 @@ import it.tugaia56.obsidian.xposed.utils.AccentUtil;
  *
  * Si accende con la proprieta' persist.oxytheme.switchstyle (la imposta Oxydian Theme, scheda Interruttori):
  * barra_stretta (o narrow), barra_accento (barra nel colore dell'accento da acceso), pallino_pieno (tondo acceso pieno),
- * barra_media (barra piu' spessa), sprite (stile Sprite: barra accento da accesa, tondo pieno col bordo).
+ * barra_media (barra piu' spessa), anello (pillola col tondo ad anello), on_off / on_off_verde_rosso (pillola con la scritta
+ * ON/OFF), pulsante (cornice scura col pulsante colorato), sprite (stile Sprite: barra accento da accesa, tondo pieno col bordo).
  * Vuota = si disegna l'originale. Le posizioni vengono dall'interruttore stesso (setOuterCircleRectF), cosi' animazione e
  * pressione restano quelle di OnePlus. Nomi di campi legati alla versione di COUISwitch di OOS 16 (vedi log LSPosed).
  */
@@ -119,8 +120,10 @@ public class CouiSwitchMod extends XposedMods {
         float dis = enabled ? 1f : 0.38f;
         float cy = o.centerY();
 
-        // barra stretta: dal bordo del pallino spento al bordo del pallino acceso
         String var = variant();
+        if (drawForm(canvas, var, checked, enabled, pad, minW, o, scale,
+                XposedHelpers.getIntField(v, "mBarHeight"), fg, accent, d)) return;
+        // barra stretta: dal bordo del pallino spento al bordo del pallino acceso
         boolean classic = "sprite".equals(var);
         float th = ("barra_media".equals(var) ? 4f : 2f) * d;
         int cp = XposedHelpers.getIntField(v, "mCirclePadding");
@@ -140,7 +143,7 @@ public class CouiSwitchMod extends XposedMods {
         canvas.scale(scale, scale, cx, cy);
         int fill = checked ? alpha(accent, "pallino_pieno".equals(var) ? 0xFF : 0x59) : alpha(fg, 0x22);
         int stroke = checked ? accent : alpha(fg, 0x99);
-        if (classic) fill = attrColor(c, android.R.attr.colorBackground, 0xFF1B2029) | 0xFF000000;
+        if (classic) fill = alpha(accent, 0x59);
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setColor(alpha(fill, Math.round(Color_a(fill) * dis)));
         canvas.drawCircle(cx, cy, r, mPaint);
@@ -149,6 +152,71 @@ public class CouiSwitchMod extends XposedMods {
         mPaint.setColor(alpha(stroke, Math.round(Color_a(stroke) * dis)));
         canvas.drawCircle(cx, cy, r, mPaint);
         canvas.restore();
+    }
+
+    private final Paint mText = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    /** Stili "a forma": pillola con anello, ON/OFF, pulsante. Stessa geometria dell'interruttore OnePlus. */
+    private boolean drawForm(Canvas canvas, String var, boolean checked, boolean enabled, int pad, int minW,
+                             RectF o, float scale, int barH, int fg, int accent, float d) {
+        boolean ring = "anello".equals(var), onoff = var.startsWith("on_off"), btn = "pulsante".equals(var);
+        if (!(ring || onoff || btn)) return false;
+        float cy = o.centerY(), h = barH > 0 ? barH : o.height() + 6 * d;
+        float left = pad, right = pad + minW;
+        int on = accent, off = alpha(fg, 0x55);
+        if ("on_off_verde_rosso".equals(var)) { on = 0xFF34A853; off = 0xFFD93025; }
+        int save = enabled ? -1 : canvas.saveLayerAlpha(null, 97);
+        mPaint.setStyle(Paint.Style.FILL);
+        mRect.set(left, cy - h / 2f, right, cy + h / 2f);
+        if (btn) {
+            mPaint.setColor(0xFF2A2D33);
+            canvas.drawRoundRect(mRect, h / 2f, h / 2f, mPaint);
+            mPaint.setStyle(Paint.Style.STROKE);
+            mPaint.setStrokeWidth(1.5f * d);
+            mPaint.setColor(alpha(fg, 0x66));
+            mRect.inset(0.75f * d, 0.75f * d);
+            canvas.drawRoundRect(mRect, h / 2f, h / 2f, mPaint);
+        } else {
+            mPaint.setColor(checked ? on : off);
+            canvas.drawRoundRect(mRect, h / 2f, h / 2f, mPaint);
+        }
+        float cx = o.centerX(), rad = o.height() / 2f;
+        canvas.save();
+        canvas.scale(scale, scale, cx, cy);
+        if (ring) {
+            mPaint.setStyle(Paint.Style.STROKE);
+            mPaint.setStrokeWidth(3f * d);
+            mPaint.setColor(0xFFFFFFFF);
+            canvas.drawCircle(cx, cy, rad - 1.5f * d, mPaint);
+        } else if (onoff) {
+            mPaint.setStyle(Paint.Style.FILL);
+            mPaint.setColor(0xFFFFFFFF);
+            canvas.drawCircle(cx, cy, rad - 1f * d, mPaint);
+            mPaint.setStyle(Paint.Style.STROKE);
+            mPaint.setStrokeWidth(1f * d);
+            mPaint.setColor(0xFFB0B0B0);
+            canvas.drawCircle(cx, cy, rad - 1f * d, mPaint);
+        } else {
+            mPaint.setStyle(Paint.Style.FILL);
+            mPaint.setColor(checked ? accent : 0xFF3A3E46);
+            canvas.drawCircle(cx, cy, rad - 3f * d, mPaint);
+            mPaint.setStyle(Paint.Style.STROKE);
+            mPaint.setStrokeWidth(1.5f * d);
+            mPaint.setColor(alpha(fg, 0x66));
+            canvas.drawCircle(cx, cy, rad - 3f * d, mPaint);
+        }
+        canvas.restore();
+        if (onoff) {
+            mText.setColor(0xFFFFFFFF);
+            mText.setTextAlign(Paint.Align.CENTER);
+            mText.setFakeBoldText(true);
+            mText.setTextSize(h * 0.36f);
+            float mid = checked ? (left + (cx - rad)) / 2f : ((cx + rad) + right) / 2f;
+            float base = cy - (mText.ascent() + mText.descent()) / 2f;
+            canvas.drawText(checked ? "ON" : "OFF", mid, base, mText);
+        }
+        if (save >= 0) canvas.restoreToCount(save);
+        return true;
     }
 
     private static int Color_a(int color) {
