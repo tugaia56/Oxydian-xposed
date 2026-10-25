@@ -285,7 +285,7 @@ public class CouiSwitchMod extends XposedMods {
                 c.drawRoundRect(r, (bot - top) / 2f, (bot - top) / 2f, p);
                 p.setColor(0x44FFFFFF);
                 p.setStrokeWidth(1f * d);
-                r.set(left + d + 5 * d, top + 1.5f * d, right - d - 5 * d, top + 1.5f * d);
+                r.set(left + d + 11 * d, top + 1.5f * d, right - d - 11 * d, top + 1.5f * d);
                 c.drawLine(r.left, r.top, r.right, r.top, p);
                 // pallino come una sfera lucida con ombra
                 float rr = rad - 2 * d;
