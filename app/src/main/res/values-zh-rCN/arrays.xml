@@ -698,6 +698,8 @@
         <item>相机</item>
         <item>钱包</item>
         <item>热点（开发中）</item>
+        <item>Stopwatch</item>
+        <item>Alarm</item>
     </string-array>
     <!-- Lockscreen album cover filter -->
     <string-array name="lockscreen_album_art_filter_entries">

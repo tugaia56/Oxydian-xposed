@@ -819,10 +819,23 @@ public class LockscreenWidgetsMod extends XposedMods {
                 r.onClick = v -> { if (mLauncher != null) mLauncher.launchMusicPlayer(); };
                 r.onLongClick = v -> { toggleMediaPlayback(); return true; };
             }
-            case 4 -> { // Timer
+            case 4 -> { // Timer — apre la pagina Timer dell'app Orologio
                 r.icon = resolveDrawable("ic_clock");
-                r.label = "Timer";
+                r.label = "Apri Timer";
                 r.onClick = v -> { if (mLauncher != null) mLauncher.launchTimer(); };
+            }
+            case 15 -> { // Cronometro — apre l'app Orologio
+                r.icon = resolveDrawable("ic_widget_stopwatch");
+                r.label = "Apri Cronometro";
+                r.onClick = v -> { if (mLauncher != null) mLauncher.launchStopwatch(); };
+            }
+            case 16 -> { // Sveglia — apre l'app scelta (o l'app Orologio); etichetta = prossima sveglia
+                r.icon = resolveDrawable("ic_widget_alarm");
+                String next = nextAlarmLabel();
+                r.active = next != null;
+                r.label = next != null ? "Sveglia " + next : "Apri Sveglia";
+                final String alarmApp = appPackage;
+                r.onClick = v -> { if (mLauncher != null) mLauncher.launchAlarm(alarmApp); };
             }
             case 5 -> { // Torcia
                 r.icon = resolveDrawable("ic_widget_torch");
@@ -890,6 +903,18 @@ public class LockscreenWidgetsMod extends XposedMods {
             default -> { return null; }
         }
         return r;
+    }
+
+    /** Ora della prossima sveglia ("07:00"), oppure null se non ce ne sono. */
+    private String nextAlarmLabel() {
+        try {
+            android.app.AlarmManager am = mContext.getSystemService(android.app.AlarmManager.class);
+            android.app.AlarmManager.AlarmClockInfo info = am != null ? am.getNextAlarmClock() : null;
+            if (info == null) return null;
+            return android.text.format.DateFormat.getTimeFormat(mContext).format(new java.util.Date(info.getTriggerTime()));
+        } catch (Throwable t) {
+            return null;
+        }
     }
 
     /** "34°C · Soleggiato", come OC (mWeatherInfo.temp + unit + " • " + condizione). Usa la

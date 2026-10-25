@@ -66,6 +66,8 @@ public class LockscreenWidgetsFragment extends Fragment {
      *  usa, il pacchetto scelto vive in "&lt;chiave_slot&gt;_app_package" (letto anche
      *  dall'hook reale, LockscreenWidgetsMod). */
     private static final int TYPE_CUSTOM_APP = 1;
+    /** "Sveglia": apre l'app scelta (oppure, senza scelta, l'app Orologio). */
+    private static final int TYPE_ALARM = 16;
 
     private static final String KEY_ENABLED       = "lockscreen_widgets_enabled";
     private static final String KEY_DEVICE_WIDGET  = "lockscreen_device_widget";
@@ -509,7 +511,7 @@ public class LockscreenWidgetsFragment extends Fragment {
         String[] entries = getResources().getStringArray(entriesArrayRes);
         int idx = 0;
         try { idx = Integer.parseInt(ObsidianPrefs.getString(key, "0")); } catch (NumberFormatException ignored) {}
-        if (entriesArrayRes == R.array.lockscreen_widget_entries && idx == TYPE_CUSTOM_APP) {
+        if (entriesArrayRes == R.array.lockscreen_widget_entries && (idx == TYPE_CUSTOM_APP || idx == TYPE_ALARM)) {
             String pkg = ObsidianPrefs.getString(key + "_app_package", "");
             if (!pkg.isEmpty()) {
                 try {
@@ -534,6 +536,9 @@ public class LockscreenWidgetsFragment extends Fragment {
                     ObsidianPrefs.putString(key, String.valueOf(selected[0]));
                     if (entriesArrayRes == R.array.lockscreen_widget_entries && selected[0] == TYPE_CUSTOM_APP) {
                         showAppPickerDialog(key);
+                    } else if (entriesArrayRes == R.array.lockscreen_widget_entries && selected[0] == TYPE_ALARM) {
+                        ObsidianPrefs.putString(key + "_app_package", "");   // si riparte dall'app Orologio
+                        showAppPickerDialog(key, true);
                     } else {
                         rebuild();
                     }
@@ -546,6 +551,10 @@ public class LockscreenWidgetsFragment extends Fragment {
     // ── Selettore "App Personalizzata" ───────────────────────────────────────────
 
     private void showAppPickerDialog(String slotKey) {
+        showAppPickerDialog(slotKey, false);
+    }
+
+    private void showAppPickerDialog(String slotKey, boolean withDefault) {
         PackageManager pm = requireContext().getPackageManager();
         Intent launcherIntent = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER);
         List<ResolveInfo> apps = pm.queryIntentActivities(launcherIntent, 0);
@@ -557,6 +566,20 @@ public class LockscreenWidgetsFragment extends Fragment {
         list.setPadding(pad, pad, pad, pad);
 
         androidx.appcompat.app.AlertDialog[] dlgRef = new androidx.appcompat.app.AlertDialog[1];
+        if (withDefault) {
+            // prima voce: l'app Orologio del sistema (nessun pacchetto salvato)
+            TextView def = new TextView(requireContext());
+            def.setText(R.string.lockscreen_widgets_alarm_default_app);
+            def.setTextColor(ObsidianTheme.textColor());
+            def.setTextSize(15);
+            def.setPadding(dp(12), dp(14), dp(12), dp(14));
+            def.setOnClickListener(v -> {
+                ObsidianPrefs.putString(slotKey + "_app_package", "");
+                rebuild();
+                if (dlgRef[0] != null) dlgRef[0].dismiss();
+            });
+            list.addView(def);
+        }
         for (ResolveInfo info : apps) {
             ApplicationInfo appInfo = info.activityInfo.applicationInfo;
             String packageName = appInfo.packageName;

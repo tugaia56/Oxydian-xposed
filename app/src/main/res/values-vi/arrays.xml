@@ -698,6 +698,8 @@
         <item>Máy ảnh</item>
         <item>Ví</item>
         <item>Điểm phát sóng (đang phát triển)</item>
+        <item>Stopwatch</item>
+        <item>Alarm</item>
     </string-array>
     <!-- Lockscreen album cover filter -->
     <string-array name="lockscreen_album_art_filter_entries">

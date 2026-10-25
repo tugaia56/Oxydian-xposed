@@ -288,6 +288,7 @@
     <string name="nav_lock_widgets_summary">Device widgets and mini widgets on the lock screen</string>
     <string name="lockscreen_widgets_enabled_title">Enable Widgets</string>
     <string name="lockscreen_widgets_enabled_summary">Show widgets on the lock screen</string>
+    <string name="lockscreen_widgets_alarm_default_app">Use the system Clock app</string>
     <string name="lockscreen_widgets_pick_app_title">Choose app</string>
     <string name="lockscreen_display_widgets_title">Device Widget</string>
     <string name="lockscreen_display_widgets_summary">Show the device status widget</string>

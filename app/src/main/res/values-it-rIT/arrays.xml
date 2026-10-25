@@ -585,6 +585,8 @@
         <item>Fotocamera</item>
         <item>Wallet</item>
         <item>Hotspot (in costruzione)</item>
+        <item>Cronometro</item>
+        <item>Sveglia</item>
     </string-array>
     <string-array name="notif_default_expansion_entries">
         <item>Predefinito</item>

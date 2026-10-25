@@ -697,6 +697,8 @@
         <item>Камера</item>
         <item>Кошелёк</item>
         <item>Точка доступа (в разработке)</item>
+        <item>Stopwatch</item>
+        <item>Alarm</item>
     </string-array>
     <!-- Lockscreen album cover filter -->
     <string-array name="lockscreen_album_art_filter_entries">

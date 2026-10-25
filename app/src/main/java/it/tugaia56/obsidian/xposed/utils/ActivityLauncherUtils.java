@@ -23,6 +23,10 @@ public class ActivityLauncherUtils {
             "com.oneplus.calculator", "com.coloros.calculator",
             "com.android.calculator2", "com.google.android.calculator",
     };
+    private static final String[] CLOCK_PACKAGES = {
+            "com.oneplus.deskclock", "com.coloros.alarmclock", "com.oplus.alarmclock",
+            "com.google.android.deskclock", "com.android.deskclock",
+    };
     private static final String WALLET_PACKAGE = "com.google.android.apps.walletnfcrel";
     private static final String[] WEATHER_PACKAGES = {
             "net.oneplus.weather", "com.coloros.weather2", "com.oplus.weather",
@@ -51,7 +55,51 @@ public class ActivityLauncherUtils {
         launch(new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA_SECURE));
     }
 
+    /** Apre l'app Orologio OnePlus direttamente su una scheda (stesso trucco del tocco sull'orologio della barra di stato):
+     *  azione "enter_and_open_timer" + extra "clock_tab_index" (0=Sveglia, 1=Orologio mondiale, 2=Cronometro, 3=Timer).
+     *  Se l'app non c'e', ripiega sulle richieste standard o sull'app Orologio del sistema. */
+    private void launchClockTab(int tab) {
+        if (mPackageManager.getLaunchIntentForPackage(CLOCK_PACKAGES[0]) != null) {
+            Intent intent = new Intent();
+            intent.setComponent(new ComponentName(CLOCK_PACKAGES[0], "com.oplus.alarmclock.AlarmClock"));
+            intent.setAction("com.oplus.alarmclock.alarmclock.enter_and_open_timer");
+            intent.putExtra("clock_tab_index", tab);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            launch(intent);
+            return;
+        }
+        if (tab == 3) {
+            Intent intent = new Intent("android.intent.action.SHOW_TIMERS");
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            launch(intent);
+            return;
+        }
+        for (String pkg : CLOCK_PACKAGES) {
+            Intent found = mPackageManager.getLaunchIntentForPackage(pkg);
+            if (found != null) {
+                found.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                launch(found);
+                return;
+            }
+        }
+    }
+
+    /** Apre il Timer dell'app Orologio. */
     public void launchTimer() {
+        launchClockTab(3);
+    }
+
+    /** Apre il Cronometro dell'app Orologio. */
+    public void launchStopwatch() {
+        launchClockTab(2);
+    }
+
+    /** Sveglia: apre l'app scelta dall'utente, oppure la lista delle sveglie dell'app Orologio. */
+    public void launchAlarm(String packageName) {
+        if (packageName != null && !packageName.isEmpty()) {
+            launchApp(packageName);
+            return;
+        }
         Intent intent = new Intent("android.intent.action.SHOW_ALARMS");
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         launch(intent);

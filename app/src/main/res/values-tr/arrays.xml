@@ -698,6 +698,8 @@
         <item>Kamera</item>
         <item>Cüzdan</item>
         <item>Hotspot (geliştirme aşamasında)</item>
+        <item>Stopwatch</item>
+        <item>Alarm</item>
     </string-array>
     <!-- Lockscreen album cover filter -->
     <string-array name="lockscreen_album_art_filter_entries">

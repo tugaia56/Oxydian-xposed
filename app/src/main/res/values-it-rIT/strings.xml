@@ -285,6 +285,7 @@
     <string name="nav_lock_widgets_summary">Widget dispositivo e mini widget sulla schermata di blocco</string>
     <string name="lockscreen_widgets_enabled_title">Abilita Widget</string>
     <string name="lockscreen_widgets_enabled_summary">Mostra widget sulla schermata di blocco</string>
+    <string name="lockscreen_widgets_alarm_default_app">Usa l\'app Orologio del sistema</string>
     <string name="lockscreen_widgets_pick_app_title">Scegli app</string>
     <string name="lockscreen_display_widgets_title">Widget Dispositivo</string>
     <string name="lockscreen_display_widgets_summary">Mostra il widget di stato del dispositivo</string>

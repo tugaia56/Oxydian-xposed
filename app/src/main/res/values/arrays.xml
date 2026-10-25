@@ -706,6 +706,8 @@
         <item>Camera</item>
         <item>Wallet</item>
         <item>Hotspot (in progress)</item>
+        <item>Stopwatch</item>
+        <item>Alarm</item>
     </string-array>
     <!-- Lockscreen album cover filter -->
     <string-array name="lockscreen_album_art_filter_entries">
