@@ -21,8 +21,10 @@ import it.tugaia56.obsidian.xposed.utils.AccentUtil;
  * non ne cambia la forma. Qui onDraw viene sostituito con lo stile "barra stretta": barra sottile del colore del testo
  * (bianca sul tema scuro, scura sul chiaro) e tondo con bordo e riempimento trasparente dell'accento.
  *
- * Si accende con la proprieta' persist.oxytheme.switchstyle = narrow (la imposta Oxydian Theme, scheda Interruttori);
- * spenta si disegna l'originale. Le posizioni vengono dall'interruttore stesso (setOuterCircleRectF), cosi' animazione e
+ * Si accende con la proprieta' persist.oxytheme.switchstyle (la imposta Oxydian Theme, scheda Interruttori):
+ * barra_stretta (o narrow), barra_accento (barra nel colore dell'accento da acceso), pallino_pieno (tondo acceso pieno),
+ * barra_media (barra piu' spessa), sprite (stile Sprite: barra accento da accesa, tondo pieno col bordo).
+ * Vuota = si disegna l'originale. Le posizioni vengono dall'interruttore stesso (setOuterCircleRectF), cosi' animazione e
  * pressione restano quelle di OnePlus. Nomi di campi legati alla versione di COUISwitch di OOS 16 (vedi log LSPosed).
  */
 public class CouiSwitchMod extends XposedMods {
@@ -30,7 +32,7 @@ public class CouiSwitchMod extends XposedMods {
     private static final String CLS = "com.coui.appcompat.couiswitch.COUISwitch";
     private static final String PROP = "persist.oxytheme.switchstyle";
 
-    private static volatile boolean sOn;
+    private static volatile String sVariant = "";
     private static volatile long sAt = -10000;
 
     private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -56,7 +58,7 @@ public class CouiSwitchMod extends XposedMods {
             XposedHelpers.findAndHookMethod(cls, "onDraw", Canvas.class, new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam p) {
                     try {
-                        if (!enabled()) return;
+                        if (variant().isEmpty()) return;
                         View v = (View) p.thisObject;
                         if (XposedHelpers.getBooleanField(v, "mIsThemedEnabled")) return;
                         if (XposedHelpers.getBooleanField(v, "mIsLoading")) return;
@@ -73,18 +75,19 @@ public class CouiSwitchMod extends XposedMods {
         }
     }
 
-    private static boolean enabled() {
+    private static String variant() {
         long now = SystemClock.elapsedRealtime();
         if (now - sAt > 3000) {
             sAt = now;
             try {
                 Class<?> sp = Class.forName("android.os.SystemProperties");
-                sOn = "narrow".equals(XposedHelpers.callStaticMethod(sp, "get", PROP, ""));
+                String v = String.valueOf(XposedHelpers.callStaticMethod(sp, "get", PROP, ""));
+                sVariant = v == null ? "" : v.trim().toLowerCase();
             } catch (Throwable t) {
-                sOn = false;
+                sVariant = "";
             }
         }
-        return sOn;
+        return sVariant;
     }
 
     private static int attrColor(Context c, int attr, int def) {
@@ -117,22 +120,27 @@ public class CouiSwitchMod extends XposedMods {
         float cy = o.centerY();
 
         // barra stretta: dal bordo del pallino spento al bordo del pallino acceso
-        float th = 2f * d;
+        String var = variant();
+        boolean classic = "sprite".equals(var);
+        float th = ("barra_media".equals(var) ? 4f : 2f) * d;
         int cp = XposedHelpers.getIntField(v, "mCirclePadding");
         int ow = XposedHelpers.getIntField(v, "mOuterCircleWidth");
         mRect.set(pad + cp, cy - th / 2f, pad + minW - cp, cy + th / 2f);
         mPaint.setStyle(Paint.Style.FILL);
-        mPaint.setColor(alpha(fg, Math.round(0xFF * dis)));
+        int barColor = checked && ("barra_accento".equals(var) || classic) ? accent : fg;
+        if (classic && !checked) barColor = alpha(fg, 0x40);
+        mPaint.setColor(alpha(barColor, Math.round(0xFF * dis)));
         canvas.drawRoundRect(mRect, th / 2f, th / 2f, mPaint);
 
         // tondo con bordo e riempimento trasparente
-        float sw = 1.5f * d;
+        float sw = (classic ? 1f : 1.5f) * d;
         float r = o.height() / 2f - sw / 2f;
         float cx = o.centerX();
         canvas.save();
         canvas.scale(scale, scale, cx, cy);
-        int fill = checked ? alpha(accent, 0x59) : alpha(fg, 0x22);
+        int fill = checked ? alpha(accent, "pallino_pieno".equals(var) ? 0xFF : 0x59) : alpha(fg, 0x22);
         int stroke = checked ? accent : alpha(fg, 0x99);
+        if (classic) fill = attrColor(c, android.R.attr.colorBackground, 0xFF1B2029) | 0xFF000000;
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setColor(alpha(fill, Math.round(Color_a(fill) * dis)));
         canvas.drawCircle(cx, cy, r, mPaint);
