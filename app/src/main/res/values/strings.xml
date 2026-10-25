@@ -302,6 +302,8 @@
     <string name="large_widgets_category_title">Large Widgets</string>
     <string name="main_custom_widgets1">Large Widget 1</string>
     <string name="main_custom_widgets2">Large Widget 2</string>
+    <string name="main_custom_widgets3">Large Widget 3</string>
+    <string name="main_custom_widgets4">Large Widget 4</string>
     <string name="mini_widgets_category_title">Mini Widgets</string>
     <string name="custom_widgets1">Mini Widget 1</string>
     <string name="custom_widgets2">Mini Widget 2</string>

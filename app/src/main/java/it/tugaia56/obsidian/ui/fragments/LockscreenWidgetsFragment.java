@@ -73,6 +73,8 @@ public class LockscreenWidgetsFragment extends Fragment {
     private static final String KEY_DEVICE_WIDGET  = "lockscreen_device_widget";
     private static final String KEY_MAIN_WIDGET1   = "main_custom_widgets1";
     private static final String KEY_MAIN_WIDGET2   = "main_custom_widgets2";
+    private static final String KEY_MAIN_WIDGET3   = "main_custom_widgets3";
+    private static final String KEY_MAIN_WIDGET4   = "main_custom_widgets4";
     private static final String KEY_MINI_WIDGET1   = "custom_widgets1";
     private static final String KEY_MINI_WIDGET2   = "custom_widgets2";
     private static final String KEY_MINI_WIDGET3   = "custom_widgets3";
@@ -171,7 +173,9 @@ public class LockscreenWidgetsFragment extends Fragment {
             chain.add(new SectionTitleAdapter(List.of(getString(R.string.large_widgets_category_title))));
             GroupUtils.addGroup(chain, List.of(
                     singleChoiceItem(getString(R.string.main_custom_widgets1), KEY_MAIN_WIDGET1, R.array.lockscreen_widget_entries),
-                    singleChoiceItem(getString(R.string.main_custom_widgets2), KEY_MAIN_WIDGET2, R.array.lockscreen_widget_entries)));
+                    singleChoiceItem(getString(R.string.main_custom_widgets2), KEY_MAIN_WIDGET2, R.array.lockscreen_widget_entries),
+                    singleChoiceItem(getString(R.string.main_custom_widgets3), KEY_MAIN_WIDGET3, R.array.lockscreen_widget_entries),
+                    singleChoiceItem(getString(R.string.main_custom_widgets4), KEY_MAIN_WIDGET4, R.array.lockscreen_widget_entries)));
 
             chain.add(new SectionTitleAdapter(List.of(getString(R.string.mini_widgets_category_title))));
             GroupUtils.addGroup(chain, List.of(

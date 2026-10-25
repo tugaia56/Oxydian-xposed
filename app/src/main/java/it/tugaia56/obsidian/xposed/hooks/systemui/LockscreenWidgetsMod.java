@@ -72,11 +72,13 @@ public class LockscreenWidgetsMod extends XposedMods {
     private static final String KEY_ENABLED    = "lockscreen_widgets_enabled";
     private static final String KEY_TOP_MARGIN = "lockscreen_widgets_top_margin";
     private static final String[] SLOT_KEYS = {
-            "main_custom_widgets1", "main_custom_widgets2",
+            "main_custom_widgets1", "main_custom_widgets2", "main_custom_widgets3", "main_custom_widgets4",
             "custom_widgets1", "custom_widgets2", "custom_widgets3", "custom_widgets4",
     };
-    /** Solo i primi 2 slot (main_custom_widgets1/2) sono "grandi" — il resto è "mini". */
-    private static final int MAIN_SLOT_COUNT = 2;
+    /** I primi 4 slot (main_custom_widgets1..4) sono "grandi" (due per riga) — il resto è "mini". */
+    private static final int MAIN_SLOT_COUNT = 4;
+    /** Widget grandi per riga. */
+    private static final int MAIN_PER_ROW = 2;
     /** OC: kg_widget_circle_size = 68dp, scalato ×0.85 per SDK 35+ (kgwidgets_dimens.xml /
      *  LockscreenWidgetsView) — qui il ramo SDK<35 è già escluso a monte (handleLoadPackage),
      *  quindi il fattore è sempre applicato: 68×0.85 ≈ 58dp. */
@@ -166,6 +168,7 @@ public class LockscreenWidgetsMod extends XposedMods {
      *  Ognuna nascosta (GONE) per conto proprio se non ha slot attivi, così con soli mini
      *  widget attivi non resta uno spazio vuoto dove sarebbe stata la riga grande. */
     private LinearLayout mMainRow;
+    private LinearLayout mMainRow2;
     private LinearLayout mMiniRow;
     private boolean mDeviceRowDirty = true;
     /** getView(1) spara in continuazione (decine di volte al secondo, ad ogni frame
@@ -377,6 +380,7 @@ public class LockscreenWidgetsMod extends XposedMods {
             mWidgetRow = null;
             mDeviceBlock = null;
             mMainRow = null;
+            mMainRow2 = null;
             mMiniRow = null;
             return;
         }
@@ -405,6 +409,7 @@ public class LockscreenWidgetsMod extends XposedMods {
             // dopo qualche secondo.
             mDeviceBlock = null;
             mMainRow = null;
+            mMainRow2 = null;
             mMiniRow = null;
             mRowDirty = true;
             mDeviceRowDirty = true;
@@ -448,6 +453,14 @@ public class LockscreenWidgetsMod extends XposedMods {
                         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 mRowDirty = true;
             }
+            if (mMainRow2 == null) {
+                mMainRow2 = new LinearLayout(mContext);
+                mMainRow2.setOrientation(LinearLayout.HORIZONTAL);
+                mMainRow2.setGravity(Gravity.CENTER_HORIZONTAL);
+                mWidgetRow.addView(mMainRow2, new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                mRowDirty = true;
+            }
             if (mMiniRow == null) {
                 mMiniRow = new LinearLayout(mContext);
                 mMiniRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -462,8 +475,10 @@ public class LockscreenWidgetsMod extends XposedMods {
             }
         } else if (mMainRow != null) {
             mWidgetRow.removeView(mMainRow);
+            mWidgetRow.removeView(mMainRow2);
             mWidgetRow.removeView(mMiniRow);
             mMainRow = null;
+            mMainRow2 = null;
             mMiniRow = null;
         }
 
@@ -476,17 +491,20 @@ public class LockscreenWidgetsMod extends XposedMods {
      *  sempre così: se ci sono widget grandi E mini, occupano due righe fisse; se c'è solo un
      *  tipo, l'altra riga resta GONE invece di lasciare uno spazio vuoto. */
     private void rebuildWidgetRows() {
-        if (mMainRow == null || mMiniRow == null) return;
+        if (mMainRow == null || mMainRow2 == null || mMiniRow == null) return;
         mMainRow.removeAllViews();
+        mMainRow2.removeAllViews();
         mMiniRow.removeAllViews();
         int margin = dp(WIDGET_MARGIN_DP);
 
         // Se c'è un solo widget grande attivo, il peso lo farebbe allungare su tutta la riga
         // (nessun altro peso con cui condividere lo spazio) — come in OC, il peso si usa solo
         // quando ce ne sono almeno due; con uno solo si torna alla larghezza fissa.
-        int activeMainCount = 0;
+        int activeMainCount = 0;   // riga 1
+        int activeMain2Count = 0;  // riga 2
         for (int i = 0; i < MAIN_SLOT_COUNT && i < SLOT_KEYS.length; i++) {
-            if (mSlotType[i] != 0) activeMainCount++;
+            if (mSlotType[i] == 0) continue;
+            if (i < MAIN_PER_ROW) activeMainCount++; else activeMain2Count++;
         }
         int activeMiniCount = 0;
         for (int i = MAIN_SLOT_COUNT; i < SLOT_KEYS.length; i++) {
@@ -507,7 +525,7 @@ public class LockscreenWidgetsMod extends XposedMods {
                 // LinearLayout divide lo spazio esattamente a metà tra i pulsanti grandi,
                 // indipendentemente da quanto testo/riga ha ciascuno. Altezza fissa per lo
                 // stesso motivo (non WRAP_CONTENT, che varia con 1 o 2 righe di testo).
-                if (activeMainCount >= 2) {
+                if ((i < MAIN_PER_ROW ? activeMainCount : activeMain2Count) >= 2) {
                     lp.width = 0;
                     lp.weight = 1f;
                 } else {
@@ -520,16 +538,20 @@ public class LockscreenWidgetsMod extends XposedMods {
             // vanno centrati verticalmente tra loro, non allineati in alto, altrimenti sembrano
             // sfalsati quando uno dei due va a capo e l'altro no.
             lp.gravity = Gravity.CENTER_VERTICAL;
-            (isMain ? mMainRow : mMiniRow).addView(widget, lp);
+            (isMain ? (i < MAIN_PER_ROW ? mMainRow : mMainRow2) : mMiniRow).addView(widget, lp);
         }
 
         mMainRow.setVisibility(activeMainCount > 0 ? View.VISIBLE : View.GONE);
+        mMainRow2.setVisibility(activeMain2Count > 0 ? View.VISIBLE : View.GONE);
         mMiniRow.setVisibility(activeMiniCount > 0 ? View.VISIBLE : View.GONE);
         // Spazio tra le due righe solo quando sono entrambe visibili — altrimenti (una sola
         // riga) non deve avanzare margine sopra il resto del contenuto.
         LinearLayout.LayoutParams mainLp = (LinearLayout.LayoutParams) mMainRow.getLayoutParams();
-        mainLp.bottomMargin = (activeMainCount > 0 && activeMiniCount > 0) ? dp(ROW_GAP_DP) : 0;
+        mainLp.bottomMargin = (activeMainCount > 0 && (activeMain2Count > 0 || activeMiniCount > 0)) ? dp(ROW_GAP_DP) : 0;
         mMainRow.setLayoutParams(mainLp);
+        LinearLayout.LayoutParams main2Lp = (LinearLayout.LayoutParams) mMainRow2.getLayoutParams();
+        main2Lp.bottomMargin = (activeMain2Count > 0 && activeMiniCount > 0) ? dp(ROW_GAP_DP) : 0;
+        mMainRow2.setLayoutParams(main2Lp);
     }
 
     // ── Widget Dispositivo: nome + fino a 6 gauge (batteria/RAM/volume/temperatura) ────────
@@ -670,7 +692,10 @@ public class LockscreenWidgetsMod extends XposedMods {
         fab.setText(res.label);
         fab.setTextColor(iconColor);
         fab.setAllCaps(false);
-        fab.setTextSize(12);
+        // parola lunga (es. "Cronometro") = testo un po' piu' piccolo, altrimenti va a capo a meta' parola
+        int longestWord = 0;
+        for (String w : String.valueOf(res.label).split("[ \n]+")) longestWord = Math.max(longestWord, w.length());
+        fab.setTextSize(longestWord >= 10 ? 11 : 12);
         fab.setSingleLine(false);
         fab.setMaxLines(3);
         fab.setLineSpacing(0, 0.95f);
@@ -879,7 +904,7 @@ public class LockscreenWidgetsMod extends XposedMods {
                 boolean dataOn = isMobileDataOn();
                 r.icon = resolveDrawable("ic_widget_mobile_data");
                 r.active = dataOn;
-                r.label = dataOn ? "Dati mobili attivi" : "Dati mobili disattivi";
+                r.label = dataOn ? "Dati mobili attivati" : "Dati mobili disattivati";
                 r.onClick = v -> toggleMobileData();
             }
             case 14 -> { // Hotspot — TetheringManager (via reflection: e' un'API di sistema)
@@ -887,7 +912,7 @@ public class LockscreenWidgetsMod extends XposedMods {
                 boolean apOn = isHotspotOn();
                 r.icon = resolveDrawable("ic_widget_hotspot");
                 r.active = apOn;
-                r.label = apOn ? "Hotspot attivo" : "Hotspot disattivo";
+                r.label = apOn ? "Hotspot attivato" : "Hotspot disattivato";
                 r.onClick = v -> toggleHotspot(apOn);
             }
             case 10 -> { // Bluetooth — stessa cosa: API pubblica ma deprecata/ristretta.

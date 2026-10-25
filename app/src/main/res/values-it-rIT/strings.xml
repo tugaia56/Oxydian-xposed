@@ -299,6 +299,8 @@
     <string name="large_widgets_category_title">Widget Grandi</string>
     <string name="main_custom_widgets1">Widget Grande 1</string>
     <string name="main_custom_widgets2">Widget Grande 2</string>
+    <string name="main_custom_widgets3">Widget Grande 3</string>
+    <string name="main_custom_widgets4">Widget Grande 4</string>
     <string name="mini_widgets_category_title">Mini Widget</string>
     <string name="custom_widgets1">Mini Widget 1</string>
     <string name="custom_widgets2">Mini Widget 2</string>
