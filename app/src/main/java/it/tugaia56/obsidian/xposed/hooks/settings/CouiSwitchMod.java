@@ -23,7 +23,7 @@ import it.tugaia56.obsidian.xposed.utils.AccentUtil;
  *
  * Si accende con la proprieta' persist.oxytheme.switchstyle (la imposta Oxydian Theme, scheda Interruttori):
  * barra_stretta (o narrow), barra_accento (barra nel colore dell'accento da acceso), pallino_pieno (tondo acceso pieno),
- * barra_media (barra piu' spessa), anello (pillola col tondo ad anello), on_off / on_off_verde_rosso (pillola con la scritta
+ * anello (pillola col tondo ad anello), on_off / on_off_verde_rosso (pillola con la scritta
  * ON/OFF), pulsante (cornice scura col pulsante colorato), sprite (stile Sprite: barra accento da accesa, tondo pieno col bordo).
  * Vuota = si disegna l'originale. Le posizioni vengono dall'interruttore stesso (setOuterCircleRectF), cosi' animazione e
  * pressione restano quelle di OnePlus. Nomi di campi legati alla versione di COUISwitch di OOS 16 (vedi log LSPosed).
@@ -125,7 +125,7 @@ public class CouiSwitchMod extends XposedMods {
                 XposedHelpers.getIntField(v, "mBarHeight"), fg, accent, d)) return;
         // barra stretta: dal bordo del pallino spento al bordo del pallino acceso
         boolean classic = "sprite".equals(var);
-        float th = ("barra_media".equals(var) ? 4f : 2f) * d;
+        float th = 2f * d;
         int cp = XposedHelpers.getIntField(v, "mCirclePadding");
         int ow = XposedHelpers.getIntField(v, "mOuterCircleWidth");
         mRect.set(pad + cp, cy - th / 2f, pad + minW - cp, cy + th / 2f);
@@ -141,7 +141,8 @@ public class CouiSwitchMod extends XposedMods {
         float cx = o.centerX();
         canvas.save();
         canvas.scale(scale, scale, cx, cy);
-        int fill = checked ? alpha(accent, "pallino_pieno".equals(var) ? 0xFF : 0x59) : alpha(fg, 0x22);
+        boolean full = "pallino_pieno".equals(var);
+        int fill = checked ? alpha(accent, full ? 0xFF : 0x59) : alpha(fg, full ? 0x99 : 0x22);
         int stroke = checked ? accent : alpha(fg, 0x99);
         if (classic) fill = alpha(accent, 0x59);
         mPaint.setStyle(Paint.Style.FILL);
@@ -198,7 +199,7 @@ public class CouiSwitchMod extends XposedMods {
             canvas.drawCircle(cx, cy, rad - 1f * d, mPaint);
         } else {
             mPaint.setStyle(Paint.Style.FILL);
-            mPaint.setColor(checked ? accent : 0xFF3A3E46);
+            mPaint.setColor(checked ? accent : 0xFF8A8F99);
             canvas.drawCircle(cx, cy, rad - 3f * d, mPaint);
             mPaint.setStyle(Paint.Style.STROKE);
             mPaint.setStrokeWidth(1.5f * d);
