@@ -16,11 +16,6 @@
             android:strokeColor="#908DFF"
             android:strokeWidth="4"
             android:strokeLineJoin="round" />
-        <path
-            android:pathData="M41,100 a59,59 0 1,0 118,0 a59,59 0 1,0 -118,0"
-            android:strokeColor="#908DFF"
-            android:strokeAlpha="0.6"
-            android:strokeWidth="2" />
     <group
         android:pivotX="0"
         android:pivotY="0"
