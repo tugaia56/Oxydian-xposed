@@ -145,11 +145,9 @@ public class GradientBorderFragment extends Fragment {
 
     private void rebuild() {
         List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
-        chain.add(new SectionTitleAdapter(List.of(getString(R.string.gb_note))));
-        chain.add(new PreviewAdapter());
-
+        // interruttore per primo, con la spiegazione come sottotitolo
         SwitchWidgetAdapter.SwitchItem on = new SwitchWidgetAdapter.SwitchItem(
-                getString(R.string.gb_title), getString(R.string.gb_summary),
+                getString(R.string.gb_title), getString(R.string.gb_note),
                 ObsidianPrefs.getBoolean(KEY_ON, false), null);
         on.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_ON, on.checked);
@@ -158,6 +156,7 @@ public class GradientBorderFragment extends Fragment {
         chain.add(new SwitchWidgetAdapter(List.of(on)));
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.gb_colors))));
+        chain.add(new PreviewAdapter());
         List<Object> rows = new ArrayList<>();
         rows.add(new ListWidgetAdapter.ListItem(getString(R.string.gb_c1),
                 ObsidianPrefs.getBoolean(KEY_C1_ON, false) ? hex(c1()) : getString(R.string.gb_c1_summary), this::showC1Dialog));
