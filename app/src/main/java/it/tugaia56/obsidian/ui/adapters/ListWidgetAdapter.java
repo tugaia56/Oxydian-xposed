@@ -53,6 +53,7 @@ public class ListWidgetAdapter extends RecyclerView.Adapter<ListWidgetAdapter.VH
         ListItem item = items.get(pos);
         h.title.setText(item.title);
         h.value.setText(item.valueSummary != null ? item.valueSummary : "");
+        h.value.setVisibility(item.valueSummary == null || item.valueSummary.isEmpty() ? View.GONE : View.VISIBLE);
         h.itemView.setOnClickListener(v -> { if (item.onClick != null) item.onClick.run(); });
 
         // ── DST-based colours + grouped/standalone card background ───────────

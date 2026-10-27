@@ -158,11 +158,9 @@ public class GradientBorderFragment extends Fragment {
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.gb_colors))));
         chain.add(new PreviewAdapter());
         List<Object> rows = new ArrayList<>();
-        rows.add(new ListWidgetAdapter.ListItem(getString(R.string.gb_c1),
-                ObsidianPrefs.getBoolean(KEY_C1_ON, false) ? hex(c1()) : getString(R.string.gb_c1_summary), this::showC1Dialog));
+        rows.add(new ListWidgetAdapter.ListItem(getString(R.string.gb_c1), "", this::showC1Dialog));
         rows.add(new ListWidgetAdapter.ListItem(getString(R.string.gb_c2), hex(c2()), this::pickC2));
-        rows.add(new ListWidgetAdapter.ListItem(getString(R.string.gb_c3),
-                ObsidianPrefs.getBoolean(KEY_C3_ON, true) ? hex(c3()) : getString(R.string.gb_c3_none), this::showC3Dialog));
+        rows.add(new ListWidgetAdapter.ListItem(getString(R.string.gb_c3), "", this::showC3Dialog));
         GroupUtils.addGroup(chain, rows);
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.gb_direction_section))));
