@@ -91,9 +91,8 @@ public class LauncherMod extends XposedMods {
     private static final String KEY_RECENTS_ICON_ROUND = "launcher_recents_icon_round";
     private static final String KEY_RECENTS_ICON_SIZE  = "launcher_recents_icon_size";
     private static final int RECENTS_ICON_ROUND_DEFAULT = 30;
-    /** Misure delle icone nelle recenti: l'icona sopra la scheda (intestazione) e la fila in basso (recent dock). */
+    /** Misure delle icone della fila in basso nelle recenti (recent dock). L'icona sopra la scheda non si ingrandisce. */
     private static final String[] RECENTS_ICON_DIMENS = {
-            "color_task_header_view_icon_size", "oplus_overview_grid_task_header_icon_size",
             "recent_dock_icon_size", "recent_dock_icon_default_size", "recent_dock_icon_size_foldscreen_expand",
     };
     private static final int[] DOCK_BLUR_AMOUNTS = { 240, 300, 480, 660, 800 };

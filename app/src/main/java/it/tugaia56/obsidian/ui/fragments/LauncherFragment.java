@@ -137,7 +137,7 @@ public class LauncherFragment extends Fragment {
                 boolItem(R.string.launcher_replace_lock_title, R.string.launcher_replace_lock_summary, KEY_REPLACE_LOCK),
                 recentsButtonColorSwitch(),
                 sliderItem(getString(R.string.launcher_recents_icon_round), "launcher_recents_icon_round", 0, 50, 30),
-                sliderItem(getString(R.string.launcher_recents_icon_size), "launcher_recents_icon_size", 100, 150, 100)));
+                sliderItem(getString(R.string.launcher_recents_icon_size), "launcher_recents_icon_size", 100, 200, 100)));
         GroupUtils.addGroup(chain, recentsRows);
 
         // ── Home Layout ──────────────────────────────────────────────────────
