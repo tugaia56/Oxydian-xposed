@@ -165,6 +165,8 @@ public class ModPacks {
             mods.add(LauncherMod.class);
             mods.add(LauncherCardBackgroundMod.class);
         }
+        // interruttori AndroidX/Material (SwitchCompat, MaterialSwitch) nello stile scelto, in ogni app dove il modulo e' attivo
+        mods.add(it.tugaia56.obsidian.xposed.hooks.settings.SwitchCompatMod.class);
         return mods;
     }
 }

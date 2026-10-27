@@ -79,7 +79,7 @@ public class CouiSwitchMod extends XposedMods {
         }
     }
 
-    private static String variant() {
+    static String variant() {
         long now = SystemClock.elapsedRealtime();
         if (now - sAt > 3000) {
             sAt = now;
@@ -94,7 +94,7 @@ public class CouiSwitchMod extends XposedMods {
         return sVariant;
     }
 
-    private static int attrColor(Context c, int attr, int def) {
+    static int attrColor(Context c, int attr, int def) {
         TypedValue tv = new TypedValue();
         if (c.getTheme().resolveAttribute(attr, tv, true)) {
             if (tv.type >= TypedValue.TYPE_FIRST_COLOR_INT && tv.type <= TypedValue.TYPE_LAST_COLOR_INT) return tv.data;
@@ -126,11 +126,18 @@ public class CouiSwitchMod extends XposedMods {
         String var = variant();
         if (drawForm(canvas, var, checked, enabled, pad, minW, o, scale,
                 XposedHelpers.getIntField(v, "mBarHeight"), fg, accent, d)) return;
+        drawNarrow(canvas, var, checked, enabled, pad, minW, o, scale,
+                XposedHelpers.getIntField(v, "mCirclePadding"), fg, accent, d);
+    }
+
+    /** "Barra stretta" e varianti semplici (sprite, barra_accento, pallino_pieno): cp = distanza fra bordo barra e tondo. */
+    private void drawNarrow(Canvas canvas, String var, boolean checked, boolean enabled, int pad, int minW,
+                            RectF o, float scale, int cp, int fg, int accent, float d) {
+        float dis = enabled ? 1f : 0.38f;
+        float cy = o.centerY();
         // barra stretta: dal bordo del pallino spento al bordo del pallino acceso
         boolean classic = "sprite".equals(var);
         float th = 2f * d;
-        int cp = XposedHelpers.getIntField(v, "mCirclePadding");
-        int ow = XposedHelpers.getIntField(v, "mOuterCircleWidth");
         mRect.set(pad + cp, cy - th / 2f, pad + minW - cp, cy + th / 2f);
         mPaint.setStyle(Paint.Style.FILL);
         int barColor = checked && ("barra_accento".equals(var) || classic) ? accent : fg;
@@ -156,6 +163,19 @@ public class CouiSwitchMod extends XposedMods {
         mPaint.setColor(alpha(stroke, Math.round(Color_a(stroke) * dis)));
         canvas.drawCircle(cx, cy, r, mPaint);
         canvas.restore();
+    }
+
+    /** Per gli interruttori AndroidX/Material (SwitchCompat, MaterialSwitch): stessa grafica, con la geometria calcolata
+     *  dal chiamante: barra da trackLeft per trackW, centro verticale cy, altezza barH; tondo centrato in cx. */
+    boolean drawGeneric(Canvas canvas, String var, boolean checked, boolean enabled,
+                        float trackLeft, float trackW, float cy, float barH, float cx, float thumbDiam,
+                        float d, int fg, int accent) {
+        float r = thumbDiam / 2f;
+        RectF o = new RectF(cx - r, cy - r, cx + r, cy + r);
+        int pad = Math.round(trackLeft), minW = Math.round(trackW);
+        if (drawForm(canvas, var, checked, enabled, pad, minW, o, 1f, Math.round(barH), fg, accent, d)) return true;
+        drawNarrow(canvas, var, checked, enabled, pad, minW, o, 1f, Math.round(Math.max(0f, (barH - thumbDiam) / 2f)), fg, accent, d);
+        return true;
     }
 
     private final Paint mText = new Paint(Paint.ANTI_ALIAS_FLAG);
