@@ -238,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
     @Override
     protected void onResume() {
         super.onResume();
+        new Thread(it.tugaia56.obsidian.receivers.BootReceiver::syncRecentsBtnIfStale).start();
         applyAccentChrome();
         // Segui il Sistema: re-check the system's current dark/light state on every resume
         // (not just cold start) so it keeps tracking day/night transitions that happened

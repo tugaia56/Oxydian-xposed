@@ -88,8 +88,19 @@ public class LauncherMod extends XposedMods {
     private static final String KEY_DOCK_BG_RADIUS   = "dockBackgroundRadius";
     private static final String KEY_DOCK_MAX_LIMIT   = "removeDockMaxLimit";
     private static final String KEY_AUTO_CLOSE_FOLDER = "autoCloseFolder";
+    private static final String KEY_RECENTS_ICON_ROUND = "launcher_recents_icon_round";
+    private static final String KEY_RECENTS_ICON_SIZE  = "launcher_recents_icon_size";
+    private static final int RECENTS_ICON_ROUND_DEFAULT = 30;
+    /** Misure delle icone nelle recenti: l'icona sopra la scheda (intestazione) e la fila in basso (recent dock). */
+    private static final String[] RECENTS_ICON_DIMENS = {
+            "color_task_header_view_icon_size", "oplus_overview_grid_task_header_icon_size",
+            "recent_dock_icon_size", "recent_dock_icon_default_size", "recent_dock_icon_size_foldscreen_expand",
+    };
     private static final int[] DOCK_BLUR_AMOUNTS = { 240, 300, 480, 660, 800 };
 
+    private int mRecentsIconRound = RECENTS_ICON_ROUND_DEFAULT;
+    private int mRecentsIconSize = 100;
+    private java.util.Set<Integer> mRecentsIconDimenIds;
     private boolean mHideDesktopLabels = false;
     private boolean mHideDrawerLabels  = false;
     private boolean mOpenAppDetails       = false;
@@ -131,6 +142,8 @@ public class LauncherMod extends XposedMods {
     public void updatePrefs(String... key) {
         if (Xprefs == null) return;
         mHideDesktopLabels   = Xprefs.getBoolean(KEY_HIDE_DESKTOP_LABELS, false);
+        mRecentsIconRound    = Xprefs.getInt(KEY_RECENTS_ICON_ROUND, RECENTS_ICON_ROUND_DEFAULT);
+        mRecentsIconSize     = Xprefs.getInt(KEY_RECENTS_ICON_SIZE, 100);
         mPageIndicatorTapOn  = Xprefs.getBoolean("launcher_page_indicator_tap_on", false);
         mPageIndicatorTapPkg = Xprefs.getString("launcher_page_indicator_tap_pkg", "");
         mHideDrawerLabels    = Xprefs.getBoolean(KEY_HIDE_DRAWER_LABELS, false);
@@ -171,6 +184,7 @@ public class LauncherMod extends XposedMods {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         hookHideLabels(lpparam);
+        hookRecentsIcons(lpparam);
         hookPageIndicatorTap(lpparam);
         hookOpenAppDetails(lpparam);
         hookDisablePreviousRecents(lpparam);
@@ -201,6 +215,84 @@ public class LauncherMod extends XposedMods {
     // tablet) il valore stock è già hardcoded a 5 (vedi ExpandConfig sorgente reale), stesso
     // ordine di grandezza delle colonne home — la condizione non scattava mai. Fix: forzare
     // sempre un valore più alto (colonne+3, minimo 8) quando il toggle è ON, senza confronti.
+    /** Icone nelle recenti: arrotondamento e dimensione.
+     *  - Arrotondamento: il launcher legge la forma delle icone dall'impostazione sicura
+     *    "com.oplus.icons.icon_config" ({"smooth_corner":30,"smooth_weight":0.99,"min_corner":30}); dentro il launcher
+     *    si risponde con il valore scelto (niente scrittura nelle impostazioni di sistema). Provato dal vivo
+     *    cambiandola a mano: le icone delle recenti diventano piu' tonde o quadrate.
+     *  - Dimensione: le misure delle icone (intestazione sopra la scheda e fila in basso) si moltiplicano per la
+     *    percentuale scelta. Si vede dopo il riavvio del launcher. */
+    private void hookRecentsIcons(XC_LoadPackage.LoadPackageParam lpparam) {
+        try {
+            XC_MethodHook cfg = new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    if (mRecentsIconRound == RECENTS_ICON_ROUND_DEFAULT) return;
+                    if (p.args.length >= 2 && "com.oplus.icons.icon_config".equals(p.args[1])) {
+                        p.setResult("{\"smooth_corner\": " + mRecentsIconRound + ", \"smooth_weight\": 0.99, \"min_corner\": "
+                                + mRecentsIconRound + "}");
+                    }
+                }
+            };
+            XposedBridge.hookAllMethods(Settings.Secure.class, "getString", cfg);
+            XposedBridge.hookAllMethods(Settings.Secure.class, "getStringForUser", cfg);
+
+            XC_MethodHook dim = new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    if (mRecentsIconSize == 100 || p.args.length < 1 || !(p.args[0] instanceof Integer)) return;
+                    java.util.Set<Integer> ids = recentsIconDimenIds();
+                    if (ids == null || !ids.contains((Integer) p.args[0])) return;
+                    Object r = p.getResult();
+                    float f = mRecentsIconSize / 100f;
+                    if (r instanceof Integer) p.setResult(Math.round((Integer) r * f));
+                    else if (r instanceof Float) p.setResult((Float) r * f);
+                }
+            };
+            XposedBridge.hookAllMethods(android.content.res.Resources.class, "getDimensionPixelSize", dim);
+            XposedBridge.hookAllMethods(android.content.res.Resources.class, "getDimensionPixelOffset", dim);
+            XposedBridge.hookAllMethods(android.content.res.Resources.class, "getDimension", dim);
+
+            // Le misure scritte nei layout XML (@dimen/...) passano da TypedArray, con l'indice dell'attributo
+            XC_MethodHook dimTa = new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    if (mRecentsIconSize == 100 || p.args.length < 1 || !(p.args[0] instanceof Integer)) return;
+                    java.util.Set<Integer> ids = recentsIconDimenIds();
+                    if (ids == null || ids.isEmpty()) return;
+                    try {
+                        android.util.TypedValue tv = ((android.content.res.TypedArray) p.thisObject).peekValue((Integer) p.args[0]);
+                        if (tv == null || !ids.contains(tv.resourceId)) return;
+                    } catch (Throwable t) { return; }
+                    Object r = p.getResult();
+                    float f = mRecentsIconSize / 100f;
+                    if (r instanceof Integer && (Integer) r > 0) p.setResult(Math.round((Integer) r * f));
+                    else if (r instanceof Float) p.setResult((Float) r * f);
+                }
+            };
+            XposedBridge.hookAllMethods(android.content.res.TypedArray.class, "getDimensionPixelSize", dimTa);
+            XposedBridge.hookAllMethods(android.content.res.TypedArray.class, "getDimensionPixelOffset", dimTa);
+            XposedBridge.hookAllMethods(android.content.res.TypedArray.class, "getDimension", dimTa);
+            XposedBridge.hookAllMethods(android.content.res.TypedArray.class, "getLayoutDimension", dimTa);
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] LauncherMod.hookRecentsIcons failed: " + t);
+        }
+    }
+
+    /** Id delle misure da ingrandire, risolti una volta sola con le risorse del launcher. */
+    private java.util.Set<Integer> recentsIconDimenIds() {
+        if (mRecentsIconDimenIds != null) return mRecentsIconDimenIds;
+        try {
+            android.app.Application app = android.app.AndroidAppHelper.currentApplication();
+            if (app == null) return null;
+            android.content.res.Resources res = app.getResources();
+            java.util.Set<Integer> ids = new java.util.HashSet<>();
+            for (String n : RECENTS_ICON_DIMENS) {
+                int id = res.getIdentifier(n, "dimen", LAUNCHER);
+                if (id != 0) ids.add(id);
+            }
+            mRecentsIconDimenIds = ids;
+        } catch (Throwable ignored) {}
+        return mRecentsIconDimenIds;
+    }
+
     /** Tocco sull'indicatore di pagina (la voce "Cerca sul fondo" / Breeno): il Launcher chiede a
      *  IndicatorEntry.Companion.getIndicatorAppLaunchIntent(Context) quale intent lanciare — con
      *  l'opzione attiva lo sostituiamo con l'app scelta. Idea da Oxygen Customizer (2026-09-18),

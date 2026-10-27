@@ -461,6 +461,8 @@
     <string name="launcher_auto_close_folder">Auto-Close Folder After Opening an App</string>
     <string name="launcher_auto_close_folder_summary">Closes the folder as soon as you tap an app inside it</string>
     <string name="launcher_recents">Recents</string>
+    <string name="launcher_recents_icon_round">Recents icons: corner roundness (0 = square, 50 = round)</string>
+    <string name="launcher_recents_icon_size">Recents icons: size (%)</string>
     <string name="launcher_reboot_banner">⚠ Turn on whatever mods you want, then reboot\nForce-stopping the Launcher app is not enough</string>
     <string name="launcher_recents_color_no_reboot">Applies live, no reboot needed — reopen Recents if you don\'t see it right away</string>
     <string name="launcher_recents_button_color_title">Recents Button Color</string>

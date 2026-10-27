@@ -458,6 +458,8 @@
     <string name="launcher_auto_close_folder">Chiudi Automaticamente la Cartella Dopo Aver Aperto un\'App</string>
     <string name="launcher_auto_close_folder_summary">Chiude la cartella non appena tocchi un\'app al suo interno</string>
     <string name="launcher_recents">Recenti</string>
+    <string name="launcher_recents_icon_round">Icone nelle recenti: arrotondamento (0 = quadrate, 50 = tonde)</string>
+    <string name="launcher_recents_icon_size">Icone nelle recenti: dimensione (%)</string>
     <string name="launcher_reboot_banner">⚠ Attiva le mod che vuoi, poi riavvia il telefono\nNon basta forzare l\'arresto del Launcher</string>
     <string name="launcher_recents_color_no_reboot">Si applica subito, non serve riavviare — riapri Recenti se non lo vedi cambiare al momento</string>
     <string name="launcher_recents_button_color_title">Colore Pulsante Recenti</string>

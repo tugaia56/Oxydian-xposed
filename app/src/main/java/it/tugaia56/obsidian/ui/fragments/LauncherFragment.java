@@ -135,7 +135,9 @@ public class LauncherFragment extends Fragment {
                 boolItem(R.string.launcher_app_details_title, R.string.launcher_app_details_summary, KEY_OPEN_APP_DETAILS),
                 boolItem(R.string.launcher_disable_recents_previous_page_title, R.string.launcher_disable_recents_previous_page_summary, KEY_DISABLE_PREV_RECENTS),
                 boolItem(R.string.launcher_replace_lock_title, R.string.launcher_replace_lock_summary, KEY_REPLACE_LOCK),
-                recentsButtonColorSwitch()));
+                recentsButtonColorSwitch(),
+                sliderItem(getString(R.string.launcher_recents_icon_round), "launcher_recents_icon_round", 0, 50, 30),
+                sliderItem(getString(R.string.launcher_recents_icon_size), "launcher_recents_icon_size", 100, 130, 100)));
         GroupUtils.addGroup(chain, recentsRows);
 
         // ── Home Layout ──────────────────────────────────────────────────────
@@ -344,6 +346,7 @@ public class LauncherFragment extends Fragment {
     }
 
     private void applyRecentsBtnColor(int color) {
+        ObsidianPrefs.putInt(KEY_RECENTS_BTN_COLOR + "_baked", color);
         String hex = fmt(color);
         String pkg = Constants.LAUNCHER;
         FabricatedUtil.buildAndEnableOverlays(

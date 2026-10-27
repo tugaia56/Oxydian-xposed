@@ -52,12 +52,22 @@ public class BootReceiver extends BroadcastReceiver {
         }).start();
     }
 
+    /** Se il pulsante "Chiudi" delle recenti segue l'accento ma l'overlay e' stato cotto con un accento diverso
+     *  (l'accento e' cambiato dopo l'ultimo avvio), lo rifa col colore attuale. Chiamato all'apertura dell'app. */
+    public static void syncRecentsBtnIfStale() {
+        String key = "LAUNCHER_RECENTS_BTN_COLOR";
+        if (!ObsidianPrefs.getBoolean(key + "_on", false) || !ObsidianPrefs.getBoolean(key + "_use_accent", false)) return;
+        if (ObsidianPrefs.getInt(key + "_baked", 0) == ObsidianTheme.overlayAccent()) return;
+        reapplyRecentsBtn();
+    }
+
     private static void reapplyRecentsBtn() {
         String key = "LAUNCHER_RECENTS_BTN_COLOR";
         if (!ObsidianPrefs.getBoolean(key + "_on", false)) return;
         int color = ObsidianPrefs.getBoolean(key + "_use_accent", false)
                 ? ObsidianTheme.overlayAccent()
                 : ObsidianPrefs.getInt(key, 0xFF6200EE);
+        ObsidianPrefs.putInt(key + "_baked", color);
         String hex = fmt(color);
         FabricatedUtil.buildAndEnableOverlays(
             new Object[]{Constants.LAUNCHER, "LAUNCHER_RECENTS_0", "color",
