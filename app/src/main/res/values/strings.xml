@@ -1336,7 +1336,7 @@
     <string name="lockscreen_analog_seconds">Second hand</string>
     <string name="lockscreen_analog_seconds_summary">Shows the seconds on the lock screen (not on the always-on display, to save battery)</string>
     <string name="aod_analog_img_color">Dial image color</string>
-    <string name="gb_note">Gradient border for dialogs, popups, notifications and toasts. The first colour is your accent.</string>
+    <string name="gb_note">Gradient border with 2 or 3 colours for dialogs, popups, notifications and toasts. By default the first colour is your accent, but you can choose another one.</string>
     <string name="gb_title">Gradient border</string>
     <string name="gb_summary">Dialogs, popups, notifications, toasts and windows</string>
     <string name="gb_colors">Colours</string>

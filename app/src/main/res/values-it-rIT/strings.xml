@@ -1308,7 +1308,7 @@
     <string name="lockscreen_analog_seconds">Lancetta dei secondi</string>
     <string name="lockscreen_analog_seconds_summary">Mostra i secondi sulla schermata di blocco (non sull\'AOD, per risparmiare batteria)</string>
     <string name="aod_analog_img_color">Colore immagine quadrante</string>
-    <string name="gb_note">Bordo sfumato per dialog, popup, notifiche e toast. Il primo colore è il tuo accento.</string>
+    <string name="gb_note">Bordo sfumato con 2 o 3 colori per dialog, popup, notifiche e toast. Di serie il primo colore è il tuo accento, ma puoi sceglierne un altro.</string>
     <string name="gb_title">Bordo sfumato</string>
     <string name="gb_summary">Dialog, popup, notifiche, toast e finestre</string>
     <string name="gb_colors">Colori</string>
