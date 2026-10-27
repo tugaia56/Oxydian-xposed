@@ -34,6 +34,7 @@ import de.robv.android.xposed.XposedHelpers;
 public final class GradientBorder {
 
     public static final String PROP_ON = "persist.obsidian.grad_on";
+    public static final String PROP_W  = "persist.obsidian.grad_w";    // spessore in mezzi dp (3 = 1,5 dp, di serie); 0 = come lo stile
     public static final String PROP_C1 = "persist.obsidian.grad_c1";
     public static final String PROP_C2 = "persist.obsidian.grad_c2";
     public static final String PROP_C3 = "persist.obsidian.grad_c3";
@@ -46,6 +47,7 @@ public final class GradientBorder {
     private static boolean sOn = false;
     private static int sC1 = 0, sC2 = 0, sC3 = 0;
     private static boolean sHasC1 = false, sHasC2 = false, sHasC3 = false;
+    private static int sHalfDp = 0;
     private static Field sStateField, sWidthField, sColorsField;
     private static int sLogged = 0, sDrawLogged = 0, sErrLogged = 0;
 
@@ -66,6 +68,8 @@ public final class GradientBorder {
         sPropsAt = now;
         sOn = "1".equals(prop(PROP_ON));
         String c1 = prop(PROP_C1), c2 = prop(PROP_C2), c3 = prop(PROP_C3);
+        Integer hw = parse(prop(PROP_W));
+        sHalfDp = hw != null ? hw : 3;   // di serie 1,5 dp
         sHasC1 = parse(c1) != null;
         sHasC2 = parse(c2) != null;
         sHasC3 = parse(c3) != null;
@@ -182,6 +186,9 @@ public final class GradientBorder {
 
     private static void draw(GradientDrawable d, Canvas c, int width, int first) {
         refresh();
+        if (sHalfDp > 0) {
+            width = Math.max(1, Math.round(sHalfDp * 0.5f * android.content.res.Resources.getSystem().getDisplayMetrics().density));
+        }
         if (sHasC1) first = sC1;   // colore 1 scelto dall'utente al posto dell'accento
         Rect b = d.getBounds();
         if (b.isEmpty()) return;

@@ -1349,4 +1349,6 @@
     <string name="nav_gradient_border">Gradient border</string>
     <string name="nav_gradient_border_summary">Border with 2 or 3 colours on dialogs, popups, notifications and toasts</string>
     <string name="gb_c1_accent">Accent (follows Oxydian Theme)</string>
+    <string name="gb_thickness_section">Thickness</string>
+    <string name="gb_thickness">Border thickness (half dp: 3 = 1.5 dp)</string>
 </resources>

@@ -1321,4 +1321,6 @@
     <string name="nav_gradient_border">Bordo sfumato</string>
     <string name="nav_gradient_border_summary">Bordo con 2 o 3 colori su dialog, popup, notifiche e toast</string>
     <string name="gb_c1_accent">Accento (segue Oxydian Theme)</string>
+    <string name="gb_thickness_section">Spessore</string>
+    <string name="gb_thickness">Spessore del bordo (mezzi dp: 3 = 1,5 dp)</string>
 </resources>

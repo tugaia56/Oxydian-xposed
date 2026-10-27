@@ -40,6 +40,8 @@ import it.tugaia56.obsidian.utils.ObsidianTheme;
 public class GradientBorderFragment extends Fragment {
 
     private static final String KEY_ON = "grad_border_on";
+    private static final String KEY_W = "grad_border_w";   // mezzi dp, di serie 3 = 1,5 dp
+    private static final int DEF_W = 3;
     private static final String KEY_C1 = "grad_border_c1";
     private static final String KEY_C1_ON = "grad_border_c1_custom";
     private static final String KEY_C2 = "grad_border_c2";
@@ -104,6 +106,11 @@ public class GradientBorderFragment extends Fragment {
         rows.add(new ListWidgetAdapter.ListItem(getString(R.string.gb_c3),
                 ObsidianPrefs.getBoolean(KEY_C3_ON, true) ? hex(c3()) : getString(R.string.gb_c3_none), this::showC3Dialog));
         GroupUtils.addGroup(chain, rows);
+
+        chain.add(new SectionTitleAdapter(List.of(getString(R.string.gb_thickness_section))));
+        GroupUtils.addGroup(chain, List.of(new it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter.SliderItem(
+                getString(R.string.gb_thickness), ObsidianPrefs.getInt(KEY_W, DEF_W), 1, 8, "", DEF_W,
+                value -> { ObsidianPrefs.putInt(KEY_W, value); applyProps(); })));
 
         mRv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
@@ -181,6 +188,7 @@ public class GradientBorderFragment extends Fragment {
         new Thread(() -> Shell.cmd(
                 "setprop persist.obsidian.grad_on " + (on ? "1" : "0"),
                 "setprop persist.obsidian.grad_c1 " + (c1on ? String.valueOf(c1) : "''"),
+                "setprop persist.obsidian.grad_w " + ObsidianPrefs.getInt(KEY_W, DEF_W),
                 "setprop persist.obsidian.grad_c2 " + c2,
                 "setprop persist.obsidian.grad_c3 " + (c3on ? String.valueOf(c3) : "''")).exec()).start();
     }
