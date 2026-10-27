@@ -1352,4 +1352,6 @@
     <string name="gb_thickness_section">Thickness</string>
     <string name="gb_thickness">Border thickness (half dp: 3 = 1.5 dp)</string>
     <string name="gb_preview">Preview</string>
+    <string name="gb_direction_section">Direction</string>
+    <string name="gb_direction">Gradient direction</string>
 </resources>

@@ -1324,4 +1324,6 @@
     <string name="gb_thickness_section">Spessore</string>
     <string name="gb_thickness">Spessore del bordo (mezzi dp: 3 = 1,5 dp)</string>
     <string name="gb_preview">Anteprima</string>
+    <string name="gb_direction_section">Direzione</string>
+    <string name="gb_direction">Direzione della sfumatura</string>
 </resources>

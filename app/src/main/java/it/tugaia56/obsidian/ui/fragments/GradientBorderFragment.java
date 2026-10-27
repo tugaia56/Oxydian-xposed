@@ -40,6 +40,7 @@ import it.tugaia56.obsidian.utils.ObsidianTheme;
 public class GradientBorderFragment extends Fragment {
 
     private static final String KEY_ON = "grad_border_on";
+    private static final String KEY_DIR = "grad_border_dir";   // 0 diagonale ... 5 radiale
     private static final String KEY_W = "grad_border_w";   // mezzi dp, di serie 3 = 1,5 dp
     private static final int DEF_W = 3;
     private static final String KEY_C1 = "grad_border_c1";
@@ -103,8 +104,8 @@ public class GradientBorderFragment extends Fragment {
             float radius = 24 * d;
             c.drawRoundRect(r, radius, radius, mFill);
             mRing.setStrokeWidth(w);
-            mRing.setShader(new android.graphics.LinearGradient(r.left, r.top, r.right, r.bottom, colors, null,
-                    android.graphics.Shader.TileMode.CLAMP));
+            mRing.setShader(it.tugaia56.obsidian.xposed.utils.GradientBorder.makeShader(r, colors,
+                    ObsidianPrefs.getInt(KEY_DIR, 0)));
             c.drawRoundRect(r, radius - half, radius - half, mRing);
             mText.setTextSize(16 * d);
             c.drawText(getResources().getString(R.string.gb_preview), getWidth() / 2f,
@@ -165,6 +166,10 @@ public class GradientBorderFragment extends Fragment {
                 ObsidianPrefs.getBoolean(KEY_C3_ON, true) ? hex(c3()) : getString(R.string.gb_c3_none), this::showC3Dialog));
         GroupUtils.addGroup(chain, rows);
 
+        chain.add(new SectionTitleAdapter(List.of(getString(R.string.gb_direction_section))));
+        GroupUtils.addGroup(chain, List.of(new ListWidgetAdapter.ListItem(getString(R.string.gb_direction),
+                dirNames()[Math.max(0, Math.min(5, ObsidianPrefs.getInt(KEY_DIR, 0)))], this::showDirDialog)));
+
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.gb_thickness_section))));
         GroupUtils.addGroup(chain, List.of(new it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter.SliderItem(
                 getString(R.string.gb_thickness), ObsidianPrefs.getInt(KEY_W, DEF_W), 1, 8, "", DEF_W,
@@ -195,6 +200,22 @@ public class GradientBorderFragment extends Fragment {
                         ((MainActivity) getActivity()).showColorPickerDialog(DIALOG_C1, c1(), false, true, true);
                     }
                 })
+                .show());
+    }
+
+    private String[] dirNames() { return getResources().getStringArray(R.array.gb_directions); }
+
+    private void showDirDialog() {
+        final int[] sel = {Math.max(0, Math.min(5, ObsidianPrefs.getInt(KEY_DIR, 0)))};
+        ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.gb_direction)
+                .setSingleChoiceItems(dirNames(), sel[0], (d, which) -> sel[0] = which)
+                .setPositiveButton(R.string.apply, (d, w) -> {
+                    ObsidianPrefs.putInt(KEY_DIR, sel[0]);
+                    applyProps();
+                    rebuild();
+                })
+                .setNegativeButton(R.string.cancel, null)
                 .show());
     }
 
@@ -251,6 +272,7 @@ public class GradientBorderFragment extends Fragment {
                 "setprop persist.obsidian.grad_on " + (on ? "1" : "0"),
                 "setprop persist.obsidian.grad_c1 " + (c1on ? String.valueOf(c1) : "''"),
                 "setprop persist.obsidian.grad_w " + ObsidianPrefs.getInt(KEY_W, DEF_W),
+                "setprop persist.obsidian.grad_dir " + ObsidianPrefs.getInt(KEY_DIR, 0),
                 "setprop persist.obsidian.grad_c2 " + c2,
                 "setprop persist.obsidian.grad_c3 " + (c3on ? String.valueOf(c3) : "''")).exec()).start();
     }

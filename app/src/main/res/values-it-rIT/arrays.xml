@@ -662,4 +662,12 @@
         <item>Ucraino</item>
     </string-array>
 
+    <string-array name="gb_directions">
+        <item>Diagonale (da alto a sinistra a basso a destra)</item>
+        <item>Da sinistra a destra</item>
+        <item>Da destra a sinistra</item>
+        <item>Dall’alto in basso</item>
+        <item>Dal basso in alto</item>
+        <item>Radiale (dal centro)</item>
+    </string-array>
 </resources>

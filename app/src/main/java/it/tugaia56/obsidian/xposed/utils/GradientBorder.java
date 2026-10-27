@@ -35,6 +35,7 @@ public final class GradientBorder {
 
     public static final String PROP_ON = "persist.obsidian.grad_on";
     public static final String PROP_W  = "persist.obsidian.grad_w";    // spessore in mezzi dp (3 = 1,5 dp, di serie); 0 = come lo stile
+    public static final String PROP_DIR = "persist.obsidian.grad_dir";  // 0 diagonale, 1 sx>dx, 2 dx>sx, 3 alto>basso, 4 basso>alto, 5 radiale
     public static final String PROP_C1 = "persist.obsidian.grad_c1";
     public static final String PROP_C2 = "persist.obsidian.grad_c2";
     public static final String PROP_C3 = "persist.obsidian.grad_c3";
@@ -48,6 +49,7 @@ public final class GradientBorder {
     private static int sC1 = 0, sC2 = 0, sC3 = 0;
     private static boolean sHasC1 = false, sHasC2 = false, sHasC3 = false;
     private static int sHalfDp = 0;
+    private static int sDir = 0;
     private static Field sStateField, sWidthField, sColorsField;
     private static int sLogged = 0, sDrawLogged = 0, sErrLogged = 0;
 
@@ -68,6 +70,8 @@ public final class GradientBorder {
         sPropsAt = now;
         sOn = "1".equals(prop(PROP_ON));
         String c1 = prop(PROP_C1), c2 = prop(PROP_C2), c3 = prop(PROP_C3);
+        Integer dir = parse(prop(PROP_DIR));
+        sDir = dir != null ? dir : 0;
         Integer hw = parse(prop(PROP_W));
         sHalfDp = hw != null ? hw : 3;   // di serie 1,5 dp
         sHasC1 = parse(c1) != null;
@@ -182,6 +186,22 @@ public final class GradientBorder {
         }
     }
 
+    /** Sfumatura sul rettangolo: 0 diagonale, 1 sinistra>destra, 2 destra>sinistra, 3 alto>basso, 4 basso>alto, 5 radiale. */
+    public static Shader makeShader(RectF r, int[] colors, int dir) {
+        float cx = r.centerX(), cy = r.centerY();
+        switch (dir) {
+            case 1: return new LinearGradient(r.left, cy, r.right, cy, colors, null, Shader.TileMode.CLAMP);
+            case 2: return new LinearGradient(r.right, cy, r.left, cy, colors, null, Shader.TileMode.CLAMP);
+            case 3: return new LinearGradient(cx, r.top, cx, r.bottom, colors, null, Shader.TileMode.CLAMP);
+            case 4: return new LinearGradient(cx, r.bottom, cx, r.top, colors, null, Shader.TileMode.CLAMP);
+            case 5: {
+                float rad = (float) Math.hypot(r.width() / 2f, r.height() / 2f);
+                return new android.graphics.RadialGradient(cx, cy, Math.max(1f, rad), colors, null, Shader.TileMode.CLAMP);
+            }
+            default: return new LinearGradient(r.left, r.top, r.right, r.bottom, colors, null, Shader.TileMode.CLAMP);
+        }
+    }
+
     private static final ThreadLocal<Paint> sPaint = new ThreadLocal<>();
 
     private static void draw(GradientDrawable d, Canvas c, int width, int first) {
@@ -209,7 +229,7 @@ public final class GradientBorder {
             sPaint.set(p);
         }
         p.setStrokeWidth(width);
-        p.setShader(new LinearGradient(r.left, r.top, r.right, r.bottom, colors, null, Shader.TileMode.CLAMP));
+        p.setShader(makeShader(r, colors, sDir));
         float rr = Math.max(0f, radius - half);
         c.drawRoundRect(r, rr, rr, p);
         p.setShader(null);

@@ -940,4 +940,12 @@
         <item>Vietnamese</item>
         <item>Ukrainian</item>
     </string-array>
+    <string-array name="gb_directions">
+        <item>Diagonal (top left to bottom right)</item>
+        <item>Left to right</item>
+        <item>Right to left</item>
+        <item>Top to bottom</item>
+        <item>Bottom to top</item>
+        <item>Radial (from the centre)</item>
+    </string-array>
 </resources>
