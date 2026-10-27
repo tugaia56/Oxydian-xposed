@@ -37,7 +37,7 @@ public final class GradientBorder {
     public static final String PROP_W  = "persist.obsidian.grad_w";    // spessore in mezzi dp (3 = 1,5 dp, di serie); 0 = come lo stile
     public static final String PROP_DIR = "persist.obsidian.grad_dir";  // 0 diagonale, 1 sx>dx, 2 dx>sx, 3 alto>basso, 4 basso>alto, 5 radiale
     public static final String PROP_C1 = "persist.obsidian.grad_c1";
-    public static final String PROP_C2 = "persist.obsidian.grad_c2";
+    public static final String PROP_C2 = "persist.obsidian.grad_c2";   // intero ARGB oppure "accent"
     public static final String PROP_C3 = "persist.obsidian.grad_c3";
 
     /** Alfa riservato alla marcatura: il bordo "vero" ha alfa 1/255 (invisibile) e lo disegna l'hook. */
@@ -48,6 +48,7 @@ public final class GradientBorder {
     private static boolean sOn = false;
     private static int sC1 = 0, sC2 = 0, sC3 = 0;
     private static boolean sHasC1 = false, sHasC2 = false, sHasC3 = false;
+    private static boolean sAcc2 = false, sAcc3 = false;   // colore 2 / 3 = accento del Theme (prop "accent")
     private static int sHalfDp = 0;
     private static int sDir = 0;
     private static Field sStateField, sWidthField, sColorsField;
@@ -75,11 +76,13 @@ public final class GradientBorder {
         Integer hw = parse(prop(PROP_W));
         sHalfDp = hw != null ? hw : 3;   // di serie 1,5 dp
         sHasC1 = parse(c1) != null;
-        sHasC2 = parse(c2) != null;
-        sHasC3 = parse(c3) != null;
+        sAcc2 = "accent".equals(c2);
+        sAcc3 = "accent".equals(c3);
+        sHasC2 = sAcc2 || parse(c2) != null;
+        sHasC3 = sAcc3 || parse(c3) != null;
         sC1 = sHasC1 ? parse(c1) : 0;
-        sC2 = sHasC2 ? parse(c2) : 0;
-        sC3 = sHasC3 ? parse(c3) : 0;
+        sC2 = sAcc2 ? accent() : sHasC2 ? parse(c2) : 0;
+        sC3 = sAcc3 ? accent() : sHasC3 ? parse(c3) : 0;
     }
 
     private static Integer parse(String s) {

@@ -48,6 +48,8 @@ public class GradientBorderFragment extends Fragment {
     private static final String KEY_C2 = "grad_border_c2";
     private static final String KEY_C3 = "grad_border_c3";
     private static final String KEY_C3_ON = "grad_border_c3_on";
+    private static final String KEY_C2_ACC = "grad_border_c2_accent";   // colore 2 = accento del Theme
+    private static final String KEY_C3_ACC = "grad_border_c3_accent";   // colore 3 = accento del Theme
     private static final int DEF_C2 = 0xFFFF7AA8;
     private static final int DEF_C3 = 0xFF4DD0E1;
     private static final int DIALOG_C1 = KEY_C1.hashCode();
@@ -97,7 +99,10 @@ public class GradientBorderFragment extends Fragment {
             float d = getResources().getDisplayMetrics().density;
             int first = ObsidianPrefs.getBoolean(KEY_C1_ON, false) ? c1() : ObsidianTheme.overlayAccent();
             boolean three = ObsidianPrefs.getBoolean(KEY_C3_ON, true);
-            int[] colors = three ? new int[]{first, c2(), c3()} : new int[]{first, c2()};
+            int acc = ObsidianTheme.overlayAccent();
+            int s2 = ObsidianPrefs.getBoolean(KEY_C2_ACC, false) ? acc : c2();
+            int s3 = ObsidianPrefs.getBoolean(KEY_C3_ACC, false) ? acc : c3();
+            int[] colors = three ? new int[]{first, s2, s3} : new int[]{first, s2};
             float w = Math.max(1f, ObsidianPrefs.getInt(KEY_W, DEF_W) * 0.5f * d);
             float half = w / 2f;
             android.graphics.RectF r = new android.graphics.RectF(half, half, getWidth() - half, getHeight() - half);
@@ -159,7 +164,7 @@ public class GradientBorderFragment extends Fragment {
         chain.add(new PreviewAdapter());
         List<Object> rows = new ArrayList<>();
         rows.add(new ListWidgetAdapter.ListItem(getString(R.string.gb_c1), "", this::showC1Dialog));
-        rows.add(new ListWidgetAdapter.ListItem(getString(R.string.gb_c2), hex(c2()), this::pickC2));
+        rows.add(new ListWidgetAdapter.ListItem(getString(R.string.gb_c2), "", this::showC2Dialog));
         rows.add(new ListWidgetAdapter.ListItem(getString(R.string.gb_c3), "", this::showC3Dialog));
         GroupUtils.addGroup(chain, rows);
 
@@ -216,18 +221,33 @@ public class GradientBorderFragment extends Fragment {
                 .show());
     }
 
-    private void pickC2() {
-        if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).showColorPickerDialog(DIALOG_C2, c2(), false, true, true);
-        }
+    private void showC2Dialog() {
+        String[] entries = {getString(R.string.gb_c1_accent), getString(R.string.gb_c3_pick)};
+        ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.gb_c2)
+                .setItems(entries, (d, which) -> {
+                    if (which == 0) {
+                        ObsidianPrefs.putBoolean(KEY_C2_ACC, true);
+                        applyProps();
+                        rebuild();
+                    } else if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).showColorPickerDialog(DIALOG_C2, c2(), false, true, true);
+                    }
+                })
+                .show());
     }
 
     private void showC3Dialog() {
-        String[] entries = {getString(R.string.gb_c3_pick), getString(R.string.gb_c3_none)};
+        String[] entries = {getString(R.string.gb_c1_accent), getString(R.string.gb_c3_pick), getString(R.string.gb_c3_none)};
         ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.gb_c3)
                 .setItems(entries, (d, which) -> {
                     if (which == 0) {
+                        ObsidianPrefs.putBoolean(KEY_C3_ACC, true);
+                        ObsidianPrefs.putBoolean(KEY_C3_ON, true);
+                        applyProps();
+                        rebuild();
+                    } else if (which == 1) {
                         if (getActivity() instanceof MainActivity) {
                             ((MainActivity) getActivity()).showColorPickerDialog(DIALOG_C3, c3(), false, true, true);
                         }
@@ -247,8 +267,10 @@ public class GradientBorderFragment extends Fragment {
             ObsidianPrefs.putBoolean(KEY_C1_ON, true);
         } else if (e.dialogId() == DIALOG_C2) {
             ObsidianPrefs.putInt(KEY_C2, e.color() | 0xFF000000);
+            ObsidianPrefs.putBoolean(KEY_C2_ACC, false);
         } else if (e.dialogId() == DIALOG_C3) {
             ObsidianPrefs.putInt(KEY_C3, e.color() | 0xFF000000);
+            ObsidianPrefs.putBoolean(KEY_C3_ACC, false);
             ObsidianPrefs.putBoolean(KEY_C3_ON, true);
         } else {
             return;
@@ -265,12 +287,14 @@ public class GradientBorderFragment extends Fragment {
         final int c2 = c2();
         final boolean c3on = ObsidianPrefs.getBoolean(KEY_C3_ON, true);
         final int c3 = c3();
+        final boolean c2acc = ObsidianPrefs.getBoolean(KEY_C2_ACC, false);
+        final boolean c3acc = ObsidianPrefs.getBoolean(KEY_C3_ACC, false);
         new Thread(() -> Shell.cmd(
                 "setprop persist.obsidian.grad_on " + (on ? "1" : "0"),
                 "setprop persist.obsidian.grad_c1 " + (c1on ? String.valueOf(c1) : "''"),
                 "setprop persist.obsidian.grad_w " + ObsidianPrefs.getInt(KEY_W, DEF_W),
                 "setprop persist.obsidian.grad_dir " + ObsidianPrefs.getInt(KEY_DIR, 0),
-                "setprop persist.obsidian.grad_c2 " + c2,
-                "setprop persist.obsidian.grad_c3 " + (c3on ? String.valueOf(c3) : "''")).exec()).start();
+                "setprop persist.obsidian.grad_c2 " + (c2acc ? "accent" : String.valueOf(c2)),
+                "setprop persist.obsidian.grad_c3 " + (!c3on ? "''" : c3acc ? "accent" : String.valueOf(c3))).exec()).start();
     }
 }
