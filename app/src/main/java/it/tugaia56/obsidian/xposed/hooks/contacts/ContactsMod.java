@@ -78,11 +78,21 @@ public class ContactsMod extends XposedMods {
             if (!a1.isEmpty()) return 0xFF000000 | Integer.parseInt(a1);
         } catch (NumberFormatException ignored) {}
         try {
-            Resources r = Resources.getSystem();
+            Resources r = appResources();
             int id = r.getIdentifier("accent_material_dark", "color", "android");
             if (id != 0) return r.getColor(id, null);
         } catch (Throwable ignored) {}
         return 0xFF908DFF;
+    }
+
+    /** Risorse dell'app (con gli overlay di Oxydian Theme applicati): Resources.getSystem() ha i colori originali di
+     *  Android, non quelli del tema, e dava il colore "strano" alle card senza bordo. */
+    private static Resources appResources() {
+        try {
+            android.app.Application app = android.app.AndroidAppHelper.currentApplication();
+            if (app != null) return app.getResources();
+        } catch (Throwable ignored) {}
+        return Resources.getSystem();
     }
 
     private void refreshProps() {
@@ -92,7 +102,7 @@ public class ContactsMod extends XposedMods {
         mBorder = "1".equals(prop(PROP_BORDER, "0"));
         mAccent = accent();
         try {
-            Resources r = Resources.getSystem();
+            Resources r = appResources();
             mDensity = r.getDisplayMetrics().density;
             mScreenW = r.getDisplayMetrics().widthPixels;
             int id = r.getIdentifier("button_material_dark", "color", "android");
