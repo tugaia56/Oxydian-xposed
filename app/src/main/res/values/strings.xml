@@ -1351,4 +1351,5 @@
     <string name="gb_c1_accent">Accent (follows Oxydian Theme)</string>
     <string name="gb_thickness_section">Thickness</string>
     <string name="gb_thickness">Border thickness (half dp: 3 = 1.5 dp)</string>
+    <string name="gb_preview">Preview</string>
 </resources>

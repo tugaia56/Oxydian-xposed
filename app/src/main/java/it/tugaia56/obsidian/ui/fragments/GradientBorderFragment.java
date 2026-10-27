@@ -54,6 +54,63 @@ public class GradientBorderFragment extends Fragment {
     private static final int DIALOG_C3 = KEY_C3.hashCode();
 
     private RecyclerView mRv;
+    private PreviewView mPreview;
+
+    /** Riquadro di anteprima: scheda scura con il bordo sfumato dei colori e dello spessore scelti. */
+    private final class PreviewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        @Override public int getItemCount() { return 1; }
+
+        @NonNull @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            float d = parent.getResources().getDisplayMetrics().density;
+            PreviewView v = new PreviewView(parent.getContext());
+            RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, Math.round(96 * d));
+            lp.setMargins(Math.round(16 * d), Math.round(8 * d), Math.round(16 * d), Math.round(8 * d));
+            v.setLayoutParams(lp);
+            mPreview = v;
+            return new RecyclerView.ViewHolder(v) {};
+        }
+
+        @Override public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+            ((PreviewView) holder.itemView).refresh();
+        }
+    }
+
+    private static final class PreviewView extends View {
+        private final android.graphics.Paint mFill = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint mRing = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint mText = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+
+        PreviewView(android.content.Context c) {
+            super(c);
+            mFill.setColor(0xFF1B2029);
+            mRing.setStyle(android.graphics.Paint.Style.STROKE);
+            mText.setColor(0xFFFFFFFF);
+            mText.setTextAlign(android.graphics.Paint.Align.CENTER);
+        }
+
+        void refresh() { invalidate(); }
+
+        @Override protected void onDraw(android.graphics.Canvas c) {
+            float d = getResources().getDisplayMetrics().density;
+            int first = ObsidianPrefs.getBoolean(KEY_C1_ON, false) ? c1() : ObsidianTheme.overlayAccent();
+            boolean three = ObsidianPrefs.getBoolean(KEY_C3_ON, true);
+            int[] colors = three ? new int[]{first, c2(), c3()} : new int[]{first, c2()};
+            float w = Math.max(1f, ObsidianPrefs.getInt(KEY_W, DEF_W) * 0.5f * d);
+            float half = w / 2f;
+            android.graphics.RectF r = new android.graphics.RectF(half, half, getWidth() - half, getHeight() - half);
+            float radius = 24 * d;
+            c.drawRoundRect(r, radius, radius, mFill);
+            mRing.setStrokeWidth(w);
+            mRing.setShader(new android.graphics.LinearGradient(r.left, r.top, r.right, r.bottom, colors, null,
+                    android.graphics.Shader.TileMode.CLAMP));
+            c.drawRoundRect(r, radius - half, radius - half, mRing);
+            mText.setTextSize(16 * d);
+            c.drawText(getResources().getString(R.string.gb_preview), getWidth() / 2f,
+                    getHeight() / 2f + 6 * d, mText);
+        }
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -88,6 +145,7 @@ public class GradientBorderFragment extends Fragment {
     private void rebuild() {
         List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.gb_note))));
+        chain.add(new PreviewAdapter());
 
         SwitchWidgetAdapter.SwitchItem on = new SwitchWidgetAdapter.SwitchItem(
                 getString(R.string.gb_title), getString(R.string.gb_summary),
@@ -110,7 +168,11 @@ public class GradientBorderFragment extends Fragment {
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.gb_thickness_section))));
         GroupUtils.addGroup(chain, List.of(new it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter.SliderItem(
                 getString(R.string.gb_thickness), ObsidianPrefs.getInt(KEY_W, DEF_W), 1, 8, "", DEF_W,
-                value -> { ObsidianPrefs.putInt(KEY_W, value); applyProps(); })));
+                value -> {
+                    ObsidianPrefs.putInt(KEY_W, value);
+                    applyProps();
+                    if (mPreview != null) mPreview.refresh();
+                })));
 
         mRv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
