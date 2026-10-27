@@ -771,7 +771,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
         bg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
         bg.setColor(cardColor());
         bg.setCornerRadius(radius);
-        bg.setStroke((int) stroke, mAccentColor);
+        it.tugaia56.obsidian.xposed.utils.GradientBorder.setStroke(bg, (int) stroke, mAccentColor);
         v.setBackground(bg);
     }
 
@@ -996,7 +996,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
             bg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
             bg.setColor(cardColor());
             bg.setCornerRadius(radius);
-            bg.setStroke((int) stroke, mAccentColor);
+            it.tugaia56.obsidian.xposed.utils.GradientBorder.setStroke(bg, (int) stroke, mAccentColor);
             v.setBackground(bg);
         } catch (Throwable ignored) {}
     }

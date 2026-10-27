@@ -265,7 +265,7 @@ public class DstToastStyle {
         GradientDrawable d = newProtectedShape();
         d.setColor(fill);
         d.setCornerRadius(cornerRadius);
-        if (strokeWidth > 0) d.setStroke(strokeWidth, strokeColor);
+        it.tugaia56.obsidian.xposed.utils.GradientBorder.setStrokeOrForce(d, strokeWidth, strokeColor);
         return d;
     }
 

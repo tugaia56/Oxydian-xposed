@@ -99,6 +99,13 @@ public class MiscFragment extends Fragment {
 
                 new NavAdapter.NavItem(
                         R.drawable.ic_settings,
+                        getString(R.string.nav_gradient_border),
+                        getString(R.string.nav_gradient_border_summary),
+                        () -> navigate(new GradientBorderFragment(),
+                                getString(R.string.nav_gradient_border))),
+
+                new NavAdapter.NavItem(
+                        R.drawable.ic_settings,
                         getString(R.string.gesture_navigation_title),
                         getString(R.string.gesture_navigation_summary),
                         () -> navigate(new GestureNavigationFragment(),

@@ -68,7 +68,7 @@ public class PermissionDialogMod extends XposedMods {
             float d = r.getDisplayMetrics().density;
             GradientDrawable g = new GradientDrawable();
             g.setColor(sysColor(r, "background_dark", 0xFF1B2029));
-            g.setStroke(Math.max(2, Math.round(2 * d)), sysColor(r, "accent_material_dark", 0xFF908DFF));
+            it.tugaia56.obsidian.xposed.utils.GradientBorder.setStroke(g, Math.max(2, Math.round(2 * d)), sysColor(r, "accent_material_dark", 0xFF908DFF));
             g.setCornerRadius(28 * d);
             // ai lati la finestra taglia qualche pixel: il disegno si restringe un po' per far vedere il bordo
             int side = Math.round(4 * d);
