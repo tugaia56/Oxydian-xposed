@@ -1369,7 +1369,7 @@
     <string name="bat_rep_off">Tắt màn hình: trung bình %1$d mA (%2$s giờ)</string>
     <string name="bat_rep_on">Bật màn hình: trung bình %1$d mA (%2$s giờ)</string>
     <string name="bat_rep_top">Các tiến trình hoạt động nhiều nhất khi tắt màn hình (CPU trung bình %%):</string>
-    <string name="bat_limits_note">Giới hạn ngăn ứng dụng và việc quét nền đánh thức điện thoại khi bạn không dùng, giúp pin dùng được lâu hơn. Ứng dụng vẫn hoạt động bình thường khi bạn mở; chúng chỉ ngừng chạy nền (không đồng bộ hay thông báo cho đến khi bạn mở). Hãy dùng cho ứng dụng ít dùng nhưng hao pin, hoặc để dừng việc quét Wi-Fi và Bluetooth liên tục. Đừng giới hạn các ứng dụng bạn muốn nhận thông báo (tin nhắn, lịch, báo thức).</string>
+    <string name="bat_limits_note">Giới hạn ngăn ứng dụng và việc quét nền đánh thức điện thoại khi bạn không dùng, giúp pin dùng được lâu hơn. Ứng dụng vẫn hoạt động bình thường khi bạn mở; chúng chỉ ngừng chạy nền (không đồng bộ hay thông báo cho đến khi bạn mở). Hãy dùng cho ứng dụng ít dùng nhưng hao pin, hoặc để dừng việc quét Wi-Fi và Bluetooth liên tục. Đừng giới hạn các ứng dụng bạn muốn nhận thông báo (tin nhắn, lịch, báo thức). Các ứng dụng bị giới hạn cũng không tự khởi chạy khi điện thoại khởi động, giúp quá trình khởi động nhẹ hơn.</string>
     <string name="nav_boot_log">Nhật ký khởi động</string>
     <string name="nav_boot_log_summary">Ghi lại thứ làm nặng máy sau khi khởi động lại</string>
     <string name="boot_title">Ghi nhật ký khởi động</string>

@@ -1369,7 +1369,7 @@
     <string name="bat_rep_off">Layar mati: rata-rata %1$d mA (%2$s jam)</string>
     <string name="bat_rep_on">Layar menyala: rata-rata %1$d mA (%2$s jam)</string>
     <string name="bat_rep_top">Proses paling aktif saat layar mati (rata-rata CPU %%):</string>
-    <string name="bat_limits_note">Batasan mencegah aplikasi dan pemindaian di latar belakang membangunkan ponsel saat tidak Anda gunakan, sehingga baterai lebih awet. Aplikasi tetap berfungsi normal saat dibuka; hanya berhenti bekerja di latar belakang (tanpa sinkronisasi atau notifikasi sampai Anda membukanya). Gunakan untuk aplikasi yang jarang dipakai tetapi boros baterai, atau untuk menghentikan pemindaian Wi-Fi dan Bluetooth terus-menerus. Jangan batasi aplikasi yang notifikasinya Anda butuhkan (pesan, kalender, alarm).</string>
+    <string name="bat_limits_note">Batasan mencegah aplikasi dan pemindaian di latar belakang membangunkan ponsel saat tidak Anda gunakan, sehingga baterai lebih awet. Aplikasi tetap berfungsi normal saat dibuka; hanya berhenti bekerja di latar belakang (tanpa sinkronisasi atau notifikasi sampai Anda membukanya). Gunakan untuk aplikasi yang jarang dipakai tetapi boros baterai, atau untuk menghentikan pemindaian Wi-Fi dan Bluetooth terus-menerus. Jangan batasi aplikasi yang notifikasinya Anda butuhkan (pesan, kalender, alarm). Aplikasi yang dibatasi juga tidak lagi menyala sendiri saat ponsel dihidupkan, sehingga proses booting lebih ringan.</string>
     <string name="nav_boot_log">Log booting</string>
     <string name="nav_boot_log_summary">Mencatat apa yang membebani ponsel setelah dihidupkan ulang</string>
     <string name="boot_title">Rekam log booting</string>

@@ -1369,7 +1369,7 @@
     <string name="bat_rep_off">Tela apagada: média de %1$d mA (%2$s h)</string>
     <string name="bat_rep_on">Tela ligada: média de %1$d mA (%2$s h)</string>
     <string name="bat_rep_top">Processos mais ativos com a tela apagada (CPU média %%):</string>
-    <string name="bat_limits_note">Os limites impedem que apps e verificações em segundo plano acordem o telefone quando você não o está usando, para a bateria durar mais. Os apps funcionam normalmente quando você os abre; só deixam de trabalhar em segundo plano (sem sincronização ou notificações até você abri-los). Use para apps que você usa pouco e gastam bateria, ou para parar a verificação constante de Wi-Fi e Bluetooth. Não limite apps dos quais você quer receber notificações (mensagens, agenda, alarmes).</string>
+    <string name="bat_limits_note">Os limites impedem que apps e verificações em segundo plano acordem o telefone quando você não o está usando, para a bateria durar mais. Os apps funcionam normalmente quando você os abre; só deixam de trabalhar em segundo plano (sem sincronização ou notificações até você abri-los). Use para apps que você usa pouco e gastam bateria, ou para parar a verificação constante de Wi-Fi e Bluetooth. Não limite apps dos quais você quer receber notificações (mensagens, agenda, alarmes). Os apps limitados também deixam de iniciar sozinhos quando o telefone liga, o que deixa a inicialização mais leve.</string>
     <string name="nav_boot_log">Registro de inicialização</string>
     <string name="nav_boot_log_summary">Registra o que sobrecarrega o telefone após uma reinicialização</string>
     <string name="boot_title">Gravar o registro de inicialização</string>

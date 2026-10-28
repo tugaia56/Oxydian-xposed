@@ -46,7 +46,7 @@ import it.tugaia56.obsidian.utils.ObsidianTheme;
 public class BatteryFragment extends Fragment {
 
     private static final String MOD = "/data/adb/modules/oxydian_battery";
-    private static final int MOD_VERSION = 3;
+    private static final int MOD_VERSION = 4;
     private static final String ASSET_DIR = "oxydian_battery";
 
     private RecyclerView mRv;

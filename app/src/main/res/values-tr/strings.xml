@@ -1369,7 +1369,7 @@
     <string name="bat_rep_off">Ekran kapalı: ortalama %1$d mA (%2$s sa)</string>
     <string name="bat_rep_on">Ekran açık: ortalama %1$d mA (%2$s sa)</string>
     <string name="bat_rep_top">Ekran kapalıyken en yoğun işlemler (ortalama CPU %%):</string>
-    <string name="bat_limits_note">Sınırlar, siz telefonu kullanmazken uygulamaların ve arka plan taramalarının telefonu uyandırmasını engeller; böylece pil daha uzun dayanır. Uygulamalar açtığınızda normal çalışır; yalnızca arka planda çalışmayı bırakırlar (açana kadar eşitleme veya bildirim olmaz). Nadiren kullandığınız ve pil tüketen uygulamalar için ya da sürekli Wi-Fi ve Bluetooth taramasını durdurmak için kullanın. Bildirim almak istediğiniz uygulamaları (mesajlar, takvim, alarmlar) sınırlamayın.</string>
+    <string name="bat_limits_note">Sınırlar, siz telefonu kullanmazken uygulamaların ve arka plan taramalarının telefonu uyandırmasını engeller; böylece pil daha uzun dayanır. Uygulamalar açtığınızda normal çalışır; yalnızca arka planda çalışmayı bırakırlar (açana kadar eşitleme veya bildirim olmaz). Nadiren kullandığınız ve pil tüketen uygulamalar için ya da sürekli Wi-Fi ve Bluetooth taramasını durdurmak için kullanın. Bildirim almak istediğiniz uygulamaları (mesajlar, takvim, alarmlar) sınırlamayın. Sınırlanan uygulamalar telefon açılırken kendiliğinden başlamaz; bu da açılışı hafifletir.</string>
     <string name="nav_boot_log">Açılış günlüğü</string>
     <string name="nav_boot_log_summary">Yeniden başlatmadan sonra telefonu neyin yorduğunu kaydeder</string>
     <string name="boot_title">Açılış günlüğünü kaydet</string>

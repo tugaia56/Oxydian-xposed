@@ -9,6 +9,13 @@ if [ -f "$MODDIR/applied.list" ]; then
   done
   : > "$MODDIR/applied.list"
 fi
+if [ -f "$MODDIR/applied.recv" ]; then
+  tr -d '' < "$MODDIR/applied.recv" | while read -r c; do
+    [ -z "$c" ] && continue
+    pm enable --user 0 "$c" >/dev/null 2>&1
+  done
+  : > "$MODDIR/applied.recv"
+fi
 if [ -f "$MODDIR/applied.scans" ]; then
   read -r w b < "$MODDIR/applied.scans"
   [ "$w" = "null" ] || [ -z "$w" ] && w=1

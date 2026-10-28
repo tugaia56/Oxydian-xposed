@@ -1379,7 +1379,7 @@
     <string name="bat_rep_off">Screen off: %1$d mA average (%2$s h)</string>
     <string name="bat_rep_on">Screen on: %1$d mA average (%2$s h)</string>
     <string name="bat_rep_top">Busiest processes with the screen off (average CPU %%):</string>
-    <string name="bat_limits_note">Limits keep apps and background scans from waking the phone when you are not using it, so the battery lasts longer. Apps still work normally when you open them; they only stop working in the background (no syncing or notifications until you open them). Use them for apps you rarely use that drain the battery, or to stop constant Wi-Fi and Bluetooth scanning. Do not limit apps you want notifications from (messages, calendar, alarms).</string>
+    <string name="bat_limits_note">Limits keep apps and background scans from waking the phone when you are not using it, so the battery lasts longer. Apps still work normally when you open them; they only stop working in the background (no syncing or notifications until you open them). Use them for apps you rarely use that drain the battery, or to stop constant Wi-Fi and Bluetooth scanning. Do not limit apps you want notifications from (messages, calendar, alarms). Limited apps also stop starting by themselves when the phone boots, which makes start-up lighter.</string>
     <string name="nav_boot_log">Boot log</string>
     <string name="nav_boot_log_summary">Records what loads the phone after a restart</string>
     <string name="boot_title">Record the boot log</string>

@@ -1351,7 +1351,7 @@
     <string name="bat_rep_off">Schermo spento: %1$d mA in media (%2$s h)</string>
     <string name="bat_rep_on">Schermo acceso: %1$d mA in media (%2$s h)</string>
     <string name="bat_rep_top">Processi più attivi a schermo spento (CPU media %%):</string>
-    <string name="bat_limits_note">I limiti impediscono ad app e scansioni in background di svegliare il telefono quando non lo usi, così la batteria dura di più. Le app funzionano normalmente quando le apri: smettono solo di lavorare in background (niente sincronizzazioni o notifiche finché non le apri). Usali per le app che usi poco e consumano, o per fermare le scansioni Wi-Fi e Bluetooth continue. Non limitare le app da cui vuoi ricevere notifiche (messaggi, calendario, sveglie).</string>
+    <string name="bat_limits_note">I limiti impediscono ad app e scansioni in background di svegliare il telefono quando non lo usi, così la batteria dura di più. Le app funzionano normalmente quando le apri: smettono solo di lavorare in background (niente sincronizzazioni o notifiche finché non le apri). Usali per le app che usi poco e consumano, o per fermare le scansioni Wi-Fi e Bluetooth continue. Non limitare le app da cui vuoi ricevere notifiche (messaggi, calendario, sveglie). Le app limitate non partono più da sole all’avvio del telefono, e questo rende l’avvio più leggero.</string>
     <string name="nav_boot_log">Log di avvio</string>
     <string name="nav_boot_log_summary">Registra cosa appesantisce il telefono dopo un riavvio</string>
     <string name="boot_title">Registra il log di avvio</string>
