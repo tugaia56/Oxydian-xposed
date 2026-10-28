@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.util.TypedValue;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -25,6 +27,7 @@ public class WundergroundMod extends XposedMods {
 
     public static final String PKG = "com.wunderground.android.weather";
     private int mWindSpeedId = -1;
+    private int mTitleId = -1;
 
     public WundergroundMod(Context context) {
         super(context);
@@ -52,22 +55,44 @@ public class WundergroundMod extends XposedMods {
                                     Resources res = ((LayoutInflater) p.thisObject).getContext().getResources();
                                     mWindSpeedId = res.getIdentifier("cc_wind_speed", "id", PKG);
                                 }
-                                if (mWindSpeedId <= 0) return;
-                                View v = ((View) r).findViewById(mWindSpeedId);
-                                if (v == null) return;
-                                ViewGroup.LayoutParams lp2 = v.getLayoutParams();
-                                if (lp2 == null) return;
-                                if (lp2.width > 0 || lp2.height > 0) {   // misura fissa (12 dp) nel layout dell'app
-                                    lp2.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-                                    lp2.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                                    v.setLayoutParams(lp2);
+                                if (mTitleId == -1) {
+                                    Resources res = ((LayoutInflater) p.thisObject).getContext().getResources();
+                                    mTitleId = res.getIdentifier("toolbar_title", "id", PKG);
                                 }
+                                fixWind((View) r);
+                                fixTitle((View) r);
                             } catch (Throwable ignored) {}
                         }
                     });
-            XposedBridge.log("[ Obsidian ] WundergroundMod: wind speed layout fix installed in " + lp.packageName);
+            XposedBridge.log("[ Obsidian ] WundergroundMod: layout fixes (wind speed, header title) installed in " + lp.packageName);
         } catch (Throwable t) {
             XposedBridge.log("[ Obsidian ] WundergroundMod: hook failed: " + t);
         }
+    }
+
+    private void fixWind(View root) {
+        if (mWindSpeedId <= 0) return;
+        View v = root.findViewById(mWindSpeedId);
+        if (v == null) return;
+        ViewGroup.LayoutParams lp = v.getLayoutParams();
+        if (lp == null) return;
+        if (lp.width > 0 || lp.height > 0) {   // misura fissa (12 dp) nel layout dell'app
+            lp.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            v.setLayoutParams(lp);
+        }
+    }
+
+    /** Titolo dell'intestazione (nome della localita'): con nomi lunghi va a capo su 4 righe e l'ultima viene tagliata.
+     *  Il testo si rimpicciolisce da solo fino a starci tutto (mai sotto il 60% della misura originale). */
+    private void fixTitle(View root) {
+        if (mTitleId <= 0) return;
+        View v = root.findViewById(mTitleId);
+        if (!(v instanceof TextView) || v.getTag(mTitleId) != null) return;
+        TextView tv = (TextView) v;
+        float max = tv.getTextSize();
+        if (max <= 0f) return;
+        tv.setAutoSizeTextTypeUniformWithConfiguration(Math.round(max * 0.6f), Math.round(max), 1, TypedValue.COMPLEX_UNIT_PX);
+        tv.setTag(mTitleId, Boolean.TRUE);
     }
 }
