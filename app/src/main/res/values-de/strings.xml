@@ -1369,4 +1369,5 @@
     <string name="bat_rep_off">Bildschirm aus: durchschnittlich %1$d mA (%2$s h)</string>
     <string name="bat_rep_on">Bildschirm an: durchschnittlich %1$d mA (%2$s h)</string>
     <string name="bat_rep_top">Aktivste Prozesse bei ausgeschaltetem Bildschirm (durchschnittliche CPU %%):</string>
+    <string name="bat_limits_note">Limits verhindern, dass Apps und Hintergrund-Scans das Telefon aufwecken, wenn du es nicht benutzt, damit der Akku länger hält. Apps funktionieren normal, wenn du sie öffnest; sie arbeiten nur nicht mehr im Hintergrund (keine Synchronisierung oder Benachrichtigungen, bis du sie öffnest). Nutze sie für selten genutzte Apps, die Akku verbrauchen, oder um ständiges WLAN- und Bluetooth-Scannen zu stoppen. Schränke keine Apps ein, von denen du Benachrichtigungen willst (Nachrichten, Kalender, Wecker).</string>
 </resources>

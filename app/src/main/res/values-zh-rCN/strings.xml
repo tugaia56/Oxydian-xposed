@@ -1369,4 +1369,5 @@
     <string name="bat_rep_off">息屏:平均 %1$d mA(%2$s 小时)</string>
     <string name="bat_rep_on">亮屏:平均 %1$d mA(%2$s 小时)</string>
     <string name="bat_rep_top">息屏时最活跃的进程(平均 CPU %%):</string>
+    <string name="bat_limits_note">限制可防止应用和后台扫描在你不使用手机时将其唤醒,从而让电池更耐用。应用在你打开时仍正常工作,只是不再在后台运行(打开前不会同步或发送通知)。适合用于不常用却耗电的应用,或停止 Wi-Fi 和蓝牙的持续扫描。请不要限制你需要接收通知的应用(消息、日历、闹钟)。</string>
 </resources>

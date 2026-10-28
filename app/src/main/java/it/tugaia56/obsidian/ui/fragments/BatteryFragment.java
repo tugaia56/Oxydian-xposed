@@ -31,7 +31,9 @@ import java.util.Locale;
 import java.util.Set;
 
 import it.tugaia56.obsidian.R;
+import it.tugaia56.obsidian.ui.adapters.FooterWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.GroupUtils;
+import it.tugaia56.obsidian.ui.widgets.FooterWidget;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SectionTitleAdapter;
 import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
@@ -167,6 +169,7 @@ public class BatteryFragment extends Fragment {
         GroupUtils.addGroup(chain, repRows);
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.bat_section_limits))));
+        chain.add(new FooterWidgetAdapter(List.of(new FooterWidget(getString(R.string.bat_limits_note), null))));
         List<Object> limRows = new ArrayList<>();
         limRows.add(new ListWidgetAdapter.ListItem(getString(R.string.bat_limits_title), modeNames()[mMode], this::showModeDialog));
         limRows.add(new ListWidgetAdapter.ListItem(getString(R.string.bat_apps_title),
