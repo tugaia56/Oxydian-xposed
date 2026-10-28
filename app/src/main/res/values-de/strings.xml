@@ -1379,7 +1379,7 @@
     <string name="boot_show">Letztes Protokoll anzeigen</string>
     <string name="boot_show_summary">Zusammenfassung der letzten Aufzeichnung</string>
     <string name="boot_no_log">Noch keine Aufzeichnung</string>
-    <string name="boot_note">Nutze es, wenn das Telefon nach einem Neustart einfriert oder langsam wird (zum Beispiel beim Eingeben der PIN). Die Zusammenfassung zeigt die Lastspitze, den niedrigsten freien Speicher, den genutzten Swap und die aktivsten Apps, um zu verstehen, was das Telefon überlastet. Benötigt Root. Die vollständigen Protokolle liegen im Ordner „Log Oxydian“ des internen Speichers.</string>
+    <string name="boot_note">Nutze es, wenn das Telefon nach einem Neustart einfriert oder langsam wird (zum Beispiel beim Eingeben der PIN). Die Zusammenfassung zeigt die Lastspitze, den niedrigsten freien Speicher, den genutzten Swap und die aktivsten Apps, um zu verstehen, was das Telefon überlastet. Die vollständigen Protokolle liegen im Ordner „Log Oxydian“ des internen Speichers.</string>
     <string name="boot_rep_none">Noch keine Aufzeichnung. Schalte den Schalter ein und starte das Telefon neu.</string>
     <string name="boot_rep_load">Lastspitze: %1$s (bei %2$s nach dem Start; über 8 ist hoch)</string>
     <string name="boot_rep_mem">Geringster freier Speicher: %1$s MB · max. genutzter Swap: %2$s MB</string>

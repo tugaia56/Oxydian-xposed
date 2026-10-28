@@ -1379,7 +1379,7 @@
     <string name="boot_show">Son günlüğü göster</string>
     <string name="boot_show_summary">Son kaydın özeti</string>
     <string name="boot_no_log">Henüz kayıt yok</string>
-    <string name="boot_note">Telefon yeniden başlatmadan sonra donduğunda veya yavaşladığında (örneğin PIN yazarken) kullanın. Özet; yük zirvesini, en düşük boş belleği, kullanılan swap miktarını ve en yoğun uygulamaları göstererek telefonu neyin yorduğunu anlamanıza yardım eder. Root gerekir. Tam günlükler dahili depolamadaki “Log Oxydian” klasörüne kaydedilir.</string>
+    <string name="boot_note">Telefon yeniden başlatmadan sonra donduğunda veya yavaşladığında (örneğin PIN yazarken) kullanın. Özet; yük zirvesini, en düşük boş belleği, kullanılan swap miktarını ve en yoğun uygulamaları göstererek telefonu neyin yorduğunu anlamanıza yardım eder. Tam günlükler dahili depolamadaki “Log Oxydian” klasörüne kaydedilir.</string>
     <string name="boot_rep_none">Henüz kayıt yok. Anahtarı açın ve telefonu yeniden başlatın.</string>
     <string name="boot_rep_load">Yük zirvesi: %1$s (açılıştan %2$s sonra; 8’in üstü ağırdır)</string>
     <string name="boot_rep_mem">En düşük boş bellek: %1$s MB · kullanılan en yüksek swap: %2$s MB</string>

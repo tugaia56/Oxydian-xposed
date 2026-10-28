@@ -1379,7 +1379,7 @@
     <string name="boot_show">Tampilkan log terakhir</string>
     <string name="boot_show_summary">Ringkasan rekaman terakhir</string>
     <string name="boot_no_log">Belum ada rekaman</string>
-    <string name="boot_note">Gunakan saat ponsel macet atau melambat setelah dihidupkan ulang (misalnya saat mengetik PIN). Ringkasan menampilkan puncak beban, memori bebas terendah, jumlah swap yang dipakai, dan aplikasi tersibuk, untuk memahami apa yang membebani ponsel. Memerlukan root. Log lengkap disimpan di folder “Log Oxydian” pada penyimpanan internal.</string>
+    <string name="boot_note">Gunakan saat ponsel macet atau melambat setelah dihidupkan ulang (misalnya saat mengetik PIN). Ringkasan menampilkan puncak beban, memori bebas terendah, jumlah swap yang dipakai, dan aplikasi tersibuk, untuk memahami apa yang membebani ponsel. Log lengkap disimpan di folder “Log Oxydian” pada penyimpanan internal.</string>
     <string name="boot_rep_none">Belum ada rekaman. Aktifkan sakelar dan hidupkan ulang ponsel.</string>
     <string name="boot_rep_load">Puncak beban: %1$s (pada %2$s setelah booting; di atas 8 tergolong berat)</string>
     <string name="boot_rep_mem">Memori bebas terendah: %1$s MB · swap terpakai maksimal: %2$s MB</string>

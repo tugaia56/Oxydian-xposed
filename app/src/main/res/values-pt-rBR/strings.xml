@@ -1379,7 +1379,7 @@
     <string name="boot_show">Mostrar o último registro</string>
     <string name="boot_show_summary">Resumo da última gravação</string>
     <string name="boot_no_log">Ainda não há gravação</string>
-    <string name="boot_note">Use quando o telefone travar ou ficar lento após uma reinicialização (por exemplo ao digitar o PIN). O resumo mostra o pico de carga, a menor memória livre, quanto swap foi usado e quais apps estavam mais ativos, para entender o que sobrecarrega o telefone. Requer root. Os registros completos ficam na pasta “Log Oxydian” do armazenamento interno.</string>
+    <string name="boot_note">Use quando o telefone travar ou ficar lento após uma reinicialização (por exemplo ao digitar o PIN). O resumo mostra o pico de carga, a menor memória livre, quanto swap foi usado e quais apps estavam mais ativos, para entender o que sobrecarrega o telefone. Os registros completos ficam na pasta “Log Oxydian” do armazenamento interno.</string>
     <string name="boot_rep_none">Ainda não há gravação. Ligue o botão e reinicie o telefone.</string>
     <string name="boot_rep_load">Pico de carga: %1$s (a %2$s da inicialização; acima de 8 é pesado)</string>
     <string name="boot_rep_mem">Menor memória livre: %1$s MB · máximo de swap usado: %2$s MB</string>
