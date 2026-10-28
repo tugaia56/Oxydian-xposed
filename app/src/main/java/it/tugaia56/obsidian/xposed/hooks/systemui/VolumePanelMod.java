@@ -637,7 +637,7 @@ public class VolumePanelMod extends XposedMods {
                         if (lo.contains("timeout") || lo.contains("computetime")) {
                             boolean hook = lo.contains("computetimeout")
                                     && m.getReturnType() == int.class;
-                            XposedBridge.log("[ Obsidian ] VolumePanelMod: DIAG "
+                            log("DIAG "
                                     + c.getSimpleName() + "." + m.getName()
                                     + " [" + m.getReturnType().getSimpleName() + "]"
                                     + (hook ? " ← hooking" : ""));
@@ -724,7 +724,7 @@ public class VolumePanelMod extends XposedMods {
     private void applyColorsToRow(Object volumeRow) {
         try {
             Object slider = getObjectField(volumeRow, "slider");
-            XposedBridge.log("[ Obsidian ] VolumePanelMod: DIAG applyColorsToRow mCustomProgress=" + mCustomProgress
+            log("DIAG applyColorsToRow mCustomProgress=" + mCustomProgress
                     + " mProgressColor=#" + Integer.toHexString(mProgressColor)
                     + " mCustomBg=" + mCustomBg + " mBgColor=#" + Integer.toHexString(mBgColor));
             if (mProgressLineOn) {
@@ -738,7 +738,7 @@ public class VolumePanelMod extends XposedMods {
             } else if (mCustomProgress) {
                 try {
                     callMethod(slider, "setProgressColor", ColorStateList.valueOf(mProgressColor));
-                    XposedBridge.log("[ Obsidian ] VolumePanelMod: DIAG setProgressColor OK");
+                    log("DIAG setProgressColor OK");
                 } catch (Throwable t) {
                     XposedBridge.log("[ Obsidian ] VolumePanelMod: DIAG setProgressColor FAILED: " + t);
                 }
@@ -773,7 +773,7 @@ public class VolumePanelMod extends XposedMods {
                 try {
                     callMethod(slider, "setInactiveTrackDrawable", (Object) null); // esce dalla modalità immagine se attiva prima
                     callMethod(slider, "setSeekBarBackgroundColor", ColorStateList.valueOf(mBgColor));
-                    XposedBridge.log("[ Obsidian ] VolumePanelMod: DIAG setSeekBarBackgroundColor OK");
+                    log("DIAG setSeekBarBackgroundColor OK");
                 } catch (Throwable t) {
                     XposedBridge.log("[ Obsidian ] VolumePanelMod: DIAG setSeekBarBackgroundColor FAILED: " + t);
                 }

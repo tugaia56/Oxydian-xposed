@@ -201,23 +201,8 @@ public class ModHealthFragment extends Fragment {
                 }
             }
 
-            File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            // Nome nuovo a ogni export: un file con lo stesso nome già in Download (creato da
-            // un'installazione precedente) non è sovrascrivibile e l'export falliva in silenzio.
-            File file = new File(dir, "Oxydian_ModHealth_"
-                    + new java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.US).format(new java.util.Date())
-                    + ".txt");
-            String result;
-            try {
-                if (!dir.exists()) dir.mkdirs();
-                try (FileWriter w = new FileWriter(file)) {
-                    w.write(sb.toString());
-                }
-                result = file.getAbsolutePath();
-            } catch (Exception ex) {
-                result = null;
-            }
-            String finalResult = result;
+            // cartella "Log Oxydian" della memoria interna, nome con data a ogni export (ne restano 10)
+            String finalResult = it.tugaia56.obsidian.utils.LogFolder.saveText(ctx, "modhealth", "txt", sb.toString());
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> {
                     if (!isAdded()) return;

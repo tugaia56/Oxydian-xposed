@@ -1386,4 +1386,6 @@
     <string name="boot_rep_psi">Đỉnh áp lực CPU: %1$s%% · áp lực bộ nhớ: %2$s%%</string>
     <string name="boot_rep_cpu">Ứng dụng dùng nhiều CPU nhất:</string>
     <string name="boot_rep_ram">Ứng dụng dùng nhiều bộ nhớ nhất:</string>
+    <string name="save_logs_title">Lưu nhật ký Oxydian</string>
+    <string name="save_logs_summary">Lưu các thông báo của Oxydian vào thư mục “Log Oxydian” trong bộ nhớ trong, để gửi kèm báo cáo lỗi. Hãy bật nhật ký bổ sung trước, tái hiện sự cố rồi lưu</string>
 </resources>

@@ -1386,4 +1386,6 @@
     <string name="boot_rep_psi">Пік тиску ЦП: %1$s%% · тиск пам’яті: %2$s%%</string>
     <string name="boot_rep_cpu">Застосунки з найбільшим навантаженням ЦП:</string>
     <string name="boot_rep_ram">Застосунки, що використовують найбільше пам’яті:</string>
+    <string name="save_logs_title">Зберегти журнали Oxydian</string>
+    <string name="save_logs_summary">Зберігає повідомлення Oxydian у папці «Log Oxydian» у внутрішній пам’яті, щоб надіслати разом зі звітом про помилку. Спершу ввімкніть додаткові журнали, відтворіть проблему, потім збережіть</string>
 </resources>

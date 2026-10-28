@@ -1386,4 +1386,6 @@
     <string name="boot_rep_psi">CPU baskısı zirvesi: %1$s%% · bellek baskısı: %2$s%%</string>
     <string name="boot_rep_cpu">En çok CPU kullanan uygulamalar:</string>
     <string name="boot_rep_ram">En çok bellek kullanan uygulamalar:</string>
+    <string name="save_logs_title">Oxydian günlüklerini kaydet</string>
+    <string name="save_logs_summary">Oxydian iletilerini dahili depolamadaki “Log Oxydian” klasörüne kaydeder; hata raporuyla gönderebilirsiniz. Önce ek günlükleri açın, sorunu yeniden oluşturun, sonra kaydedin</string>
 </resources>

@@ -1396,4 +1396,6 @@
     <string name="boot_rep_psi">Peak CPU pressure: %1$s%% · memory pressure: %2$s%%</string>
     <string name="boot_rep_cpu">Apps using the most CPU:</string>
     <string name="boot_rep_ram">Apps using the most memory:</string>
+    <string name="save_logs_title">Save Oxydian logs</string>
+    <string name="save_logs_summary">Saves the Oxydian messages in the “Log Oxydian” folder of your internal storage, to send with a bug report. Turn on Extra Logs first, reproduce the problem, then save</string>
 </resources>

@@ -1386,4 +1386,6 @@
     <string name="boot_rep_psi">Max. CPU-Druck: %1$s%% · Speicherdruck: %2$s%%</string>
     <string name="boot_rep_cpu">Apps mit der höchsten CPU-Last:</string>
     <string name="boot_rep_ram">Apps mit dem höchsten Speicherverbrauch:</string>
+    <string name="save_logs_title">Oxydian-Protokolle speichern</string>
+    <string name="save_logs_summary">Speichert die Oxydian-Meldungen im Ordner „Log Oxydian“ des internen Speichers, zum Senden mit einem Fehlerbericht. Schalte zuerst die zusätzlichen Protokolle ein, löse das Problem aus und speichere dann</string>
 </resources>

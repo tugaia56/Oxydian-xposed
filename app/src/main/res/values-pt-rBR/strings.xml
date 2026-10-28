@@ -1386,4 +1386,6 @@
     <string name="boot_rep_psi">Pico de pressão da CPU: %1$s%% · pressão da memória: %2$s%%</string>
     <string name="boot_rep_cpu">Apps que mais usam CPU:</string>
     <string name="boot_rep_ram">Apps que mais usam memória:</string>
+    <string name="save_logs_title">Salvar os registros do Oxydian</string>
+    <string name="save_logs_summary">Salva as mensagens do Oxydian na pasta “Log Oxydian” do armazenamento interno, para enviar com um relatório de erro. Ative primeiro os registros adicionais, reproduza o problema e depois salve</string>
 </resources>

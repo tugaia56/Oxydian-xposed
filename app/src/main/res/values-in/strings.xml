@@ -1386,4 +1386,6 @@
     <string name="boot_rep_psi">Puncak tekanan CPU: %1$s%% · tekanan memori: %2$s%%</string>
     <string name="boot_rep_cpu">Aplikasi dengan CPU tertinggi:</string>
     <string name="boot_rep_ram">Aplikasi dengan memori tertinggi:</string>
+    <string name="save_logs_title">Simpan log Oxydian</string>
+    <string name="save_logs_summary">Menyimpan pesan Oxydian di folder “Log Oxydian” pada penyimpanan internal, untuk dikirim bersama laporan bug. Aktifkan Log Tambahan dulu, ulangi masalahnya, lalu simpan</string>
 </resources>

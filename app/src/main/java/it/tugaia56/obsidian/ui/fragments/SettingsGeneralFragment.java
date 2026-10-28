@@ -101,8 +101,25 @@ public class SettingsGeneralFragment extends Fragment {
         moreLoggingItem.onChanged = () ->
                 ObsidianPrefs.putBoolean(KEY_MORE_LOGGING, moreLoggingItem.checked);
         chain.add(new SwitchWidgetAdapter(List.of(moreLoggingItem)));
+        chain.add(new ListWidgetAdapter(List.of(new ListWidgetAdapter.ListItem(
+                getString(R.string.save_logs_title), getString(R.string.save_logs_summary), this::saveXposedLog))));
 
         mRv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
+    }
+
+    /** Salva in "Log Oxydian" i messaggi di Oxydian presi dal log di LSPosed, con un riepilogo del telefono. */
+    private void saveXposedLog() {
+        final android.content.Context ctx = requireContext().getApplicationContext();
+        new Thread(() -> {
+            String header = "Oxydian - log dei mod\n"
+                    + it.tugaia56.obsidian.utils.DeviceInfo.diagnosticSummary()
+                    + it.tugaia56.obsidian.utils.DeviceInfo.rootDiagnostics();
+            String path = it.tugaia56.obsidian.utils.LogFolder.saveXposedLog(ctx, header);
+            if (getActivity() == null) return;
+            requireActivity().runOnUiThread(() -> android.widget.Toast.makeText(ctx,
+                    path != null ? getString(R.string.mod_health_export_ok_fmt, path)
+                            : getString(R.string.mod_health_export_fail), android.widget.Toast.LENGTH_LONG).show());
+        }).start();
     }
 
     private String themeModeLabel() {
