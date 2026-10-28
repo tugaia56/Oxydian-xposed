@@ -1370,4 +1370,20 @@
     <string name="bat_rep_on">亮屏:平均 %1$d mA(%2$s 小时)</string>
     <string name="bat_rep_top">息屏时最活跃的进程(平均 CPU %%):</string>
     <string name="bat_limits_note">限制可防止应用和后台扫描在你不使用手机时将其唤醒,从而让电池更耐用。应用在你打开时仍正常工作,只是不再在后台运行(打开前不会同步或发送通知)。适合用于不常用却耗电的应用,或停止 Wi-Fi 和蓝牙的持续扫描。请不要限制你需要接收通知的应用(消息、日历、闹钟)。</string>
+    <string name="nav_boot_log">启动日志</string>
+    <string name="nav_boot_log_summary">记录重启后是什么拖慢了手机</string>
+    <string name="boot_title">记录启动日志</string>
+    <string name="boot_summary">下次重启时,手机会记录 4 分钟的负载(CPU、内存、最繁忙的应用),之后此开关会自动关闭</string>
+    <string name="boot_always_title">每次重启</string>
+    <string name="boot_always_summary">每次重启都会持续记录,直到你关闭。适合偶尔才出现卡死的情况;会让开机稍慢,并覆盖上一份日志</string>
+    <string name="boot_show">查看最近的日志</string>
+    <string name="boot_show_summary">最近一次记录的摘要</string>
+    <string name="boot_no_log">暂无记录</string>
+    <string name="boot_note">当手机在重启后卡死或变慢时使用(例如输入 PIN 码时)。摘要会显示负载峰值、最低可用内存、使用的 swap 量以及最繁忙的应用,帮助你找出是什么让手机过载。需要 root。完整日志位于 /data/local/tmp/bootcap.log。</string>
+    <string name="boot_rep_none">暂无记录。请开启开关并重启手机。</string>
+    <string name="boot_rep_load">负载峰值:%1$s(开机后 %2$s;高于 8 属于繁重)</string>
+    <string name="boot_rep_mem">最低可用内存:%1$s MB · 最大 swap 使用:%2$s MB</string>
+    <string name="boot_rep_psi">CPU 压力峰值:%1$s%% · 内存压力:%2$s%%</string>
+    <string name="boot_rep_cpu">占用 CPU 最多的应用:</string>
+    <string name="boot_rep_ram">占用内存最多的应用:</string>
 </resources>

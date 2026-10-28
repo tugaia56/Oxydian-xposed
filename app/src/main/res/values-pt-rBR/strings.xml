@@ -1370,4 +1370,20 @@
     <string name="bat_rep_on">Tela ligada: média de %1$d mA (%2$s h)</string>
     <string name="bat_rep_top">Processos mais ativos com a tela apagada (CPU média %%):</string>
     <string name="bat_limits_note">Os limites impedem que apps e verificações em segundo plano acordem o telefone quando você não o está usando, para a bateria durar mais. Os apps funcionam normalmente quando você os abre; só deixam de trabalhar em segundo plano (sem sincronização ou notificações até você abri-los). Use para apps que você usa pouco e gastam bateria, ou para parar a verificação constante de Wi-Fi e Bluetooth. Não limite apps dos quais você quer receber notificações (mensagens, agenda, alarmes).</string>
+    <string name="nav_boot_log">Registro de inicialização</string>
+    <string name="nav_boot_log_summary">Registra o que sobrecarrega o telefone após uma reinicialização</string>
+    <string name="boot_title">Gravar o registro de inicialização</string>
+    <string name="boot_summary">Na próxima reinicialização o telefone grava 4 minutos de carga (CPU, memória, apps mais ativos) e depois este botão se desliga sozinho</string>
+    <string name="boot_always_title">Em cada reinicialização</string>
+    <string name="boot_always_summary">Continua gravando a cada reinicialização até você desligar. Útil se os travamentos acontecem só de vez em quando; deixa a inicialização um pouco mais lenta e sobrescreve o registro anterior</string>
+    <string name="boot_show">Mostrar o último registro</string>
+    <string name="boot_show_summary">Resumo da última gravação</string>
+    <string name="boot_no_log">Ainda não há gravação</string>
+    <string name="boot_note">Use quando o telefone travar ou ficar lento após uma reinicialização (por exemplo ao digitar o PIN). O resumo mostra o pico de carga, a menor memória livre, quanto swap foi usado e quais apps estavam mais ativos, para entender o que sobrecarrega o telefone. Requer root. O registro completo está em /data/local/tmp/bootcap.log.</string>
+    <string name="boot_rep_none">Ainda não há gravação. Ligue o botão e reinicie o telefone.</string>
+    <string name="boot_rep_load">Pico de carga: %1$s (a %2$s da inicialização; acima de 8 é pesado)</string>
+    <string name="boot_rep_mem">Menor memória livre: %1$s MB · máximo de swap usado: %2$s MB</string>
+    <string name="boot_rep_psi">Pico de pressão da CPU: %1$s%% · pressão da memória: %2$s%%</string>
+    <string name="boot_rep_cpu">Apps que mais usam CPU:</string>
+    <string name="boot_rep_ram">Apps que mais usam memória:</string>
 </resources>

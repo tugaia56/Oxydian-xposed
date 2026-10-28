@@ -1370,4 +1370,20 @@
     <string name="bat_rep_on">Ekran açık: ortalama %1$d mA (%2$s sa)</string>
     <string name="bat_rep_top">Ekran kapalıyken en yoğun işlemler (ortalama CPU %%):</string>
     <string name="bat_limits_note">Sınırlar, siz telefonu kullanmazken uygulamaların ve arka plan taramalarının telefonu uyandırmasını engeller; böylece pil daha uzun dayanır. Uygulamalar açtığınızda normal çalışır; yalnızca arka planda çalışmayı bırakırlar (açana kadar eşitleme veya bildirim olmaz). Nadiren kullandığınız ve pil tüketen uygulamalar için ya da sürekli Wi-Fi ve Bluetooth taramasını durdurmak için kullanın. Bildirim almak istediğiniz uygulamaları (mesajlar, takvim, alarmlar) sınırlamayın.</string>
+    <string name="nav_boot_log">Açılış günlüğü</string>
+    <string name="nav_boot_log_summary">Yeniden başlatmadan sonra telefonu neyin yorduğunu kaydeder</string>
+    <string name="boot_title">Açılış günlüğünü kaydet</string>
+    <string name="boot_summary">Bir sonraki yeniden başlatmada telefon 4 dakikalık yükü (CPU, bellek, en yoğun uygulamalar) kaydeder, ardından bu anahtar kendiliğinden kapanır</string>
+    <string name="boot_always_title">Her yeniden başlatmada</string>
+    <string name="boot_always_summary">Siz kapatana kadar her yeniden başlatmada kayda devam eder. Donmalar yalnızca ara sıra oluyorsa yararlıdır; açılışı biraz yavaşlatır ve önceki günlüğün üzerine yazar</string>
+    <string name="boot_show">Son günlüğü göster</string>
+    <string name="boot_show_summary">Son kaydın özeti</string>
+    <string name="boot_no_log">Henüz kayıt yok</string>
+    <string name="boot_note">Telefon yeniden başlatmadan sonra donduğunda veya yavaşladığında (örneğin PIN yazarken) kullanın. Özet; yük zirvesini, en düşük boş belleği, kullanılan swap miktarını ve en yoğun uygulamaları göstererek telefonu neyin yorduğunu anlamanıza yardım eder. Root gerekir. Tam günlük /data/local/tmp/bootcap.log dosyasındadır.</string>
+    <string name="boot_rep_none">Henüz kayıt yok. Anahtarı açın ve telefonu yeniden başlatın.</string>
+    <string name="boot_rep_load">Yük zirvesi: %1$s (açılıştan %2$s sonra; 8’in üstü ağırdır)</string>
+    <string name="boot_rep_mem">En düşük boş bellek: %1$s MB · kullanılan en yüksek swap: %2$s MB</string>
+    <string name="boot_rep_psi">CPU baskısı zirvesi: %1$s%% · bellek baskısı: %2$s%%</string>
+    <string name="boot_rep_cpu">En çok CPU kullanan uygulamalar:</string>
+    <string name="boot_rep_ram">En çok bellek kullanan uygulamalar:</string>
 </resources>

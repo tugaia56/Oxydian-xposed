@@ -1352,4 +1352,20 @@
     <string name="bat_rep_on">Schermo acceso: %1$d mA in media (%2$s h)</string>
     <string name="bat_rep_top">Processi più attivi a schermo spento (CPU media %%):</string>
     <string name="bat_limits_note">I limiti impediscono ad app e scansioni in background di svegliare il telefono quando non lo usi, così la batteria dura di più. Le app funzionano normalmente quando le apri: smettono solo di lavorare in background (niente sincronizzazioni o notifiche finché non le apri). Usali per le app che usi poco e consumano, o per fermare le scansioni Wi-Fi e Bluetooth continue. Non limitare le app da cui vuoi ricevere notifiche (messaggi, calendario, sveglie).</string>
+    <string name="nav_boot_log">Log di avvio</string>
+    <string name="nav_boot_log_summary">Registra cosa appesantisce il telefono dopo un riavvio</string>
+    <string name="boot_title">Registra il log di avvio</string>
+    <string name="boot_summary">Al prossimo riavvio il telefono registra 4 minuti di carico (CPU, memoria, app più pesanti), poi l’interruttore si spegne da solo</string>
+    <string name="boot_always_title">Ad ogni riavvio</string>
+    <string name="boot_always_summary">Continua a registrare ad ogni riavvio finché non lo spegni. Utile se i blocchi capitano solo ogni tanto; rallenta un po’ l’avvio e sovrascrive il log precedente</string>
+    <string name="boot_show">Mostra ultimo log</string>
+    <string name="boot_show_summary">Riassunto dell’ultima registrazione</string>
+    <string name="boot_no_log">Nessuna registrazione ancora</string>
+    <string name="boot_note">Usalo quando il telefono si blocca o rallenta dopo un riavvio (per esempio mentre scrivi il PIN). Il riassunto mostra il picco di carico, la memoria libera più bassa, quanto swap è stato usato e quali app erano più pesanti, per capire cosa sovraccarica il telefono. Serve il root. Il log completo è in /data/local/tmp/bootcap.log.</string>
+    <string name="boot_rep_none">Ancora nessuna registrazione. Accendi l’interruttore e riavvia il telefono.</string>
+    <string name="boot_rep_load">Picco di carico: %1$s (a %2$s dall’avvio; sopra 8 è pesante)</string>
+    <string name="boot_rep_mem">Memoria libera minima: %1$s MB · swap massimo usato: %2$s MB</string>
+    <string name="boot_rep_psi">Picco di pressione CPU: %1$s%% · pressione memoria: %2$s%%</string>
+    <string name="boot_rep_cpu">App che usano più CPU:</string>
+    <string name="boot_rep_ram">App che usano più memoria:</string>
 </resources>

@@ -99,6 +99,13 @@ public class MiscFragment extends Fragment {
 
                 new NavAdapter.NavItem(
                         R.drawable.ic_settings,
+                        getString(R.string.nav_boot_log),
+                        getString(R.string.nav_boot_log_summary),
+                        () -> navigate(new BootLogFragment(),
+                                getString(R.string.nav_boot_log))),
+
+                new NavAdapter.NavItem(
+                        R.drawable.ic_settings,
                         getString(R.string.nav_battery),
                         getString(R.string.nav_battery_summary),
                         () -> navigate(new BatteryFragment(),

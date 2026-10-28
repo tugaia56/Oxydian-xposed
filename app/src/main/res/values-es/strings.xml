@@ -1370,4 +1370,20 @@
     <string name="bat_rep_on">Pantalla encendida: %1$d mA de media (%2$s h)</string>
     <string name="bat_rep_top">Procesos más activos con la pantalla apagada (CPU media %%):</string>
     <string name="bat_limits_note">Los límites evitan que las apps y los escaneos en segundo plano despierten el teléfono cuando no lo usas, para que la batería dure más. Las apps funcionan con normalidad al abrirlas; solo dejan de trabajar en segundo plano (sin sincronizaciones ni notificaciones hasta que las abras). Úsalos con apps que usas poco y gastan batería, o para detener el escaneo constante de Wi-Fi y Bluetooth. No limites apps de las que quieras recibir notificaciones (mensajes, calendario, alarmas).</string>
+    <string name="nav_boot_log">Registro de arranque</string>
+    <string name="nav_boot_log_summary">Registra qué satura el teléfono tras un reinicio</string>
+    <string name="boot_title">Registrar el registro de arranque</string>
+    <string name="boot_summary">En el próximo reinicio el teléfono registra 4 minutos de carga (CPU, memoria, apps más activas) y luego este interruptor se apaga solo</string>
+    <string name="boot_always_title">En cada reinicio</string>
+    <string name="boot_always_summary">Sigue registrando en cada reinicio hasta que lo apagues. Útil si los bloqueos ocurren solo de vez en cuando; ralentiza un poco el arranque y sobrescribe el registro anterior</string>
+    <string name="boot_show">Mostrar el último registro</string>
+    <string name="boot_show_summary">Resumen de la última grabación</string>
+    <string name="boot_no_log">Aún no hay grabación</string>
+    <string name="boot_note">Úsalo cuando el teléfono se bloquee o vaya lento tras un reinicio (por ejemplo al escribir el PIN). El resumen muestra el pico de carga, la memoria libre más baja, cuánto swap se usó y qué apps estaban más activas, para entender qué sobrecarga el teléfono. Requiere root. El registro completo está en /data/local/tmp/bootcap.log.</string>
+    <string name="boot_rep_none">Aún no hay grabación. Activa el interruptor y reinicia el teléfono.</string>
+    <string name="boot_rep_load">Pico de carga: %1$s (a %2$s del arranque; por encima de 8 es alto)</string>
+    <string name="boot_rep_mem">Memoria libre mínima: %1$s MB · máximo de swap usado: %2$s MB</string>
+    <string name="boot_rep_psi">Pico de presión de CPU: %1$s%% · presión de memoria: %2$s%%</string>
+    <string name="boot_rep_cpu">Apps que más CPU usan:</string>
+    <string name="boot_rep_ram">Apps que más memoria usan:</string>
 </resources>
