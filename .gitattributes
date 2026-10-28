@@ -1,0 +1,3 @@
+
+# script del modulo oxydian_battery: devono restare con fine riga LF (girano su Android)
+app/src/main/assets/oxydian_battery/* text eol=lf
