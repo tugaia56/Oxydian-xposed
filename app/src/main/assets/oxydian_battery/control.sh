@@ -18,5 +18,5 @@ case "$1" in
     p=$(cat /data/local/tmp/oxydian_battery.pid 2>/dev/null)
     if [ -n "$p" ] && kill -0 "$p" 2>/dev/null; then echo "logger=1"; else echo "logger=0"; fi
     grep -E '^(REPORT|LIMITS|SCANS_OFF)=' "$CONF"
-    grep -v '^[[:space:]]*#' "$MODDIR/restrict.list" | tr -d '' | grep -v '^[[:space:]]*$' | sed 's/^/app=/' ;;
+    grep -v '^[[:space:]]*#' "$MODDIR/restrict.list" | sed 's/[^[:print:]]//g' | grep -v '^[[:space:]]*$' | sed 's/^/app=/' ;;
 esac
