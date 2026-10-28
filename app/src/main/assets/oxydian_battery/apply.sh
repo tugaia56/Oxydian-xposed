@@ -4,7 +4,7 @@ MODDIR=${0%/*}
 . "$MODDIR/battery.conf"
 : > "$MODDIR/applied.list"
 if [ "$LIMITS" = "1" ]; then
-  grep -v '^[[:space:]]*#' "$MODDIR/restrict.list" | while read -r p; do
+  grep -v '^[[:space:]]*#' "$MODDIR/restrict.list" | tr -d '' | while read -r p; do
     [ -z "$p" ] && continue
     cmd appops set "$p" RUN_ANY_IN_BACKGROUND ignore 2>/dev/null
     am set-standby-bucket "$p" restricted 2>/dev/null

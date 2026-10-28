@@ -2,11 +2,11 @@
 # Annulla quanto fatto da apply.sh: le app tornano com'erano e le scansioni sempre attive tornano come prima.
 MODDIR=${0%/*}
 if [ -f "$MODDIR/applied.list" ]; then
-  while read -r p; do
+  tr -d '' < "$MODDIR/applied.list" | while read -r p; do
     [ -z "$p" ] && continue
     cmd appops set "$p" RUN_ANY_IN_BACKGROUND allow 2>/dev/null
     am set-standby-bucket "$p" active 2>/dev/null
-  done < "$MODDIR/applied.list"
+  done
   : > "$MODDIR/applied.list"
 fi
 if [ -f "$MODDIR/applied.scans" ]; then

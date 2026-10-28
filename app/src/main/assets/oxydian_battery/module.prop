@@ -1,6 +1,6 @@
 id=oxydian_battery
 name=Oxydian Battery
-version=v0.2
-versionCode=2
+version=v0.3
+versionCode=3
 author=tugaia56
 description=Rapporto consumi e limiti in background opzionali, si gestiscono dalla pagina Batteria di Oxydian
