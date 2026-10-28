@@ -927,4 +927,12 @@
         <item>Vietnamca</item>
         <item>Ukraynaca</item>
     </string-array>
+    <string-array name="gb_directions">
+        <item>Çapraz (sol üstten sağ alta)</item>
+        <item>Soldan sağa</item>
+        <item>Sağdan sola</item>
+        <item>Yukarıdan aşağıya</item>
+        <item>Aşağıdan yukarıya</item>
+        <item>Radyal (merkezden)</item>
+    </string-array>
 </resources>

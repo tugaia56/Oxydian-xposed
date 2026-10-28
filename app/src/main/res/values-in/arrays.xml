@@ -927,4 +927,12 @@
         <item>Vietnam</item>
         <item>Ukraina</item>
     </string-array>
+    <string-array name="gb_directions">
+        <item>Diagonal (kiri atas ke kanan bawah)</item>
+        <item>Kiri ke kanan</item>
+        <item>Kanan ke kiri</item>
+        <item>Atas ke bawah</item>
+        <item>Bawah ke atas</item>
+        <item>Radial (dari tengah)</item>
+    </string-array>
 </resources>

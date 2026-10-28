@@ -927,4 +927,12 @@
         <item>越南语</item>
         <item>乌克兰语</item>
     </string-array>
+    <string-array name="gb_directions">
+        <item>对角线(左上到右下)</item>
+        <item>从左到右</item>
+        <item>从右到左</item>
+        <item>从上到下</item>
+        <item>从下到上</item>
+        <item>径向(从中心)</item>
+    </string-array>
 </resources>

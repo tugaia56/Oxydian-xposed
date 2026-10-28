@@ -1308,4 +1308,40 @@
     <string name="lockscreen_analog_seconds">Секундна стрілка</string>
     <string name="lockscreen_analog_seconds_summary">Показує секунди на екрані блокування (не на AOD, щоб заощадити заряд)</string>
     <string name="aod_analog_img_color">Колір зображення циферблата</string>
+    <string name="lockscreen_widgets_alarm_default_app">Використовувати системний застосунок «Годинник»</string>
+    <string name="main_custom_widgets3">Великий віджет 3</string>
+    <string name="main_custom_widgets4">Великий віджет 4</string>
+    <string name="nav_misc_search_border">Рамка навколо поля пошуку в Налаштуваннях</string>
+    <string name="nav_misc_search_border_summary">Контур кольору акценту навколо рядка пошуку на головній сторінці Налаштувань</string>
+    <string name="launcher_recents_icon_round">Значки нещодавніх: заокруглення кутів (0 = квадрат, 50 = коло)</string>
+    <string name="launcher_recents_icon_size">Значки нещодавніх: розмір (%)</string>
+    <string name="settings_backup_date">Формат дати резервної копії</string>
+    <string name="settings_backup_time">Формат часу резервної копії</string>
+    <string name="bf_dmy">день-місяць-рік</string>
+    <string name="bf_dmy_short">день-місяць-рік, рік із двох цифр</string>
+    <string name="bf_ymd">рік-місяць-день</string>
+    <string name="bf_ymd_compact">рік місяць день, без дефісів</string>
+    <string name="bf_hm">години:хвилини, 24-годинний формат</string>
+    <string name="bf_hms">години:хвилини:секунди</string>
+    <string name="bf_hm_compact">години та хвилини, без роздільника</string>
+    <string name="bf_hm12">12-годинний формат з AM/PM</string>
+    <string name="settings_backup_time_none">Без часу (лише дата)</string>
+    <string name="gb_note">Градієнтна рамка з 2 або 3 кольорів для діалогів, спливаючих вікон, сповіщень і тостів. За замовчуванням перший колір — ваш акцентний, але можна вибрати інший.</string>
+    <string name="gb_title">Градієнтна рамка</string>
+    <string name="gb_summary">Діалоги, спливаючі вікна, сповіщення, тости та вікна</string>
+    <string name="gb_colors">Кольори</string>
+    <string name="gb_c1">Колір 1</string>
+    <string name="gb_c1_summary">Ваш акцентний колір (як в Oxydian Theme)</string>
+    <string name="gb_c2">Колір 2</string>
+    <string name="gb_c3">Колір 3 (необов’язково)</string>
+    <string name="gb_c3_none">Немає (два кольори)</string>
+    <string name="gb_c3_pick">Вибрати колір</string>
+    <string name="nav_gradient_border">Градієнтна рамка</string>
+    <string name="nav_gradient_border_summary">Рамка з 2 або 3 кольорів для діалогів, спливаючих вікон, сповіщень і тостів</string>
+    <string name="gb_c1_accent">Акцент (як в Oxydian Theme)</string>
+    <string name="gb_thickness_section">Товщина</string>
+    <string name="gb_thickness">Товщина рамки (половина dp: 3 = 1,5 dp)</string>
+    <string name="gb_preview">Попередній перегляд</string>
+    <string name="gb_direction_section">Напрямок</string>
+    <string name="gb_direction">Напрямок градієнта</string>
 </resources>

@@ -927,4 +927,12 @@
         <item>Tiếng Việt</item>
         <item>Tiếng Ukraina</item>
     </string-array>
+    <string-array name="gb_directions">
+        <item>Đường chéo (từ trên trái xuống dưới phải)</item>
+        <item>Từ trái sang phải</item>
+        <item>Từ phải sang trái</item>
+        <item>Từ trên xuống dưới</item>
+        <item>Từ dưới lên trên</item>
+        <item>Hướng tâm (từ giữa)</item>
+    </string-array>
 </resources>

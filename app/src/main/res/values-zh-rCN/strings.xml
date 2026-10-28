@@ -1308,4 +1308,40 @@
     <string name="lockscreen_analog_seconds">秒针</string>
     <string name="lockscreen_analog_seconds_summary">在锁屏上显示秒针（息屏显示时不显示，以节省电量）</string>
     <string name="aod_analog_img_color">表盘图像颜色</string>
+    <string name="lockscreen_widgets_alarm_default_app">使用系统时钟应用</string>
+    <string name="main_custom_widgets3">大型小部件 3</string>
+    <string name="main_custom_widgets4">大型小部件 4</string>
+    <string name="nav_misc_search_border">设置搜索框边框</string>
+    <string name="nav_misc_search_border_summary">在设置主页的搜索框周围显示强调色轮廓</string>
+    <string name="launcher_recents_icon_round">最近任务图标:圆角程度(0 = 方形,50 = 圆形)</string>
+    <string name="launcher_recents_icon_size">最近任务图标:大小(%)</string>
+    <string name="settings_backup_date">备份日期格式</string>
+    <string name="settings_backup_time">备份时间格式</string>
+    <string name="bf_dmy">日-月-年</string>
+    <string name="bf_dmy_short">日-月-年,两位数年份</string>
+    <string name="bf_ymd">年-月-日</string>
+    <string name="bf_ymd_compact">年月日,不带连字符</string>
+    <string name="bf_hm">时:分,24 小时制</string>
+    <string name="bf_hms">时:分:秒</string>
+    <string name="bf_hm_compact">时和分,不带分隔符</string>
+    <string name="bf_hm12">12 小时制(AM/PM)</string>
+    <string name="settings_backup_time_none">不含时间(仅日期)</string>
+    <string name="gb_note">为对话框、弹出窗口、通知和提示(Toast)添加 2 或 3 种颜色的渐变边框。默认第一种颜色为你的强调色,也可以选择其他颜色。</string>
+    <string name="gb_title">渐变边框</string>
+    <string name="gb_summary">对话框、弹出窗口、通知、提示和窗口</string>
+    <string name="gb_colors">颜色</string>
+    <string name="gb_c1">颜色 1</string>
+    <string name="gb_c1_summary">你的强调色(跟随 Oxydian Theme)</string>
+    <string name="gb_c2">颜色 2</string>
+    <string name="gb_c3">颜色 3(可选)</string>
+    <string name="gb_c3_none">无(两种颜色)</string>
+    <string name="gb_c3_pick">选择颜色</string>
+    <string name="nav_gradient_border">渐变边框</string>
+    <string name="nav_gradient_border_summary">为对话框、弹出窗口、通知和提示添加 2 或 3 种颜色的边框</string>
+    <string name="gb_c1_accent">强调色(跟随 Oxydian Theme)</string>
+    <string name="gb_thickness_section">粗细</string>
+    <string name="gb_thickness">边框粗细(半 dp:3 = 1.5 dp)</string>
+    <string name="gb_preview">预览</string>
+    <string name="gb_direction_section">方向</string>
+    <string name="gb_direction">渐变方向</string>
 </resources>

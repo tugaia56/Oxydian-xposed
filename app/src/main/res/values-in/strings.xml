@@ -1308,4 +1308,40 @@
     <string name="lockscreen_analog_seconds">Jarum detik</string>
     <string name="lockscreen_analog_seconds_summary">Tampilkan detik di layar kunci (tidak di AOD, untuk menghemat baterai)</string>
     <string name="aod_analog_img_color">Warna gambar dial</string>
+    <string name="lockscreen_widgets_alarm_default_app">Gunakan aplikasi Jam sistem</string>
+    <string name="main_custom_widgets3">Widget besar 3</string>
+    <string name="main_custom_widgets4">Widget besar 4</string>
+    <string name="nav_misc_search_border">Bingkai pada kolom pencarian Pengaturan</string>
+    <string name="nav_misc_search_border_summary">Garis tepi berwarna aksen di sekeliling kolom Cari pada halaman utama Pengaturan</string>
+    <string name="launcher_recents_icon_round">Ikon Terbaru: kebulatan sudut (0 = kotak, 50 = bulat)</string>
+    <string name="launcher_recents_icon_size">Ikon Terbaru: ukuran (%)</string>
+    <string name="settings_backup_date">Format tanggal cadangan</string>
+    <string name="settings_backup_time">Format waktu cadangan</string>
+    <string name="bf_dmy">hari-bulan-tahun</string>
+    <string name="bf_dmy_short">hari-bulan-tahun, tahun singkat</string>
+    <string name="bf_ymd">tahun-bulan-hari</string>
+    <string name="bf_ymd_compact">tahun bulan hari, tanpa tanda hubung</string>
+    <string name="bf_hm">jam:menit, format 24 jam</string>
+    <string name="bf_hms">jam:menit:detik</string>
+    <string name="bf_hm_compact">jam dan menit, tanpa pemisah</string>
+    <string name="bf_hm12">12 jam dengan AM/PM</string>
+    <string name="settings_backup_time_none">Tanpa waktu (hanya tanggal)</string>
+    <string name="gb_note">Bingkai gradasi dengan 2 atau 3 warna untuk dialog, popup, notifikasi, dan toast. Secara default warna pertama adalah warna aksen Anda, tetapi Anda dapat memilih yang lain.</string>
+    <string name="gb_title">Bingkai gradasi</string>
+    <string name="gb_summary">Dialog, popup, notifikasi, toast, dan jendela</string>
+    <string name="gb_colors">Warna</string>
+    <string name="gb_c1">Warna 1</string>
+    <string name="gb_c1_summary">Aksen Anda (mengikuti Oxydian Theme)</string>
+    <string name="gb_c2">Warna 2</string>
+    <string name="gb_c3">Warna 3 (opsional)</string>
+    <string name="gb_c3_none">Tidak ada (dua warna)</string>
+    <string name="gb_c3_pick">Pilih warna</string>
+    <string name="nav_gradient_border">Bingkai gradasi</string>
+    <string name="nav_gradient_border_summary">Bingkai 2 atau 3 warna pada dialog, popup, notifikasi, dan toast</string>
+    <string name="gb_c1_accent">Aksen (mengikuti Oxydian Theme)</string>
+    <string name="gb_thickness_section">Ketebalan</string>
+    <string name="gb_thickness">Ketebalan bingkai (setengah dp: 3 = 1,5 dp)</string>
+    <string name="gb_preview">Pratinjau</string>
+    <string name="gb_direction_section">Arah</string>
+    <string name="gb_direction">Arah gradasi</string>
 </resources>

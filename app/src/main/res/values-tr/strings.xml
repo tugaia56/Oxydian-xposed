@@ -1308,4 +1308,40 @@
     <string name="lockscreen_analog_seconds">Saniye ibresi</string>
     <string name="lockscreen_analog_seconds_summary">Saniyeleri kilit ekranında gösterir (pil tasarrufu için AOD\'de değil)</string>
     <string name="aod_analog_img_color">Kadran görseli rengi</string>
+    <string name="lockscreen_widgets_alarm_default_app">Sistem Saat uygulamasını kullan</string>
+    <string name="main_custom_widgets3">Büyük Widget 3</string>
+    <string name="main_custom_widgets4">Büyük Widget 4</string>
+    <string name="nav_misc_search_border">Ayarlar arama alanında kenarlık</string>
+    <string name="nav_misc_search_border_summary">Ayarlar ana sayfasındaki Arama çubuğunun etrafında vurgu renginde çerçeve</string>
+    <string name="launcher_recents_icon_round">Son uygulama simgeleri: köşe yuvarlaklığı (0 = kare, 50 = yuvarlak)</string>
+    <string name="launcher_recents_icon_size">Son uygulama simgeleri: boyut (%)</string>
+    <string name="settings_backup_date">Yedek tarih biçimi</string>
+    <string name="settings_backup_time">Yedek saat biçimi</string>
+    <string name="bf_dmy">gün-ay-yıl</string>
+    <string name="bf_dmy_short">gün-ay-yıl, kısa yıl</string>
+    <string name="bf_ymd">yıl-ay-gün</string>
+    <string name="bf_ymd_compact">yıl ay gün, tire olmadan</string>
+    <string name="bf_hm">saat:dakika, 24 saat</string>
+    <string name="bf_hms">saat:dakika:saniye</string>
+    <string name="bf_hm_compact">saat ve dakika, ayırıcı olmadan</string>
+    <string name="bf_hm12">AM/PM ile 12 saat</string>
+    <string name="settings_backup_time_none">Saat yok (yalnızca tarih)</string>
+    <string name="gb_note">Diyaloglar, açılır pencereler, bildirimler ve toast iletileri için 2 veya 3 renkli degrade kenarlık. Varsayılan olarak ilk renk vurgu renginizdir, ancak başka bir renk seçebilirsiniz.</string>
+    <string name="gb_title">Degrade kenarlık</string>
+    <string name="gb_summary">Diyaloglar, açılır pencereler, bildirimler, toast iletileri ve pencereler</string>
+    <string name="gb_colors">Renkler</string>
+    <string name="gb_c1">Renk 1</string>
+    <string name="gb_c1_summary">Vurgu renginiz (Oxydian Theme ile aynı)</string>
+    <string name="gb_c2">Renk 2</string>
+    <string name="gb_c3">Renk 3 (isteğe bağlı)</string>
+    <string name="gb_c3_none">Yok (iki renk)</string>
+    <string name="gb_c3_pick">Renk seç</string>
+    <string name="nav_gradient_border">Degrade kenarlık</string>
+    <string name="nav_gradient_border_summary">Diyaloglar, açılır pencereler, bildirimler ve toast iletilerinde 2 veya 3 renkli kenarlık</string>
+    <string name="gb_c1_accent">Vurgu (Oxydian Theme ile aynı)</string>
+    <string name="gb_thickness_section">Kalınlık</string>
+    <string name="gb_thickness">Kenarlık kalınlığı (yarım dp: 3 = 1,5 dp)</string>
+    <string name="gb_preview">Önizleme</string>
+    <string name="gb_direction_section">Yön</string>
+    <string name="gb_direction">Degrade yönü</string>
 </resources>

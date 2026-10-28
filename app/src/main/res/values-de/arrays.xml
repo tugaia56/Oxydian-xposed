@@ -927,4 +927,12 @@
         <item>Vietnamesisch</item>
         <item>Ukrainisch</item>
     </string-array>
+    <string-array name="gb_directions">
+        <item>Diagonal (oben links nach unten rechts)</item>
+        <item>Von links nach rechts</item>
+        <item>Von rechts nach links</item>
+        <item>Von oben nach unten</item>
+        <item>Von unten nach oben</item>
+        <item>Radial (von der Mitte aus)</item>
+    </string-array>
 </resources>

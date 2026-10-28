@@ -927,4 +927,12 @@
         <item>Vietnamita</item>
         <item>Ucraniano</item>
     </string-array>
+    <string-array name="gb_directions">
+        <item>Diagonal (do canto superior esquerdo ao inferior direito)</item>
+        <item>Da esquerda para a direita</item>
+        <item>Da direita para a esquerda</item>
+        <item>De cima para baixo</item>
+        <item>De baixo para cima</item>
+        <item>Radial (a partir do centro)</item>
+    </string-array>
 </resources>

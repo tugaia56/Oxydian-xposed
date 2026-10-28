@@ -926,4 +926,12 @@
         <item>Вьетнамский</item>
         <item>Украинский</item>
     </string-array>
+    <string-array name="gb_directions">
+        <item>По диагонали (из левого верхнего угла в правый нижний)</item>
+        <item>Слева направо</item>
+        <item>Справа налево</item>
+        <item>Сверху вниз</item>
+        <item>Снизу вверх</item>
+        <item>Радиальный (от центра)</item>
+    </string-array>
 </resources>

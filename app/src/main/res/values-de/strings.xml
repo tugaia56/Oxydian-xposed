@@ -1308,4 +1308,40 @@
     <string name="lockscreen_analog_seconds">Sekundenzeiger</string>
     <string name="lockscreen_analog_seconds_summary">Zeigt die Sekunden auf dem Sperrbildschirm (nicht im Always-on-Display, um Akku zu sparen)</string>
     <string name="aod_analog_img_color">Farbe des Zifferblattbilds</string>
+    <string name="lockscreen_widgets_alarm_default_app">Standard-Uhr-App des Systems verwenden</string>
+    <string name="main_custom_widgets3">Großes Widget 3</string>
+    <string name="main_custom_widgets4">Großes Widget 4</string>
+    <string name="nav_misc_search_border">Rahmen am Suchfeld der Einstellungen</string>
+    <string name="nav_misc_search_border_summary">Umriss in Akzentfarbe um die Suchleiste auf der Startseite der Einstellungen</string>
+    <string name="launcher_recents_icon_round">Symbole in „Zuletzt verwendet“: Eckenrundung (0 = eckig, 50 = rund)</string>
+    <string name="launcher_recents_icon_size">Symbole in „Zuletzt verwendet“: Größe (%)</string>
+    <string name="settings_backup_date">Datumsformat der Sicherung</string>
+    <string name="settings_backup_time">Zeitformat der Sicherung</string>
+    <string name="bf_dmy">Tag-Monat-Jahr</string>
+    <string name="bf_dmy_short">Tag-Monat-Jahr, Jahr zweistellig</string>
+    <string name="bf_ymd">Jahr-Monat-Tag</string>
+    <string name="bf_ymd_compact">Jahr Monat Tag, ohne Bindestriche</string>
+    <string name="bf_hm">Stunden:Minuten, 24-Stunden-Format</string>
+    <string name="bf_hms">Stunden:Minuten:Sekunden</string>
+    <string name="bf_hm_compact">Stunden und Minuten, ohne Trennzeichen</string>
+    <string name="bf_hm12">12-Stunden-Format mit AM/PM</string>
+    <string name="settings_backup_time_none">Keine Uhrzeit (nur Datum)</string>
+    <string name="gb_note">Verlaufsrahmen mit 2 oder 3 Farben für Dialoge, Popups, Benachrichtigungen und Toasts. Standardmäßig ist die erste Farbe deine Akzentfarbe, du kannst aber eine andere wählen.</string>
+    <string name="gb_title">Verlaufsrahmen</string>
+    <string name="gb_summary">Dialoge, Popups, Benachrichtigungen, Toasts und Fenster</string>
+    <string name="gb_colors">Farben</string>
+    <string name="gb_c1">Farbe 1</string>
+    <string name="gb_c1_summary">Deine Akzentfarbe (folgt Oxydian Theme)</string>
+    <string name="gb_c2">Farbe 2</string>
+    <string name="gb_c3">Farbe 3 (optional)</string>
+    <string name="gb_c3_none">Keine (zwei Farben)</string>
+    <string name="gb_c3_pick">Farbe wählen</string>
+    <string name="nav_gradient_border">Verlaufsrahmen</string>
+    <string name="nav_gradient_border_summary">Rahmen mit 2 oder 3 Farben für Dialoge, Popups, Benachrichtigungen und Toasts</string>
+    <string name="gb_c1_accent">Akzent (folgt Oxydian Theme)</string>
+    <string name="gb_thickness_section">Stärke</string>
+    <string name="gb_thickness">Rahmenstärke (halbe dp: 3 = 1,5 dp)</string>
+    <string name="gb_preview">Vorschau</string>
+    <string name="gb_direction_section">Richtung</string>
+    <string name="gb_direction">Verlaufsrichtung</string>
 </resources>

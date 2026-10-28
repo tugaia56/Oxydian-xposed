@@ -1308,4 +1308,40 @@
     <string name="lockscreen_analog_seconds">Ponteiro dos segundos</string>
     <string name="lockscreen_analog_seconds_summary">Mostra os segundos na tela de bloqueio (não no AOD, para economizar bateria)</string>
     <string name="aod_analog_img_color">Cor da imagem do mostrador</string>
+    <string name="lockscreen_widgets_alarm_default_app">Usar o app Relógio do sistema</string>
+    <string name="main_custom_widgets3">Widget grande 3</string>
+    <string name="main_custom_widgets4">Widget grande 4</string>
+    <string name="nav_misc_search_border">Borda no campo de pesquisa das Configurações</string>
+    <string name="nav_misc_search_border_summary">Contorno na cor de destaque ao redor da barra de pesquisa na página inicial das Configurações</string>
+    <string name="launcher_recents_icon_round">Ícones dos recentes: arredondamento dos cantos (0 = quadrado, 50 = redondo)</string>
+    <string name="launcher_recents_icon_size">Ícones dos recentes: tamanho (%)</string>
+    <string name="settings_backup_date">Formato da data do backup</string>
+    <string name="settings_backup_time">Formato da hora do backup</string>
+    <string name="bf_dmy">dia-mês-ano</string>
+    <string name="bf_dmy_short">dia-mês-ano, ano curto</string>
+    <string name="bf_ymd">ano-mês-dia</string>
+    <string name="bf_ymd_compact">ano mês dia, sem hífens</string>
+    <string name="bf_hm">horas:minutos, formato de 24 horas</string>
+    <string name="bf_hms">horas:minutos:segundos</string>
+    <string name="bf_hm_compact">horas e minutos, sem separador</string>
+    <string name="bf_hm12">12 horas com AM/PM</string>
+    <string name="settings_backup_time_none">Sem hora (apenas data)</string>
+    <string name="gb_note">Borda em degradê com 2 ou 3 cores para diálogos, pop-ups, notificações e toasts. Por padrão, a primeira cor é o seu destaque, mas você pode escolher outra.</string>
+    <string name="gb_title">Borda em degradê</string>
+    <string name="gb_summary">Diálogos, pop-ups, notificações, toasts e janelas</string>
+    <string name="gb_colors">Cores</string>
+    <string name="gb_c1">Cor 1</string>
+    <string name="gb_c1_summary">Seu destaque (acompanha o Oxydian Theme)</string>
+    <string name="gb_c2">Cor 2</string>
+    <string name="gb_c3">Cor 3 (opcional)</string>
+    <string name="gb_c3_none">Nenhuma (duas cores)</string>
+    <string name="gb_c3_pick">Escolher cor</string>
+    <string name="nav_gradient_border">Borda em degradê</string>
+    <string name="nav_gradient_border_summary">Borda com 2 ou 3 cores em diálogos, pop-ups, notificações e toasts</string>
+    <string name="gb_c1_accent">Destaque (acompanha o Oxydian Theme)</string>
+    <string name="gb_thickness_section">Espessura</string>
+    <string name="gb_thickness">Espessura da borda (meio dp: 3 = 1,5 dp)</string>
+    <string name="gb_preview">Pré-visualização</string>
+    <string name="gb_direction_section">Direção</string>
+    <string name="gb_direction">Direção do degradê</string>
 </resources>

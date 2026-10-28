@@ -1308,4 +1308,40 @@
     <string name="lockscreen_analog_seconds">Segundero</string>
     <string name="lockscreen_analog_seconds_summary">Muestra los segundos en la pantalla de bloqueo (no en la pantalla siempre activa, para ahorrar batería)</string>
     <string name="aod_analog_img_color">Color de la imagen de la esfera</string>
+    <string name="lockscreen_widgets_alarm_default_app">Usar la app Reloj del sistema</string>
+    <string name="main_custom_widgets3">Widget grande 3</string>
+    <string name="main_custom_widgets4">Widget grande 4</string>
+    <string name="nav_misc_search_border">Borde en el campo de búsqueda de Ajustes</string>
+    <string name="nav_misc_search_border_summary">Contorno con el color de acento alrededor de la barra de búsqueda en la página principal de Ajustes</string>
+    <string name="launcher_recents_icon_round">Iconos de recientes: redondez de las esquinas (0 = cuadrado, 50 = redondo)</string>
+    <string name="launcher_recents_icon_size">Iconos de recientes: tamaño (%)</string>
+    <string name="settings_backup_date">Formato de fecha de la copia de seguridad</string>
+    <string name="settings_backup_time">Formato de hora de la copia de seguridad</string>
+    <string name="bf_dmy">día-mes-año</string>
+    <string name="bf_dmy_short">día-mes-año, año corto</string>
+    <string name="bf_ymd">año-mes-día</string>
+    <string name="bf_ymd_compact">año mes día, sin guiones</string>
+    <string name="bf_hm">horas:minutos, formato de 24 horas</string>
+    <string name="bf_hms">horas:minutos:segundos</string>
+    <string name="bf_hm_compact">horas y minutos, sin separador</string>
+    <string name="bf_hm12">12 horas con AM/PM</string>
+    <string name="settings_backup_time_none">Sin hora (solo fecha)</string>
+    <string name="gb_note">Borde degradado con 2 o 3 colores para diálogos, ventanas emergentes, notificaciones y avisos. Por defecto, el primer color es tu acento, pero puedes elegir otro.</string>
+    <string name="gb_title">Borde degradado</string>
+    <string name="gb_summary">Diálogos, ventanas emergentes, notificaciones, avisos y ventanas</string>
+    <string name="gb_colors">Colores</string>
+    <string name="gb_c1">Color 1</string>
+    <string name="gb_c1_summary">Tu acento (sigue a Oxydian Theme)</string>
+    <string name="gb_c2">Color 2</string>
+    <string name="gb_c3">Color 3 (opcional)</string>
+    <string name="gb_c3_none">Ninguno (dos colores)</string>
+    <string name="gb_c3_pick">Elegir color</string>
+    <string name="nav_gradient_border">Borde degradado</string>
+    <string name="nav_gradient_border_summary">Borde con 2 o 3 colores en diálogos, ventanas emergentes, notificaciones y avisos</string>
+    <string name="gb_c1_accent">Acento (sigue a Oxydian Theme)</string>
+    <string name="gb_thickness_section">Grosor</string>
+    <string name="gb_thickness">Grosor del borde (medio dp: 3 = 1,5 dp)</string>
+    <string name="gb_preview">Vista previa</string>
+    <string name="gb_direction_section">Dirección</string>
+    <string name="gb_direction">Dirección del degradado</string>
 </resources>

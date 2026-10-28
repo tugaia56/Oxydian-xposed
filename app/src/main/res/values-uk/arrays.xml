@@ -928,4 +928,12 @@
         <item>В\'єтнамська</item>
         <item>Українська</item>
     </string-array>
+    <string-array name="gb_directions">
+        <item>По діагоналі (з лівого верхнього кута в правий нижній)</item>
+        <item>Зліва направо</item>
+        <item>Справа наліво</item>
+        <item>Згори вниз</item>
+        <item>Знизу вгору</item>
+        <item>Радіальний (від центру)</item>
+    </string-array>
 </resources>

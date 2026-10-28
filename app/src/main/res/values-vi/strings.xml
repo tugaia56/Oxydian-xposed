@@ -1308,4 +1308,40 @@
     <string name="lockscreen_analog_seconds">Kim giây</string>
     <string name="lockscreen_analog_seconds_summary">Hiển thị giây trên màn hình khóa (không hiển thị trên AOD để tiết kiệm pin)</string>
     <string name="aod_analog_img_color">Màu hình ảnh mặt đồng hồ</string>
+    <string name="lockscreen_widgets_alarm_default_app">Dùng ứng dụng Đồng hồ của hệ thống</string>
+    <string name="main_custom_widgets3">Widget lớn 3</string>
+    <string name="main_custom_widgets4">Widget lớn 4</string>
+    <string name="nav_misc_search_border">Viền cho ô tìm kiếm trong Cài đặt</string>
+    <string name="nav_misc_search_border_summary">Viền màu nhấn quanh thanh Tìm kiếm ở trang chủ Cài đặt</string>
+    <string name="launcher_recents_icon_round">Biểu tượng gần đây: độ bo góc (0 = vuông, 50 = tròn)</string>
+    <string name="launcher_recents_icon_size">Biểu tượng gần đây: kích thước (%)</string>
+    <string name="settings_backup_date">Định dạng ngày của bản sao lưu</string>
+    <string name="settings_backup_time">Định dạng giờ của bản sao lưu</string>
+    <string name="bf_dmy">ngày-tháng-năm</string>
+    <string name="bf_dmy_short">ngày-tháng-năm, năm rút gọn</string>
+    <string name="bf_ymd">năm-tháng-ngày</string>
+    <string name="bf_ymd_compact">năm tháng ngày, không dấu gạch ngang</string>
+    <string name="bf_hm">giờ:phút, định dạng 24 giờ</string>
+    <string name="bf_hms">giờ:phút:giây</string>
+    <string name="bf_hm_compact">giờ và phút, không dấu phân cách</string>
+    <string name="bf_hm12">12 giờ với AM/PM</string>
+    <string name="settings_backup_time_none">Không có giờ (chỉ ngày)</string>
+    <string name="gb_note">Viền chuyển sắc 2 hoặc 3 màu cho hộp thoại, cửa sổ bật lên, thông báo và toast. Mặc định màu đầu tiên là màu nhấn của bạn, nhưng bạn có thể chọn màu khác.</string>
+    <string name="gb_title">Viền chuyển sắc</string>
+    <string name="gb_summary">Hộp thoại, cửa sổ bật lên, thông báo, toast và cửa sổ</string>
+    <string name="gb_colors">Màu sắc</string>
+    <string name="gb_c1">Màu 1</string>
+    <string name="gb_c1_summary">Màu nhấn của bạn (theo Oxydian Theme)</string>
+    <string name="gb_c2">Màu 2</string>
+    <string name="gb_c3">Màu 3 (tùy chọn)</string>
+    <string name="gb_c3_none">Không (hai màu)</string>
+    <string name="gb_c3_pick">Chọn màu</string>
+    <string name="nav_gradient_border">Viền chuyển sắc</string>
+    <string name="nav_gradient_border_summary">Viền 2 hoặc 3 màu cho hộp thoại, cửa sổ bật lên, thông báo và toast</string>
+    <string name="gb_c1_accent">Màu nhấn (theo Oxydian Theme)</string>
+    <string name="gb_thickness_section">Độ dày</string>
+    <string name="gb_thickness">Độ dày viền (nửa dp: 3 = 1,5 dp)</string>
+    <string name="gb_preview">Xem trước</string>
+    <string name="gb_direction_section">Hướng</string>
+    <string name="gb_direction">Hướng chuyển sắc</string>
 </resources>
