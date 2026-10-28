@@ -4,9 +4,20 @@
 MODDIR=${0%/*}
 OUT=/data/local/tmp/bootcap.log
 DUR=${BOOTCAP_SECS:-240}
-renice -n 19 $$ >/dev/null 2>&1
+renice -n 5 $$ >/dev/null 2>&1
 : > "$OUT"
-echo "bootcap v4 $(date)" >> "$OUT"
+echo "bootcap v5 $(date)" >> "$OUT"
+
+# CPU per thread di un processo in 1 secondo: "percentuale-tick tid nome", i primi 6
+threads() {
+  p=$(pidof "$1" | cut -d' ' -f1)
+  [ -n "$p" ] || return
+  echo "-- thread $1:"
+  snap() { awk '{ r = $0; tid = $1; c = r; sub(/^[0-9]+ \(/, "", c); sub(/\) .*/, "", c); sub(/.*\) /, "", r); n = split(r, f, " "); print tid, f[12] + f[13], c }' /proc/$p/task/*/stat 2>/dev/null; }
+  snap > "$OUT.t0"; sleep 1; snap > "$OUT.t1"
+  awk 'NR == FNR { a[$1] = $2; next } { d = $2 - a[$1]; if (d > 0) print d, $1, $3 }' "$OUT.t0" "$OUT.t1" | sort -nr | head -6
+  rm -f "$OUT.t0" "$OUT.t1"
+}
 n=0
 while [ $((n * 10)) -lt "$DUR" ]; do
   up=$(cut -d' ' -f1 /proc/uptime)
@@ -22,9 +33,10 @@ while [ $((n * 10)) -lt "$DUR" ]; do
     /system/bin/top -b -n 2 -d 1 -m 8 -s 2 -o PID,%CPU,RES,ARGS 2>/dev/null | awk '/PID/{blk++} blk==2' | head -9 | cut -c1-110
     echo "-- memoria (RSS):"
     /system/bin/ps -A -o PID,RSS,ARGS --sort=-rss 2>/dev/null | head -7 | cut -c1-110
+    if [ "${up%%.*}" -lt 130 ]; then threads system_server; threads com.android.systemui; fi
   } >> "$OUT"
   n=$((n + 1))
-  sleep 10
+  if [ "${up%%.*}" -lt 130 ]; then sleep 3; else sleep 10; fi
 done
 {
   echo "=== fine: processi con piu' tempo CPU accumulato dall'avvio"

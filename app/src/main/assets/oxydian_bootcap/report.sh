@@ -12,6 +12,7 @@ awk '
 /^psi mem:/ { split($4, a, "="); if (a[2] + 0 > maxp + 0) maxp = a[2]; next }
 /^-- CPU:/ { mode = "cpu"; next }
 /^-- memoria/ { mode = "mem"; next }
+/^-- thread/ { mode = "thr"; next }
 /^fine:/ { mode = "end"; next }
 mode == "cpu" && $1 ~ /^[0-9]+$/ && $2 ~ /^[0-9.]+$/ && $4 !~ /^(top|-b)/ { name = $4; cpu[name] += $2; cs[name]++ }
 mode == "mem" && $1 ~ /^[0-9]+$/ && $2 ~ /^[0-9]+$/ { name = $3; if ($2 + 0 > rss[name] + 0) rss[name] = $2 }

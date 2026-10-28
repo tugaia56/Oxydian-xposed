@@ -1,6 +1,6 @@
 id=oxydian_bootcap
 name=Oxydian Boot Log
-version=v4
-versionCode=4
+version=v5
+versionCode=5
 author=tugaia56
 description=Registra 4 minuti di carico all'avvio quando lo attivi dalla pagina Log di avvio di Oxydian
