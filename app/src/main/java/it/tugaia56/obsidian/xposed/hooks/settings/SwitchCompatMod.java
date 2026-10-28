@@ -60,7 +60,6 @@ public class SwitchCompatMod extends XposedMods {
                     }
                 }
             });
-            XposedBridge.log("[ Obsidian ] SwitchCompatMod: hooked SwitchCompat.onDraw in " + lp.packageName);
         } catch (Throwable t) {
             XposedBridge.log("[ Obsidian ] SwitchCompatMod: hook failed in " + lp.packageName + ": " + t);
         }

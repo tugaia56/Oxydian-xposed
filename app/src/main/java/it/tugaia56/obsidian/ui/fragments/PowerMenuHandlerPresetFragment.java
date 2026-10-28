@@ -117,7 +117,6 @@ public class PowerMenuHandlerPresetFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        checkExternalImageChange();
         if (mRv != null) rebuild();
     }
 
@@ -196,7 +195,6 @@ public class PowerMenuHandlerPresetFragment extends Fragment {
                 int n;
                 while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
             }
-            logImageWrite("gallery pick");
             ObsidianPrefs.putString(PREF_HANDLER_MODE, BG_MODE_IMAGE);
             mCurrentStyle = -1;
             // Foto nuova: il riquadro di una foto precedente non ha senso, riparte centrato
@@ -259,7 +257,6 @@ public class PowerMenuHandlerPresetFragment extends Fragment {
                 bmp.compress(Bitmap.CompressFormat.PNG, 100, out);
             }
 
-            logImageWrite("preset fingerprint_" + index);
             ObsidianPrefs.putString(PREF_HANDLER_MODE, BG_MODE_IMAGE);
             mCurrentStyle = index;
             ObsidianPrefs.putInt(PREF_HANDLER_CROP_CX, 50);
@@ -270,45 +267,6 @@ public class PowerMenuHandlerPresetFragment extends Fragment {
             AppUtils.showRestartReminder(requireContext());
         } catch (Throwable t) {
             Toast.makeText(requireContext(), R.string.qs_header_pick_error, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    // ── Diagnostica temporanea: chi riscrive l'immagine del Pallino (2026-09-19) ──────────────
-    // Ogni scrittura fatta da questa schermata finisce in .obsidian/handler_image_log.txt; se
-    // all'apertura la data del file non corrisponde all'ultima scrittura registrata, e' cambiato
-    // per un'altra strada ("EXTERNAL CHANGE"). Da rimuovere quando la causa e' chiara.
-    private static final String PREF_LAST_WRITE_MTIME = "power_menu_handler_last_write_mtime";
-
-    private void appendImageLog(String line) {
-        try {
-            File log = new File(Environment.getExternalStorageDirectory(), ".obsidian/handler_image_log.txt");
-            try (FileOutputStream out = new FileOutputStream(log, true)) {
-                String ts = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US)
-                        .format(new java.util.Date());
-                out.write((ts + "  " + line + System.lineSeparator()).getBytes());
-            }
-        } catch (Throwable ignored) {}
-    }
-
-    private void logImageWrite(String source) {
-        appendImageLog("WRITE by " + source);
-        // mtime reale del file dopo la scrittura si conosce solo a compress/close finiti: si
-        // registra all'apertura successiva, ma qui segno "attesa" cosi' il confronto usa il valore vero
-        ObsidianPrefs.putString(PREF_LAST_WRITE_MTIME, "pending");
-    }
-
-    private void checkExternalImageChange() {
-        File f = getImageFile();
-        if (!f.exists()) return;
-        String mt = String.valueOf(f.lastModified());
-        String last = ObsidianPrefs.getString(PREF_LAST_WRITE_MTIME, null);
-        if ("pending".equals(last)) {
-            ObsidianPrefs.putString(PREF_LAST_WRITE_MTIME, mt);
-        } else if (last != null && !last.equals(mt)) {
-            appendImageLog("EXTERNAL CHANGE: file mtime " + mt + " != last own write " + last);
-            ObsidianPrefs.putString(PREF_LAST_WRITE_MTIME, mt);
-        } else if (last == null) {
-            ObsidianPrefs.putString(PREF_LAST_WRITE_MTIME, mt);
         }
     }
 

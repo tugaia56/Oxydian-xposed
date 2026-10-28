@@ -52,7 +52,7 @@ public final class GradientBorder {
     private static int sHalfDp = 0;
     private static int sDir = 0;
     private static Field sStateField, sWidthField, sColorsField;
-    private static int sLogged = 0, sDrawLogged = 0, sErrLogged = 0;
+    private static int sErrLogged = 0;
 
     private GradientBorder() {}
 
@@ -140,10 +140,6 @@ public final class GradientBorder {
     private static void mark(GradientDrawable d, int width, int color) {
         ensureHooked();
         d.setStroke(width, (MARK_ALPHA << 24) | (color & 0xFFFFFF));
-        if (sLogged < 3) {
-            sLogged++;
-            XposedBridge.log("[ Obsidian ] GradientBorder: marked " + d.getClass().getName() + " w=" + width);
-        }
     }
 
     private static void ensureHooked() {
@@ -168,10 +164,6 @@ public final class GradientBorder {
                             if (csl == null) return;
                             int c = csl.getDefaultColor();
                             if ((c >>> 24) != MARK_ALPHA) return;
-                            if (sDrawLogged < 3) {
-                                sDrawLogged++;
-                                XposedBridge.log("[ Obsidian ] GradientBorder: draw " + d.getClass().getName());
-                            }
                             draw(d, (Canvas) p.args[0], width, 0xFF000000 | (c & 0xFFFFFF));
                         } catch (Throwable t) {
                             if (sErrLogged < 3) {
@@ -182,7 +174,6 @@ public final class GradientBorder {
                     }
                 });
                 sHooked = true;
-                XposedBridge.log("[ Obsidian ] GradientBorder: draw hook installed");
             } catch (Throwable t) {
                 XposedBridge.log("[ Obsidian ] GradientBorder hook failed: " + t);
             }
