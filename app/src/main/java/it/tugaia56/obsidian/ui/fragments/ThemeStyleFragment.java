@@ -221,6 +221,17 @@ public class ThemeStyleFragment extends Fragment {
                 getString(R.string.nav_misc_settings_summary),
                 () -> showMiscSettingsDialog(cornerNames)));
 
+        mNavItems.add(new NavAdapter.NavItem(
+                R.drawable.ic_ui_styles,
+                getString(R.string.nav_gradient_border),
+                getString(R.string.nav_gradient_border_summary),
+                () -> {
+                    if (getActivity() instanceof it.tugaia56.obsidian.ui.activity.MainActivity) {
+                        ((it.tugaia56.obsidian.ui.activity.MainActivity) getActivity())
+                                .navigateTo(new GradientBorderFragment(), getString(R.string.nav_gradient_border));
+                    }
+                }));
+
         mNavAdapter = new NavAdapter(mNavItems, 0xFF00BCD4); // cyan, colore categoria "Stili Notifica e Toast"
         rv.setAdapter(new ConcatAdapter(headerAdapter, mNavAdapter));
     }
