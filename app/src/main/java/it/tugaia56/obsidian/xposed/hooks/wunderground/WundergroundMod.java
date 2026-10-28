@@ -83,7 +83,7 @@ public class WundergroundMod extends XposedMods {
     }
 
     /** Titolo dell'intestazione: l'app scrive "Citta', provincia di XY", che con le icone a destra va a capo su 4 righe e
-     *  viene tagliato. Si mostra solo il nome della localita' (fino alla prima virgola), alla misura originale. */
+     *  viene tagliato. Si toglie "provincia di" e si lascia "Citta', XY", alla misura originale. */
     private void hookSetText() {
         XposedHelpers.findAndHookMethod(TextView.class, "setText", CharSequence.class, TextView.BufferType.class, new XC_MethodHook() {
             @Override protected void beforeHookedMethod(MethodHookParam p) {
@@ -91,8 +91,8 @@ public class WundergroundMod extends XposedMods {
                     TextView tv = (TextView) p.thisObject;
                     if (mTitleId <= 0 || tv.getId() != mTitleId || !(p.args[0] instanceof CharSequence)) return;
                     String t = p.args[0].toString();
-                    int c = t.indexOf(',');
-                    if (c > 0) p.args[0] = t.substring(0, c).trim();
+                    String n = t.replaceFirst("(?i),\\s*provincia di\\s+", ", ");
+                    if (!n.equals(t)) p.args[0] = n;
                 } catch (Throwable ignored) {}
             }
         });
