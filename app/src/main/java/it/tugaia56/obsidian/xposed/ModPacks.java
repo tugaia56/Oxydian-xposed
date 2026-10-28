@@ -53,6 +53,7 @@ import it.tugaia56.obsidian.xposed.hooks.permissions.PermissionDialogMod;
 import it.tugaia56.obsidian.xposed.hooks.contacts.ContactsMod;
 import it.tugaia56.obsidian.xposed.hooks.garmin.GarminConnectMod;
 import it.tugaia56.obsidian.xposed.hooks.logfox.LogFoxMod;
+import it.tugaia56.obsidian.xposed.hooks.wunderground.WundergroundMod;
 import it.tugaia56.obsidian.xposed.hooks.messages.MessagesBubbleMod;
 
 public class ModPacks {
@@ -148,6 +149,9 @@ public class ModPacks {
         }
         if (GarminConnectMod.PKG.equals(packageName) || GarminConnectMod.PKG_IQ.equals(packageName)) {
             mods.add(GarminConnectMod.class);
+        }
+        if (WundergroundMod.PKG.equals(packageName)) {
+            mods.add(WundergroundMod.class);
         }
         if (LogFoxMod.PKG.equals(packageName)) {
             mods.add(LogFoxMod.class);
