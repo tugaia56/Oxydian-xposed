@@ -91,7 +91,7 @@ public class WundergroundMod extends XposedMods {
                     TextView tv = (TextView) p.thisObject;
                     if (mTitleId <= 0 || tv.getId() != mTitleId || !(p.args[0] instanceof CharSequence)) return;
                     String t = p.args[0].toString();
-                    String n = t.replaceFirst("(?i),\\s*provincia di\\s+", ", ");
+                    String n = t.replaceFirst("(?i),\\s*provincia di\\s+", ",\n");
                     if (!n.equals(t)) p.args[0] = n;
                 } catch (Throwable ignored) {}
             }
