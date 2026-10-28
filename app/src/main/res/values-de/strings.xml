@@ -1375,11 +1375,11 @@
     <string name="boot_title">Startprotokoll aufzeichnen</string>
     <string name="boot_summary">Beim nächsten Neustart zeichnet das Telefon 4 Minuten Last auf (CPU, Speicher, aktivste Apps), danach schaltet sich dieser Schalter von selbst aus</string>
     <string name="boot_always_title">Bei jedem Neustart</string>
-    <string name="boot_always_summary">Zeichnet bei jedem Neustart auf, bis du es ausschaltest. Nützlich, wenn das Einfrieren nur gelegentlich auftritt; der Start wird etwas langsamer und das vorherige Protokoll wird überschrieben</string>
+    <string name="boot_always_summary">Zeichnet bei jedem Neustart auf, bis du es ausschaltest. Nützlich, wenn das Einfrieren nur gelegentlich auftritt; der Start wird etwas langsamer. Die letzten 10 Protokolle bleiben erhalten</string>
     <string name="boot_show">Letztes Protokoll anzeigen</string>
     <string name="boot_show_summary">Zusammenfassung der letzten Aufzeichnung</string>
     <string name="boot_no_log">Noch keine Aufzeichnung</string>
-    <string name="boot_note">Nutze es, wenn das Telefon nach einem Neustart einfriert oder langsam wird (zum Beispiel beim Eingeben der PIN). Die Zusammenfassung zeigt die Lastspitze, den niedrigsten freien Speicher, den genutzten Swap und die aktivsten Apps, um zu verstehen, was das Telefon überlastet. Benötigt Root. Das vollständige Protokoll liegt in /data/local/tmp/bootcap.log.</string>
+    <string name="boot_note">Nutze es, wenn das Telefon nach einem Neustart einfriert oder langsam wird (zum Beispiel beim Eingeben der PIN). Die Zusammenfassung zeigt die Lastspitze, den niedrigsten freien Speicher, den genutzten Swap und die aktivsten Apps, um zu verstehen, was das Telefon überlastet. Benötigt Root. Die vollständigen Protokolle liegen im Ordner „Log Oxydian“ des internen Speichers.</string>
     <string name="boot_rep_none">Noch keine Aufzeichnung. Schalte den Schalter ein und starte das Telefon neu.</string>
     <string name="boot_rep_load">Lastspitze: %1$s (bei %2$s nach dem Start; über 8 ist hoch)</string>
     <string name="boot_rep_mem">Geringster freier Speicher: %1$s MB · max. genutzter Swap: %2$s MB</string>

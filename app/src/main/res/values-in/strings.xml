@@ -1375,11 +1375,11 @@
     <string name="boot_title">Rekam log booting</string>
     <string name="boot_summary">Pada penghidupan ulang berikutnya, ponsel merekam beban selama 4 menit (CPU, memori, aplikasi tersibuk), lalu sakelar ini mati sendiri</string>
     <string name="boot_always_title">Setiap kali dihidupkan ulang</string>
-    <string name="boot_always_summary">Terus merekam di setiap penghidupan ulang sampai Anda mematikannya. Berguna jika macet hanya sesekali; memperlambat sedikit proses booting dan menimpa log sebelumnya</string>
+    <string name="boot_always_summary">Terus merekam di setiap penghidupan ulang sampai Anda mematikannya. Berguna jika macet hanya sesekali; memperlambat sedikit proses booting. Menyimpan 10 log terakhir</string>
     <string name="boot_show">Tampilkan log terakhir</string>
     <string name="boot_show_summary">Ringkasan rekaman terakhir</string>
     <string name="boot_no_log">Belum ada rekaman</string>
-    <string name="boot_note">Gunakan saat ponsel macet atau melambat setelah dihidupkan ulang (misalnya saat mengetik PIN). Ringkasan menampilkan puncak beban, memori bebas terendah, jumlah swap yang dipakai, dan aplikasi tersibuk, untuk memahami apa yang membebani ponsel. Memerlukan root. Log lengkap ada di /data/local/tmp/bootcap.log.</string>
+    <string name="boot_note">Gunakan saat ponsel macet atau melambat setelah dihidupkan ulang (misalnya saat mengetik PIN). Ringkasan menampilkan puncak beban, memori bebas terendah, jumlah swap yang dipakai, dan aplikasi tersibuk, untuk memahami apa yang membebani ponsel. Memerlukan root. Log lengkap disimpan di folder “Log Oxydian” pada penyimpanan internal.</string>
     <string name="boot_rep_none">Belum ada rekaman. Aktifkan sakelar dan hidupkan ulang ponsel.</string>
     <string name="boot_rep_load">Puncak beban: %1$s (pada %2$s setelah booting; di atas 8 tergolong berat)</string>
     <string name="boot_rep_mem">Memori bebas terendah: %1$s MB · swap terpakai maksimal: %2$s MB</string>

@@ -1375,11 +1375,11 @@
     <string name="boot_title">Açılış günlüğünü kaydet</string>
     <string name="boot_summary">Bir sonraki yeniden başlatmada telefon 4 dakikalık yükü (CPU, bellek, en yoğun uygulamalar) kaydeder, ardından bu anahtar kendiliğinden kapanır</string>
     <string name="boot_always_title">Her yeniden başlatmada</string>
-    <string name="boot_always_summary">Siz kapatana kadar her yeniden başlatmada kayda devam eder. Donmalar yalnızca ara sıra oluyorsa yararlıdır; açılışı biraz yavaşlatır ve önceki günlüğün üzerine yazar</string>
+    <string name="boot_always_summary">Siz kapatana kadar her yeniden başlatmada kayda devam eder. Donmalar yalnızca ara sıra oluyorsa yararlıdır; açılışı biraz yavaşlatır. Son 10 günlüğü saklar</string>
     <string name="boot_show">Son günlüğü göster</string>
     <string name="boot_show_summary">Son kaydın özeti</string>
     <string name="boot_no_log">Henüz kayıt yok</string>
-    <string name="boot_note">Telefon yeniden başlatmadan sonra donduğunda veya yavaşladığında (örneğin PIN yazarken) kullanın. Özet; yük zirvesini, en düşük boş belleği, kullanılan swap miktarını ve en yoğun uygulamaları göstererek telefonu neyin yorduğunu anlamanıza yardım eder. Root gerekir. Tam günlük /data/local/tmp/bootcap.log dosyasındadır.</string>
+    <string name="boot_note">Telefon yeniden başlatmadan sonra donduğunda veya yavaşladığında (örneğin PIN yazarken) kullanın. Özet; yük zirvesini, en düşük boş belleği, kullanılan swap miktarını ve en yoğun uygulamaları göstererek telefonu neyin yorduğunu anlamanıza yardım eder. Root gerekir. Tam günlükler dahili depolamadaki “Log Oxydian” klasörüne kaydedilir.</string>
     <string name="boot_rep_none">Henüz kayıt yok. Anahtarı açın ve telefonu yeniden başlatın.</string>
     <string name="boot_rep_load">Yük zirvesi: %1$s (açılıştan %2$s sonra; 8’in üstü ağırdır)</string>
     <string name="boot_rep_mem">En düşük boş bellek: %1$s MB · kullanılan en yüksek swap: %2$s MB</string>

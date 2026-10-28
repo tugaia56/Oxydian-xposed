@@ -1357,11 +1357,11 @@
     <string name="boot_title">Registra il log di avvio</string>
     <string name="boot_summary">Al prossimo riavvio il telefono registra 4 minuti di carico (CPU, memoria, app più pesanti), poi l’interruttore si spegne da solo</string>
     <string name="boot_always_title">Ad ogni riavvio</string>
-    <string name="boot_always_summary">Continua a registrare ad ogni riavvio finché non lo spegni. Utile se i blocchi capitano solo ogni tanto; rallenta un po’ l’avvio e sovrascrive il log precedente</string>
+    <string name="boot_always_summary">Continua a registrare ad ogni riavvio finché non lo spegni. Utile se i blocchi capitano solo ogni tanto; rallenta un po’ l’avvio. Conserva gli ultimi 10 log</string>
     <string name="boot_show">Mostra ultimo log</string>
     <string name="boot_show_summary">Riassunto dell’ultima registrazione</string>
     <string name="boot_no_log">Nessuna registrazione ancora</string>
-    <string name="boot_note">Usalo quando il telefono si blocca o rallenta dopo un riavvio (per esempio mentre scrivi il PIN). Il riassunto mostra il picco di carico, la memoria libera più bassa, quanto swap è stato usato e quali app erano più pesanti, per capire cosa sovraccarica il telefono. Serve il root. Il log completo è in /data/local/tmp/bootcap.log.</string>
+    <string name="boot_note">Usalo quando il telefono si blocca o rallenta dopo un riavvio (per esempio mentre scrivi il PIN). Il riassunto mostra il picco di carico, la memoria libera più bassa, quanto swap è stato usato e quali app erano più pesanti, per capire cosa sovraccarica il telefono. Serve il root. I log completi sono salvati nella cartella “Log Oxydian” della memoria interna.</string>
     <string name="boot_rep_none">Ancora nessuna registrazione. Accendi l’interruttore e riavvia il telefono.</string>
     <string name="boot_rep_load">Picco di carico: %1$s (a %2$s dall’avvio; sopra 8 è pesante)</string>
     <string name="boot_rep_mem">Memoria libera minima: %1$s MB · swap massimo usato: %2$s MB</string>

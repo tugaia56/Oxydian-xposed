@@ -1375,11 +1375,11 @@
     <string name="boot_title">Gravar o registro de inicialização</string>
     <string name="boot_summary">Na próxima reinicialização o telefone grava 4 minutos de carga (CPU, memória, apps mais ativos) e depois este botão se desliga sozinho</string>
     <string name="boot_always_title">Em cada reinicialização</string>
-    <string name="boot_always_summary">Continua gravando a cada reinicialização até você desligar. Útil se os travamentos acontecem só de vez em quando; deixa a inicialização um pouco mais lenta e sobrescreve o registro anterior</string>
+    <string name="boot_always_summary">Continua gravando a cada reinicialização até você desligar. Útil se os travamentos acontecem só de vez em quando; deixa a inicialização um pouco mais lenta. Mantém os últimos 10 registros</string>
     <string name="boot_show">Mostrar o último registro</string>
     <string name="boot_show_summary">Resumo da última gravação</string>
     <string name="boot_no_log">Ainda não há gravação</string>
-    <string name="boot_note">Use quando o telefone travar ou ficar lento após uma reinicialização (por exemplo ao digitar o PIN). O resumo mostra o pico de carga, a menor memória livre, quanto swap foi usado e quais apps estavam mais ativos, para entender o que sobrecarrega o telefone. Requer root. O registro completo está em /data/local/tmp/bootcap.log.</string>
+    <string name="boot_note">Use quando o telefone travar ou ficar lento após uma reinicialização (por exemplo ao digitar o PIN). O resumo mostra o pico de carga, a menor memória livre, quanto swap foi usado e quais apps estavam mais ativos, para entender o que sobrecarrega o telefone. Requer root. Os registros completos ficam na pasta “Log Oxydian” do armazenamento interno.</string>
     <string name="boot_rep_none">Ainda não há gravação. Ligue o botão e reinicie o telefone.</string>
     <string name="boot_rep_load">Pico de carga: %1$s (a %2$s da inicialização; acima de 8 é pesado)</string>
     <string name="boot_rep_mem">Menor memória livre: %1$s MB · máximo de swap usado: %2$s MB</string>

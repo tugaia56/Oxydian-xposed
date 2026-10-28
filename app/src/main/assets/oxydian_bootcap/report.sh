@@ -1,6 +1,7 @@
 #!/system/bin/sh
 # Riassunto (chiave=valore) dell'ultima registrazione del boot, per l'app.
-LOG=/data/local/tmp/bootcap.log
+LOG=$(ls -t "/sdcard/Log Oxydian"/bootcap_*.log 2>/dev/null | head -1)
+[ -n "$LOG" ] || LOG=/data/local/tmp/bootcap.log
 [ -f "$LOG" ] || { echo "samples=0"; exit 0; }
 awk '
 /^=== [0-9]/ { n++; for (i = 1; i <= NF; i++) { if ($i == "load") { l = $(i+1); if (l + 0 > maxl + 0) { maxl = l; maxl_at = $4 } } } mode = ""; next }

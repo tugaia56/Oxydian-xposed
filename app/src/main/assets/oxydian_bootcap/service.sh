@@ -6,7 +6,7 @@ OUT=/data/local/tmp/bootcap.log
 DUR=${BOOTCAP_SECS:-240}
 renice -n 19 $$ >/dev/null 2>&1
 : > "$OUT"
-echo "bootcap v3 $(date)" >> "$OUT"
+echo "bootcap v4 $(date)" >> "$OUT"
 n=0
 while [ $((n * 10)) -lt "$DUR" ]; do
   up=$(cut -d' ' -f1 /proc/uptime)
@@ -32,5 +32,15 @@ done
   echo "=== servizi/moduli attivi al boot"
   ls /data/adb/modules 2>/dev/null | tr '\n' ' '; echo
 } >> "$OUT"
+# copia nella cartella "Log Oxydian" della memoria interna (visibile da qualsiasi file manager), tiene gli ultimi 10
+i=0
+until touch /sdcard/.oxydian_w 2>/dev/null || [ $i -ge 60 ]; do sleep 5; i=$((i + 1)); done
+if [ -f /sdcard/.oxydian_w ]; then
+  rm -f /sdcard/.oxydian_w
+  LD="/sdcard/Log Oxydian"
+  mkdir -p "$LD"
+  cp "$OUT" "$LD/bootcap_$(date +%Y%m%d_%H%M).log"
+  ls -t "$LD"/bootcap_*.log 2>/dev/null | tail -n +11 | while read -r f; do rm -f "$f"; done
+fi
 # una tantum: il modulo si disarma da solo (si riattiva dalla pagina Log di avvio di Oxydian)
 if [ ! -f "$MODDIR/always" ]; then touch "$MODDIR/disable"; fi

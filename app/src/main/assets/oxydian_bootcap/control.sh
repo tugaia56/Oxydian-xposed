@@ -10,5 +10,5 @@ case "$1" in
   status)
     [ -f "$MODDIR/disable" ] && echo "armed=0" || echo "armed=1"
     [ -f "$MODDIR/always" ] && echo "always=1" || echo "always=0"
-    [ -f /data/local/tmp/bootcap.log ] && echo "haslog=1" || echo "haslog=0" ;;
+    if ls "/sdcard/Log Oxydian"/bootcap_*.log >/dev/null 2>&1 || [ -f /data/local/tmp/bootcap.log ]; then echo "haslog=1"; else echo "haslog=0"; fi ;;
 esac
