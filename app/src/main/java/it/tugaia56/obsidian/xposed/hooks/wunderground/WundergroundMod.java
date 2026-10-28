@@ -6,6 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.util.TypedValue;
 import android.view.ViewGroup;
+import android.text.Editable;
+import android.text.StaticLayout;
+import android.text.TextPaint;
+import android.text.TextWatcher;
 import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -83,16 +87,47 @@ public class WundergroundMod extends XposedMods {
         }
     }
 
-    /** Titolo dell'intestazione (nome della localita'): con nomi lunghi va a capo su 4 righe e l'ultima viene tagliata.
-     *  Il testo si rimpicciolisce da solo fino a starci tutto (mai sotto il 60% della misura originale). */
+    /** Titolo dell'intestazione (nome della localita'): con nomi lunghi va a capo su 4 righe e l'ultima viene tagliata,
+     *  perche' lo spazio e' alto 88 dp. La misura si abbassa a piccoli passi solo quanto serve a far stare tutte le
+     *  righe in quello spazio (mai sotto il 60% dell'originale); con nomi corti resta quella dell'app. */
     private void fixTitle(View root) {
         if (mTitleId <= 0) return;
         View v = root.findViewById(mTitleId);
         if (!(v instanceof TextView) || v.getTag(mTitleId) != null) return;
-        TextView tv = (TextView) v;
-        float max = tv.getTextSize();
-        if (max <= 0f) return;
-        tv.setAutoSizeTextTypeUniformWithConfiguration(Math.round(max * 0.6f), Math.round(max), 1, TypedValue.COMPLEX_UNIT_PX);
+        final TextView tv = (TextView) v;
+        final float orig = tv.getTextSize();
+        if (orig <= 0f) return;
         tv.setTag(mTitleId, Boolean.TRUE);
+        tv.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence c, int a, int b, int d) {}
+            @Override public void onTextChanged(CharSequence c, int a, int b, int d) {}
+            @Override public void afterTextChanged(Editable e) { fitTitle(tv, orig); }
+        });
+        tv.addOnLayoutChangeListener((view, l, t, r, b, ol, ot, or, ob) -> {
+            if (r - l != or - ol) fitTitle(tv, orig);   // cambio di larghezza
+        });
+        tv.post(() -> fitTitle(tv, orig));
+    }
+
+    private void fitTitle(TextView tv, float orig) {
+        try {
+            CharSequence text = tv.getText();
+            int w = tv.getWidth() - tv.getPaddingLeft() - tv.getPaddingRight();
+            if (text == null || text.length() == 0 || w <= 0) return;
+            float maxH = 88f * tv.getResources().getDisplayMetrics().density;
+            float best = orig * 0.6f;
+            for (float size = orig; size >= orig * 0.6f; size -= orig * 0.04f) {
+                TextPaint paint = new TextPaint(tv.getPaint());
+                paint.setTextSize(size);
+                StaticLayout l = StaticLayout.Builder.obtain(text, 0, text.length(), paint, w)
+                        .setLineSpacing(tv.getLineSpacingExtra(), tv.getLineSpacingMultiplier())
+                        .setIncludePad(tv.getIncludeFontPadding()).build();
+                if (l.getHeight() <= maxH) {
+                    best = size;
+                    break;
+                }
+            }
+            if (Math.abs(tv.getTextSize() - best) > 0.5f) tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, best);
+        } catch (Throwable ignored) {}
     }
 }
