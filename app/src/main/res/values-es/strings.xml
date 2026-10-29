@@ -1388,4 +1388,10 @@
     <string name="boot_rep_ram">Apps que más memoria usan:</string>
     <string name="save_logs_title">Guardar los registros de Oxydian</string>
     <string name="save_logs_summary">Guarda los mensajes de Oxydian en la carpeta «Log Oxydian» del almacenamiento interno, para enviarlos con un informe de error. Activa primero los registros adicionales, reproduce el problema y luego guarda</string>
+    <string name="log_folder_title">Carpeta de registros</string>
+    <string name="log_folder_pick">Elegir carpeta</string>
+    <string name="log_folder_default">Carpeta predeterminada</string>
+    <string name="log_folder_internal_only">Solo se pueden usar carpetas del almacenamiento interno</string>
+    <string name="log_folder_message">Dónde guarda Oxydian los registros que puedes enviar con un informe de error (mensajes de Oxydian, estado de los mods, registro de arranque).\n\nAhora: %1$s</string>
+    <string name="save_logs_button">Guardar</string>
 </resources>

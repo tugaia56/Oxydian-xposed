@@ -6,7 +6,7 @@ OUT=/data/local/tmp/bootcap.log
 DUR=${BOOTCAP_SECS:-240}
 renice -n 5 $$ >/dev/null 2>&1
 : > "$OUT"
-echo "bootcap v5 $(date)" >> "$OUT"
+echo "bootcap v6 $(date)" >> "$OUT"
 
 # CPU per thread di un processo in 1 secondo: "percentuale-tick tid nome", i primi 6
 threads() {
@@ -49,7 +49,9 @@ i=0
 until touch /sdcard/.oxydian_w 2>/dev/null || [ $i -ge 60 ]; do sleep 5; i=$((i + 1)); done
 if [ -f /sdcard/.oxydian_w ]; then
   rm -f /sdcard/.oxydian_w
-  LD="/sdcard/Log Oxydian"
+  LDIR=$(head -n 1 /data/adb/oxydian_logdir 2>/dev/null | tr -d '\r')
+  [ -n "$LDIR" ] || LDIR="/sdcard/Log Oxydian"
+  LD="$LDIR"
   mkdir -p "$LD"
   cp "$OUT" "$LD/bootcap_$(date +%Y%m%d_%H%M).log"
   ls -t "$LD"/bootcap_*.log 2>/dev/null | tail -n +11 | while read -r f; do rm -f "$f"; done

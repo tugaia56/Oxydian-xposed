@@ -1388,4 +1388,10 @@
     <string name="boot_rep_ram">Apps mit dem höchsten Speicherverbrauch:</string>
     <string name="save_logs_title">Oxydian-Protokolle speichern</string>
     <string name="save_logs_summary">Speichert die Oxydian-Meldungen im Ordner „Log Oxydian“ des internen Speichers, zum Senden mit einem Fehlerbericht. Schalte zuerst die zusätzlichen Protokolle ein, löse das Problem aus und speichere dann</string>
+    <string name="log_folder_title">Protokollordner</string>
+    <string name="log_folder_pick">Ordner wählen</string>
+    <string name="log_folder_default">Standardordner</string>
+    <string name="log_folder_internal_only">Es können nur Ordner im internen Speicher verwendet werden</string>
+    <string name="log_folder_message">Wo Oxydian die Protokolle speichert, die Sie mit einer Fehlermeldung senden können (Oxydian-Meldungen, Modulstatus, Startprotokoll).\n\nAktuell: %1$s</string>
+    <string name="save_logs_button">Speichern</string>
 </resources>

@@ -1,6 +1,8 @@
 #!/system/bin/sh
 # Riassunto (chiave=valore) dell'ultima registrazione del boot, per l'app.
-LOG=$(ls -t "/sdcard/Log Oxydian"/bootcap_*.log 2>/dev/null | head -1)
+LDIR=$(head -n 1 /data/adb/oxydian_logdir 2>/dev/null | tr -d '\r')
+[ -n "$LDIR" ] || LDIR="/sdcard/Log Oxydian"
+LOG=$(ls -t "$LDIR"/bootcap_*.log 2>/dev/null | head -1)
 [ -n "$LOG" ] || LOG=/data/local/tmp/bootcap.log
 [ -f "$LOG" ] || { echo "samples=0"; exit 0; }
 awk '

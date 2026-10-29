@@ -19,19 +19,48 @@ import java.util.Locale;
  */
 public final class LogFolder {
 
-    public static final String DIR = "/sdcard/Log Oxydian";
+    public static final String DEFAULT_DIR = "/sdcard/Log Oxydian";
+    private static final String PREF_DIR = "log_folder_path";
+    /** Percorso scelto, riletto anche dagli script del modulo del log di avvio (solo root puo' scriverlo). */
+    private static final String CFG_FILE = "/data/adb/oxydian_logdir";
     private static final int KEEP = 10;
 
     private LogFolder() {}
 
+    /** Cartella dei log in uso: quella scelta nelle impostazioni, altrimenti "Log Oxydian". */
+    public static String dir() {
+        String d = ObsidianPrefs.getString(PREF_DIR, null);
+        return d == null || d.isEmpty() ? DEFAULT_DIR : d;
+    }
+
+    /** Cambia la cartella ("" = predefinita) e la comunica al modulo del log di avvio. */
+    public static void setDir(String path) {
+        boolean def = path == null || path.isEmpty() || path.equals(DEFAULT_DIR);
+        ObsidianPrefs.putString(PREF_DIR, def ? "" : path);
+        String quoted = "'" + (def ? "" : path).replace("'", "'\\''") + "'";
+        Shell.cmd(def ? "rm -f " + CFG_FILE : "printf '%s\\n' " + quoted + " > " + CFG_FILE).submit();
+    }
+
+    /** Da una cartella scelta con il selettore di Android al percorso: solo la memoria interna ("primary:"). */
+    public static String pathFromTree(android.net.Uri tree) {
+        try {
+            String id = android.provider.DocumentsContract.getTreeDocumentId(tree);
+            if (!id.startsWith("primary:")) return null;
+            String rel = id.substring("primary:".length());
+            return rel.isEmpty() ? "/sdcard" : "/sdcard/" + rel;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
     /** Percorso di un nuovo file di log di quel tipo. */
     public static String newPath(String type, String ext) {
-        return DIR + "/" + type + "_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + "." + ext;
+        return dir() + "/" + type + "_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + "." + ext;
     }
 
     /** Toglie i file piu' vecchi dello stesso tipo, lasciando gli ultimi KEEP. */
     private static String pruneCmd(String type) {
-        return "ls -t \"" + DIR + "\"/" + type + "_* 2>/dev/null | tail -n +" + (KEEP + 1)
+        return "ls -t \"" + dir() + "\"/" + type + "_* 2>/dev/null | tail -n +" + (KEEP + 1)
                 + " | while read -r f; do rm -f \"$f\"; done";
     }
 
@@ -43,7 +72,7 @@ public final class LogFolder {
                 out.write(text.getBytes(StandardCharsets.UTF_8));
             }
             String dest = newPath(type, ext);
-            boolean ok = Shell.cmd("mkdir -p \"" + DIR + "\"", "cp \"" + tmp.getAbsolutePath() + "\" \"" + dest + "\"",
+            boolean ok = Shell.cmd("mkdir -p \"" + dir() + "\"", "cp \"" + tmp.getAbsolutePath() + "\" \"" + dest + "\"",
                     pruneCmd(type)).exec().isSuccess();
             //noinspection ResultOfMethodCallIgnored
             tmp.delete();
@@ -65,7 +94,7 @@ public final class LogFolder {
             }
             String dest = newPath("xposed", "log");
             String src = "/data/adb/lspd/log.old/modules_*.log /data/adb/lspd/log/modules_*.log";   // dal piu' vecchio al piu' recente
-            boolean ok = Shell.cmd("mkdir -p \"" + DIR + "\"",
+            boolean ok = Shell.cmd("mkdir -p \"" + dir() + "\"",
                     "{ cat \"" + tmp.getAbsolutePath() + "\"; echo; echo '=== LSPosed: messaggi di Oxydian (ultime 20000 righe) ==='; "
                             + "cat " + src + " 2>/dev/null | grep -a -E 'Obsidian|oxydian' | tail -n 20000; } > \"" + dest + "\"",
                     pruneCmd("xposed")).exec().isSuccess();

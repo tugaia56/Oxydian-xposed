@@ -1388,4 +1388,10 @@
     <string name="boot_rep_ram">Aplikasi dengan memori tertinggi:</string>
     <string name="save_logs_title">Simpan log Oxydian</string>
     <string name="save_logs_summary">Menyimpan pesan Oxydian di folder “Log Oxydian” pada penyimpanan internal, untuk dikirim bersama laporan bug. Aktifkan Log Tambahan dulu, ulangi masalahnya, lalu simpan</string>
+    <string name="log_folder_title">Folder log</string>
+    <string name="log_folder_pick">Pilih folder</string>
+    <string name="log_folder_default">Folder bawaan</string>
+    <string name="log_folder_internal_only">Hanya folder di penyimpanan internal yang dapat digunakan</string>
+    <string name="log_folder_message">Tempat Oxydian menyimpan log yang dapat dikirim bersama laporan bug (pesan Oxydian, status mod, log booting).\n\nSaat ini: %1$s</string>
+    <string name="save_logs_button">Simpan</string>
 </resources>

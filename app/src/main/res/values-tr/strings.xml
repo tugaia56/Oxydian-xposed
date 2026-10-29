@@ -1388,4 +1388,10 @@
     <string name="boot_rep_ram">En çok bellek kullanan uygulamalar:</string>
     <string name="save_logs_title">Oxydian günlüklerini kaydet</string>
     <string name="save_logs_summary">Oxydian iletilerini dahili depolamadaki “Log Oxydian” klasörüne kaydeder; hata raporuyla gönderebilirsiniz. Önce ek günlükleri açın, sorunu yeniden oluşturun, sonra kaydedin</string>
+    <string name="log_folder_title">Günlük klasörü</string>
+    <string name="log_folder_pick">Klasör seç</string>
+    <string name="log_folder_default">Varsayılan klasör</string>
+    <string name="log_folder_internal_only">Yalnızca dahili depolamadaki klasörler kullanılabilir</string>
+    <string name="log_folder_message">Hata raporuyla gönderebileceğiniz günlüklerin (Oxydian iletileri, mod durumu, açılış günlüğü) kaydedildiği yer.\n\nŞimdi: %1$s</string>
+    <string name="save_logs_button">Kaydet</string>
 </resources>

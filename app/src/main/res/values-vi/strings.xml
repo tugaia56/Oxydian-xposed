@@ -1388,4 +1388,10 @@
     <string name="boot_rep_ram">Ứng dụng dùng nhiều bộ nhớ nhất:</string>
     <string name="save_logs_title">Lưu nhật ký Oxydian</string>
     <string name="save_logs_summary">Lưu các thông báo của Oxydian vào thư mục “Log Oxydian” trong bộ nhớ trong, để gửi kèm báo cáo lỗi. Hãy bật nhật ký bổ sung trước, tái hiện sự cố rồi lưu</string>
+    <string name="log_folder_title">Thư mục nhật ký</string>
+    <string name="log_folder_pick">Chọn thư mục</string>
+    <string name="log_folder_default">Thư mục mặc định</string>
+    <string name="log_folder_internal_only">Chỉ dùng được thư mục trong bộ nhớ trong</string>
+    <string name="log_folder_message">Nơi Oxydian lưu nhật ký bạn có thể gửi kèm báo cáo lỗi (thông báo của Oxydian, trạng thái mod, nhật ký khởi động).\n\nHiện tại: %1$s</string>
+    <string name="save_logs_button">Lưu</string>
 </resources>

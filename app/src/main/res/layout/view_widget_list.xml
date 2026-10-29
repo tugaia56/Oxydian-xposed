@@ -35,6 +35,22 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/listAction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:gravity="center"
+        android:minWidth="64dp"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/listChevron"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="›"

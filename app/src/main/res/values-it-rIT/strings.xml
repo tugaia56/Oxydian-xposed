@@ -1370,4 +1370,10 @@
     <string name="boot_rep_ram">App che usano più memoria:</string>
     <string name="save_logs_title">Salva i log di Oxydian</string>
     <string name="save_logs_summary">Salva i messaggi di Oxydian nella cartella “Log Oxydian” della memoria interna, da inviare con una segnalazione. Accendi prima Log aggiuntivi, riproduci il problema e poi salva</string>
+    <string name="log_folder_title">Cartella dei log</string>
+    <string name="log_folder_pick">Scegli cartella</string>
+    <string name="log_folder_default">Cartella predefinita</string>
+    <string name="log_folder_internal_only">Si possono usare solo cartelle della memoria interna</string>
+    <string name="log_folder_message">Dove Oxydian salva i log da inviare con una segnalazione (messaggi di Oxydian, stato dei mod, log di avvio).\n\nAdesso: %1$s</string>
+    <string name="save_logs_button">Salva</string>
 </resources>

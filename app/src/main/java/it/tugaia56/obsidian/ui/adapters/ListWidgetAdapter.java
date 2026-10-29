@@ -27,6 +27,9 @@ public class ListWidgetAdapter extends RecyclerView.Adapter<ListWidgetAdapter.VH
         /** Lighter/bordered background instead of the normal card colour — for options
          *  revealed by tapping a row above them. */
         public boolean nested = false;
+        /** Se presente, al posto della freccia c'e' un pulsantino con questa scritta che esegue onAction. */
+        public String actionLabel;
+        public Runnable onAction;
 
         public ListItem(String title, String valueSummary, Runnable onClick) {
             this.title        = title;
@@ -55,6 +58,23 @@ public class ListWidgetAdapter extends RecyclerView.Adapter<ListWidgetAdapter.VH
         h.value.setText(item.valueSummary != null ? item.valueSummary : "");
         h.value.setVisibility(item.valueSummary == null || item.valueSummary.isEmpty() ? View.GONE : View.VISIBLE);
         h.itemView.setOnClickListener(v -> { if (item.onClick != null) item.onClick.run(); });
+        if (item.actionLabel != null) {
+            int acc = ObsidianTheme.accentColor();
+            android.graphics.drawable.GradientDrawable pill = new android.graphics.drawable.GradientDrawable();
+            pill.setCornerRadius(1000f);
+            pill.setColor((acc & 0x00FFFFFF) | 0x33000000);
+            pill.setStroke((int) (1.5f * h.itemView.getResources().getDisplayMetrics().density), acc);
+            h.action.setBackground(pill);
+            h.action.setTextColor(acc);
+            h.action.setText(item.actionLabel);
+            h.action.setVisibility(View.VISIBLE);
+            h.action.setOnClickListener(v -> { if (item.onAction != null) item.onAction.run(); });
+            h.chevron.setVisibility(View.GONE);
+        } else {
+            h.action.setVisibility(View.GONE);
+            h.action.setOnClickListener(null);
+            h.chevron.setVisibility(View.VISIBLE);
+        }
 
         // ── DST-based colours + grouped/standalone card background ───────────
         h.title.setTextColor(ObsidianTheme.textColor());
@@ -74,10 +94,12 @@ public class ListWidgetAdapter extends RecyclerView.Adapter<ListWidgetAdapter.VH
     @Override public int getItemCount() { return items.size(); }
 
     static class VH extends RecyclerView.ViewHolder {
-        TextView title, value;
+        TextView title, value, action, chevron;
 
         VH(View v) {
             super(v);
+            action = v.findViewById(R.id.listAction);
+            chevron = v.findViewById(R.id.listChevron);
             title = v.findViewById(R.id.listTitle);
             value = v.findViewById(R.id.listValue);
         }

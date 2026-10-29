@@ -1398,4 +1398,10 @@
     <string name="boot_rep_ram">Apps using the most memory:</string>
     <string name="save_logs_title">Save Oxydian logs</string>
     <string name="save_logs_summary">Saves the Oxydian messages in the “Log Oxydian” folder of your internal storage, to send with a bug report. Turn on Extra Logs first, reproduce the problem, then save</string>
+    <string name="log_folder_title">Logs folder</string>
+    <string name="log_folder_pick">Choose folder</string>
+    <string name="log_folder_default">Default folder</string>
+    <string name="log_folder_internal_only">Only folders in the internal storage can be used</string>
+    <string name="log_folder_message">Where Oxydian saves the logs you can send with a bug report (Oxydian messages, mod status, boot log).\n\nNow: %1$s</string>
+    <string name="save_logs_button">Save</string>
 </resources>
