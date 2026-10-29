@@ -187,7 +187,7 @@ public class SettingsFragment extends Fragment {
 
         // ── Log: salva i messaggi di Oxydian e scegli la cartella ─────────────
         ListWidgetAdapter.ListItem saveLogsItem = new ListWidgetAdapter.ListItem(
-                getString(R.string.save_logs_title), getString(R.string.save_logs_summary), this::saveXposedLog);
+                getString(R.string.save_logs_title), getString(R.string.save_logs_summary, it.tugaia56.obsidian.utils.LogFolder.dir()), this::saveXposedLog);
         saveLogsItem.actionLabel = getString(R.string.save_logs_button);
         saveLogsItem.onAction = this::saveXposedLog;
         saveLogsItem.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.TOP;

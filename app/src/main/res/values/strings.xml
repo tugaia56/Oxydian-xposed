@@ -1389,7 +1389,7 @@
     <string name="boot_show">Show last log</string>
     <string name="boot_show_summary">Summary of the last recording</string>
     <string name="boot_no_log">No recording yet</string>
-    <string name="boot_note">Use it when the phone freezes or slows down after a restart (for example while typing the PIN). The summary shows the load peak, the lowest free memory, how much swap was used and which apps were busiest, to understand what is overloading the phone. The full logs are saved in the "Log Oxydian" folder of your internal storage.</string>
+    <string name="boot_note">Use it when the phone freezes or slows down after a restart (for example while typing the PIN). The summary shows the load peak, the lowest free memory, how much swap was used and which apps were busiest, to understand what is overloading the phone. The full logs are saved in the %1$s folder of your internal storage.</string>
     <string name="boot_rep_none">No recording yet. Turn the switch on and restart the phone.</string>
     <string name="boot_rep_load">Peak load: %1$s (at %2$s after start-up; above 8 is heavy)</string>
     <string name="boot_rep_mem">Lowest free memory: %1$s MB · most swap used: %2$s MB</string>
@@ -1397,7 +1397,7 @@
     <string name="boot_rep_cpu">Apps using the most CPU:</string>
     <string name="boot_rep_ram">Apps using the most memory:</string>
     <string name="save_logs_title">Save Oxydian logs</string>
-    <string name="save_logs_summary">Saves the Oxydian messages in the “Log Oxydian” folder of your internal storage, to send with a bug report. Turn on Extra Logs first, reproduce the problem, then save</string>
+    <string name="save_logs_summary">Saves the Oxydian messages in the %1$s folder of your internal storage, to send with a bug report. Turn on Extra Logs first, reproduce the problem, then save</string>
     <string name="log_folder_title">Logs folder</string>
     <string name="log_folder_pick">Choose folder</string>
     <string name="log_folder_default">Default folder</string>

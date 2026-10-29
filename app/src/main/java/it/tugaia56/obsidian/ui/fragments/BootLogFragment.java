@@ -144,7 +144,7 @@ public class BootLogFragment extends Fragment {
         del.onAction = this::deleteLogs;
         rows.add(del);
         GroupUtils.addGroup(chain, rows);
-        chain.add(new InfoCardAdapter(getString(R.string.boot_note)));
+        chain.add(new InfoCardAdapter(getString(R.string.boot_note, it.tugaia56.obsidian.utils.LogFolder.dir())));
         mRv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
 

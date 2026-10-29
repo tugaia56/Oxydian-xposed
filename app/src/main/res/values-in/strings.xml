@@ -1379,7 +1379,7 @@
     <string name="boot_show">Tampilkan log terakhir</string>
     <string name="boot_show_summary">Ringkasan rekaman terakhir</string>
     <string name="boot_no_log">Belum ada rekaman</string>
-    <string name="boot_note">Gunakan saat ponsel macet atau melambat setelah dihidupkan ulang (misalnya saat mengetik PIN). Ringkasan menampilkan puncak beban, memori bebas terendah, jumlah swap yang dipakai, dan aplikasi tersibuk, untuk memahami apa yang membebani ponsel. Log lengkap disimpan di folder “Log Oxydian” pada penyimpanan internal.</string>
+    <string name="boot_note">Gunakan saat ponsel macet atau melambat setelah dihidupkan ulang (misalnya saat mengetik PIN). Ringkasan menampilkan puncak beban, memori bebas terendah, jumlah swap yang dipakai, dan aplikasi tersibuk, untuk memahami apa yang membebani ponsel. Log lengkap disimpan di folder %1$s pada penyimpanan internal.</string>
     <string name="boot_rep_none">Belum ada rekaman. Aktifkan sakelar dan hidupkan ulang ponsel.</string>
     <string name="boot_rep_load">Puncak beban: %1$s (pada %2$s setelah booting; di atas 8 tergolong berat)</string>
     <string name="boot_rep_mem">Memori bebas terendah: %1$s MB · swap terpakai maksimal: %2$s MB</string>
@@ -1387,7 +1387,7 @@
     <string name="boot_rep_cpu">Aplikasi dengan CPU tertinggi:</string>
     <string name="boot_rep_ram">Aplikasi dengan memori tertinggi:</string>
     <string name="save_logs_title">Simpan log Oxydian</string>
-    <string name="save_logs_summary">Menyimpan pesan Oxydian di folder “Log Oxydian” pada penyimpanan internal, untuk dikirim bersama laporan bug. Aktifkan Log Tambahan dulu, ulangi masalahnya, lalu simpan</string>
+    <string name="save_logs_summary">Menyimpan pesan Oxydian di folder %1$s pada penyimpanan internal, untuk dikirim bersama laporan bug. Aktifkan Log Tambahan dulu, ulangi masalahnya, lalu simpan</string>
     <string name="log_folder_title">Folder log</string>
     <string name="log_folder_pick">Pilih folder</string>
     <string name="log_folder_default">Folder bawaan</string>

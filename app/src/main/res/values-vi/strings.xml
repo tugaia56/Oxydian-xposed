@@ -1379,7 +1379,7 @@
     <string name="boot_show">Xem nhật ký gần nhất</string>
     <string name="boot_show_summary">Tóm tắt lần ghi gần nhất</string>
     <string name="boot_no_log">Chưa có bản ghi</string>
-    <string name="boot_note">Dùng khi điện thoại bị treo hoặc chậm sau khi khởi động lại (ví dụ lúc nhập PIN). Bản tóm tắt cho biết đỉnh tải, bộ nhớ trống thấp nhất, lượng swap đã dùng và các ứng dụng bận nhất, để hiểu điều gì làm máy quá tải. Nhật ký đầy đủ được lưu trong thư mục “Log Oxydian” của bộ nhớ trong.</string>
+    <string name="boot_note">Dùng khi điện thoại bị treo hoặc chậm sau khi khởi động lại (ví dụ lúc nhập PIN). Bản tóm tắt cho biết đỉnh tải, bộ nhớ trống thấp nhất, lượng swap đã dùng và các ứng dụng bận nhất, để hiểu điều gì làm máy quá tải. Nhật ký đầy đủ được lưu trong thư mục %1$s của bộ nhớ trong.</string>
     <string name="boot_rep_none">Chưa có bản ghi. Hãy bật công tắc và khởi động lại điện thoại.</string>
     <string name="boot_rep_load">Đỉnh tải: %1$s (tại %2$s sau khi khởi động; trên 8 là nặng)</string>
     <string name="boot_rep_mem">Bộ nhớ trống thấp nhất: %1$s MB · swap dùng nhiều nhất: %2$s MB</string>
@@ -1387,7 +1387,7 @@
     <string name="boot_rep_cpu">Ứng dụng dùng nhiều CPU nhất:</string>
     <string name="boot_rep_ram">Ứng dụng dùng nhiều bộ nhớ nhất:</string>
     <string name="save_logs_title">Lưu nhật ký Oxydian</string>
-    <string name="save_logs_summary">Lưu các thông báo của Oxydian vào thư mục “Log Oxydian” trong bộ nhớ trong, để gửi kèm báo cáo lỗi. Hãy bật nhật ký bổ sung trước, tái hiện sự cố rồi lưu</string>
+    <string name="save_logs_summary">Lưu các thông báo của Oxydian vào thư mục %1$s trong bộ nhớ trong, để gửi kèm báo cáo lỗi. Hãy bật nhật ký bổ sung trước, tái hiện sự cố rồi lưu</string>
     <string name="log_folder_title">Thư mục nhật ký</string>
     <string name="log_folder_pick">Chọn thư mục</string>
     <string name="log_folder_default">Thư mục mặc định</string>
