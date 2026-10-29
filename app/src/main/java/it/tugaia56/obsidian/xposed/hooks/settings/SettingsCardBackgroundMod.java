@@ -194,7 +194,9 @@ public class SettingsCardBackgroundMod extends XposedMods {
         int result = mCardColor;
         if (mCardFromSystem && mContext != null) {
             try {
-                result = mContext.getColor(android.R.color.background_dark) | 0xFF000000;
+                // 2026-10-29: senza forzare l'opacita': con gli sfondi "Trasparenza" il colore di sistema ha
+                // trasparenza (es. #80000000) e prima diventava nero pieno in tutta l'app Impostazioni.
+                result = mContext.getColor(android.R.color.background_dark);
             } catch (Throwable ignored) {}
         }
         return result;
