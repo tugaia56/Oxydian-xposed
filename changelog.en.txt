@@ -1,0 +1,11 @@
+Added:
+- Oxydian Theme transparent backgrounds: the Oxydian app also shows the phone wallpaper (bars, pages and cards), at the level chosen in the Theme
+- Backup: "Logs" section with "Save Oxydian logs" (Save button, shows where it saved) and a "Logs folder" you can choose anywhere. The boot log follows the chosen folder (module v6)
+- Delete buttons: boot logs, status files, saved logs and Oxydian backups can be removed from their own page, only their own kind of file, with a confirmation and the file count
+- Backup: the "Backup folder" row shows the full path
+Changed:
+- System Settings is no longer all black with transparent backgrounds (the card background colour is no longer forced opaque)
+- Boot log: the note shows the logs folder path
+Fixed:
+- The app closed after "Restore" of the settings
+- Saving logs now shows the path of the saved file
