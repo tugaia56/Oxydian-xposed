@@ -1379,7 +1379,7 @@
     <string name="boot_show">Xem nhật ký gần nhất</string>
     <string name="boot_show_summary">Tóm tắt lần ghi gần nhất</string>
     <string name="boot_no_log">Chưa có bản ghi</string>
-    <string name="boot_note">Dùng khi điện thoại bị treo hoặc chậm sau khi khởi động lại (ví dụ lúc nhập PIN). Bản tóm tắt cho biết đỉnh tải, bộ nhớ trống thấp nhất, lượng swap đã dùng và các ứng dụng bận nhất, để hiểu điều gì làm máy quá tải. Nhật ký đầy đủ được lưu trong thư mục %1$s của bộ nhớ trong.</string>
+    <string name="boot_note">Dùng khi điện thoại bị treo hoặc chậm sau khi khởi động lại (ví dụ lúc nhập PIN). Bản tóm tắt cho biết đỉnh tải, bộ nhớ trống thấp nhất, lượng swap đã dùng và các ứng dụng bận nhất, để hiểu điều gì làm máy quá tải. Nhật ký đầy đủ được lưu trong %1$s.</string>
     <string name="boot_rep_none">Chưa có bản ghi. Hãy bật công tắc và khởi động lại điện thoại.</string>
     <string name="boot_rep_load">Đỉnh tải: %1$s (tại %2$s sau khi khởi động; trên 8 là nặng)</string>
     <string name="boot_rep_mem">Bộ nhớ trống thấp nhất: %1$s MB · swap dùng nhiều nhất: %2$s MB</string>

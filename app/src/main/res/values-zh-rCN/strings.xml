@@ -1379,7 +1379,7 @@
     <string name="boot_show">查看最近的日志</string>
     <string name="boot_show_summary">最近一次记录的摘要</string>
     <string name="boot_no_log">暂无记录</string>
-    <string name="boot_note">当手机在重启后卡死或变慢时使用(例如输入 PIN 码时)。摘要会显示负载峰值、最低可用内存、使用的 swap 量以及最繁忙的应用,帮助你找出是什么让手机过载。完整日志保存在内部存储的%1$s文件夹中。</string>
+    <string name="boot_note">当手机在重启后卡死或变慢时使用(例如输入 PIN 码时)。摘要会显示负载峰值、最低可用内存、使用的 swap 量以及最繁忙的应用,帮助你找出是什么让手机过载。完整日志保存在%1$s。</string>
     <string name="boot_rep_none">暂无记录。请开启开关并重启手机。</string>
     <string name="boot_rep_load">负载峰值:%1$s(开机后 %2$s;高于 8 属于繁重)</string>
     <string name="boot_rep_mem">最低可用内存:%1$s MB · 最大 swap 使用:%2$s MB</string>
