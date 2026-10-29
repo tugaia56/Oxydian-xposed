@@ -67,6 +67,18 @@ public class SettingsFragment extends Fragment {
     // ── SAF launchers (must be registered before STARTED) ─────────────────────
     private ActivityResultLauncher<Uri>      mFolderPickerLauncher;
     private ActivityResultLauncher<String[]> mFilePickerLauncher;
+    /** Cartella dei log: scelta con il selettore di Android (solo memoria interna). */
+    private final ActivityResultLauncher<Uri> mLogFolderPicker =
+            registerForActivityResult(new ActivityResultContracts.OpenDocumentTree(), uri -> {
+                if (uri == null) return;
+                String path = it.tugaia56.obsidian.utils.LogFolder.pathFromTree(uri);
+                if (path == null) {
+                    android.widget.Toast.makeText(requireContext(), R.string.log_folder_internal_only, android.widget.Toast.LENGTH_LONG).show();
+                    return;
+                }
+                it.tugaia56.obsidian.utils.LogFolder.setDir(path);
+                if (isAdded() && getView() instanceof RecyclerView) onViewCreated(getView(), null);
+            });
 
     // ── Adapters (need ref to update folder summary) ─────────────────────────
     private ListWidgetAdapter.ListItem mFolderItem;
@@ -173,6 +185,16 @@ public class SettingsFragment extends Fragment {
         clearItem.groupPos   = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.BOTTOM;
         mFolderAdapter = new ListWidgetAdapter(List.of(mFolderItem));
 
+        // ── Log: salva i messaggi di Oxydian e scegli la cartella ─────────────
+        ListWidgetAdapter.ListItem saveLogsItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.save_logs_title), getString(R.string.save_logs_summary), this::saveXposedLog);
+        saveLogsItem.actionLabel = getString(R.string.save_logs_button);
+        saveLogsItem.onAction = this::saveXposedLog;
+        saveLogsItem.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.TOP;
+        ListWidgetAdapter.ListItem logFolderItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.log_folder_title), it.tugaia56.obsidian.utils.LogFolder.dir(), this::showLogFolderDialog);
+        logFolderItem.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.BOTTOM;
+
         rv.setAdapter(new ConcatAdapter(
                 new SectionTitleAdapter(List.of(getString(R.string.settings_section))),
                 mFolderAdapter,
@@ -180,7 +202,45 @@ public class SettingsFragment extends Fragment {
                 new ListWidgetAdapter(List.of(timeItem)),
                 new ListWidgetAdapter(List.of(backupItem)),
                 new ListWidgetAdapter(List.of(restoreItem)),
-                new ListWidgetAdapter(List.of(clearItem))));
+                new ListWidgetAdapter(List.of(clearItem)),
+                new SectionTitleAdapter(List.of(getString(R.string.settings_logs_section))),
+                new ListWidgetAdapter(List.of(saveLogsItem)),
+                new ListWidgetAdapter(List.of(logFolderItem))));
+    }
+
+    // ── Log ───────────────────────────────────────────────────────────────────
+
+    private void showLogFolderDialog() {
+        ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.log_folder_title)
+                .setMessage(getString(R.string.log_folder_message, it.tugaia56.obsidian.utils.LogFolder.dir()))
+                .setPositiveButton(R.string.log_folder_pick, (d, w) -> mLogFolderPicker.launch(null))
+                .setNeutralButton(R.string.log_folder_default, (d, w) -> {
+                    it.tugaia56.obsidian.utils.LogFolder.setDir("");
+                    if (getView() instanceof RecyclerView) onViewCreated(getView(), null);
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show());
+    }
+
+    /** Salva nella cartella dei log i messaggi di Oxydian presi dal log di LSPosed, con un riepilogo del telefono. */
+    private void saveXposedLog() {
+        final Context ctx = requireContext().getApplicationContext();
+        new Thread(() -> {
+            String header = "Oxydian - log dei mod\n"
+                    + it.tugaia56.obsidian.utils.DeviceInfo.diagnosticSummary()
+                    + it.tugaia56.obsidian.utils.DeviceInfo.rootDiagnostics();
+            String path = it.tugaia56.obsidian.utils.LogFolder.saveXposedLog(ctx, header);
+            if (getActivity() == null) return;
+            requireActivity().runOnUiThread(() -> {
+                if (!isAdded()) return;
+                ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
+                        .setMessage(path != null ? getString(R.string.mod_health_export_ok_fmt, path)
+                                : getString(R.string.mod_health_export_fail))
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show());
+            });
+        }).start();
     }
 
     // ── Formato data / ora del nome file ──────────────────────────────────────

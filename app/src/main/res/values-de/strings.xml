@@ -1394,4 +1394,5 @@
     <string name="log_folder_internal_only">Es können nur Ordner im internen Speicher verwendet werden</string>
     <string name="log_folder_message">Wo Oxydian die Protokolle speichert, die Sie mit einer Fehlermeldung senden können (Oxydian-Meldungen, Modulstatus, Startprotokoll).\n\nAktuell: %1$s</string>
     <string name="save_logs_button">Speichern</string>
+    <string name="settings_logs_section">Protokolle</string>
 </resources>

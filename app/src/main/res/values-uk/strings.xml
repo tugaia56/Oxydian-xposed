@@ -1394,4 +1394,5 @@
     <string name="log_folder_internal_only">Можна використовувати лише папки у внутрішній пам’яті</string>
     <string name="log_folder_message">Куди Oxydian зберігає журнали, які можна надіслати зі звітом про помилку (повідомлення Oxydian, стан модів, журнал завантаження).\n\nЗараз: %1$s</string>
     <string name="save_logs_button">Зберегти</string>
+    <string name="settings_logs_section">Журнали</string>
 </resources>

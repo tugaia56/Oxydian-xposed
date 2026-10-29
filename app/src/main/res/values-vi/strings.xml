@@ -1394,4 +1394,5 @@
     <string name="log_folder_internal_only">Chỉ dùng được thư mục trong bộ nhớ trong</string>
     <string name="log_folder_message">Nơi Oxydian lưu nhật ký bạn có thể gửi kèm báo cáo lỗi (thông báo của Oxydian, trạng thái mod, nhật ký khởi động).\n\nHiện tại: %1$s</string>
     <string name="save_logs_button">Lưu</string>
+    <string name="settings_logs_section">Nhật ký</string>
 </resources>

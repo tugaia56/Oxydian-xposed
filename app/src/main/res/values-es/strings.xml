@@ -1394,4 +1394,5 @@
     <string name="log_folder_internal_only">Solo se pueden usar carpetas del almacenamiento interno</string>
     <string name="log_folder_message">Dónde guarda Oxydian los registros que puedes enviar con un informe de error (mensajes de Oxydian, estado de los mods, registro de arranque).\n\nAhora: %1$s</string>
     <string name="save_logs_button">Guardar</string>
+    <string name="settings_logs_section">Registros</string>
 </resources>

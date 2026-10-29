@@ -1394,4 +1394,5 @@
     <string name="log_folder_internal_only">Yalnızca dahili depolamadaki klasörler kullanılabilir</string>
     <string name="log_folder_message">Hata raporuyla gönderebileceğiniz günlüklerin (Oxydian iletileri, mod durumu, açılış günlüğü) kaydedildiği yer.\n\nŞimdi: %1$s</string>
     <string name="save_logs_button">Kaydet</string>
+    <string name="settings_logs_section">Günlükler</string>
 </resources>

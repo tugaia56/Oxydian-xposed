@@ -1394,4 +1394,5 @@
     <string name="log_folder_internal_only">Hanya folder di penyimpanan internal yang dapat digunakan</string>
     <string name="log_folder_message">Tempat Oxydian menyimpan log yang dapat dikirim bersama laporan bug (pesan Oxydian, status mod, log booting).\n\nSaat ini: %1$s</string>
     <string name="save_logs_button">Simpan</string>
+    <string name="settings_logs_section">Log</string>
 </resources>

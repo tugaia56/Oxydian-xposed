@@ -1394,4 +1394,5 @@
     <string name="log_folder_internal_only">Só é possível usar pastas do armazenamento interno</string>
     <string name="log_folder_message">Onde o Oxydian salva os logs que você pode enviar com um relatório de erro (mensagens do Oxydian, estado dos mods, log de inicialização).\n\nAgora: %1$s</string>
     <string name="save_logs_button">Salvar</string>
+    <string name="settings_logs_section">Logs</string>
 </resources>
