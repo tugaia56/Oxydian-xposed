@@ -1395,4 +1395,13 @@
     <string name="log_folder_message">Dónde guarda Oxydian los registros que puedes enviar con un informe de error (mensajes de Oxydian, estado de los mods, registro de arranque).\n\nAhora: %1$s</string>
     <string name="save_logs_button">Guardar</string>
     <string name="settings_logs_section">Registros</string>
+    <string name="delete_button">Eliminar</string>
+    <string name="delete_confirm">¿Eliminar %1$d archivos de %2$s? Solo se eliminan los archivos de este tipo.</string>
+    <string name="delete_none">Nada que eliminar</string>
+    <string name="delete_done">Eliminados: %1$d</string>
+    <string name="delete_summary">Elimina solo los archivos de este tipo</string>
+    <string name="boot_delete_title">Eliminar registros de arranque</string>
+    <string name="logs_delete_title">Eliminar registros guardados</string>
+    <string name="health_delete_title">Eliminar archivos de estado guardados</string>
+    <string name="backup_delete_title">Eliminar copias de seguridad</string>
 </resources>

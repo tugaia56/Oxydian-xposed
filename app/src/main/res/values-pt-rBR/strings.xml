@@ -1395,4 +1395,13 @@
     <string name="log_folder_message">Onde o Oxydian salva os logs que você pode enviar com um relatório de erro (mensagens do Oxydian, estado dos mods, log de inicialização).\n\nAgora: %1$s</string>
     <string name="save_logs_button">Salvar</string>
     <string name="settings_logs_section">Logs</string>
+    <string name="delete_button">Excluir</string>
+    <string name="delete_confirm">Excluir %1$d arquivos de %2$s? Somente os arquivos deste tipo são removidos.</string>
+    <string name="delete_none">Nada para excluir</string>
+    <string name="delete_done">Excluídos: %1$d</string>
+    <string name="delete_summary">Remove apenas os arquivos deste tipo</string>
+    <string name="boot_delete_title">Excluir logs de inicialização</string>
+    <string name="logs_delete_title">Excluir logs salvos</string>
+    <string name="health_delete_title">Excluir arquivos de estado salvos</string>
+    <string name="backup_delete_title">Excluir backups</string>
 </resources>

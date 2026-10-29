@@ -1395,4 +1395,13 @@
     <string name="log_folder_message">Wo Oxydian die Protokolle speichert, die Sie mit einer Fehlermeldung senden können (Oxydian-Meldungen, Modulstatus, Startprotokoll).\n\nAktuell: %1$s</string>
     <string name="save_logs_button">Speichern</string>
     <string name="settings_logs_section">Protokolle</string>
+    <string name="delete_button">Löschen</string>
+    <string name="delete_confirm">%1$d Dateien aus %2$s löschen? Es werden nur Dateien dieser Art entfernt.</string>
+    <string name="delete_none">Nichts zu löschen</string>
+    <string name="delete_done">Gelöscht: %1$d</string>
+    <string name="delete_summary">Entfernt nur Dateien dieser Art</string>
+    <string name="boot_delete_title">Startprotokolle löschen</string>
+    <string name="logs_delete_title">Gespeicherte Protokolle löschen</string>
+    <string name="health_delete_title">Gespeicherte Statusdateien löschen</string>
+    <string name="backup_delete_title">Backups löschen</string>
 </resources>

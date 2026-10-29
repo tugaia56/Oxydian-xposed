@@ -53,6 +53,42 @@ public final class LogFolder {
         }
     }
 
+    /**
+     * Elimina tutti i file di quel tipo ("bootcap", "modhealth", "xposed") dalla cartella dei log, dopo aver chiesto conferma
+     * col numero dei file. Gli altri tipi non si toccano. extraFile: un altro file da togliere insieme (o null).
+     */
+    public static void confirmDelete(android.app.Activity act, String type, String extraFile, Runnable after) {
+        final String dir = dir();
+        new Thread(() -> {
+            String extra = extraFile == null ? "" : "; [ -f " + extraFile + " ] && n=$((n+1))";
+            int n = 0;
+            try {
+                java.util.List<String> out = Shell.cmd("n=$(ls \"" + dir + "\"/" + type + "_* 2>/dev/null | wc -l)" + extra + "; echo $n").exec().getOut();
+                n = Integer.parseInt(out.get(out.size() - 1).trim());
+            } catch (Exception ignored) {}
+            final int count = n;
+            act.runOnUiThread(() -> {
+                if (act.isFinishing()) return;
+                if (count == 0) {
+                    android.widget.Toast.makeText(act, it.tugaia56.obsidian.R.string.delete_none, android.widget.Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                ObsidianTheme.themeDialog(new com.google.android.material.dialog.MaterialAlertDialogBuilder(act)
+                        .setMessage(act.getString(it.tugaia56.obsidian.R.string.delete_confirm, count, dir))
+                        .setPositiveButton(it.tugaia56.obsidian.R.string.delete_button, (d, w) -> new Thread(() -> {
+                            Shell.cmd("rm -f \"" + dir + "\"/" + type + "_*" + (extraFile == null ? "" : "; rm -f " + extraFile)).exec();
+                            act.runOnUiThread(() -> {
+                                android.widget.Toast.makeText(act, act.getString(it.tugaia56.obsidian.R.string.delete_done, count),
+                                        android.widget.Toast.LENGTH_SHORT).show();
+                                if (after != null) after.run();
+                            });
+                        }).start())
+                        .setNegativeButton(it.tugaia56.obsidian.R.string.cancel, null)
+                        .show());
+            });
+        }).start();
+    }
+
     /** Percorso di un nuovo file di log di quel tipo. */
     public static String newPath(String type, String ext) {
         return dir() + "/" + type + "_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + "." + ext;

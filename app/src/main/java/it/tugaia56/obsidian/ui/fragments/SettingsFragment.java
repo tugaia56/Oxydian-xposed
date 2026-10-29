@@ -193,7 +193,16 @@ public class SettingsFragment extends Fragment {
         saveLogsItem.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.TOP;
         ListWidgetAdapter.ListItem logFolderItem = new ListWidgetAdapter.ListItem(
                 getString(R.string.log_folder_title), it.tugaia56.obsidian.utils.LogFolder.dir(), this::showLogFolderDialog);
-        logFolderItem.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.BOTTOM;
+        logFolderItem.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.MIDDLE;
+        ListWidgetAdapter.ListItem deleteLogsItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.logs_delete_title), getString(R.string.delete_summary), this::deleteLogs);
+        deleteLogsItem.actionLabel = getString(R.string.delete_button);
+        deleteLogsItem.onAction = this::deleteLogs;
+        deleteLogsItem.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.BOTTOM;
+        ListWidgetAdapter.ListItem deleteBackupsItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.backup_delete_title), getString(R.string.delete_summary), this::deleteBackups);
+        deleteBackupsItem.actionLabel = getString(R.string.delete_button);
+        deleteBackupsItem.onAction = this::deleteBackups;
 
         rv.setAdapter(new ConcatAdapter(
                 new SectionTitleAdapter(List.of(getString(R.string.settings_section))),
@@ -203,9 +212,61 @@ public class SettingsFragment extends Fragment {
                 new ListWidgetAdapter(List.of(backupItem)),
                 new ListWidgetAdapter(List.of(restoreItem)),
                 new ListWidgetAdapter(List.of(clearItem)),
+                new SectionTitleAdapter(List.of(getString(R.string.delete_button))),
+                new ListWidgetAdapter(List.of(deleteBackupsItem)),
                 new SectionTitleAdapter(List.of(getString(R.string.settings_logs_section))),
                 new ListWidgetAdapter(List.of(saveLogsItem)),
-                new ListWidgetAdapter(List.of(logFolderItem))));
+                new ListWidgetAdapter(List.of(logFolderItem)),
+                new ListWidgetAdapter(List.of(deleteLogsItem))));
+    }
+
+    // ── Eliminazione ──────────────────────────────────────────────────────────
+
+    /** Toglie solo i log salvati da questa pagina (xposed_*) dalla cartella dei log, con conferma. */
+    private void deleteLogs() {
+        it.tugaia56.obsidian.utils.LogFolder.confirmDelete(requireActivity(), "xposed", null, null);
+    }
+
+    /** Toglie solo i backup di Oxydian (*_oxydian_backup.json) dalla cartella dei backup, con conferma. */
+    private void deleteBackups() {
+        final Context ctx = mAppCtx;
+        final android.app.Activity act = requireActivity();
+        new Thread(() -> {
+            java.util.List<DocumentFile> docs = new java.util.ArrayList<>();
+            java.util.List<File> files = new java.util.ArrayList<>();
+            try {
+                String uriStr = ObsidianPrefs.getString(PREF_BACKUP_FOLDER_URI, null);
+                if (uriStr != null) {
+                    DocumentFile dir = DocumentFile.fromTreeUri(ctx, Uri.parse(uriStr));
+                    if (dir != null) for (DocumentFile f : dir.listFiles()) {
+                        String n = f.getName();
+                        if (n != null && n.endsWith("_oxydian_backup.json")) docs.add(f);
+                    }
+                } else {
+                    File dir = ctx.getExternalFilesDir(null);
+                    File[] l = dir == null ? null : dir.listFiles((d, n) -> n.endsWith("_oxydian_backup.json"));
+                    if (l != null) files.addAll(java.util.Arrays.asList(l));
+                }
+            } catch (Throwable ignored) {}
+            final int count = docs.size() + files.size();
+            act.runOnUiThread(() -> {
+                if (act.isFinishing()) return;
+                if (count == 0) {
+                    android.widget.Toast.makeText(act, R.string.delete_none, android.widget.Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(act)
+                        .setMessage(getString(R.string.delete_confirm, count, getFolderSummary()))
+                        .setPositiveButton(R.string.delete_button, (d, w) -> new Thread(() -> {
+                            for (DocumentFile f : docs) f.delete();
+                            for (File f : files) f.delete();
+                            act.runOnUiThread(() -> android.widget.Toast.makeText(act, getString(R.string.delete_done, count),
+                                    android.widget.Toast.LENGTH_SHORT).show());
+                        }).start())
+                        .setNegativeButton(R.string.cancel, null)
+                        .show());
+            });
+        }).start();
     }
 
     // ── Log ───────────────────────────────────────────────────────────────────
@@ -350,8 +411,8 @@ public class SettingsFragment extends Fragment {
             toast(getString(R.string.settings_restore_ok));
             // Re-applica i FabricatedOverlay DST abilitati; il riavvio SystemUI
             // resta manuale (pulsante in alto), come per ogni altra opzione.
-            DstFabricatedUtil.reapplyAll(() ->
-                    Toast.makeText(requireContext(), R.string.obs_restart_ui_hint, Toast.LENGTH_SHORT).show());
+            // la callback arriva da un thread di lavoro: il messaggio va mostrato dal thread principale
+            DstFabricatedUtil.reapplyAll(() -> toast(getString(R.string.obs_restart_ui_hint)));
         } catch (Exception ex) {
             toast(getString(R.string.settings_error) + "\n" + ex.getMessage());
         }

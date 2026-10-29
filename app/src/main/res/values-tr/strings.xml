@@ -1395,4 +1395,13 @@
     <string name="log_folder_message">Hata raporuyla gönderebileceğiniz günlüklerin (Oxydian iletileri, mod durumu, açılış günlüğü) kaydedildiği yer.\n\nŞimdi: %1$s</string>
     <string name="save_logs_button">Kaydet</string>
     <string name="settings_logs_section">Günlükler</string>
+    <string name="delete_button">Sil</string>
+    <string name="delete_confirm">%2$s içinden %1$d dosya silinsin mi? Yalnızca bu türdeki dosyalar silinir.</string>
+    <string name="delete_none">Silinecek bir şey yok</string>
+    <string name="delete_done">Silindi: %1$d</string>
+    <string name="delete_summary">Yalnızca bu türdeki dosyaları siler</string>
+    <string name="boot_delete_title">Açılış günlüklerini sil</string>
+    <string name="logs_delete_title">Kaydedilen günlükleri sil</string>
+    <string name="health_delete_title">Kaydedilen durum dosyalarını sil</string>
+    <string name="backup_delete_title">Yedekleri sil</string>
 </resources>

@@ -1395,4 +1395,13 @@
     <string name="log_folder_message">Tempat Oxydian menyimpan log yang dapat dikirim bersama laporan bug (pesan Oxydian, status mod, log booting).\n\nSaat ini: %1$s</string>
     <string name="save_logs_button">Simpan</string>
     <string name="settings_logs_section">Log</string>
+    <string name="delete_button">Hapus</string>
+    <string name="delete_confirm">Hapus %1$d file dari %2$s? Hanya file jenis ini yang dihapus.</string>
+    <string name="delete_none">Tidak ada yang dihapus</string>
+    <string name="delete_done">Dihapus: %1$d</string>
+    <string name="delete_summary">Hanya menghapus file jenis ini</string>
+    <string name="boot_delete_title">Hapus log booting</string>
+    <string name="logs_delete_title">Hapus log tersimpan</string>
+    <string name="health_delete_title">Hapus file status tersimpan</string>
+    <string name="backup_delete_title">Hapus cadangan</string>
 </resources>

@@ -1405,4 +1405,13 @@
     <string name="log_folder_message">Where Oxydian saves the logs you can send with a bug report (Oxydian messages, mod status, boot log).\n\nNow: %1$s</string>
     <string name="save_logs_button">Save</string>
     <string name="settings_logs_section">Logs</string>
+    <string name="delete_button">Delete</string>
+    <string name="delete_confirm">Delete %1$d files from %2$s? Only this kind of file is removed.</string>
+    <string name="delete_none">Nothing to delete</string>
+    <string name="delete_done">Deleted: %1$d</string>
+    <string name="delete_summary">Removes only this kind of file</string>
+    <string name="boot_delete_title">Delete boot logs</string>
+    <string name="logs_delete_title">Delete saved logs</string>
+    <string name="health_delete_title">Delete saved status files</string>
+    <string name="backup_delete_title">Delete backups</string>
 </resources>

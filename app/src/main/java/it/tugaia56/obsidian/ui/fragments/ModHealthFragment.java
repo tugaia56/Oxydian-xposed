@@ -128,10 +128,15 @@ public class ModHealthFragment extends Fragment {
         }
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.mod_health_export_section))));
-        GroupUtils.addGroup(chain, List.of(new ListWidgetAdapter.ListItem(
+        ListWidgetAdapter.ListItem exportItem = new ListWidgetAdapter.ListItem(
                 getString(R.string.mod_health_export_title),
                 getString(R.string.mod_health_export_summary),
-                this::exportLog)));
+                this::exportLog);
+        ListWidgetAdapter.ListItem deleteItem = new ListWidgetAdapter.ListItem(
+                getString(R.string.health_delete_title), getString(R.string.delete_summary), this::deleteExports);
+        deleteItem.actionLabel = getString(R.string.delete_button);
+        deleteItem.onAction = this::deleteExports;
+        GroupUtils.addGroup(chain, List.of(exportItem, deleteItem));
 
         mRv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
@@ -177,6 +182,11 @@ public class ModHealthFragment extends Fragment {
 
     // ── Esporta log — file di testo leggibile, stesso contenuto della schermata ma con il
     // messaggio completo per ogni FAIL (troncato a 160 caratteri già in fase di scrittura). ──
+
+    /** Toglie solo i file di stato salvati (modhealth_*) dalla cartella dei log, con conferma. */
+    private void deleteExports() {
+        it.tugaia56.obsidian.utils.LogFolder.confirmDelete(requireActivity(), "modhealth", null, null);
+    }
 
     private void exportLog() {
         Context ctx = requireContext().getApplicationContext();

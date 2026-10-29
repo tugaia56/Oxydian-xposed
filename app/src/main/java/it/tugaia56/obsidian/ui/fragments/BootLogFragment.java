@@ -138,9 +138,19 @@ public class BootLogFragment extends Fragment {
         List<Object> rows = new ArrayList<>();
         rows.add(new ListWidgetAdapter.ListItem(getString(R.string.boot_show),
                 mHasLog ? getString(R.string.boot_show_summary) : getString(R.string.boot_no_log), this::showReport));
+        ListWidgetAdapter.ListItem del = new ListWidgetAdapter.ListItem(
+                getString(R.string.boot_delete_title), getString(R.string.delete_summary), this::deleteLogs);
+        del.actionLabel = getString(R.string.delete_button);
+        del.onAction = this::deleteLogs;
+        rows.add(del);
         GroupUtils.addGroup(chain, rows);
         chain.add(new InfoCardAdapter(getString(R.string.boot_note)));
         mRv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
+    }
+
+    /** Toglie solo i log di avvio (bootcap_*) dalla cartella dei log, con conferma. */
+    private void deleteLogs() {
+        it.tugaia56.obsidian.utils.LogFolder.confirmDelete(requireActivity(), "bootcap", "/data/local/tmp/bootcap.log", this::load);
     }
 
     private void showReport() {

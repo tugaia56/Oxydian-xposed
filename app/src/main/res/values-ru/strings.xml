@@ -1395,4 +1395,13 @@
     <string name="log_folder_message">Куда Oxydian сохраняет журналы, которые можно отправить с отчётом об ошибке (сообщения Oxydian, состояние модов, журнал загрузки).\n\nСейчас: %1$s</string>
     <string name="save_logs_button">Сохранить</string>
     <string name="settings_logs_section">Журналы</string>
+    <string name="delete_button">Удалить</string>
+    <string name="delete_confirm">Удалить файлов: %1$d из %2$s? Удаляются только файлы этого типа.</string>
+    <string name="delete_none">Нечего удалять</string>
+    <string name="delete_done">Удалено: %1$d</string>
+    <string name="delete_summary">Удаляет только файлы этого типа</string>
+    <string name="boot_delete_title">Удалить журналы загрузки</string>
+    <string name="logs_delete_title">Удалить сохранённые журналы</string>
+    <string name="health_delete_title">Удалить сохранённые файлы состояния</string>
+    <string name="backup_delete_title">Удалить резервные копии</string>
 </resources>

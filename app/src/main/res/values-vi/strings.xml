@@ -1395,4 +1395,13 @@
     <string name="log_folder_message">Nơi Oxydian lưu nhật ký bạn có thể gửi kèm báo cáo lỗi (thông báo của Oxydian, trạng thái mod, nhật ký khởi động).\n\nHiện tại: %1$s</string>
     <string name="save_logs_button">Lưu</string>
     <string name="settings_logs_section">Nhật ký</string>
+    <string name="delete_button">Xóa</string>
+    <string name="delete_confirm">Xóa %1$d tệp khỏi %2$s? Chỉ xóa các tệp thuộc loại này.</string>
+    <string name="delete_none">Không có gì để xóa</string>
+    <string name="delete_done">Đã xóa: %1$d</string>
+    <string name="delete_summary">Chỉ xóa các tệp thuộc loại này</string>
+    <string name="boot_delete_title">Xóa nhật ký khởi động</string>
+    <string name="logs_delete_title">Xóa nhật ký đã lưu</string>
+    <string name="health_delete_title">Xóa tệp trạng thái đã lưu</string>
+    <string name="backup_delete_title">Xóa bản sao lưu</string>
 </resources>
