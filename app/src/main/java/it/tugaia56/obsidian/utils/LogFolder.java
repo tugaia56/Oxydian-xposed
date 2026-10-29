@@ -33,6 +33,14 @@ public final class LogFolder {
         return d == null || d.isEmpty() ? DEFAULT_DIR : d;
     }
 
+    /**
+     * Il percorso per i testi: tra virgolette e senza possibilita' di andare a capo a meta' (niente a capo dopo "/" ne' nello
+     * spazio: si usano il "word joiner" e lo spazio non separabile).
+     */
+    public static String quotedDir() {
+        return "\"" + dir().replace("/", "/" + (char) 0x2060).replace(' ', (char) 0xA0) + "\"";
+    }
+
     /** Cambia la cartella ("" = predefinita) e la comunica al modulo del log di avvio. */
     public static void setDir(String path) {
         boolean def = path == null || path.isEmpty() || path.equals(DEFAULT_DIR);
