@@ -436,10 +436,26 @@ public class SettingsFragment extends Fragment {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
+    /** Percorso completo di una cartella scelta con il selettore (es. /sdcard/Download/Backup); null se non si ricava. */
+    private static String fullPath(Uri tree) {
+        try {
+            String id = android.provider.DocumentsContract.getTreeDocumentId(tree);
+            int c = id.indexOf(':');
+            if (c < 0) return null;
+            String vol = id.substring(0, c), rel = id.substring(c + 1);
+            String base = vol.equals("primary") ? "/sdcard" : "/storage/" + vol;
+            return rel.isEmpty() ? base : base + "/" + rel;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
     private String getFolderSummary() {
         String uriStr = ObsidianPrefs.getString(PREF_BACKUP_FOLDER_URI, null);
         if (uriStr == null) return getString(R.string.settings_folder_default);
         Uri uri = Uri.parse(uriStr);
+        String full = fullPath(uri);
+        if (full != null) return String.format(getString(R.string.settings_folder_summary_fmt), full);
         DocumentFile dir = DocumentFile.fromTreeUri(requireContext(), uri);
         String name = (dir != null) ? dir.getName() : null;
         if (name == null || name.isEmpty()) {
