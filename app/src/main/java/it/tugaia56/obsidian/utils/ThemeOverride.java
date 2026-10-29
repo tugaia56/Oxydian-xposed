@@ -14,7 +14,7 @@ public final class ThemeOverride {
     private static final long TTL_MS = 3000;
 
     private static long sAt = -TTL_MS;
-    private static Integer sAccent, sBg, sWifiIcon, sMobileIcon, sNavIcon;
+    private static Integer sAccent, sBg, sWifiIcon, sMobileIcon, sNavIcon, sBgAlpha;
 
     private ThemeOverride() {}
 
@@ -28,6 +28,15 @@ public final class ThemeOverride {
     public static synchronized Integer bg() {
         load();
         return sBg;
+    }
+
+    /**
+     * Sfondo con trasparenza scelto in Oxydian Theme: opacita' del nero (0-255) per lo sfondo dell'app, oppure null se lo
+     * sfondo scelto e' un colore pieno. In questo caso {@link #bg()} e' null.
+     */
+    public static synchronized Integer bgAlpha() {
+        load();
+        return sBgAlpha;
     }
 
     /** Colore delle icone Wi-Fi scelto in Oxydian Theme, o null. */
@@ -68,16 +77,16 @@ public final class ThemeOverride {
         new Thread(() -> {
             try {
                 java.util.List<String> out = com.topjohnwu.superuser.Shell.cmd(
-                        "for k in accent bg wifi_icon_color mobile_icon_color nav_icon_color; do echo \"$k=$(getprop persist.oxytheme.$k)\"; done")
+                        "for k in accent bg wifi_icon_color mobile_icon_color nav_icon_color bg_alpha; do echo \"$k=$(getprop persist.oxytheme.$k)\"; done")
                         .exec().getOut();
                 java.util.Map<String, String> m = new java.util.HashMap<>();
                 for (String l : out) { int i = l.indexOf('='); if (i > 0) m.put(l.substring(0, i), l.substring(i + 1)); }
                 if (m.isEmpty()) return;
-                Integer a = parse(m.get("accent")), b = parse(m.get("bg"));
+                Integer a = parse(m.get("accent")), b = parse(m.get("bg")), al = parseAlpha(m.get("bg_alpha"));
                 boolean changed;
                 synchronized (ThemeOverride.class) {
-                    changed = !java.util.Objects.equals(a, sAccent) || !java.util.Objects.equals(b, sBg);
-                    sAccent = a; sBg = b;
+                    changed = !java.util.Objects.equals(a, sAccent) || !java.util.Objects.equals(b, sBg) || !java.util.Objects.equals(al, sBgAlpha);
+                    sAccent = a; sBg = b; sBgAlpha = al;
                     sWifiIcon = parse(m.get("wifi_icon_color"));
                     sMobileIcon = parse(m.get("mobile_icon_color"));
                     sNavIcon = parse(m.get("nav_icon_color"));
@@ -85,7 +94,7 @@ public final class ThemeOverride {
                 }
                 try {
                     ObsidianPrefs.putString("theme_override_cache", m.get("accent") + "|" + m.get("bg") + "|" + m.get("wifi_icon_color")
-                            + "|" + m.get("mobile_icon_color") + "|" + m.get("nav_icon_color"));
+                            + "|" + m.get("mobile_icon_color") + "|" + m.get("nav_icon_color") + "|" + m.get("bg_alpha"));
                 } catch (Throwable ignored) {}
                 Runnable r = sOnChange;
                 if (changed && r != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(r);
@@ -109,6 +118,7 @@ public final class ThemeOverride {
                         String[] p = c.split("[|]", -1);
                         if (p.length >= 5) {
                             sAccent = parse(p[0]); sBg = parse(p[1]); sWifiIcon = parse(p[2]); sMobileIcon = parse(p[3]); sNavIcon = parse(p[4]);
+                            sBgAlpha = p.length >= 6 ? parseAlpha(p[5]) : null;
                             sRootSeeded = true;
                         }
                     }
@@ -122,6 +132,19 @@ public final class ThemeOverride {
         sWifiIcon = parse(get("persist.oxytheme.wifi_icon_color"));
         sMobileIcon = parse(get("persist.oxytheme.mobile_icon_color"));
         sNavIcon = parse(get("persist.oxytheme.nav_icon_color"));
+        sBgAlpha = parseAlpha(get("persist.oxytheme.bg_alpha"));
+    }
+
+    private static Integer parseAlpha(String s) {
+        if (s == null) return null;
+        s = s.trim();
+        if (s.isEmpty() || s.equals("null")) return null;
+        try {
+            int v = Integer.parseInt(s);
+            return v < 0 || v > 255 ? null : v;
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private static Integer parse(String s) {

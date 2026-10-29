@@ -221,7 +221,22 @@ public class ObsidianTheme {
         float[] hsv = new float[3];
         Color.colorToHSV(bg, hsv);
         hsv[2] = isDark(bg) ? Math.min(1f, hsv[2] + 0.05f) : Math.max(0f, hsv[2] - 0.05f);
-        return Color.HSVToColor(hsv);
+        int card = Color.HSVToColor(hsv);
+        Integer a = ThemeOverride.bgAlpha();
+        // con uno sfondo con trasparenza anche le card lasciano intravedere lo sfondo, ma meno della pagina (restano leggibili)
+        if (a != null) card = (card & 0x00FFFFFF) | (Math.min(255, a + 0x50) << 24);
+        return card;
+    }
+
+    /** Sfondo con trasparenza scelto in Oxydian Theme (opacita' 0-255 del nero), o null se lo sfondo e' pieno. */
+    public static Integer bgAlpha() {
+        return ThemeOverride.bgAlpha();
+    }
+
+    /** Colore di sfondo di finestra, barre e menu in basso: nero trasparente se c'e' una trasparenza, altrimenti {@link #bgColor()}. */
+    public static int windowBg() {
+        Integer a = ThemeOverride.bgAlpha();
+        return a != null ? (a << 24) : bgColor();
     }
 
     /** Perceived-luminance check (ITU-R BT.601) — true if {@code color} reads as dark enough

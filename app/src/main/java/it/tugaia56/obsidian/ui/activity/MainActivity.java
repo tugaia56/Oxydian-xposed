@@ -119,6 +119,11 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
     protected void onCreate(Bundle savedInstanceState) {
         ObsidianTheme.refreshThemeMode(this);
         super.onCreate(savedInstanceState);
+        if (ObsidianTheme.bgAlpha() != null) {
+            // sfondo con trasparenza (scelto in Oxydian Theme): la finestra mostra lo sfondo del telefono
+            getWindow().setFormat(android.graphics.PixelFormat.TRANSLUCENT);
+            getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
+        }
         setContentView(R.layout.activity_main);
 
         mBottomNav             = findViewById(R.id.bottom_nav);
@@ -249,7 +254,13 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
         if (ObsidianTheme.themeMode() == ObsidianTheme.THEME_SYSTEM) {
             ObsidianTheme.syncBackgroundPresetToTheme();
         }
-        int bg = ObsidianTheme.bgColor();
+        if (ObsidianTheme.bgAlpha() != null) {
+            getWindow().setFormat(android.graphics.PixelFormat.TRANSLUCENT);
+            getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
+        } else {
+            getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
+        }
+        int bg = ObsidianTheme.windowBg();
         getWindow().getDecorView().setBackgroundColor(bg);
         getWindow().setStatusBarColor(bg);
         getWindow().setNavigationBarColor(bg);
@@ -410,12 +421,12 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
 
         // ── Results overlay ───────────────────────────────────────────────────
         mSearchResultsRv.setLayoutManager(new LinearLayoutManager(this));
-        mSearchResultsRv.setBackgroundColor(ObsidianTheme.bgColor());
+        mSearchResultsRv.setBackgroundColor(ObsidianTheme.windowBg());
         // Senza sfondo opaco il testo "Nessun risultato" resta trasparente e si vede
         // sovrapposto alla tab sottostante invece di coprirla — si confonde con le card
         // dietro invece di leggersi come un vero stato "nessun risultato".
         if (mSearchEmptyTv != null) {
-            mSearchEmptyTv.setBackgroundColor(ObsidianTheme.bgColor());
+            mSearchEmptyTv.setBackgroundColor(ObsidianTheme.windowBg());
             mSearchEmptyTv.setTextColor(ObsidianTheme.textColor(0x99));
         }
     }
@@ -847,6 +858,11 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
     }
 
     private void applyNavBarColor() {
+        if (ObsidianTheme.bgAlpha() != null) {
+            mBottomNav.setBackgroundColor(ObsidianTheme.windowBg());
+            if (mNavDivider != null) mNavDivider.setBackgroundColor(0x33FFFFFF);
+            return;
+        }
         boolean bgOn = ObsidianPrefs.getBoolean("DST_BACKGROUND_on", false);
         if (!bgOn) return;
         int bgColor = ObsidianPrefs.getInt("DST_BACKGROUND", 0xFF1A1A2E) | 0xFF000000;
