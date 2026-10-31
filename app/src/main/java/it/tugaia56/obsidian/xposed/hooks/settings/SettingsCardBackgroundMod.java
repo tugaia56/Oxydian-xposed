@@ -377,6 +377,9 @@ public class SettingsCardBackgroundMod extends XposedMods {
         // telefono + swatch colori) era già navy giusto, solo l'header mancava.
         tintViewByIdInPackage(activity, "aod_toolbar_container");
         tintViewByIdInPackage(activity, "aod_toolbar");
+        // com.oplus.notificationmanager, Non disturbare > Programmi > Modifica (2026-10-31): la barra in basso con
+        // "Elimina" (zen_navigation_tool) e' #1f1f1f fisso, prende il colore di sfondo del tema come l'header
+        tintViewByIdInPackage(activity, "zen_navigation_tool");
         // Stessa pagina, 2026-09-07: l'utente segnala anche un "bottom_sheet" marrone/#1e1e1e
         // ancora presente dopo il fix header. Confermato via dumpsys activity --views dal vivo:
         // non esiste alcuna view con "bottom"/"sheet" nel nome — il vero elemento è
