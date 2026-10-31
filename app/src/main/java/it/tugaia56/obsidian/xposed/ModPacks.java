@@ -156,6 +156,9 @@ public class ModPacks {
         if (it.tugaia56.obsidian.xposed.hooks.materialyou.MaterialSurfaceMod.PKGS.contains(packageName)) {
             mods.add(it.tugaia56.obsidian.xposed.hooks.materialyou.MaterialSurfaceMod.class);
         }
+        if (it.tugaia56.obsidian.xposed.hooks.colorremap.ColorRemapMod.handles(packageName)) {
+            mods.add(it.tugaia56.obsidian.xposed.hooks.colorremap.ColorRemapMod.class);
+        }
         if (it.tugaia56.obsidian.xposed.hooks.alexa.AlexaColorMod.PKG.equals(packageName)) {
             mods.add(it.tugaia56.obsidian.xposed.hooks.alexa.AlexaColorMod.class);
         }
