@@ -161,6 +161,18 @@ public class AlexaColorMod extends XposedMods {
             });
             ok++;
         } catch (Throwable t) { log("Paint.setColor(long)", t); }
+        // colori letti dalle risorse (alone della barra "Chiedi ad Alexa", testi nativi): stesso criterio dopo la lettura
+        XC_MethodHook after = new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam p) {
+                try {
+                    int c = (Integer) p.getResult();
+                    int n = map(c);
+                    if (n != c && night()) p.setResult(n);
+                } catch (Throwable ignored) {}
+            }
+        };
+        try { XposedHelpers.findAndHookMethod(Resources.class, "getColor", int.class, Resources.Theme.class, after); ok++; } catch (Throwable t) { log("Resources.getColor", t); }
+        try { XposedHelpers.findAndHookMethod(android.content.res.TypedArray.class, "getColor", int.class, int.class, after); ok++; } catch (Throwable t) { log("TypedArray.getColor", t); }
         hookTileBorder(lp);
         XposedBridge.log("[ Obsidian ] AlexaColorMod: " + ok + " colour hooks installed in " + lp.packageName);
     }
