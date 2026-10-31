@@ -80,6 +80,7 @@ public class ColorRemapMod extends XposedMods {
         // F-Droid (org.fdroid.fdroid): interfaccia Compose con colori Material fissi nel codice
         Map<Integer, Integer> fdroid = new HashMap<>();
         fdroid.put(0x111318, PAGE);   // sfondo usato ovunque
+        fdroid.put(0x1D2024, PAGE);   // barra di navigazione
         fdroid.put(0xA6C8FF, ACCENT); // icona selezionata della barra di navigazione (e altri blu primari)
         fdroid.put(0x01315E, WHITE);  // icona sopra il colore primario
         fdroid.put(0xBACF82, ACCENT); // testo verde nelle Impostazioni
