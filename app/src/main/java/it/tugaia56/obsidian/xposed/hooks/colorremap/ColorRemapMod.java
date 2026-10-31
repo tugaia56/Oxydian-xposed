@@ -60,7 +60,17 @@ public class ColorRemapMod extends XposedMods {
         claude.put(0x151515, PAGE);
         claude.put(0x20201F, TILE);
         claude.put(0x313131, CARD);
+        claude.put(0x111111, PAGE);
         RULES.put("com.anthropic.claude", claude);
+    }
+
+    /** Colori che cambiano solo quando l'app li disegna come rettangolo arrotondato (pulsanti, chip): il testo e le icone con lo stesso colore restano come sono. */
+    private static final Map<String, Map<Integer, Integer>> FILL_RULES = new HashMap<>();
+
+    static {
+        Map<Integer, Integer> claudeFill = new HashMap<>();
+        claudeFill.put(0xF9F9F7, ACCENT);   // pulsante "Nuova sessione" e pulsante di invio
+        FILL_RULES.put("com.anthropic.claude", claudeFill);
     }
 
     public static boolean handles(String pkg) {
@@ -239,6 +249,115 @@ public class ColorRemapMod extends XposedMods {
             });
             ok++;
         } catch (Throwable t) { log("View.setBackground", t); }
+        // gradienti (Compose usa LinearGradient per le sfumature, ad esempio sotto l'header): si mappano i colori delle tappe
+        try {
+            XposedHelpers.findAndHookConstructor(android.graphics.LinearGradient.class, float.class, float.class, float.class, float.class,
+                    int[].class, float[].class, android.graphics.Shader.TileMode.class, new XC_MethodHook() {
+                        @Override protected void beforeHookedMethod(MethodHookParam p) {
+                            try {
+                                int[] a = (int[]) p.args[4];
+                                if (a == null || sBusy.get() != null || !night()) return;
+                                int[] b = null;
+                                for (int i = 0; i < a.length; i++) {
+                                    int n = map(a[i]);
+                                    if (n != a[i]) {
+                                        if (b == null) b = a.clone();
+                                        b[i] = n;
+                                    }
+                                }
+                                if (b != null) p.args[4] = b;
+                            } catch (Throwable ignored) {}
+                        }
+                    });
+            ok++;
+        } catch (Throwable t) { log("LinearGradient(int[])", t); }
+        try {
+            XposedHelpers.findAndHookConstructor(android.graphics.LinearGradient.class, float.class, float.class, float.class, float.class,
+                    int.class, int.class, android.graphics.Shader.TileMode.class, new XC_MethodHook() {
+                        @Override protected void beforeHookedMethod(MethodHookParam p) {
+                            try {
+                                if (sBusy.get() != null || !night()) return;
+                                for (int i = 4; i <= 5; i++) {
+                                    int c = (Integer) p.args[i], n = map(c);
+                                    if (n != c) p.args[i] = n;
+                                }
+                            } catch (Throwable ignored) {}
+                        }
+                    });
+            ok++;
+        } catch (Throwable t) { log("LinearGradient(int,int)", t); }
+        final Map<Integer, Integer> fill = FILL_RULES.get(lp.packageName);
+        if (fill != null) {
+            try {
+                Class<?> rc = XposedHelpers.findClassIfExists("android.graphics.BaseRecordingCanvas", lp.classLoader);
+                if (rc != null) {
+                    XC_MethodHook rr = new XC_MethodHook() {
+                        @Override protected void beforeHookedMethod(MethodHookParam p) {
+                            try {
+                                if (sBusy.get() != null || !night()) return;
+                                Paint paint = (Paint) p.args[p.args.length - 1];
+                                int c = paint.getColor();
+                                Integer role = fill.get(c & 0xFFFFFF);
+                                if (role == null) return;
+                                if (!sReady) load();
+                                if (!sReady || sColors[role] < 0) return;
+                                p.setObjectExtra("old", c);
+                                paint.setColor((c & 0xFF000000) | sColors[role]);
+                            } catch (Throwable ignored) {}
+                        }
+
+                        @Override protected void afterHookedMethod(MethodHookParam p) {
+                            try {
+                                Object old = p.getObjectExtra("old");
+                                if (old != null) ((Paint) p.args[p.args.length - 1]).setColor((Integer) old);
+                            } catch (Throwable ignored) {}
+                        }
+                    };
+                    XposedHelpers.findAndHookMethod(rc, "drawRoundRect", float.class, float.class, float.class, float.class, float.class, float.class, Paint.class, rr);
+                    XposedHelpers.findAndHookMethod(rc, "drawRoundRect", android.graphics.RectF.class, float.class, float.class, Paint.class, rr);
+                    ok += 2;
+                    // pulsanti tondi o a pillola disegnati come cerchio/ovale/tracciato: solo se grandi (le icone, piccole, restano come sono)
+                    final float dens = Resources.getSystem().getDisplayMetrics().density;
+                    XC_MethodHook big = new XC_MethodHook() {
+                        @Override protected void beforeHookedMethod(MethodHookParam p) {
+                            try {
+                                if (sBusy.get() != null || !night()) return;
+                                Paint paint = (Paint) p.args[p.args.length - 1];
+                                int c = paint.getColor();
+                                Integer role = fill.get(c & 0xFFFFFF);
+                                if (role == null) return;
+                                float minSide;
+                                Object a0 = p.args[0];
+                                if (a0 instanceof android.graphics.Path) {
+                                    android.graphics.RectF b = new android.graphics.RectF();
+                                    ((android.graphics.Path) a0).computeBounds(b, true);
+                                    minSide = Math.min(b.width(), b.height());
+                                } else if (a0 instanceof Float && p.args.length == 4) {   // drawCircle(cx, cy, radius, paint)
+                                    minSide = 2f * (Float) p.args[2];
+                                } else {
+                                    return;
+                                }
+                                if (minSide < 36f * dens) return;
+                                if (!sReady) load();
+                                if (!sReady || sColors[role] < 0) return;
+                                p.setObjectExtra("old", c);
+                                paint.setColor((c & 0xFF000000) | sColors[role]);
+                            } catch (Throwable ignored) {}
+                        }
+
+                        @Override protected void afterHookedMethod(MethodHookParam p) {
+                            try {
+                                Object old = p.getObjectExtra("old");
+                                if (old != null) ((Paint) p.args[p.args.length - 1]).setColor((Integer) old);
+                            } catch (Throwable ignored) {}
+                        }
+                    };
+                    XposedHelpers.findAndHookMethod(rc, "drawPath", android.graphics.Path.class, Paint.class, big);
+                    XposedHelpers.findAndHookMethod(rc, "drawCircle", float.class, float.class, float.class, Paint.class, big);
+                    ok += 2;
+                }
+            } catch (Throwable t) { log("BaseRecordingCanvas.drawRoundRect", t); }
+        }
         ResultColor after = new ResultColor();
         try { XposedHelpers.findAndHookMethod(Resources.class, "getColor", int.class, Resources.Theme.class, after); ok++; } catch (Throwable t) { log("Resources.getColor", t); }
         try { XposedHelpers.findAndHookMethod(TypedArray.class, "getColor", int.class, int.class, after); ok++; } catch (Throwable t) { log("TypedArray.getColor", t); }
