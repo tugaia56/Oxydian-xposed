@@ -63,6 +63,19 @@ public class ColorRemapMod extends XposedMods {
     private static final ThreadLocal<Boolean> sBusy = new ThreadLocal<>();
 
     private Map<Integer, Integer> mRules;
+
+    public ColorRemapMod(Context context) {
+        super(context);
+    }
+
+    @Override
+    public void updatePrefs(String... Key) {}
+
+    @Override
+    public boolean listensTo(String packageName) {
+        return RULES.containsKey(packageName);
+    }
+
     private static int resColor(Resources res, String name) {
         int id = Resources.getSystem().getIdentifier(name, "color", "android");
         return id == 0 ? -1 : (res.getColor(id, null) & 0xFFFFFF);
