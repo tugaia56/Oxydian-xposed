@@ -75,6 +75,7 @@
         <item>com.box.android</item>
         <item>org.skvalex.cr</item>
         <item>com.anthropic.claude</item>
+        <item>com.hesung.dreo</item>
 	</string-array>
 
     <!-- DST ACCENT1 resource names (24 entries) -->

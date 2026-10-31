@@ -62,6 +62,10 @@ public class ColorRemapMod extends XposedMods {
         claude.put(0x313131, CARD);
         claude.put(0x111111, PAGE);
         RULES.put("com.anthropic.claude", claude);
+        // Dreo (com.hesung.dreo): il testo blu #3370ff e' scritto nel bundle JS (React Native); le card del profilo (#303236) cambiano sotto
+        Map<Integer, Integer> dreo = new HashMap<>();
+        dreo.put(0x3370FF, ACCENT);
+        RULES.put("com.hesung.dreo", dreo);
     }
 
     /** Colori che cambiano solo quando l'app li disegna come rettangolo arrotondato (pulsanti, chip): il testo e le icone con lo stesso colore restano come sono. */
@@ -71,6 +75,15 @@ public class ColorRemapMod extends XposedMods {
         Map<Integer, Integer> claudeFill = new HashMap<>();
         claudeFill.put(0xF9F9F7, ACCENT);   // pulsante "Nuova sessione" e pulsante di invio
         FILL_RULES.put("com.anthropic.claude", claudeFill);
+    }
+
+    /** Riempimenti che prendono il colore del tema e un bordo accento (card): colore originale -> ruolo del riempimento. Si agisce al momento del disegno. */
+    private static final Map<String, Map<Integer, Integer>> BORDER_FILL = new HashMap<>();
+
+    static {
+        Map<Integer, Integer> dreoCards = new HashMap<>();
+        dreoCards.put(0x303236, TILE);
+        BORDER_FILL.put("com.hesung.dreo", dreoCards);
     }
 
     public static boolean handles(String pkg) {
@@ -357,6 +370,67 @@ public class ColorRemapMod extends XposedMods {
                     ok += 2;
                 }
             } catch (Throwable t) { log("BaseRecordingCanvas.drawRoundRect", t); }
+        }
+        final Map<Integer, Integer> bf = BORDER_FILL.get(lp.packageName);
+        if (bf != null) {
+            try {
+                Class<?> rc = XposedHelpers.findClassIfExists("android.graphics.BaseRecordingCanvas", lp.classLoader);
+                if (rc != null) {
+                    final float dens = Resources.getSystem().getDisplayMetrics().density;
+                    final Paint stroke = new Paint(Paint.ANTI_ALIAS_FLAG);
+                    stroke.setStyle(Paint.Style.STROKE);
+                    final android.graphics.RectF tmp = new android.graphics.RectF();
+                    XC_MethodHook card = new XC_MethodHook() {
+                        @Override protected void beforeHookedMethod(MethodHookParam p) {
+                            try {
+                                if (sBusy.get() != null || !night()) return;
+                                Paint paint = (Paint) p.args[p.args.length - 1];
+                                int c = paint.getColor();
+                                Integer role = bf.get(c & 0xFFFFFF);
+                                if (role == null || paint.getStyle() == Paint.Style.STROKE) return;
+                                if (!sReady) load();
+                                if (!sReady || sColors[role] < 0) return;
+                                p.setObjectExtra("old", c);
+                                paint.setColor((c & 0xFF000000) | sColors[role]);
+                            } catch (Throwable ignored) {}
+                        }
+
+                        @Override protected void afterHookedMethod(MethodHookParam p) {
+                            try {
+                                Object old = p.getObjectExtra("old");
+                                if (old == null) return;
+                                Paint paint = (Paint) p.args[p.args.length - 1];
+                                paint.setColor((Integer) old);
+                                Canvas cv = (Canvas) p.thisObject;
+                                float w = 1.5f * dens;
+                                stroke.setStrokeWidth(w);
+                                stroke.setColor(0xFF000000 | sColors[ACCENT]);
+                                String n = p.method.getName();
+                                Object a0 = p.args[0];
+                                if (a0 instanceof Float) {                       // coordinate float (rect o rect arrotondato)
+                                    tmp.set((Float) a0, (Float) p.args[1], (Float) p.args[2], (Float) p.args[3]);
+                                    tmp.inset(w / 2f, w / 2f);
+                                    if (n.equals("drawRoundRect")) cv.drawRoundRect(tmp, (Float) p.args[4], (Float) p.args[5], stroke);
+                                    else cv.drawRect(tmp, stroke);
+                                } else if (a0 instanceof android.graphics.RectF) {
+                                    tmp.set((android.graphics.RectF) a0);
+                                    tmp.inset(w / 2f, w / 2f);
+                                    if (n.equals("drawRoundRect")) cv.drawRoundRect(tmp, (Float) p.args[1], (Float) p.args[2], stroke);
+                                    else cv.drawRect(tmp, stroke);
+                                } else if (a0 instanceof android.graphics.Path) {
+                                    cv.drawPath((android.graphics.Path) a0, stroke);
+                                }
+                            } catch (Throwable ignored) {}
+                        }
+                    };
+                    XposedHelpers.findAndHookMethod(rc, "drawRoundRect", float.class, float.class, float.class, float.class, float.class, float.class, Paint.class, card);
+                    XposedHelpers.findAndHookMethod(rc, "drawRoundRect", android.graphics.RectF.class, float.class, float.class, Paint.class, card);
+                    XposedHelpers.findAndHookMethod(rc, "drawRect", float.class, float.class, float.class, float.class, Paint.class, card);
+                    XposedHelpers.findAndHookMethod(rc, "drawRect", android.graphics.RectF.class, Paint.class, card);
+                    XposedHelpers.findAndHookMethod(rc, "drawPath", android.graphics.Path.class, Paint.class, card);
+                    ok += 5;
+                }
+            } catch (Throwable t) { log("card border hooks", t); }
         }
         ResultColor after = new ResultColor();
         try { XposedHelpers.findAndHookMethod(Resources.class, "getColor", int.class, Resources.Theme.class, after); ok++; } catch (Throwable t) { log("Resources.getColor", t); }
