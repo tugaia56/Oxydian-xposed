@@ -51,6 +51,10 @@ public class ColorRemapMod extends XposedMods {
         box.put(0x383838, TILE);
         box.put(0x314358, PILL);
         RULES.put("com.box.android", box);
+        // Call Recorder (org.skvalex.cr): riga verde "holo" (#99cc00) sotto le date, colorata nel codice
+        Map<Integer, Integer> cr = new HashMap<>();
+        cr.put(0x99CC00, ACCENT);
+        RULES.put("org.skvalex.cr", cr);
     }
 
     public static boolean handles(String pkg) {
