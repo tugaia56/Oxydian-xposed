@@ -29,6 +29,8 @@ public class MaterialSurfaceMod extends XposedMods {
 
     private static volatile boolean sReady;
     private static volatile int sPage, sTile, sCard;
+    /** load() legge colori con getColor, che e' agganciato: senza guardia si richiamerebbe all'infinito. */
+    private static final ThreadLocal<Boolean> sBusy = new ThreadLocal<>();
 
     public MaterialSurfaceMod(Context context) {
         super(context);
@@ -49,7 +51,8 @@ public class MaterialSurfaceMod extends XposedMods {
 
     /** Colori di destinazione con le risorse dell'app (hanno gia' gli overlay del Theme applicati). */
     private static void load() {
-        if (sReady) return;
+        if (sReady || sBusy.get() != null) return;
+        sBusy.set(Boolean.TRUE);
         try {
             Application app = AndroidAppHelper.currentApplication();
             if (app == null) return;
@@ -58,7 +61,10 @@ public class MaterialSurfaceMod extends XposedMods {
             sTile = color(res, "button_material_dark");
             sCard = color(res, "holo_light_primary_dark");
             sReady = true;
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        } finally {
+            sBusy.remove();
+        }
     }
 
     /** Valori di sistema dei colori Material (palette di questa ROM, tema scuro) -> colore del Theme; -1 se non cambia. */
@@ -85,6 +91,7 @@ public class MaterialSurfaceMod extends XposedMods {
             XposedHelpers.findAndHookMethod(Resources.class, "getColor", int.class, Resources.Theme.class, new XC_MethodHook() {
                 @Override protected void afterHookedMethod(MethodHookParam p) {
                     try {
+                        if (sBusy.get() != null) return;
                         if ((Resources.getSystem().getConfiguration().uiMode & 0x30) != 0x20) return;
                         if (!sReady) load();
                         if (!sReady) return;
