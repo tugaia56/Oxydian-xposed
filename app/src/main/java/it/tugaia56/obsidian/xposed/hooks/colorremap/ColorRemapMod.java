@@ -216,6 +216,23 @@ public class ColorRemapMod extends XposedMods {
                 ok++;
             } catch (Throwable t) { log(cn + ".setItemActiveIndicatorColor", t); }
         }
+        // sfondi a tinta unita presi da attributi/risorse (ColorDrawable): il colore si sostituisce sul drawable prima che la view lo usi
+        try {
+            XposedHelpers.findAndHookMethod(View.class, "setBackground", Drawable.class, new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    try {
+                        if (!(p.args[0] instanceof ColorDrawable) || sBusy.get() != null || !night()) return;
+                        ColorDrawable d = (ColorDrawable) p.args[0];
+                        int c = d.getColor(), n = map(c);
+                        if (n != c) {
+                            ColorDrawable m = (ColorDrawable) d.mutate();
+                            m.setColor(n);
+                        }
+                    } catch (Throwable ignored) {}
+                }
+            });
+            ok++;
+        } catch (Throwable t) { log("View.setBackground", t); }
         ResultColor after = new ResultColor();
         try { XposedHelpers.findAndHookMethod(Resources.class, "getColor", int.class, Resources.Theme.class, after); ok++; } catch (Throwable t) { log("Resources.getColor", t); }
         try { XposedHelpers.findAndHookMethod(TypedArray.class, "getColor", int.class, int.class, after); ok++; } catch (Throwable t) { log("TypedArray.getColor", t); }

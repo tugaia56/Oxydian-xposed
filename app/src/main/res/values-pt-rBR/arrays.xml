@@ -69,6 +69,11 @@
         <item>com.oplus.trafficmonitor</item>
         <item>com.oplus.vdc</item>
         <item>com.coloros.video</item>
+        <item>com.wunderground.android.weather</item>
+        <item>com.amazon.dee.app</item>
+        <item>com.apkupdater.ci</item>
+        <item>com.box.android</item>
+        <item>org.skvalex.cr</item>
 	</string-array>
 
     <!-- DST ACCENT1 resource names (24 entries) -->
