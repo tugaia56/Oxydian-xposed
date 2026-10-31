@@ -113,11 +113,22 @@ public class ColorRemapMod extends XposedMods {
     }
 
     private final class First extends XC_MethodHook {
+        private final String mName;
+        private boolean mSeen;
+
+        First(String name) { mName = name; }
+
         @Override protected void beforeHookedMethod(MethodHookParam p) {
             try {
                 if (sBusy.get() != null || !night()) return;
                 int c = (Integer) p.args[0], n = map(c);
-                if (n != c) p.args[0] = n;
+                if (n != c) {
+                    p.args[0] = n;
+                    if (!mSeen) {
+                        mSeen = true;
+                        XposedBridge.log("[ Obsidian ] ColorRemapMod: " + mName + " " + Integer.toHexString(c) + " -> " + Integer.toHexString(n));
+                    }
+                }
             } catch (Throwable ignored) {}
         }
     }
@@ -137,18 +148,20 @@ public class ColorRemapMod extends XposedMods {
         mRules = RULES.get(lp.packageName);
         if (mRules == null) return;
         int ok = 0;
-        First first = new First();
-        try { XposedHelpers.findAndHookMethod(Paint.class, "setColor", int.class, first); ok++; } catch (Throwable t) { log("Paint.setColor", t); }
-        try { XposedHelpers.findAndHookMethod(TextView.class, "setTextColor", int.class, first); ok++; } catch (Throwable t) { log("TextView.setTextColor", t); }
-        try { XposedHelpers.findAndHookMethod(View.class, "setBackgroundColor", int.class, first); ok++; } catch (Throwable t) { log("View.setBackgroundColor", t); }
-        try { XposedHelpers.findAndHookMethod(ColorDrawable.class, "setColor", int.class, first); ok++; } catch (Throwable t) { log("ColorDrawable.setColor", t); }
-        try { XposedHelpers.findAndHookConstructor(ColorDrawable.class, int.class, first); ok++; } catch (Throwable t) { log("ColorDrawable()", t); }
-        try { XposedHelpers.findAndHookMethod(GradientDrawable.class, "setColor", int.class, first); ok++; } catch (Throwable t) { log("GradientDrawable.setColor", t); }
-        try { XposedHelpers.findAndHookMethod(Canvas.class, "drawColor", int.class, first); ok++; } catch (Throwable t) { log("Canvas.drawColor", t); }
-        try { XposedHelpers.findAndHookConstructor(PorterDuffColorFilter.class, int.class, PorterDuff.Mode.class, first); ok++; } catch (Throwable t) { log("PorterDuffColorFilter()", t); }
-        try { XposedHelpers.findAndHookMethod(Drawable.class, "setColorFilter", int.class, PorterDuff.Mode.class, first); ok++; } catch (Throwable t) { log("Drawable.setColorFilter", t); }
-        try { XposedHelpers.findAndHookConstructor(ForegroundColorSpan.class, int.class, first); ok++; } catch (Throwable t) { log("ForegroundColorSpan()", t); }
-        try { XposedHelpers.findAndHookMethod(ColorStateList.class, "valueOf", int.class, first); ok++; } catch (Throwable t) { log("ColorStateList.valueOf", t); }
+        try { XposedHelpers.findAndHookMethod(Paint.class, "setColor", int.class, new First("Paint.setColor")); ok++; } catch (Throwable t) { log("Paint.setColor", t); }
+        try { XposedHelpers.findAndHookMethod(TextView.class, "setTextColor", int.class, new First("TextView.setTextColor")); ok++; } catch (Throwable t) { log("TextView.setTextColor", t); }
+        try { XposedHelpers.findAndHookMethod(View.class, "setBackgroundColor", int.class, new First("View.setBackgroundColor")); ok++; } catch (Throwable t) { log("View.setBackgroundColor", t); }
+        try { XposedHelpers.findAndHookMethod(ColorDrawable.class, "setColor", int.class, new First("ColorDrawable.setColor")); ok++; } catch (Throwable t) { log("ColorDrawable.setColor", t); }
+        try { XposedHelpers.findAndHookConstructor(ColorDrawable.class, int.class, new First("ColorDrawable()")); ok++; } catch (Throwable t) { log("ColorDrawable()", t); }
+        try { XposedHelpers.findAndHookMethod(GradientDrawable.class, "setColor", int.class, new First("GradientDrawable.setColor")); ok++; } catch (Throwable t) { log("GradientDrawable.setColor", t); }
+        try { XposedHelpers.findAndHookMethod(Canvas.class, "drawColor", int.class, new First("Canvas.drawColor")); ok++; } catch (Throwable t) { log("Canvas.drawColor", t); }
+        try { XposedHelpers.findAndHookConstructor(PorterDuffColorFilter.class, int.class, PorterDuff.Mode.class, new First("PorterDuffColorFilter()")); ok++; } catch (Throwable t) { log("PorterDuffColorFilter()", t); }
+        try { XposedHelpers.findAndHookConstructor(android.graphics.BlendModeColorFilter.class, int.class, android.graphics.BlendMode.class, new First("BlendModeColorFilter()")); ok++; } catch (Throwable t) { log("BlendModeColorFilter()", t); }
+        try { XposedHelpers.findAndHookMethod(Drawable.class, "setColorFilter", int.class, PorterDuff.Mode.class, new First("Drawable.setColorFilter")); ok++; } catch (Throwable t) { log("Drawable.setColorFilter", t); }
+        try { XposedHelpers.findAndHookMethod(Drawable.class, "setTint", int.class, new First("Drawable.setTint")); ok++; } catch (Throwable t) { log("Drawable.setTint", t); }
+        try { XposedHelpers.findAndHookMethod(android.widget.ImageView.class, "setColorFilter", int.class, new First("ImageView.setColorFilter")); ok++; } catch (Throwable t) { log("ImageView.setColorFilter", t); }
+        try { XposedHelpers.findAndHookConstructor(ForegroundColorSpan.class, int.class, new First("ForegroundColorSpan()")); ok++; } catch (Throwable t) { log("ForegroundColorSpan()", t); }
+        try { XposedHelpers.findAndHookMethod(ColorStateList.class, "valueOf", int.class, new First("ColorStateList.valueOf")); ok++; } catch (Throwable t) { log("ColorStateList.valueOf", t); }
         try {
             XposedHelpers.findAndHookConstructor(ColorStateList.class, int[][].class, int[].class, new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam p) {
