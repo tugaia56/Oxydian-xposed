@@ -156,23 +156,7 @@ public class ColorRemapMod extends XposedMods {
         try { XposedHelpers.findAndHookMethod(GradientDrawable.class, "setColor", int.class, new First("GradientDrawable.setColor")); ok++; } catch (Throwable t) { log("GradientDrawable.setColor", t); }
         try { XposedHelpers.findAndHookMethod(Canvas.class, "drawColor", int.class, new First("Canvas.drawColor")); ok++; } catch (Throwable t) { log("Canvas.drawColor", t); }
         try { XposedHelpers.findAndHookConstructor(PorterDuffColorFilter.class, int.class, PorterDuff.Mode.class, new First("PorterDuffColorFilter()")); ok++; } catch (Throwable t) { log("PorterDuffColorFilter()", t); }
-        try {
-            XposedHelpers.findAndHookConstructor(android.graphics.BlendModeColorFilter.class, int.class, android.graphics.BlendMode.class, new XC_MethodHook() {
-                @Override protected void beforeHookedMethod(MethodHookParam p) {
-                    try {
-                        if (sBusy.get() != null || !night()) return;
-                        int c = (Integer) p.args[0];
-                        // icona attiva della barra di navigazione: bianca (sulla pillola con l'accento)
-                        if ((c & 0xFFFFFF) == 0x7FB0EA && mRules.containsKey(0x7FB0EA)) p.args[0] = (c & 0xFF000000) | 0xFFFFFF;
-                        else {
-                            int n = map(c);
-                            if (n != c) p.args[0] = n;
-                        }
-                    } catch (Throwable ignored) {}
-                }
-            });
-            ok++;
-        } catch (Throwable t) { log("BlendModeColorFilter()", t); }
+        try { XposedHelpers.findAndHookConstructor(android.graphics.BlendModeColorFilter.class, int.class, android.graphics.BlendMode.class, new First("BlendModeColorFilter()")); ok++; } catch (Throwable t) { log("BlendModeColorFilter()", t); }
         try { XposedHelpers.findAndHookMethod(Drawable.class, "setColorFilter", int.class, PorterDuff.Mode.class, new First("Drawable.setColorFilter")); ok++; } catch (Throwable t) { log("Drawable.setColorFilter", t); }
         try { XposedHelpers.findAndHookMethod(Drawable.class, "setTint", int.class, new First("Drawable.setTint")); ok++; } catch (Throwable t) { log("Drawable.setTint", t); }
         try { XposedHelpers.findAndHookMethod(android.widget.ImageView.class, "setColorFilter", int.class, new First("ImageView.setColorFilter")); ok++; } catch (Throwable t) { log("ImageView.setColorFilter", t); }
