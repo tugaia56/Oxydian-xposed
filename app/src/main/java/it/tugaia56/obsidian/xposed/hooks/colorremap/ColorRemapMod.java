@@ -63,19 +63,6 @@ public class ColorRemapMod extends XposedMods {
     private static final ThreadLocal<Boolean> sBusy = new ThreadLocal<>();
 
     private Map<Integer, Integer> mRules;
-
-    public ColorRemapMod(Context context) {
-        super(context);
-    }
-
-    @Override
-    public void updatePrefs(String... Key) {}
-
-    @Override
-    public boolean listensTo(String packageName) {
-        return RULES.containsKey(packageName);
-    }
-
     private static int resColor(Resources res, String name) {
         int id = Resources.getSystem().getIdentifier(name, "color", "android");
         return id == 0 ? -1 : (res.getColor(id, null) & 0xFFFFFF);
@@ -156,7 +143,23 @@ public class ColorRemapMod extends XposedMods {
         try { XposedHelpers.findAndHookMethod(GradientDrawable.class, "setColor", int.class, new First("GradientDrawable.setColor")); ok++; } catch (Throwable t) { log("GradientDrawable.setColor", t); }
         try { XposedHelpers.findAndHookMethod(Canvas.class, "drawColor", int.class, new First("Canvas.drawColor")); ok++; } catch (Throwable t) { log("Canvas.drawColor", t); }
         try { XposedHelpers.findAndHookConstructor(PorterDuffColorFilter.class, int.class, PorterDuff.Mode.class, new First("PorterDuffColorFilter()")); ok++; } catch (Throwable t) { log("PorterDuffColorFilter()", t); }
-        try { XposedHelpers.findAndHookConstructor(android.graphics.BlendModeColorFilter.class, int.class, android.graphics.BlendMode.class, new First("BlendModeColorFilter()")); ok++; } catch (Throwable t) { log("BlendModeColorFilter()", t); }
+        try {
+            XposedHelpers.findAndHookConstructor(android.graphics.BlendModeColorFilter.class, int.class, android.graphics.BlendMode.class, new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    try {
+                        if (sBusy.get() != null || !night()) return;
+                        int c = (Integer) p.args[0];
+                        // icona attiva della barra di navigazione: bianca (sulla pillola con l'accento)
+                        if ((c & 0xFFFFFF) == 0x7FB0EA && mRules.containsKey(0x7FB0EA)) p.args[0] = (c & 0xFF000000) | 0xFFFFFF;
+                        else {
+                            int n = map(c);
+                            if (n != c) p.args[0] = n;
+                        }
+                    } catch (Throwable ignored) {}
+                }
+            });
+            ok++;
+        } catch (Throwable t) { log("BlendModeColorFilter()", t); }
         try { XposedHelpers.findAndHookMethod(Drawable.class, "setColorFilter", int.class, PorterDuff.Mode.class, new First("Drawable.setColorFilter")); ok++; } catch (Throwable t) { log("Drawable.setColorFilter", t); }
         try { XposedHelpers.findAndHookMethod(Drawable.class, "setTint", int.class, new First("Drawable.setTint")); ok++; } catch (Throwable t) { log("Drawable.setTint", t); }
         try { XposedHelpers.findAndHookMethod(android.widget.ImageView.class, "setColorFilter", int.class, new First("ImageView.setColorFilter")); ok++; } catch (Throwable t) { log("ImageView.setColorFilter", t); }
@@ -194,6 +197,24 @@ public class ColorRemapMod extends XposedMods {
             });
             ok++;
         } catch (Throwable t) { log("Paint.setColor(long)", t); }
+        // indicatore attivo ("pillola") della barra di navigazione Material: colore dell'accento
+        for (String cn : new String[]{"com.google.android.material.navigation.NavigationBarView",
+                "com.google.android.material.navigation.NavigationBarMenuView"}) {
+            try {
+                Class<?> nc = XposedHelpers.findClassIfExists(cn, lp.classLoader);
+                if (nc == null) continue;
+                XposedHelpers.findAndHookMethod(nc, "setItemActiveIndicatorColor", ColorStateList.class, new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) {
+                        try {
+                            if (p.args[0] == null || sBusy.get() != null || !night()) return;
+                            if (!sReady) load();
+                            if (sReady) p.args[0] = ColorStateList.valueOf(0xFF000000 | sColors[ACCENT]);
+                        } catch (Throwable ignored) {}
+                    }
+                });
+                ok++;
+            } catch (Throwable t) { log(cn + ".setItemActiveIndicatorColor", t); }
+        }
         ResultColor after = new ResultColor();
         try { XposedHelpers.findAndHookMethod(Resources.class, "getColor", int.class, Resources.Theme.class, after); ok++; } catch (Throwable t) { log("Resources.getColor", t); }
         try { XposedHelpers.findAndHookMethod(TypedArray.class, "getColor", int.class, int.class, after); ok++; } catch (Throwable t) { log("TypedArray.getColor", t); }
