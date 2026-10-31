@@ -85,6 +85,13 @@ public class ColorRemapMod extends XposedMods {
         fdroid.put(0x01315E, WHITE);  // icona sopra il colore primario
         fdroid.put(0xBACF82, ACCENT); // testo verde nelle Impostazioni
         RULES.put("org.fdroid.fdroid", fdroid);
+        // Droid-ify (com.looker.droidify): colori Material You di sistema, sfondo e header sul colore del Theme
+        Map<Integer, Integer> droidify = new HashMap<>();
+        droidify.put(0x13121C, PAGE);   // sfondo (system_surface_dark)
+        droidify.put(0x1F1F29, PAGE);   // header (system_surface_container_dark)
+        droidify.put(0x1B1B25, PAGE);
+        droidify.put(0x0E0D17, PAGE);
+        RULES.put("com.looker.droidify", droidify);
     }
 
     /** Colori che cambiano solo quando l'app li disegna come rettangolo arrotondato (pulsanti, chip): il testo e le icone con lo stesso colore restano come sono. */
