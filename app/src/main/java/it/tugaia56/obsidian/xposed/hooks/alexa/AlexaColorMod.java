@@ -51,17 +51,20 @@ public class AlexaColorMod extends XposedMods {
     private static void load() {
         if (sReady) return;
         try {
-            Resources sys = Resources.getSystem();
+            // con le risorse dell'app (non quelle di sistema): hanno gia' applicati gli overlay del Theme
+            android.app.Application app = android.app.AndroidAppHelper.currentApplication();
+            if (app == null) return;
+            Resources res = app.getResources();
             sAccent = AccentUtil.systemAccent() & 0xFFFFFF;
-            sSheet = color(sys, "holo_light_primary_dark");
-            sTile = color(sys, "button_material_dark");
+            sSheet = color(res, "holo_light_primary_dark");
+            sTile = color(res, "button_material_dark");
             sReady = true;
         } catch (Throwable ignored) {}
     }
 
-    private static int color(Resources sys, String name) {
-        int id = sys.getIdentifier(name, "color", "android");
-        return id == 0 ? -1 : (sys.getColor(id, null) & 0xFFFFFF);
+    private static int color(Resources res, String name) {
+        int id = Resources.getSystem().getIdentifier(name, "color", "android");
+        return id == 0 ? -1 : (res.getColor(id, null) & 0xFFFFFF);
     }
 
     static int map(int c) {
@@ -71,13 +74,13 @@ public class AlexaColorMod extends XposedMods {
             case 0x1DB2F7:
             case 0x126DFF:
                 if (!sReady) load();
-                return (c & 0xFF000000) | sAccent;
+                return sReady ? (c & 0xFF000000) | sAccent : c;
             case 0x272D32:
                 if (!sReady) load();
-                return sSheet < 0 ? c : (c & 0xFF000000) | sSheet;
+                return !sReady || sSheet < 0 ? c : (c & 0xFF000000) | sSheet;
             case 0x121C23:
                 if (!sReady) load();
-                return sTile < 0 ? c : (c & 0xFF000000) | sTile;
+                return !sReady || sTile < 0 ? c : (c & 0xFF000000) | sTile;
             default:
                 return c;
         }
@@ -89,11 +92,41 @@ public class AlexaColorMod extends XposedMods {
 
     /** Hook "prima": il primo argomento e' il colore. */
     private static final class ColorArg extends XC_MethodHook {
+        private final String mName;
+        private boolean mSeen;
+
+        ColorArg(String name) { mName = name; }
+
         @Override protected void beforeHookedMethod(MethodHookParam p) {
             try {
                 int c = (Integer) p.args[0];
                 int n = map(c);
-                if (n != c && night()) p.args[0] = n;
+                if (n != c && night()) {
+                    p.args[0] = n;
+                    if (!mSeen) {
+                        mSeen = true;
+                        XposedBridge.log("[ Obsidian ] AlexaColorMod: " + mName + " " + Integer.toHexString(c) + " -> " + Integer.toHexString(n));
+                    }
+                }
+            } catch (Throwable ignored) {}
+        }
+    }
+
+    /** Hook "prima" su un array di colori (ColorStateList): si sostituiscono i valori che corrispondono. */
+    private static final class ColorsArray extends XC_MethodHook {
+        @Override protected void beforeHookedMethod(MethodHookParam p) {
+            try {
+                int[] a = (int[]) p.args[1];
+                if (a == null || !night()) return;
+                int[] b = null;
+                for (int i = 0; i < a.length; i++) {
+                    int n = map(a[i]);
+                    if (n != a[i]) {
+                        if (b == null) b = a.clone();
+                        b[i] = n;
+                    }
+                }
+                if (b != null) p.args[1] = b;
             } catch (Throwable ignored) {}
         }
     }
@@ -102,18 +135,82 @@ public class AlexaColorMod extends XposedMods {
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lp) throws Throwable {
         if (!PKG.equals(lp.packageName)) return;
         int ok = 0;
-        ColorArg first = new ColorArg();
-        try { XposedHelpers.findAndHookMethod(Paint.class, "setColor", int.class, first); ok++; } catch (Throwable t) { log("Paint.setColor", t); }
-        try { XposedHelpers.findAndHookMethod(TextView.class, "setTextColor", int.class, first); ok++; } catch (Throwable t) { log("TextView.setTextColor", t); }
-        try { XposedHelpers.findAndHookMethod(View.class, "setBackgroundColor", int.class, first); ok++; } catch (Throwable t) { log("View.setBackgroundColor", t); }
-        try { XposedHelpers.findAndHookMethod(ColorDrawable.class, "setColor", int.class, first); ok++; } catch (Throwable t) { log("ColorDrawable.setColor", t); }
-        try { XposedHelpers.findAndHookConstructor(ColorDrawable.class, int.class, first); ok++; } catch (Throwable t) { log("ColorDrawable()", t); }
-        try { XposedHelpers.findAndHookMethod(GradientDrawable.class, "setColor", int.class, first); ok++; } catch (Throwable t) { log("GradientDrawable.setColor", t); }
-        try { XposedHelpers.findAndHookMethod(Canvas.class, "drawColor", int.class, first); ok++; } catch (Throwable t) { log("Canvas.drawColor", t); }
-        try { XposedHelpers.findAndHookConstructor(PorterDuffColorFilter.class, int.class, PorterDuff.Mode.class, first); ok++; } catch (Throwable t) { log("PorterDuffColorFilter()", t); }
-        try { XposedHelpers.findAndHookMethod(Drawable.class, "setColorFilter", int.class, PorterDuff.Mode.class, first); ok++; } catch (Throwable t) { log("Drawable.setColorFilter", t); }
+        try { XposedHelpers.findAndHookMethod(Paint.class, "setColor", int.class, new ColorArg("Paint.setColor")); ok++; } catch (Throwable t) { log("Paint.setColor", t); }
+        try { XposedHelpers.findAndHookMethod(TextView.class, "setTextColor", int.class, new ColorArg("TextView.setTextColor")); ok++; } catch (Throwable t) { log("TextView.setTextColor", t); }
+        try { XposedHelpers.findAndHookMethod(View.class, "setBackgroundColor", int.class, new ColorArg("View.setBackgroundColor")); ok++; } catch (Throwable t) { log("View.setBackgroundColor", t); }
+        try { XposedHelpers.findAndHookMethod(ColorDrawable.class, "setColor", int.class, new ColorArg("ColorDrawable.setColor")); ok++; } catch (Throwable t) { log("ColorDrawable.setColor", t); }
+        try { XposedHelpers.findAndHookConstructor(ColorDrawable.class, int.class, new ColorArg("ColorDrawable()")); ok++; } catch (Throwable t) { log("ColorDrawable()", t); }
+        try { XposedHelpers.findAndHookMethod(GradientDrawable.class, "setColor", int.class, new ColorArg("GradientDrawable.setColor")); ok++; } catch (Throwable t) { log("GradientDrawable.setColor", t); }
+        try { XposedHelpers.findAndHookMethod(Canvas.class, "drawColor", int.class, new ColorArg("Canvas.drawColor")); ok++; } catch (Throwable t) { log("Canvas.drawColor", t); }
+        try { XposedHelpers.findAndHookConstructor(PorterDuffColorFilter.class, int.class, PorterDuff.Mode.class, new ColorArg("PorterDuffColorFilter()")); ok++; } catch (Throwable t) { log("PorterDuffColorFilter()", t); }
+        try { XposedHelpers.findAndHookMethod(Drawable.class, "setColorFilter", int.class, PorterDuff.Mode.class, new ColorArg("Drawable.setColorFilter")); ok++; } catch (Throwable t) { log("Drawable.setColorFilter", t); }
+        // testo: i colori dei tratti di testo (React Native usa ForegroundColorSpan e sottoclassi) e i ColorStateList
+        try { XposedHelpers.findAndHookConstructor(android.text.style.ForegroundColorSpan.class, int.class, new ColorArg("ForegroundColorSpan()")); ok++; } catch (Throwable t) { log("ForegroundColorSpan()", t); }
+        try { XposedHelpers.findAndHookMethod(android.content.res.ColorStateList.class, "valueOf", int.class, new ColorArg("ColorStateList.valueOf")); ok++; } catch (Throwable t) { log("ColorStateList.valueOf", t); }
+        try { XposedHelpers.findAndHookConstructor(android.content.res.ColorStateList.class, int[][].class, int[].class, new ColorsArray()); ok++; } catch (Throwable t) { log("ColorStateList()", t); }
+        try {
+            XposedHelpers.findAndHookMethod(Paint.class, "setColor", long.class, new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    try {
+                        long v = (Long) p.args[0];
+                        if (!night()) return;
+                        int c = android.graphics.Color.toArgb(v), n = map(c);
+                        if (n != c) p.args[0] = android.graphics.Color.pack(n);
+                    } catch (Throwable ignored) {}
+                }
+            });
+            ok++;
+        } catch (Throwable t) { log("Paint.setColor(long)", t); }
+        hookTileBorder(lp);
         XposedBridge.log("[ Obsidian ] AlexaColorMod: " + ok + " colour hooks installed in " + lp.packageName);
     }
+
+    private final Paint mBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final android.graphics.RectF mRect = new android.graphics.RectF();
+
+    /**
+     * Bordo accento sulle tessere dei dispositivi (sfondo #121c23): il bordo non e' una proprieta' delle tessere nel JS,
+     * si disegna sopra lo sfondo di React Native (BackgroundDrawable) quando il suo colore e' quello delle tessere.
+     */
+    private void hookTileBorder(XC_LoadPackage.LoadPackageParam lp) {
+        try {
+            Class<?> cls = XposedHelpers.findClassIfExists("com.facebook.react.uimanager.drawable.BackgroundDrawable", lp.classLoader);
+            if (cls == null) {
+                XposedBridge.log("[ Obsidian ] AlexaColorMod: BackgroundDrawable not found");
+                return;
+            }
+            XposedHelpers.findAndHookMethod(cls, "draw", Canvas.class, new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    try {
+                        if (!night()) return;
+                        if (!sReady) load();
+                        if (!sReady) return;
+                        Object col = XposedHelpers.getObjectField(p.thisObject, "backgroundColor");
+                        if (!(col instanceof Integer) || ((Integer) col & 0xFFFFFF) != 0x121C23) return;
+                        Drawable d = (Drawable) p.thisObject;
+                        float dens = android.content.res.Resources.getSystem().getDisplayMetrics().density;
+                        float w = 1.5f * dens;
+                        mRect.set(d.getBounds());
+                        mRect.inset(w / 2f, w / 2f);
+                        mBorder.setStyle(Paint.Style.STROKE);
+                        mBorder.setStrokeWidth(w);
+                        mBorder.setColor(0xFF000000 | sAccent);
+                        float r = 12f * dens;
+                        ((Canvas) p.args[0]).drawRoundRect(mRect, r, r, mBorder);
+                    } catch (Throwable t) {
+                        if (!mBorderErr) {
+                            mBorderErr = true;
+                            XposedBridge.log("[ Obsidian ] AlexaColorMod: tile border: " + t);
+                        }
+                    }
+                }
+            });
+        } catch (Throwable t) {
+            log("BackgroundDrawable.draw", t);
+        }
+    }
+
+    private boolean mBorderErr;
 
     private static void log(String what, Throwable t) {
         XposedBridge.log("[ Obsidian ] AlexaColorMod: hook " + what + " failed: " + t);
