@@ -55,6 +55,12 @@ public class ColorRemapMod extends XposedMods {
         Map<Integer, Integer> cr = new HashMap<>();
         cr.put(0x99CC00, ACCENT);
         RULES.put("org.skvalex.cr", cr);
+        // Claude (com.anthropic.claude): grigi caldi scritti nel codice -> sfondo e superfici del Theme (l'arancione del marchio resta)
+        Map<Integer, Integer> claude = new HashMap<>();
+        claude.put(0x151515, PAGE);
+        claude.put(0x20201F, TILE);
+        claude.put(0x313131, CARD);
+        RULES.put("com.anthropic.claude", claude);
     }
 
     public static boolean handles(String pkg) {

@@ -74,6 +74,7 @@
         <item>com.apkupdater.ci</item>
         <item>com.box.android</item>
         <item>org.skvalex.cr</item>
+        <item>com.anthropic.claude</item>
 	</string-array>
 
     <!-- DST ACCENT1 resource names (24 entries) -->
