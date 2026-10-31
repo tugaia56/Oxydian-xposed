@@ -82,6 +82,7 @@ public class AlexaColorMod extends XposedMods {
             case 0x010B13:   // fondo delle pagine Profilo e Impostazioni (e interno della barra "Chiedi ad Alexa")
                 if (!sReady) load();
                 return !sReady || sPage < 0 ? c : (c & 0xFF000000) | sPage;
+            case 0x05A0D1:   // card azzurra "Completa il tuo profilo": come le tessere
             case 0x121C23:
                 if (!sReady) load();
                 return !sReady || sTile < 0 ? c : (c & 0xFF000000) | sTile;
