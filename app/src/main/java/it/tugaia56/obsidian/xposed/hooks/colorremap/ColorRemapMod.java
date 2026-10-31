@@ -33,12 +33,12 @@ import it.tugaia56.obsidian.xposed.utils.AccentUtil;
  * i colori fissi vengono sostituiti nel momento in cui l'app li passa alle view (Paint, testo, sfondi, filtri, liste di
  * colori, risorse). Ogni app ha una tabella "colore originale (rgb) -> ruolo": ACCENT = accento del Theme, PAGE = sfondo
  * (background_dark), TILE = tessere e barre (button_material_dark), CARD = card (holo_light_primary_dark), PILL = pillola
- * della barra di navigazione (system_secondary_container_dark). La trasparenza originale resta. Solo con il tema scuro.
+ * della barra di navigazione (system_secondary_container_dark), WHITE = bianco. La trasparenza originale resta. Solo con il tema scuro.
  * Serve la spunta sull'app nell'ambito di Oxydian in LSPosed. Prima di aggiungere un'app controllare che non abbia PairIP.
  */
 public class ColorRemapMod extends XposedMods {
 
-    private static final int ACCENT = 0, PAGE = 1, TILE = 2, CARD = 3, PILL = 4;
+    private static final int ACCENT = 0, PAGE = 1, TILE = 2, CARD = 3, PILL = 4, WHITE = 5;
 
     private static final Map<String, Map<Integer, Integer>> RULES = new HashMap<>();
 
@@ -74,6 +74,8 @@ public class ColorRemapMod extends XposedMods {
         drive.put(0x1F1F29, TILE);   // system_surface_container_dark
         drive.put(0x2A2934, CARD);
         drive.put(0x34343F, CARD);
+        drive.put(0xCFC0E8, ACCENT); // riquadro attivo di scelta vista (elenco/griglia): sfondo
+        drive.put(0x362B4B, WHITE);  // e icona
         RULES.put("com.google.android.apps.docs", drive);
     }
 
@@ -107,7 +109,7 @@ public class ColorRemapMod extends XposedMods {
     }
 
     private static volatile boolean sReady;
-    private static final int[] sColors = new int[5];
+    private static final int[] sColors = new int[6];
     /** load() legge colori con getColor, che e' agganciato: senza guardia si richiamerebbe all'infinito. */
     private static final ThreadLocal<Boolean> sBusy = new ThreadLocal<>();
 
@@ -142,6 +144,7 @@ public class ColorRemapMod extends XposedMods {
             sColors[TILE] = resColor(res, "button_material_dark");
             sColors[CARD] = resColor(res, "holo_light_primary_dark");
             sColors[PILL] = resColor(res, "system_secondary_container_dark");
+            sColors[WHITE] = 0xFFFFFF;
             sReady = true;
         } catch (Throwable ignored) {
         } finally {
