@@ -77,6 +77,7 @@
         <item>com.anthropic.claude</item>
         <item>com.hesung.dreo</item>
         <item>com.google.android.apps.docs</item>
+        <item>org.fdroid.fdroid</item>
 	</string-array>
 
     <!-- DST ACCENT1 resource names (24 entries) -->

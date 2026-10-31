@@ -77,6 +77,13 @@ public class ColorRemapMod extends XposedMods {
         drive.put(0xCFC0E8, ACCENT); // riquadro attivo di scelta vista (elenco/griglia): sfondo
         drive.put(0x362B4B, WHITE);  // e icona
         RULES.put("com.google.android.apps.docs", drive);
+        // F-Droid (org.fdroid.fdroid): interfaccia Compose con colori Material fissi nel codice
+        Map<Integer, Integer> fdroid = new HashMap<>();
+        fdroid.put(0x111318, PAGE);   // sfondo usato ovunque
+        fdroid.put(0xA6C8FF, ACCENT); // icona selezionata della barra di navigazione (e altri blu primari)
+        fdroid.put(0x01315E, WHITE);  // icona sopra il colore primario
+        fdroid.put(0xBACF82, ACCENT); // testo verde nelle Impostazioni
+        RULES.put("org.fdroid.fdroid", fdroid);
     }
 
     /** Colori che cambiano solo quando l'app li disegna come rettangolo arrotondato (pulsanti, chip): il testo e le icone con lo stesso colore restano come sono. */
