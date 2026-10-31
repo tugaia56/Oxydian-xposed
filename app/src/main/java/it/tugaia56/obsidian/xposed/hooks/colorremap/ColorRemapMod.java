@@ -86,6 +86,13 @@ public class ColorRemapMod extends XposedMods {
         BORDER_FILL.put("com.hesung.dreo", dreoCards);
     }
 
+    /** Barre di navigazione proprie dell'app: classe della vista -> sfondo pieno nel colore delle tessere, a pillola, con bordo accento. */
+    private static final Map<String, String> SOLID_BAR = new HashMap<>();
+
+    static {
+        SOLID_BAR.put("com.hesung.dreo", "com.hesung.dreo.view.CustPageNavigationView");
+    }
+
     public static boolean handles(String pkg) {
         return RULES.containsKey(pkg);
     }
@@ -431,6 +438,44 @@ public class ColorRemapMod extends XposedMods {
                     ok += 5;
                 }
             } catch (Throwable t) { log("card border hooks", t); }
+        }
+        final String barClass = SOLID_BAR.get(lp.packageName);
+        if (barClass != null) {
+            try {
+                Class<?> bc = XposedHelpers.findClassIfExists(barClass, lp.classLoader);
+                if (bc != null) {
+                    final float dens = Resources.getSystem().getDisplayMetrics().density;
+                    final Paint fillP = new Paint(Paint.ANTI_ALIAS_FLAG);
+                    final Paint strokeP = new Paint(Paint.ANTI_ALIAS_FLAG);
+                    strokeP.setStyle(Paint.Style.STROKE);
+                    final android.graphics.RectF box = new android.graphics.RectF();
+                    final Class<?> barCls = bc;
+                    // la vista disegna da sola la barra (fondo semitrasparente e bordo sfumato): prima delle icone ci si disegna sopra una pillola piena
+                    XposedHelpers.findAndHookMethod(android.view.ViewGroup.class, "dispatchDraw", Canvas.class, new XC_MethodHook() {
+                        @Override protected void beforeHookedMethod(MethodHookParam p) {
+                            try {
+                                if (p.thisObject.getClass() != barCls || !night()) return;
+                                if (!sReady) load();
+                                if (!sReady) return;
+                                View v = (View) p.thisObject;
+                                float w = 1.5f * dens;
+                                box.set(w / 2f, w / 2f, v.getWidth() - w / 2f, v.getHeight() - w / 2f);
+                                float r = box.height() / 2f;
+                                fillP.setColor(0xFF000000 | sColors[TILE]);
+                                strokeP.setStrokeWidth(w);
+                                strokeP.setColor(0xFF000000 | sColors[ACCENT]);
+                                Canvas c = (Canvas) p.args[0];
+                                c.drawRoundRect(box, r, r, fillP);
+                                c.drawRoundRect(box, r, r, strokeP);
+                            } catch (Throwable ignored) {}
+                        }
+                    });
+                    ok++;
+                    ok++;
+                } else {
+                    XposedBridge.log("[ Obsidian ] ColorRemapMod: " + barClass + " not found");
+                }
+            } catch (Throwable t) { log("solid bar", t); }
         }
         ResultColor after = new ResultColor();
         try { XposedHelpers.findAndHookMethod(Resources.class, "getColor", int.class, Resources.Theme.class, after); ok++; } catch (Throwable t) { log("Resources.getColor", t); }
