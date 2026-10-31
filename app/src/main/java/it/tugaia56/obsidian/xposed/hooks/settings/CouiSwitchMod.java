@@ -38,7 +38,6 @@ public class CouiSwitchMod extends XposedMods {
 
     private static volatile String sVariant = "";
     private static volatile long sAt = -10000;
-
     private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF mRect = new RectF();
 
@@ -119,6 +118,12 @@ public class CouiSwitchMod extends XposedMods {
         float d = c.getResources().getDisplayMetrics().density;
 
         int fg = attrColor(c, android.R.attr.colorForeground, 0xFFFFFFFF);
+        // alcune pagine (es. Programmi di Non disturbare) hanno colorForeground = colore dello sfondo: con tema scuro
+        // barra e tondo spenti sarebbero scuri su scuro, quindi si forza un colore che contrasta con il tema
+        boolean night = (c.getResources().getConfiguration().uiMode & 0x30) == 0x20;
+        boolean fgLight = android.graphics.Color.luminance(fg) > 0.5f;
+        if (night && !fgLight) fg = 0xFFFFFFFF;
+        else if (!night && fgLight) fg = 0xFF000000;
         int accent = AccentUtil.systemAccent();
         float dis = enabled ? 1f : 0.38f;
         float cy = o.centerY();
