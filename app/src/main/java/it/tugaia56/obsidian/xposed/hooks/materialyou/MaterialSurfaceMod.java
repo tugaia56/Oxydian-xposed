@@ -16,7 +16,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import it.tugaia56.obsidian.xposed.XposedMods;
 
 /**
- * App Compose/Material 3 con i colori dinamici di Android (es. APKUpdater, Google Drive): sfondo, barre e card arrivano dai colori di
+ * App Compose/Material 3 con i colori dinamici di Android (es. APKUpdater): sfondo, barre e card arrivano dai colori di
  * sistema system_background_dark / system_surface_dark / system_surface_container_*_dark, che un overlay del Theme
  * sull'app non puo' cambiare (sono risorse di android). Qui il valore letto dall'app viene sostituito con i colori di
  * sfondo del Theme (stesse risorse che usano l'overlay delle altre app): sfondo e superfici -> background_dark, contenitori
@@ -25,7 +25,7 @@ import it.tugaia56.obsidian.xposed.XposedMods;
  */
 public class MaterialSurfaceMod extends XposedMods {
 
-    public static final Set<String> PKGS = new HashSet<>(Arrays.asList("com.apkupdater.ci", "com.google.android.apps.docs"));
+    public static final Set<String> PKGS = new HashSet<>(Arrays.asList("com.apkupdater.ci"));
 
     private static volatile boolean sReady;
     private static volatile int sPage, sTile, sCard;

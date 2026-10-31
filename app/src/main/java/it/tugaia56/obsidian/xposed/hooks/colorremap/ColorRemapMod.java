@@ -66,6 +66,15 @@ public class ColorRemapMod extends XposedMods {
         Map<Integer, Integer> dreo = new HashMap<>();
         dreo.put(0x3370FF, ACCENT);
         RULES.put("com.hesung.dreo", dreo);
+        // Google Drive (com.google.android.apps.docs): sfondo e card arrivano dai colori Material You di sistema (superfici scure)
+        Map<Integer, Integer> drive = new HashMap<>();
+        drive.put(0x13121C, PAGE);   // system_background_dark / system_surface_dark: pagine e card
+        drive.put(0x0E0D17, PAGE);
+        drive.put(0x1B1B25, PAGE);   // system_surface_container_low_dark
+        drive.put(0x1F1F29, TILE);   // system_surface_container_dark
+        drive.put(0x2A2934, CARD);
+        drive.put(0x34343F, CARD);
+        RULES.put("com.google.android.apps.docs", drive);
     }
 
     /** Colori che cambiano solo quando l'app li disegna come rettangolo arrotondato (pulsanti, chip): il testo e le icone con lo stesso colore restano come sono. */
