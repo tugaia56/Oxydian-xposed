@@ -87,6 +87,8 @@ public class ColorRemapMod extends XposedMods {
         Map<Integer, Integer> apkm = new HashMap<>();
         apkm.put(0xFAFAFA, PAGE);
         apkm.put(0x000000, WHITE);
+        apkm.put(0xFF8B14, ACCENT);  // arancione dell'app (pulsante di ricerca, icona attiva in basso)
+        apkm.put(0xF47D20, PAGE);    // barra di stato (versione piu' scura)
         RULES.put("cf.vojtechh.apkmirror", apkm);
         WEBVIEW_DARK.add("cf.vojtechh.apkmirror");
         CLEARTEXT_OK.add("cf.vojtechh.apkmirror");
@@ -533,6 +535,20 @@ public class ColorRemapMod extends XposedMods {
                 ok++;
             } catch (Throwable t) { log("cleartext", t); }
         }
+        // colori dati dal sito o calcolati a runtime: Color.parseColor("#...") e barra di stato
+        try { XposedHelpers.findAndHookMethod(android.view.Window.class, "setStatusBarColor", int.class, new First("Window.setStatusBarColor")); ok++; } catch (Throwable t) { log("Window.setStatusBarColor", t); }
+        try {
+            XposedBridge.hookAllMethods(Color.class, "parseColor", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    try {
+                        if (sBusy.get() != null || !night() || !(p.getResult() instanceof Integer)) return;
+                        int c = (Integer) p.getResult(), n = map(c);
+                        if (n != c) p.setResult(n);
+                    } catch (Throwable ignored) {}
+                }
+            });
+            ok++;
+        } catch (Throwable t) { log("Color.parseColor", t); }
         ResultColor after = new ResultColor();
         try { XposedHelpers.findAndHookMethod(Resources.class, "getColor", int.class, Resources.Theme.class, after); ok++; } catch (Throwable t) { log("Resources.getColor", t); }
         try { XposedHelpers.findAndHookMethod(TypedArray.class, "getColor", int.class, int.class, after); ok++; } catch (Throwable t) { log("TypedArray.getColor", t); }
