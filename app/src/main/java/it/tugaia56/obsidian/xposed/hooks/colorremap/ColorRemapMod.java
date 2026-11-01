@@ -71,6 +71,11 @@ public class ColorRemapMod extends XposedMods {
         drive.put(0xCFC0E8, ACCENT); // riquadro attivo di scelta vista (elenco/griglia): sfondo
         drive.put(0x362B4B, WHITE);  // e icona
         RULES.put("com.google.android.apps.docs", drive);
+        // APKUpdater (com.apkupdater.ci): le superfici seguono il Theme; la barra in alto e' un colore calcolato da Material 3
+        // (superficie + velatura dell'accento) e va riportata al colore della pagina
+        Map<Integer, Integer> apku = new HashMap<>();
+        apku.put(0x25293B, PAGE);
+        RULES.put("com.apkupdater.ci", apku);
         // F-Droid (org.fdroid.fdroid): interfaccia Compose con colori Material fissi nel codice
         Map<Integer, Integer> fdroid = new HashMap<>();
         fdroid.put(0x111318, PAGE);   // sfondo usato ovunque
