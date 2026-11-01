@@ -48,6 +48,15 @@ public class ColorRemapMod extends XposedMods {
     /** App costruite per un Android recente ma che aprono ancora siti http (Android li blocca da target 28 in su). */
     private static final java.util.Set<String> CLEARTEXT_OK = new java.util.HashSet<>();
 
+    /** App con una WebView: si nascondono pubblicita' e banner promozionali del sito (CSS iniettato nella pagina). */
+    private static final java.util.Set<String> AD_BLOCK = new java.util.HashSet<>();
+
+    /** App con schermate chiare di sistema (Impostazioni): si applica il tema scuro di Android sopra quello dell'app. */
+    private static final java.util.Set<String> DARK_ACTIVITIES = new java.util.HashSet<>();
+
+    /** Barra di navigazione propria (libreria) da riempire con il colore delle tessere. */
+    private static final Map<String, String> BAR_CLASS = new HashMap<>();
+
     static {
         // Box (com.box.android)
         Map<Integer, Integer> box = new HashMap<>();
@@ -92,6 +101,9 @@ public class ColorRemapMod extends XposedMods {
         RULES.put("cf.vojtechh.apkmirror", apkm);
         WEBVIEW_DARK.add("cf.vojtechh.apkmirror");
         CLEARTEXT_OK.add("cf.vojtechh.apkmirror");
+        AD_BLOCK.add("cf.vojtechh.apkmirror");
+        DARK_ACTIVITIES.add("cf.vojtechh.apkmirror");
+        BAR_CLASS.put("cf.vojtechh.apkmirror", "com.roughike.bottombar.BottomBar");
         // F-Droid (org.fdroid.fdroid): interfaccia Compose con colori Material fissi nel codice
         Map<Integer, Integer> fdroid = new HashMap<>();
         fdroid.put(0x111318, PAGE);   // sfondo usato ovunque
@@ -536,7 +548,6 @@ public class ColorRemapMod extends XposedMods {
             } catch (Throwable t) { log("cleartext", t); }
         }
         // colori dati dal sito o calcolati a runtime: Color.parseColor("#...") e barra di stato
-        try { XposedHelpers.findAndHookMethod(android.view.Window.class, "setStatusBarColor", int.class, new First("Window.setStatusBarColor")); ok++; } catch (Throwable t) { log("Window.setStatusBarColor", t); }
         try {
             XposedBridge.hookAllMethods(Color.class, "parseColor", new XC_MethodHook() {
                 @Override protected void afterHookedMethod(MethodHookParam p) {
@@ -549,6 +560,70 @@ public class ColorRemapMod extends XposedMods {
             });
             ok++;
         } catch (Throwable t) { log("Color.parseColor", t); }
+        if (AD_BLOCK.contains(lp.packageName)) {
+            try {
+                final String js = "(function(){try{var s=document.createElement('style');s.textContent='ins.adsbygoogle,.adsbygoogle,.adslot,#apkm-ad-group,"
+                        + ".advertisement-text,.membership-text,#bottom-slider,iframe[id^=google_ads],div[id^=google_ads],iframe[src*=doubleclick],"
+                        + "iframe[src*=googlesyndication]{display:none!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important}';"
+                        + "(document.head||document.documentElement).appendChild(s);}catch(e){}})();";
+                final XC_MethodHook inject = new XC_MethodHook() {
+                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                        try {
+                            if (p.args.length > 0 && p.args[0] instanceof android.webkit.WebView)
+                                ((android.webkit.WebView) p.args[0]).evaluateJavascript(js, null);
+                        } catch (Throwable ignored) {}
+                    }
+                };
+                XposedBridge.hookAllMethods(android.webkit.WebViewClient.class, "onPageStarted", inject);
+                XposedBridge.hookAllMethods(android.webkit.WebViewClient.class, "onPageFinished", inject);
+                final java.util.Set<Class<?>> seen = new java.util.HashSet<>();
+                XposedBridge.hookAllMethods(android.webkit.WebView.class, "setWebViewClient", new XC_MethodHook() {
+                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                        try {
+                            if (p.args.length == 0 || p.args[0] == null) return;
+                            Class<?> c = p.args[0].getClass();
+                            if (c == android.webkit.WebViewClient.class || !seen.add(c)) return;
+                            XposedBridge.hookAllMethods(c, "onPageStarted", inject);
+                            XposedBridge.hookAllMethods(c, "onPageFinished", inject);
+                        } catch (Throwable ignored) {}
+                    }
+                });
+                ok += 3;
+            } catch (Throwable t) { log("ad block", t); }
+        }
+        if (DARK_ACTIVITIES.contains(lp.packageName)) {
+            try {
+                XposedHelpers.findAndHookMethod(android.app.Activity.class, "onCreate", android.os.Bundle.class, new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) {
+                        try {
+                            if (!night()) return;
+                            ((android.app.Activity) p.thisObject).getTheme().applyStyle(android.R.style.ThemeOverlay_Material_Dark, true);
+                        } catch (Throwable ignored) {}
+                    }
+                });
+                ok++;
+            } catch (Throwable t) { log("dark activities", t); }
+        }
+        final String barName = BAR_CLASS.get(lp.packageName);
+        if (barName != null) {
+            try {
+                Class<?> bc = XposedHelpers.findClassIfExists(barName, lp.classLoader);
+                if (bc != null) {
+                    XposedBridge.hookAllConstructors(bc, new XC_MethodHook() {
+                        @Override protected void afterHookedMethod(MethodHookParam p) {
+                            try {
+                                if (!night()) return;
+                                if (!sReady) load();
+                                if (!sReady) return;
+                                final View v = (View) p.thisObject;
+                                v.post(() -> v.setBackgroundColor(0xFF000000 | sColors[TILE]));
+                            } catch (Throwable ignored) {}
+                        }
+                    });
+                    ok++;
+                }
+            } catch (Throwable t) { log("bottom bar", t); }
+        }
         ResultColor after = new ResultColor();
         try { XposedHelpers.findAndHookMethod(Resources.class, "getColor", int.class, Resources.Theme.class, after); ok++; } catch (Throwable t) { log("Resources.getColor", t); }
         try { XposedHelpers.findAndHookMethod(TypedArray.class, "getColor", int.class, int.class, after); ok++; } catch (Throwable t) { log("TypedArray.getColor", t); }
