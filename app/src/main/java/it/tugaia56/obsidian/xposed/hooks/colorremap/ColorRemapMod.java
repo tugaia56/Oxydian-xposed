@@ -99,6 +99,16 @@ public class ColorRemapMod extends XposedMods {
         apkm.put(0xFF8B14, ACCENT);  // arancione dell'app (pulsante di ricerca, icona attiva in basso)
         apkm.put(0xF47D20, PAGE);    // barra di stato (versione piu' scura)
         RULES.put("cf.vojtechh.apkmirror", apkm);
+        // Discord (com.discord, React Native): grigi scuri e blu/viola del marchio -> colori del Theme (letti a runtime, non fissi)
+        Map<Integer, Integer> discord = new HashMap<>();
+        discord.put(0x1A1A1E, PAGE);   // sfondo lista canali e pagine
+        discord.put(0x121214, PAGE);   // barra dei server
+        discord.put(0x222225, TILE);   // pulsanti tondi
+        discord.put(0x29292D, TILE);   // campo Cerca e riquadri
+        discord.put(0x242429, TILE);   // barra utente in basso
+        discord.put(0x5865F2, ACCENT); // blu/viola (pulsanti, selezioni, link)
+        discord.put(0x4752C4, ACCENT); // sua variante premuta
+        RULES.put("com.discord", discord);
         WEBVIEW_DARK.add("cf.vojtechh.apkmirror");
         CLEARTEXT_OK.add("cf.vojtechh.apkmirror");
         AD_BLOCK.add("cf.vojtechh.apkmirror");

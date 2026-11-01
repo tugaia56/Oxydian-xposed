@@ -79,6 +79,7 @@
         <item>org.fdroid.fdroid</item>
         <item>com.apkupdater.ci</item>
         <item>cf.vojtechh.apkmirror</item>
+        <item>com.discord</item>
 	</string-array>
 
     <!-- DST ACCENT1 resource names (24 entries) -->
