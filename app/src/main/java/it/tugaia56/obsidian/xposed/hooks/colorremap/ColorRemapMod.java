@@ -42,6 +42,9 @@ public class ColorRemapMod extends XposedMods {
 
     private static final Map<String, Map<Integer, Integer>> RULES = new HashMap<>();
 
+    /** App con una WebView (il contenuto e' un sito chiaro): si attiva la modalita' scura della WebView. */
+    private static final java.util.Set<String> WEBVIEW_DARK = new java.util.HashSet<>();
+
     static {
         // Box (com.box.android)
         Map<Integer, Integer> box = new HashMap<>();
@@ -76,6 +79,13 @@ public class ColorRemapMod extends XposedMods {
         Map<Integer, Integer> apku = new HashMap<>();
         apku.put(0x25293B, PAGE);
         RULES.put("com.apkupdater.ci", apku);
+        // APKMirror (cf.vojtechh.apkmirror): tema chiaro; sfondo e testo delle Impostazioni vengono dai colori di Android
+        // (non cambiabili dall'overlay): sfondo -> colore del Theme, testo nero -> bianco (la trasparenza resta)
+        Map<Integer, Integer> apkm = new HashMap<>();
+        apkm.put(0xFAFAFA, PAGE);
+        apkm.put(0x000000, WHITE);
+        RULES.put("cf.vojtechh.apkmirror", apkm);
+        WEBVIEW_DARK.add("cf.vojtechh.apkmirror");
         // F-Droid (org.fdroid.fdroid): interfaccia Compose con colori Material fissi nel codice
         Map<Integer, Integer> fdroid = new HashMap<>();
         fdroid.put(0x111318, PAGE);   // sfondo usato ovunque
@@ -495,6 +505,20 @@ public class ColorRemapMod extends XposedMods {
                     XposedBridge.log("[ Obsidian ] ColorRemapMod: " + barClass + " not found");
                 }
             } catch (Throwable t) { log("solid bar", t); }
+        }
+        if (WEBVIEW_DARK.contains(lp.packageName)) {
+            try {
+                XposedBridge.hookAllConstructors(android.webkit.WebView.class, new XC_MethodHook() {
+                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                        try {
+                            android.webkit.WebSettings ws = ((android.webkit.WebView) p.thisObject).getSettings();
+                            try { ws.setAlgorithmicDarkeningAllowed(true); } catch (Throwable ignored) {}
+                            try { ws.setForceDark(android.webkit.WebSettings.FORCE_DARK_ON); } catch (Throwable ignored) {}
+                        } catch (Throwable ignored) {}
+                    }
+                });
+                ok++;
+            } catch (Throwable t) { log("WebView dark", t); }
         }
         ResultColor after = new ResultColor();
         try { XposedHelpers.findAndHookMethod(Resources.class, "getColor", int.class, Resources.Theme.class, after); ok++; } catch (Throwable t) { log("Resources.getColor", t); }

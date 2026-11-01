@@ -85,6 +85,7 @@
         <item>com.google.android.apps.docs</item>
         <item>org.fdroid.fdroid</item>
         <item>com.apkupdater.ci</item>
+        <item>cf.vojtechh.apkmirror</item>
 	</string-array>
 
     <!-- DST ACCENT1 resource names (24 entries) -->
