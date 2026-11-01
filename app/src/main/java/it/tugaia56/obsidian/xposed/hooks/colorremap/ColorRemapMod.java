@@ -66,14 +66,8 @@ public class ColorRemapMod extends XposedMods {
         Map<Integer, Integer> dreo = new HashMap<>();
         dreo.put(0x3370FF, ACCENT);
         RULES.put("com.hesung.dreo", dreo);
-        // Google Drive (com.google.android.apps.docs): sfondo e card arrivano dai colori Material You di sistema (superfici scure)
+        // Google Drive (com.google.android.apps.docs): sfondo e card seguono il Theme (colori di sistema); qui solo il riquadro attivo di scelta vista
         Map<Integer, Integer> drive = new HashMap<>();
-        drive.put(0x13121C, PAGE);   // system_background_dark / system_surface_dark: pagine e card
-        drive.put(0x0E0D17, PAGE);
-        drive.put(0x1B1B25, PAGE);   // system_surface_container_low_dark
-        drive.put(0x1F1F29, TILE);   // system_surface_container_dark
-        drive.put(0x2A2934, CARD);
-        drive.put(0x34343F, CARD);
         drive.put(0xCFC0E8, ACCENT); // riquadro attivo di scelta vista (elenco/griglia): sfondo
         drive.put(0x362B4B, WHITE);  // e icona
         RULES.put("com.google.android.apps.docs", drive);
@@ -85,13 +79,6 @@ public class ColorRemapMod extends XposedMods {
         fdroid.put(0x01315E, WHITE);  // icona sopra il colore primario
         fdroid.put(0xBACF82, ACCENT); // testo verde nelle Impostazioni
         RULES.put("org.fdroid.fdroid", fdroid);
-        // Droid-ify (com.looker.droidify): colori Material You di sistema, sfondo e header sul colore del Theme
-        Map<Integer, Integer> droidify = new HashMap<>();
-        droidify.put(0x13121C, PAGE);   // sfondo (system_surface_dark)
-        droidify.put(0x1F1F29, PAGE);   // header (system_surface_container_dark)
-        droidify.put(0x1B1B25, PAGE);
-        droidify.put(0x0E0D17, PAGE);
-        RULES.put("com.looker.droidify", droidify);
     }
 
     /** Colori che cambiano solo quando l'app li disegna come rettangolo arrotondato (pulsanti, chip): il testo e le icone con lo stesso colore restano come sono. */
