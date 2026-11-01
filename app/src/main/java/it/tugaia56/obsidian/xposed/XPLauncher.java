@@ -152,7 +152,10 @@ public class XPLauncher {
                     ClassLoader.class, String.class, Context.class, new XC_MethodHook() {
                 @Override protected void afterHookedMethod(MethodHookParam p) {
                     Log.d("ObsidianXP", "newApplication fired, mContext=" + mContext + " pkg=" + lpparam.packageName);
-                    if (mContext == null && p.args[2] instanceof Context) {
+                    // un solo avvio per PACCHETTO, non per processo: alcune ROM caricano nello stesso processo altri
+                    // pacchetti (es. com.globaldrag.dragplugin in Discord) che arrivano per primi e, con un unico
+                    // controllo per processo, impedivano l'avvio dei mod dell'app vera
+                    if (p.args[2] instanceof Context && mInitPackages.add(lpparam.packageName)) {
                         initContext((Context) p.args[2], lpparam);
                     }
                 }
@@ -163,6 +166,10 @@ public class XPLauncher {
             log("[ Obsidian ] hookOtherPackage failed for " + lpparam.packageName + ": " + t.getMessage());
         }
     }
+
+    /** Pacchetti del processo per cui i mod sono gia' stati avviati. */
+    private final java.util.Set<String> mInitPackages = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
+    private boolean mCommonInitDone;
 
     private void initContext(Context ctx, XC_LoadPackage.LoadPackageParam lpparam) {
         Log.d("ObsidianXP", "initContext: " + lpparam.packageName);
@@ -186,7 +193,10 @@ public class XPLauncher {
             it.tugaia56.obsidian.xposed.hooks.systemui.DstSignalIconStyle.initResourcesLate();
         } catch (Throwable ignored) {}
 
-        XPrefs.init(ctx);
+        if (!mCommonInitDone) {
+            mCommonInitDone = true;
+            XPrefs.init(ctx);
+        }
 
         // 2026-09-06: richiesta esplicita dell'utente dopo aver notato ritardi al boot (sfondo/
         // accento lenti ad applicarsi, il launcher stock che a volte vince la corsa per lo slot
