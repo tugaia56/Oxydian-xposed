@@ -45,6 +45,9 @@ public class ColorRemapMod extends XposedMods {
     /** App con una WebView (il contenuto e' un sito chiaro): si attiva la modalita' scura della WebView. */
     private static final java.util.Set<String> WEBVIEW_DARK = new java.util.HashSet<>();
 
+    /** App costruite per un Android recente ma che aprono ancora siti http (Android li blocca da target 28 in su). */
+    private static final java.util.Set<String> CLEARTEXT_OK = new java.util.HashSet<>();
+
     static {
         // Box (com.box.android)
         Map<Integer, Integer> box = new HashMap<>();
@@ -86,6 +89,7 @@ public class ColorRemapMod extends XposedMods {
         apkm.put(0x000000, WHITE);
         RULES.put("cf.vojtechh.apkmirror", apkm);
         WEBVIEW_DARK.add("cf.vojtechh.apkmirror");
+        CLEARTEXT_OK.add("cf.vojtechh.apkmirror");
         // F-Droid (org.fdroid.fdroid): interfaccia Compose con colori Material fissi nel codice
         Map<Integer, Integer> fdroid = new HashMap<>();
         fdroid.put(0x111318, PAGE);   // sfondo usato ovunque
@@ -519,6 +523,15 @@ public class ColorRemapMod extends XposedMods {
                 });
                 ok++;
             } catch (Throwable t) { log("WebView dark", t); }
+        }
+        if (CLEARTEXT_OK.contains(lp.packageName)) {
+            try {
+                XC_MethodHook allow = new XC_MethodHook() {
+                    @Override protected void afterHookedMethod(MethodHookParam p) { p.setResult(true); }
+                };
+                XposedBridge.hookAllMethods(android.security.NetworkSecurityPolicy.class, "isCleartextTrafficPermitted", allow);
+                ok++;
+            } catch (Throwable t) { log("cleartext", t); }
         }
         ResultColor after = new ResultColor();
         try { XposedHelpers.findAndHookMethod(Resources.class, "getColor", int.class, Resources.Theme.class, after); ok++; } catch (Throwable t) { log("Resources.getColor", t); }
