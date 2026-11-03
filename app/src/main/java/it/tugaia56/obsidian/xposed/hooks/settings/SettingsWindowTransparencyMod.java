@@ -46,6 +46,16 @@ public class SettingsWindowTransparencyMod extends XposedMods {
         }
     }
 
+    /** Oxydian Theme pubblica 1 quando e' scelto uno sfondo "Trasparente" (persist.oxytheme.settings_window). */
+    private static boolean wanted() {
+        try {
+            Class<?> sp = Class.forName("android.os.SystemProperties");
+            return "1".equals(XposedHelpers.callStaticMethod(sp, "get", "persist.oxytheme.settings_window", "0"));
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         XposedBridge.hookAllMethods(Activity.class, "onCreate", new XC_MethodHook() {
@@ -53,6 +63,7 @@ public class SettingsWindowTransparencyMod extends XposedMods {
             protected void afterHookedMethod(MethodHookParam param) {
                 try {
                     if (!(param.args.length > 0 && (param.args[0] == null || param.args[0] instanceof Bundle))) return;
+                    if (!wanted()) return;
                     Activity a = (Activity) param.thisObject;
                     Window w = a.getWindow();
                     w.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
