@@ -125,6 +125,12 @@ public class ModPacks {
             mods.add(QsTilesMod.class);
             mods.add(QsTilesCustomizeMod.class);
         }
+        if (Constants.Packages.SETTINGS.equals(packageName)
+                && !it.tugaia56.obsidian.xposed.hooks.settings.SettingsWindowTransparencyMod.isOplus()) {
+            // Android puro (crDroid, ecc.): i mod di Impostazioni sono fatti per OxygenOS, qui entra solo la finestra trasparente
+            mods.add(it.tugaia56.obsidian.xposed.hooks.settings.SettingsWindowTransparencyMod.class);
+            return mods;
+        }
         if (Constants.Packages.SETTINGS.equals(packageName)) {
             mods.add(CustomShortcut.class);
             mods.add(FallbackHomeBarMod.class);

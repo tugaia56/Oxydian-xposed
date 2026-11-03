@@ -57,6 +57,9 @@ public class XPLauncher {
             if (lpparam.packageName.equals(Constants.Packages.FRAMEWORK) && "android".equals(lpparam.processName)) {
                 log("[ Obsidian ] ROM diversa da OxygenOS/ColorOS: nessuna mod attiva");
             }
+            // unica eccezione: Impostazioni (finestra trasparente, vedi SettingsWindowTransparencyMod); ModPacks
+            // restituisce solo quella mod, tutto il resto del modulo resta spento su queste ROM
+            if (lpparam.packageName.equals(Constants.Packages.SETTINGS)) hookOtherPackage(lpparam);
             return;
         }
         log("[ Obsidian ] handleLoadPackage: " + lpparam.packageName);
