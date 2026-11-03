@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- LSPosed scope per Android puro (crDroid, ecc.): sostituisce l'elenco di OxygenOS (src/main). Solo Impostazioni:
+         li' gira la finestra trasparente (SettingsWindowTransparencyMod); tutto il resto del modulo e' spento su queste ROM. -->
+    <string-array name="xposed_scope">
+        <item>com.android.settings</item>
+    </string-array>
+</resources>

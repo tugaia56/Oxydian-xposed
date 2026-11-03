@@ -56,7 +56,9 @@ jobs:
         uses: actions/upload-artifact@v4.3.1
         with:
           name: "Oxydian_${{ env.VTag }}"
-          path: app/build/outputs/apk/release/${{ env.ApkName }}
+          path: |
+            app/build/outputs/apk/oos/release/${{ env.ApkName }}
+            app/build/outputs/apk/aosp/release/${{ env.ApkNameAndroid }}
 
       - name: Version Bump Commit
         uses: github-actions-x/commit@v2.9
@@ -78,7 +80,7 @@ jobs:
           prerelease: false
           allowUpdates: false
           draft: false
-          artifacts: 'app/build/outputs/apk/release/${{ env.ApkName }}'
+          artifacts: 'app/build/outputs/apk/oos/release/${{ env.ApkName }},app/build/outputs/apk/aosp/release/${{ env.ApkNameAndroid }}'
 
       - name: Telegram Group Post
         if: ${{ success() && vars.HAS_TELEGRAM_SECRETS == 'true' }}
@@ -98,5 +100,10 @@ jobs:
           curl -s -X POST \
             -F "chat_id=$TG_CHAT" \
             -F "caption=${{ env.VName }}" \
-            -F "document=@app/build/outputs/apk/release/${{ env.ApkName }}" \
+            -F "document=@app/build/outputs/apk/oos/release/${{ env.ApkName }}" \
+            "https://api.telegram.org/bot$TG_TOKEN/sendDocument"
+          curl -s -X POST \
+            -F "chat_id=$TG_CHAT" \
+            -F "caption=${{ env.VName }} (Android)" \
+            -F "document=@app/build/outputs/apk/aosp/release/${{ env.ApkNameAndroid }}" \
             "https://api.telegram.org/bot$TG_TOKEN/sendDocument"

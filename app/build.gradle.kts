@@ -21,6 +21,14 @@ android {
         versionName    = "1.1.10"
         buildConfigField("int", "MIN_SDK_VERSION", "$minSdk")
     }
+    // Due file dello stesso modulo (stesso pacchetto e stessa firma, non si installano insieme): l'elenco "consigliate" di
+    // LSPosed e' scritto nell'APK e non puo' cambiare da ROM a ROM. "oos" = OxygenOS/ColorOS, tutto l'ambito consigliato;
+    // "aosp" = Android puro (crDroid, ecc.), solo Impostazioni (vedi src/aosp/res/values/arrays.xml).
+    flavorDimensions += "rom"
+    productFlavors {
+        create("oos") { dimension = "rom" }
+        create("aosp") { dimension = "rom" }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -68,14 +76,15 @@ android {
         jniLibs.useLegacyPackaging = true
     }
 
-    // Rename output APK from app-debug.apk / app-release.apk to Oxydian-debug.apk / Oxydian-release-<version>.apk
+    // Rename output APK to Oxydian-debug.apk / Oxydian-release-<version>.apk (oos) e Oxydian-Android-debug.apk / Oxydian-Android-release-<version>.apk (aosp)
     // (debug stays unversioned — reinstall.bat/the "reinstall" task below reference it by that fixed name)
     applicationVariants.all {
         val variant = this
-        val suffix = if (variant.name == "release") "-${variant.versionName}" else ""
+        val suffix = if (variant.buildType.name == "release") "-${variant.versionName}" else ""
+        val prefix = if (variant.flavorName == "aosp") "Oxydian-Android" else "Oxydian"
         outputs.all {
             val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-            output.outputFileName = "Oxydian-${variant.name}$suffix.apk"
+            output.outputFileName = "$prefix-${variant.buildType.name}$suffix.apk"
         }
     }
 }
@@ -83,9 +92,9 @@ android {
 tasks.register("reinstall") {
     group       = "install"
     description = "Disinstalla l'app e reinstalla l'APK debug via ADB"
-    dependsOn("assembleDebug")
+    dependsOn("assembleOosDebug")
     doLast {
-        val apk = "${projectDir}/build/outputs/apk/debug/Oxydian-debug.apk"
+        val apk = "${projectDir}/build/outputs/apk/oos/debug/Oxydian-debug.apk"
         fun adb(vararg args: String) {
             ProcessBuilder(listOf("adb") + args.toList())
                 .inheritIO().start().waitFor()
