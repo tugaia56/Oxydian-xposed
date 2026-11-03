@@ -348,6 +348,7 @@ public class BatteryStyleManager extends XposedMods {
                             mSingleToneColor = (int) callMethod(dh, "getSingleColor",    dark);
                             mFrameColor      = (int) callMethod(dh, "getFillColor",       dark);
                             mBgColor         = (int) callMethod(dh, "getBackgroundColor", dark);
+                            applyThemeColor();
                             updateView((View) param.thisObject);
                         } catch (Throwable ignored) {}
                     }
@@ -399,6 +400,7 @@ public class BatteryStyleManager extends XposedMods {
                         d.setPowerSavingEnabled(isPowerSaving());
                         d.setShowPercentEnabled(mInsidePercent && !mHidePercent);
                         d.setAnimationEnbled(mAnimEnabled);
+                        applyThemeColor();
                         d.setColors(mFrameColor, mBgColor, mSingleToneColor);
                         applyCustomization(d);
                         iv.setImageDrawable(d);
@@ -488,6 +490,7 @@ public class BatteryStyleManager extends XposedMods {
         d.setPowerSavingEnabled(isPowerSaving());
         d.setShowPercentEnabled(mInsidePercent && !mHidePercent);
         d.setAnimationEnbled(mAnimEnabled);
+        applyThemeColor();
         d.setColors(mFrameColor, mBgColor, mSingleToneColor);
         applyCustomization(d);
         d.invalidateSelf();
@@ -515,6 +518,15 @@ public class BatteryStyleManager extends XposedMods {
                 mPowerSaveFillColor,
                 mChargingIconEnabled
         );
+    }
+
+    /** Il colore scelto in Oxydian Theme per le icone della barra di stato vale anche per l'icona della batteria. */
+    private static void applyThemeColor() {
+        Integer c = it.tugaia56.obsidian.utils.ThemeOverride.batteryIconColor();
+        if (c == null) return;
+        mFrameColor = c;
+        mSingleToneColor = c;
+        mBgColor = (c & 0x00FFFFFF) | 0x4D000000;
     }
 
     /** Legge l'accento via Xprefs invece di ObsidianTheme.accentColor() — quest'ultima richiede
@@ -566,7 +578,8 @@ public class BatteryStyleManager extends XposedMods {
             Drawable d = ResourcesCompat.getDrawable(ResourceManager.modRes, resId, mContext.getTheme());
             if (d != null) {
                 d = d.mutate();
-                int color = mChargingIconUseAccent ? appAccentColor() : mChargingIconCustomColor;
+                Integer themeColor = it.tugaia56.obsidian.utils.ThemeOverride.batteryIconColor();
+                int color = themeColor != null ? themeColor : mChargingIconUseAccent ? appAccentColor() : mChargingIconCustomColor;
                 d.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             }
             return d;

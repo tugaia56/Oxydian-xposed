@@ -14,7 +14,7 @@ public final class ThemeOverride {
     private static final long TTL_MS = 3000;
 
     private static long sAt = -TTL_MS;
-    private static Integer sAccent, sBg, sWifiIcon, sMobileIcon, sNavIcon, sBgAlpha;
+    private static Integer sAccent, sBg, sWifiIcon, sMobileIcon, sNavIcon, sBgAlpha, sBatteryIcon;
 
     private ThemeOverride() {}
 
@@ -51,6 +51,12 @@ public final class ThemeOverride {
         return sMobileIcon;
     }
 
+    /** Colore del fulmine e dell'icona della batteria scelto in Oxydian Theme, o null. */
+    public static synchronized Integer batteryIconColor() {
+        load();
+        return sBatteryIcon;
+    }
+
     /** Colore delle icone della barra di navigazione scelto in Oxydian Theme, o null. */
     public static synchronized Integer navIconColor() {
         load();
@@ -77,7 +83,7 @@ public final class ThemeOverride {
         new Thread(() -> {
             try {
                 java.util.List<String> out = com.topjohnwu.superuser.Shell.cmd(
-                        "for k in accent bg wifi_icon_color mobile_icon_color nav_icon_color bg_alpha; do echo \"$k=$(getprop persist.oxytheme.$k)\"; done")
+                        "for k in accent bg wifi_icon_color mobile_icon_color nav_icon_color bg_alpha battery_icon_color; do echo \"$k=$(getprop persist.oxytheme.$k)\"; done")
                         .exec().getOut();
                 java.util.Map<String, String> m = new java.util.HashMap<>();
                 for (String l : out) { int i = l.indexOf('='); if (i > 0) m.put(l.substring(0, i), l.substring(i + 1)); }
@@ -90,11 +96,12 @@ public final class ThemeOverride {
                     sWifiIcon = parse(m.get("wifi_icon_color"));
                     sMobileIcon = parse(m.get("mobile_icon_color"));
                     sNavIcon = parse(m.get("nav_icon_color"));
+                    sBatteryIcon = parse(m.get("battery_icon_color"));
                     sRootSeeded = true;
                 }
                 try {
                     ObsidianPrefs.putString("theme_override_cache", m.get("accent") + "|" + m.get("bg") + "|" + m.get("wifi_icon_color")
-                            + "|" + m.get("mobile_icon_color") + "|" + m.get("nav_icon_color") + "|" + m.get("bg_alpha"));
+                            + "|" + m.get("mobile_icon_color") + "|" + m.get("nav_icon_color") + "|" + m.get("bg_alpha") + "|" + m.get("battery_icon_color"));
                 } catch (Throwable ignored) {}
                 Runnable r = sOnChange;
                 if (changed && r != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(r);
@@ -119,6 +126,7 @@ public final class ThemeOverride {
                         if (p.length >= 5) {
                             sAccent = parse(p[0]); sBg = parse(p[1]); sWifiIcon = parse(p[2]); sMobileIcon = parse(p[3]); sNavIcon = parse(p[4]);
                             sBgAlpha = p.length >= 6 ? parseAlpha(p[5]) : null;
+                            sBatteryIcon = p.length >= 7 ? parse(p[6]) : null;
                             sRootSeeded = true;
                         }
                     }
@@ -133,6 +141,7 @@ public final class ThemeOverride {
         sMobileIcon = parse(get("persist.oxytheme.mobile_icon_color"));
         sNavIcon = parse(get("persist.oxytheme.nav_icon_color"));
         sBgAlpha = parseAlpha(get("persist.oxytheme.bg_alpha"));
+        sBatteryIcon = parse(get("persist.oxytheme.battery_icon_color"));
     }
 
     private static Integer parseAlpha(String s) {
