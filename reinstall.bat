@@ -4,8 +4,8 @@ rem Prima compila una release firmata: Build > Build Bundle(s) / APK(s) > Build 
 rem oppure gradlew assembleRelease. L'APK della sola "Run" di Studio e' firmato con un'altra chiave:
 rem non puo' aggiornare l'app gia' installata.
 set APK=
-for /f "delims=" %%f in ('dir /b /o-d "app\build\outputs\apk\release\*.apk" 2^>nul') do (
-    set APK=app\build\outputs\apk\release\%%f
+for /f "delims=" %%f in ('dir /b /o-d "app\build\outputs\apk\oos\release\*.apk" 2^>nul') do (
+    set APK=app\build\outputs\apk\oos\release\%%f
     goto :trovato
 )
 echo Nessun APK release trovato: prima compila l'app (vedi sopra).
