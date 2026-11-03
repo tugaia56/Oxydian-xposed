@@ -35,7 +35,8 @@ public class XPLauncher {
      */
     private static Boolean sOplusRom = null;
 
-    private static boolean isOplusRom() {
+    /** OxygenOS/ColorOS? Su qualsiasi altra ROM il modulo resta spento (tranne la trasparenza di Impostazioni). */
+    public static boolean isOplusRom() {
         if (sOplusRom == null) {
             boolean ok = false;
             try {

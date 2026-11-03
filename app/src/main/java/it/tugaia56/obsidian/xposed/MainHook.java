@@ -16,6 +16,7 @@ public class MainHook implements IXposedHookLoadPackage, IXposedHookInitPackageR
 
     @Override
     public void initZygote(StartupParam p) throws Throwable {
+        if (!XPLauncher.isOplusRom()) return;   // altre ROM (Android puro): niente hook globali
         resourceManager.initZygote(p);
     }
 
@@ -39,6 +40,7 @@ public class MainHook implements IXposedHookLoadPackage, IXposedHookInitPackageR
 
     @Override
     public void handleInitPackageResources(XC_InitPackageResources.InitPackageResourcesParam rp) throws Throwable {
+        if (!XPLauncher.isOplusRom()) return;
         resourceManager.handleInitPackageResources(rp);
     }
 }
