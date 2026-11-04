@@ -63,6 +63,7 @@ public class DstNotifBgView {
                         d = d.mutate();
                         d.setCallback(v);
                         XposedHelpers.setObjectField(v, "mBackground", d);
+                        XposedHelpers.setAdditionalInstanceField(v, "oxyStyled", Boolean.TRUE);
                         // gli angoli li decide lo stile: si evita che il sistema li riscriva (il disegno non e' quello di serie)
                         try { XposedHelpers.setBooleanField(v, "mDontModifyCorners", true); } catch (Throwable ignored) {}
                         v.invalidate();
@@ -73,6 +74,40 @@ public class DstNotifBgView {
                     }
                 }
             };
+            // crDroid "Notifiche semitrasparenti": sotto lo sfondo mette un disegno sfocato (BackgroundBlurDrawable) quadrato e opaco
+            // che copre lo stile (gli angoli non glieli aggiorna nessuno, mDontModifyCorners): con uno stile attivo lo si spegne
+            try {
+                XposedBridge.hookAllMethods(cls, "setBlurBackgroundEnabled", new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam p) {
+                        try {
+                            if (p.args.length == 1 && p.args[0] instanceof Boolean && (Boolean) p.args[0] && DstNotifStyle.isEnabled()) {
+                                p.args[0] = Boolean.FALSE;
+                            }
+                        } catch (Throwable ignored) {}
+                    }
+                });
+            } catch (Throwable t) {
+                XposedBridge.log("[ Obsidian ] DstNotifBgView: setBlurBackgroundEnabled hook FAILED: " + t);
+            }
+            // Android 17: setTint(int) dipinge tutto lo sfondo di un solo colore (e presume che il primo strato sia un GradientDrawable):
+            // cancellerebbe contorno e accento dello stile. Con lo stile applicato si salta e si tiene solo il colore.
+            try {
+                XposedBridge.hookAllMethods(cls, "setTint", new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam p) {
+                        try {
+                            if (p.args.length != 1 || !(p.args[0] instanceof Integer)) return;
+                            if (!Boolean.TRUE.equals(XposedHelpers.getAdditionalInstanceField(p.thisObject, "oxyStyled"))) return;
+                            XposedHelpers.setIntField(p.thisObject, "mTintColor", (Integer) p.args[0]);
+                            ((View) p.thisObject).invalidate();
+                            p.setResult(null);
+                        } catch (Throwable ignored) {}
+                    }
+                });
+            } catch (Throwable t) {
+                XposedBridge.log("[ Obsidian ] DstNotifBgView: setTint hook FAILED: " + t);
+            }
             // su OxygenOS il metodo si chiama setCustomBackground(Drawable), su Android 17 setCustomBackground$1()
             int n = 0;
             for (java.lang.reflect.Method m : cls.getDeclaredMethods()) {
