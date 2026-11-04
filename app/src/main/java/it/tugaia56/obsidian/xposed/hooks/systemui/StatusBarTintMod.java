@@ -19,7 +19,8 @@ import it.tugaia56.obsidian.xposed.XposedMods;
 public class StatusBarTintMod extends XposedMods {
 
     private static final String PROP = "persist.oxytheme.battery_icon_color";
-    private static volatile Integer sColor = null;
+    private static final String PROP_CLOCK = "persist.oxytheme.clock_color";
+    private static volatile Integer sColor = null, sClock = null;
     private static volatile long sRead = 0;
 
     public StatusBarTintMod(Context context) {
@@ -34,19 +35,33 @@ public class StatusBarTintMod extends XposedMods {
         return SYSTEM_UI.equals(packageName);
     }
 
-    /** Colore scelto (null = predefinito); letto al piu' ogni 2 secondi. */
-    private static Integer color() {
-        long now = android.os.SystemClock.uptimeMillis();
-        if (now - sRead < 2000) return sColor;
-        sRead = now;
-        Integer c = null;
+    private static Integer readProp(String prop) {
         try {
             Class<?> sp = Class.forName("android.os.SystemProperties");
-            String v = (String) XposedHelpers.callStaticMethod(sp, "get", PROP, "");
-            if (v != null && !v.trim().isEmpty()) c = (int) Long.parseLong(v.trim(), 16);
+            String v = (String) XposedHelpers.callStaticMethod(sp, "get", prop, "");
+            if (v != null && !v.trim().isEmpty()) return (int) Long.parseLong(v.trim(), 16);
         } catch (Throwable ignored) {}
-        sColor = c;
-        return c;
+        return null;
+    }
+
+    private static void refresh() {
+        long now = android.os.SystemClock.uptimeMillis();
+        if (now - sRead < 2000) return;
+        sRead = now;
+        sColor = readProp(PROP);
+        sClock = readProp(PROP_CLOCK);
+    }
+
+    /** Colore scelto per le icone (null = predefinito); letto al piu' ogni 2 secondi. */
+    private static Integer color() {
+        refresh();
+        return sColor;
+    }
+
+    /** Colore dell'orologio: quello scelto per lui, altrimenti lo stesso delle icone (null = predefinito). */
+    private static Integer clockColor() {
+        refresh();
+        return sClock != null ? sClock : sColor;
     }
 
     @Override
@@ -73,7 +88,27 @@ public class StatusBarTintMod extends XposedMods {
         for (String m : new String[]{"applyDarkIntensity", "applyIconTint", "applyDark", "addDarkReceiver"}) {
             try { XposedBridge.hookAllMethods(dispatcher, m, hook); } catch (Throwable ignored) {}
         }
+        hookClock(lpparam);
         hookBatteryPercent(lpparam);
+    }
+
+    /** L'orologio riceve la tinta da Clock.onDarkChanged(areas, darkIntensity, tint): con barra scura si usa il colore dell'orologio. */
+    private static void hookClock(XC_LoadPackage.LoadPackageParam lpparam) {
+        try {
+            Class<?> clock = XposedHelpers.findClass("com.android.systemui.statusbar.policy.Clock", lpparam.classLoader);
+            XposedBridge.hookAllMethods(clock, "onDarkChanged", new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) {
+                    try {
+                        Integer c = clockColor();
+                        if (c == null || param.args.length < 3) return;
+                        if (((Float) param.args[1]) < 0.5f) param.args[2] = c | 0xFF000000;
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) {
+            XposedBridge.log("StatusBarTintMod: clock hook failed: " + t);
+        }
     }
 
     /**
