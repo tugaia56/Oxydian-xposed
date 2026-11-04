@@ -73,5 +73,70 @@ public class StatusBarTintMod extends XposedMods {
         for (String m : new String[]{"applyDarkIntensity", "applyIconTint", "applyDark", "addDarkReceiver"}) {
             try { XposedBridge.hookAllMethods(dispatcher, m, hook); } catch (Throwable ignored) {}
         }
+        hookBatteryPercent(lpparam);
+    }
+
+    /**
+     * Android 17: il numero della batteria (testo "100%") e' Compose e prende un Color fisso (bianco su sfondo scuro) dal
+     * ColorProducer di BatteryWithPercent, non dalla tinta del DarkIconDispatcher. Se il risultato e' il bianco lo si sostituisce
+     * con il colore scelto. (Il fulmine e' un'emoji nel testo: non si puo' colorare.)
+     */
+    /** Valore (ULong impacchettato) di un androidx Color: e' il campo long "value" della value class. */
+    private static long packedOf(Object color) {
+        try {
+            return XposedHelpers.getLongField(color, "value");
+        } catch (Throwable t) {
+            for (java.lang.reflect.Field f : color.getClass().getDeclaredFields()) {
+                if (f.getType() == long.class && !java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
+                    try { f.setAccessible(true); return f.getLong(color); } catch (Throwable ignored) {}
+                }
+            }
+            throw new IllegalStateException("no long field in Color");
+        }
+    }
+
+    private static void hookBatteryPercent(XC_LoadPackage.LoadPackageParam lpparam) {
+        try {
+            Class<?> producer = XposedHelpers.findClass("com.android.systemui.statusbar.pipeline.battery.ui.composable.BatteryWithPercentKt$BatteryWithPercent$colorProducer$1$1", lpparam.classLoader);
+            final Class<?> colorClass = XposedHelpers.findClass("androidx.compose.ui.graphics.Color", lpparam.classLoader);
+            XposedBridge.hookAllMethods(producer, "invoke", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) {
+                    try {
+                        Integer c = color();
+                        if (c == null || param.getResult() == null) return;
+                        long packed = packedOf(param.getResult());
+                        if (packed != 0xFFFFFFFF00000000L) return; // solo il bianco di sfondo scuro
+                        long mine = (((long) (c | 0xFF000000)) & 0xFFFFFFFFL) << 32;
+                        param.setResult(XposedHelpers.callStaticMethod(colorClass, "box-impl", mine));
+                    } catch (Throwable t) {
+                        XposedBridge.log("StatusBarTintMod: producer error " + t);
+                    }
+                }
+            });
+        } catch (Throwable t) {
+            XposedBridge.log("StatusBarTintMod: battery percent hook failed: " + t);
+        }
+        // i colori della batteria (riempimento, simbolo, testo) di tema scuro sono Color fissi: quando sono bianchi si usa il colore scelto
+        final String base = "com.android.systemui.statusbar.pipeline.battery.shared.ui.BatteryColors$DarkTheme$";
+        for (String variant : new String[]{"Default", "Charging", "PowerSave", "Error"}) {
+            for (String getter : new String[]{"getFill-0d7_KjU", "getGlyph-0d7_KjU", "getAttribution-0d7_KjU"}) {
+                try {
+                    final String tag = variant + "." + getter;
+                    XposedBridge.hookAllMethods(XposedHelpers.findClass(base + variant, lpparam.classLoader), getter, new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            try {
+                                Integer c = color();
+                                if (c == null || !(param.getResult() instanceof Long)) return;
+                                long packed = (Long) param.getResult();
+                                if (packed != 0xFFFFFFFF00000000L) return;
+                                param.setResult((((long) (c | 0xFF000000)) & 0xFFFFFFFFL) << 32);
+                            } catch (Throwable ignored) {}
+                        }
+                    });
+                } catch (Throwable e) { XposedBridge.log("StatusBarTintMod: hook FAIL " + variant + "." + getter + " " + e); }
+            }
+        }
     }
 }
