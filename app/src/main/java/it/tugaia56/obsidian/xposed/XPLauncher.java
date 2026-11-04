@@ -60,7 +60,7 @@ public class XPLauncher {
             }
             // unica eccezione: Impostazioni (finestra trasparente, vedi SettingsWindowTransparencyMod); ModPacks
             // restituisce solo quella mod, tutto il resto del modulo resta spento su queste ROM
-            if (lpparam.packageName.equals(Constants.Packages.SETTINGS)) hookOtherPackage(lpparam);
+            if (lpparam.packageName.equals(Constants.Packages.SETTINGS) || lpparam.packageName.equals(Constants.Packages.SYSTEM_UI)) hookOtherPackage(lpparam);
             return;
         }
         log("[ Obsidian ] handleLoadPackage: " + lpparam.packageName);
@@ -132,7 +132,7 @@ public class XPLauncher {
     }
 
     private void hookOtherPackage(XC_LoadPackage.LoadPackageParam lpparam) {
-        if ("com.android.systemui".equals(lpparam.packageName)) {
+        if ("com.android.systemui".equals(lpparam.packageName) && isOplusRom()) {
             it.tugaia56.obsidian.xposed.hooks.systemui.DstNotifBgView.hook(lpparam);
         }
         if ("com.oplus.appplatform".equals(lpparam.packageName)) {
