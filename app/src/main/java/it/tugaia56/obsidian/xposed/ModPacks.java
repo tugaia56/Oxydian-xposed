@@ -128,6 +128,7 @@ public class ModPacks {
         if (Constants.Packages.SYSTEM_UI.equals(packageName) && !XPLauncher.isOplusRom()) {
             // Android puro: solo la trasparenza del pannello (il resto dei mod di SystemUI e' di OxygenOS)
             mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.ShadeTransparencyMod.class);
+            mods.add(DstNotifStyleMod.class);   // toglie la tinta di sistema allo sfondo delle notifiche quando c'e' uno stile scelto
             return mods;
         }
         if (Constants.Packages.SETTINGS.equals(packageName)

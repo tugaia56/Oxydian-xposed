@@ -119,7 +119,32 @@ public class DstNotifStyle {
     private static volatile String sPreset    = null;
 
     /** Called by DstNotifStyleMod to check if a preset is active. */
-    public static boolean isEnabled() { return sPreset != null; }
+    public static boolean isEnabled() { overrideFromTheme(); return sPreset != null; }
+
+    private static volatile long sThemeAt = 0;
+
+    /**
+     * Android puro (non OxygenOS): lo stile, l'accento e lo sfondo li sceglie Oxydian Theme e li pubblica come proprieta'
+     * (persist.oxytheme.notif_style, persist.obsidian.dst.a1 / .bg): hanno la precedenza sui prefs dell'app Oxydian.
+     */
+    private static void overrideFromTheme() {
+        if (it.tugaia56.obsidian.xposed.XPLauncher.isOplusRom()) return;
+        long now = android.os.SystemClock.elapsedRealtime();
+        if (now - sThemeAt < 2000) return;
+        sThemeAt = now;
+        try {
+            Class<?> sp = XposedHelpers.findClass("android.os.SystemProperties", null);
+            String style = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.oxytheme.notif_style", "");
+            String a1Str = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.a1", "");
+            String bgStr = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.bg", "");
+            sPreset = style.isEmpty() ? null : style;
+            if (!a1Str.isEmpty()) { try { sAccent = Integer.parseInt(a1Str); } catch (NumberFormatException ignored) {} }
+            if (!bgStr.isEmpty()) { try { sBg = Integer.parseInt(bgStr); } catch (NumberFormatException ignored) {} }
+            sCornerDp = DEFAULT_CORNER_DP;
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] DstNotifStyle.overrideFromTheme ERROR: " + t);
+        }
+    }
     private static volatile int    sAccent    = 0xFF9C27B0;
     private static volatile int    sBg        = 0xFF1B2029;
     private static volatile int    sCornerDp  = DEFAULT_CORNER_DP;
@@ -258,6 +283,7 @@ public class DstNotifStyle {
         // chiaro, e chi tiene il sistema scuro non vede alcun cambiamento.
         if (!isNight) return null;
         preloadFromFile();
+        overrideFromTheme();
         if (sPreset == null) return null;
         if (density <= 0f) density = 3.0f;
         // Il preset "Immagine" dipende dal file foto: non si mette in cache

@@ -5,6 +5,7 @@ import android.view.View;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 /**
@@ -27,7 +28,7 @@ public class DstNotifBgView {
         try {
             Class<?> cls = lpparam.classLoader.loadClass(CLASS_NAME);
 
-            XposedBridge.hookAllMethods(cls, "setCustomBackground", new XC_MethodHook() {
+            XC_MethodHook bgHook = new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam p) {
                     if (p.args.length == 0) return;
@@ -44,9 +45,44 @@ public class DstNotifBgView {
                         XposedBridge.log("[ Obsidian ] DstNotifBgView build ERROR: " + t);
                     }
                 }
-            });
+            };
+            // Android 17: setCustomBackground$1() senza argomenti carica da solo il disegno di serie: si sostituisce dopo
+            XC_MethodHook afterNoArg = new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam p) {
+                    try {
+                        View v = (View) p.thisObject;
+                        float density = v.getResources().getDisplayMetrics().density;
+                        boolean isNight = (v.getResources().getConfiguration().uiMode
+                                & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                                == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+                        Drawable d = DstNotifStyle.currentDrawable(density, isNight);
+                        if (d == null) return;
+                        Object old = XposedHelpers.getObjectField(v, "mBackground");
+                        if (old instanceof Drawable) ((Drawable) old).setCallback(null);
+                        d = d.mutate();
+                        d.setCallback(v);
+                        XposedHelpers.setObjectField(v, "mBackground", d);
+                        // gli angoli li decide lo stile: si evita che il sistema li riscriva (il disegno non e' quello di serie)
+                        try { XposedHelpers.setBooleanField(v, "mDontModifyCorners", true); } catch (Throwable ignored) {}
+                        v.invalidate();
+                        XposedBridge.log("[ Obsidian ] DstNotifBgView(after): replaced with " + d.getClass().getSimpleName()
+                                + " alpha=" + d.getAlpha() + " size=" + v.getWidth() + "x" + v.getHeight());
+                    } catch (Throwable t) {
+                        XposedBridge.log("[ Obsidian ] DstNotifBgView(after) ERROR: " + t);
+                    }
+                }
+            };
+            // su OxygenOS il metodo si chiama setCustomBackground(Drawable), su Android 17 setCustomBackground$1()
+            int n = 0;
+            for (java.lang.reflect.Method m : cls.getDeclaredMethods()) {
+                if (!m.getName().startsWith("setCustomBackground")) continue;
+                if (m.getParameterTypes().length == 0) XposedBridge.hookMethod(m, afterNoArg);
+                else XposedBridge.hookMethod(m, bgHook);
+                n++;
+            }
             XposedBridge.log("[ Obsidian ] DstNotifBgView: hooked " + CLASS_NAME
-                    + ".setCustomBackground");
+                    + ".setCustomBackground* (" + n + ")");
         } catch (Throwable t) {
             XposedBridge.log("[ Obsidian ] DstNotifBgView: hook FAILED: " + t);
         }

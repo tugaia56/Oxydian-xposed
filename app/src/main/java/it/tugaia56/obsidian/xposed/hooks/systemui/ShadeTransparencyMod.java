@@ -52,6 +52,28 @@ public class ShadeTransparencyMod extends XposedMods {
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
+        // Android 17 (crDroid, ecc.): BackgroundBlurAlphaSync.onPreDraw lancia "Cannot round NaN value" quando lo sfondo sfocato e'
+        // spento e fa cadere SystemUI ad ogni avvio (due crash per ogni riavvio: LSPosed entra in modalita' sicura). Si ignora l'errore.
+        try {
+            Class<?> sync = XposedHelpers.findClass("com.android.systemui.common.ui.view.BackgroundBlurAlphaSync", lpparam.classLoader);
+            XposedBridge.hookAllMethods(sync, "onPreDraw", new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    try {
+                        param.setResult(XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args));
+                    } catch (java.lang.reflect.InvocationTargetException e) {
+                        Throwable c = e.getCause();
+                        if (c instanceof IllegalArgumentException || c instanceof ArithmeticException) {
+                            param.setResult(Boolean.TRUE);   // ignorato: il disegno prosegue
+                        } else {
+                            throw c != null ? c : e;
+                        }
+                    }
+                }
+            });
+        } catch (Throwable ignored) {
+            // classe assente su altre versioni: niente da fare
+        }
         Class<?> scrimView = XposedHelpers.findClass("com.android.systemui.scrim.ScrimView", lpparam.classLoader);
         XposedBridge.hookAllMethods(scrimView, "setViewAlpha", new XC_MethodHook() {
             @Override

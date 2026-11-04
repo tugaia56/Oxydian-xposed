@@ -132,7 +132,7 @@ public class XPLauncher {
     }
 
     private void hookOtherPackage(XC_LoadPackage.LoadPackageParam lpparam) {
-        if ("com.android.systemui".equals(lpparam.packageName) && isOplusRom()) {
+        if ("com.android.systemui".equals(lpparam.packageName)) {
             it.tugaia56.obsidian.xposed.hooks.systemui.DstNotifBgView.hook(lpparam);
         }
         if ("com.oplus.appplatform".equals(lpparam.packageName)) {
