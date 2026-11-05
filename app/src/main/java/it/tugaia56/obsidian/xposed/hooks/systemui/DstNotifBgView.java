@@ -81,7 +81,8 @@ public class DstNotifBgView {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam p) {
                         try {
-                            if (p.args.length == 1 && p.args[0] instanceof Boolean && (Boolean) p.args[0] && DstNotifStyle.isEnabled()) {
+                            if (p.args.length == 1 && p.args[0] instanceof Boolean && (Boolean) p.args[0]
+                                    && !it.tugaia56.obsidian.xposed.XPLauncher.isOplusRom() && DstNotifStyle.isEnabled()) {
                                 p.args[0] = Boolean.FALSE;
                             }
                         } catch (Throwable ignored) {}
