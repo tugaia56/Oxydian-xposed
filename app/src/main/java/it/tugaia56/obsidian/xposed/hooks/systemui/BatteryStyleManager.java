@@ -279,6 +279,7 @@ public class BatteryStyleManager extends XposedMods {
         if (!listensTo(lpparam.packageName)) return;
 
         BatteryDataProvider.registerInfoCallback(this::refreshAll);
+        hookThemePercentColor();
 
         try {
             DarkIconDispatcher = findClass("com.android.systemui.plugins.DarkIconDispatcher", lpparam.classLoader);
@@ -438,6 +439,49 @@ public class BatteryStyleManager extends XposedMods {
         return null;
     }
 
+    // ── Colore del numero della batteria scelto in Oxydian Theme (persist.oxytheme.battery_pct_color) ──
+    private static volatile Integer sThemePct = null;
+    private static volatile long sThemePctAt = 0;
+    private static volatile boolean sInThemePct = false;
+
+    private static Integer themePctColor() {
+        long now = android.os.SystemClock.uptimeMillis();
+        if (now - sThemePctAt < 2000) return sThemePct;
+        sThemePctAt = now;
+        Integer c = null;
+        try {
+            Class<?> sp = Class.forName("android.os.SystemProperties");
+            String v = (String) sp.getMethod("get", String.class, String.class).invoke(null, "persist.oxytheme.battery_pct_color", "");
+            if (v != null && !v.trim().isEmpty()) c = (int) Long.parseLong(v.trim(), 16) | 0xFF000000;
+        } catch (Throwable ignored) {}
+        sThemePct = c;
+        return c;
+    }
+
+    /** Il sistema ricolora il numero a ogni cambio di tinta: dopo ogni setTextColor del numero della batteria si rimette il colore del Theme. */
+    private void hookThemePercentColor() {
+        try {
+            final int pctId = mContext.getResources().getIdentifier("battery_percentage_view", "id", mContext.getPackageName());
+            if (pctId == 0) return;
+            de.robv.android.xposed.XposedBridge.hookAllMethods(android.widget.TextView.class, "setTextColor", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam p) {
+                    try {
+                        if (sInThemePct || p.args.length != 1 || !(p.args[0] instanceof Integer)) return;
+                        android.widget.TextView tv = (android.widget.TextView) p.thisObject;
+                        if (tv.getId() != pctId) return;
+                        Integer c = themePctColor();
+                        if (c == null || c == (Integer) p.args[0]) return;
+                        sInThemePct = true;
+                        try { tv.setTextColor(c); } finally { sInThemePct = false; }
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) {
+            de.robv.android.xposed.XposedBridge.log("[ Obsidian ] BatteryStyleManager: theme percent hook failed: " + t);
+        }
+    }
+
     @SuppressWarnings("DiscouragedApi")
     private void updateView(View view) {
         // Percent text size — applied regardless of mEnabled (standalone pref)
@@ -459,6 +503,8 @@ public class BatteryStyleManager extends XposedMods {
                     pct.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, pctSz);
 
                     Integer textColor = resolveTextColor();
+                    Integer themeColor = themePctColor();
+                    if (themeColor != null) textColor = themeColor;
                     if (textColor != null) pct.setTextColor(textColor);
                 });
             }

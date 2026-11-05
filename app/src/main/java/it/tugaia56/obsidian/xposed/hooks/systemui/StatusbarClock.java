@@ -95,6 +95,25 @@ public class StatusbarClock extends XposedMods {
     private boolean mCustomColor = false;
     private int     mColor       = Color.WHITE;
 
+    /** Colore scelto in Oxydian Theme (persist.oxytheme.clock_color): ha la precedenza su quello delle preferenze del modulo. */
+    private static volatile Integer sThemeClock = null;
+    private static volatile long sThemeClockAt = 0;
+    private static Integer themeClock() {
+        long now = android.os.SystemClock.uptimeMillis();
+        if (now - sThemeClockAt < 2000) return sThemeClock;
+        sThemeClockAt = now;
+        Integer c = null;
+        try {
+            Class<?> sp = Class.forName("android.os.SystemProperties");
+            String v = (String) sp.getMethod("get", String.class, String.class).invoke(null, "persist.oxytheme.clock_color", "");
+            if (v != null && !v.trim().isEmpty()) c = (int) Long.parseLong(v.trim(), 16) | 0xFF000000;
+        } catch (Throwable ignored) {}
+        sThemeClock = c;
+        return c;
+    }
+    private boolean useColor() { return themeClock() != null || mCustomColor; }
+    private int colorNow() { Integer t = themeClock(); return t != null ? t : mColor; }
+
     // Background chip (reale OC status_bar_clock_background_chip)
     private boolean mChipOn           = false;
     private int     mChipStyle        = 0; // 0=pieno 1=contorno 2=misto
@@ -458,8 +477,8 @@ public class StatusbarClock extends XposedMods {
             hookAllMethods(ClockClass, "updateClockVisibility", new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam p) {
-                    if (p.thisObject != mClockView || !mCustomColor || mClockView == null) return;
-                    mClockView.post(() -> mClockView.setTextColor(mColor));
+                    if (p.thisObject != mClockView || !useColor() || mClockView == null) return;
+                    mClockView.post(() -> mClockView.setTextColor(colorNow()));
                 }
             });
         } catch (Throwable t) {
@@ -529,7 +548,7 @@ public class StatusbarClock extends XposedMods {
                     boolean hasBefore = !mComputedBefore.isEmpty();
                     boolean hasAfter  = !mComputedAfter.isEmpty();
                     boolean hasAmPm   = mDateStyleOn && (mAmPmStyle != AM_PM_GONE);
-                    if (!mCustomColor && !hasBefore && !hasAfter && !hasAmPm) return;
+                    if (!useColor() && !hasBefore && !hasAfter && !hasAmPm) return;
 
                     SpannableStringBuilder result = new SpannableStringBuilder();
 
@@ -541,8 +560,8 @@ public class StatusbarClock extends XposedMods {
 
                     // Clock text
                     SpannableStringBuilder clockSpan = SpannableStringBuilder.valueOf(original);
-                    if (mCustomColor) {
-                        clockSpan.setSpan(new ForegroundColorSpan(mColor), 0, clockSpan.length(),
+                    if (useColor()) {
+                        clockSpan.setSpan(new ForegroundColorSpan(colorNow()), 0, clockSpan.length(),
                                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     }
                     result.append(clockSpan);
@@ -555,8 +574,8 @@ public class StatusbarClock extends XposedMods {
                             ampmSpan.setSpan(new RelativeSizeSpan(0.75f), 0, ampmSpan.length(),
                                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         }
-                        if (mCustomColor) {
-                            ampmSpan.setSpan(new ForegroundColorSpan(mColor), 0, ampmSpan.length(),
+                        if (useColor()) {
+                            ampmSpan.setSpan(new ForegroundColorSpan(colorNow()), 0, ampmSpan.length(),
                                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         }
                         result.append(ampmSpan);
@@ -796,7 +815,7 @@ public class StatusbarClock extends XposedMods {
         SpannableStringBuilder sb = new SpannableStringBuilder(text);
         int len = sb.length();
         if (small)       sb.setSpan(new RelativeSizeSpan(0.75f),            0, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        if (mCustomColor) sb.setSpan(new ForegroundColorSpan(mColor),       0, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if (useColor()) sb.setSpan(new ForegroundColorSpan(colorNow()),       0, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         return sb;
     }
 
@@ -932,7 +951,7 @@ public class StatusbarClock extends XposedMods {
                 callMethod(calendar, "setTimeInMillis", System.currentTimeMillis());
                 callMethod(mClockView, "updateClock");
             } catch (Throwable ignored) {}
-            if (mCustomColor) mClockView.setTextColor(mColor);
+            if (useColor()) mClockView.setTextColor(colorNow());
             // 2026-09-25: garantisce un passaggio di misura FRESCO con il testo vero appena
             // impostato — la guardia in onMeasure/updateMinWidth sopra salta il calcolo della
             // larghezza quando il testo non è ancora pronto (View appena creata), quindi senza

@@ -20,7 +20,8 @@ public class StatusBarTintMod extends XposedMods {
 
     private static final String PROP = "persist.oxytheme.battery_icon_color";
     private static final String PROP_CLOCK = "persist.oxytheme.clock_color";
-    private static volatile Integer sColor = null, sClock = null;
+    private static final String PROP_PCT = "persist.oxytheme.battery_pct_color";
+    private static volatile Integer sColor = null, sClock = null, sPct = null;
     private static volatile long sRead = 0;
 
     public StatusBarTintMod(Context context) {
@@ -50,12 +51,19 @@ public class StatusBarTintMod extends XposedMods {
         sRead = now;
         sColor = readProp(PROP);
         sClock = readProp(PROP_CLOCK);
+        sPct = readProp(PROP_PCT);
     }
 
     /** Colore scelto per le icone (null = predefinito); letto al piu' ogni 2 secondi. */
     private static Integer color() {
         refresh();
         return sColor;
+    }
+
+    /** Colore del numero della batteria: quello scelto per lui, altrimenti lo stesso delle icone (null = predefinito). */
+    private static Integer pctColor() {
+        refresh();
+        return sPct != null ? sPct : sColor;
     }
 
     /** Colore dell'orologio: quello scelto per lui, altrimenti lo stesso delle icone (null = predefinito). */
@@ -138,7 +146,7 @@ public class StatusBarTintMod extends XposedMods {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
                     try {
-                        Integer c = color();
+                        Integer c = pctColor();
                         if (c == null || param.getResult() == null) return;
                         long packed = packedOf(param.getResult());
                         if (packed != 0xFFFFFFFF00000000L) return; // solo il bianco di sfondo scuro
