@@ -464,9 +464,16 @@ public class SettingsCardBackgroundMod extends XposedMods {
                 // sull'esterno) restano esclusi.
                 boolean needsInnerFix = "aodCardView".equals(cardId) || "iconCardView".equals(cardId)
                         || "moreCardView".equals(cardId);
-                if (needsInnerFix && card instanceof android.view.ViewGroup cardGroup
+                // 2026-11-06: Schermo sempre acceso / Carattere / Altro: il grigio #262626 era il fondo NERO dell'immagine
+                // della card (LayerDrawable, strato 0) con sopra un bianco al 15% (breath_screen_cover_color). Il bianco
+                // e' tolto da installWallpapersCoverHook; qui il fondo nero prende il colore dello sfondo di sistema.
+                boolean layerCard = "aodCardView".equals(cardId) || "fontCardView".equals(cardId)
+                        || "moreCardView".equals(cardId);
+                if ((needsInnerFix || layerCard) && card instanceof android.view.ViewGroup cardGroup
                         && cardGroup.getChildCount() > 0) {
-                    cardGroup.getChildAt(0).setBackgroundColor(cardColor());
+                    View inner = cardGroup.getChildAt(0);
+                    inner.setBackgroundColor(cardColor());
+                    if (layerCard) tintCardImageLayer(inner);
                 }
             } catch (Throwable ignored) {}
         }
@@ -555,6 +562,49 @@ public class SettingsCardBackgroundMod extends XposedMods {
      *  E COUICardListSelectedItemLayout). Il raggio prova a leggere getCardRoundCornerRadius() per
      *  riflessione (presente su COUICardView, non su COUICardListSelectedItemLayout — fallback
      *  silenzioso a 16dp in quel caso). */
+    /** Colora lo strato 0 (il fondo nero) del LayerDrawable dell'immagine di una card di com.oplus.wallpapers. */
+    private void tintCardImageLayer(View inner) {
+        try {
+            if (!(inner instanceof android.view.ViewGroup g)) return;
+            for (int i = 0; i < g.getChildCount(); i++) {
+                View ch = g.getChildAt(i);
+                if (!(ch instanceof android.widget.ImageView iv)) continue;
+                if (!(iv.getDrawable() instanceof android.graphics.drawable.LayerDrawable ld)) continue;
+                if (ld.getNumberOfLayers() < 1) continue;
+                android.graphics.drawable.Drawable base = ld.getDrawable(0);
+                if (base != null) {
+                    base.setColorFilter(new android.graphics.PorterDuffColorFilter(cardColor() | 0xFF000000,
+                            android.graphics.PorterDuff.Mode.SRC_IN));
+                    iv.invalidate();
+                }
+            }
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] SettingsCardBackgroundMod: tintCardImageLayer failed: " + t);
+        }
+    }
+
+    /** com.oplus.wallpapers: le card scure ricevono un bianco al 15% (breath_screen_cover_color, #26ffffff) che le
+     *  rende grigio #262626 qualunque sia lo sfondo: lo si rende trasparente, cosi' si vede la sfumatura sotto. */
+    private void installWallpapersCoverHook(XC_LoadPackage.LoadPackageParam lp) {
+        try {
+            final String pkg = lp.packageName;
+            de.robv.android.xposed.XposedHelpers.findAndHookMethod(Context.class, "getColor", int.class, new XC_MethodHook() {
+                private int mCoverId = -1;
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    try {
+                        if (mCoverId == -1) {
+                            mCoverId = ((Context) p.thisObject).getResources()
+                                    .getIdentifier("breath_screen_cover_color", "color", pkg);
+                        }
+                        if (mCoverId != 0 && (Integer) p.args[0] == mCoverId) p.setResult(0);
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] SettingsCardBackgroundMod: cover hook (wallpapers) failed: " + t);
+        }
+    }
+
     private void applyAccentBorder(View v) {
         try {
             float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16,
@@ -1180,6 +1230,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
                 || WALLPAPERS.equals(lp.packageName)) {
             installStubbornBackgroundBlockHook(lp);
         }
+        if (WALLPAPERS.equals(lp.packageName)) installWallpapersCoverHook(lp);
         if (SCREENSHOT.equals(lp.packageName)) {
             installScreenshotFloatButtonHook(lp);
         }
