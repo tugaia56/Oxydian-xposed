@@ -451,7 +451,10 @@ public class BatteryStyleManager extends XposedMods {
         Integer c = null;
         try {
             Class<?> sp = Class.forName("android.os.SystemProperties");
-            String v = (String) sp.getMethod("get", String.class, String.class).invoke(null, "persist.oxytheme.battery_pct_color", "");
+            java.lang.reflect.Method get = sp.getMethod("get", String.class, String.class);
+            String v = (String) get.invoke(null, "persist.oxytheme.battery_pct_color", "");
+            // senza un colore suo, il numero segue quello delle icone (scelta "Come le icone" nel Theme)
+            if (v == null || v.trim().isEmpty()) v = (String) get.invoke(null, "persist.oxytheme.battery_icon_color", "");
             if (v != null && !v.trim().isEmpty()) c = (int) Long.parseLong(v.trim(), 16) | 0xFF000000;
         } catch (Throwable ignored) {}
         sThemePct = c;
