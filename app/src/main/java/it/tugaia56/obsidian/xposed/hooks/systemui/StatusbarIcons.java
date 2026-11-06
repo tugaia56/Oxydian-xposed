@@ -93,6 +93,24 @@ public class StatusbarIcons extends XposedMods {
         sHideMobileActivity = mHideMobileActivity;
     }
 
+    private static volatile Integer sThemeIcon = null;
+    private static volatile long sThemeIconAt = 0;
+
+    /** Colore scelto nel Theme per le icone della barra di stato (con la stessa trasparenza del colore di sistema, cc), o null. */
+    private static Integer themeIconColor() {
+        long now = android.os.SystemClock.uptimeMillis();
+        if (now - sThemeIconAt < 2000) return sThemeIcon;
+        sThemeIconAt = now;
+        Integer c = null;
+        try {
+            Class<?> sp = Class.forName("android.os.SystemProperties");
+            String v = (String) sp.getMethod("get", String.class, String.class).invoke(null, "persist.oxytheme.battery_icon_color", "");
+            if (v != null && !v.trim().isEmpty()) c = 0xCC000000 | ((int) Long.parseLong(v.trim(), 16) & 0xFFFFFF);
+        } catch (Throwable ignored) {}
+        sThemeIcon = c;
+        return c;
+    }
+
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lp) throws Throwable {
         if (!SYSTEM_UI.equals(lp.packageName)) return;
@@ -104,6 +122,24 @@ public class StatusbarIcons extends XposedMods {
 
         mDisplayMetrics = mContext.getResources().getDisplayMetrics();
         mDisplayManager = (DisplayManager) mContext.getSystemService(Context.DISPLAY_SERVICE);
+
+        // Icone di stato "classiche" (Non disturbare, sveglia, Bluetooth...): su OxygenOS StatIconView richiama onDarkChanged ad ogni
+        // disegno con il bianco di partenza e cancella l'accento (la luna restava bianca dopo un riavvio dell'interfaccia). Con un colore
+        // scelto nel Theme ("Colore icone barra di stato", persist.oxytheme.battery_icon_color) si usa quello al posto del bianco.
+        try {
+            Class<?> sbiv = findClass("com.android.systemui.statusbar.StatusBarIconView", lp.classLoader);
+            hookAllMethods(sbiv, "onDarkChanged", new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam p) {
+                    try {
+                        if (p.args.length != 3 || !(p.args[1] instanceof Float) || !(p.args[2] instanceof Integer)) return;
+                        if ((Float) p.args[1] >= 0.5f) return;   // barra chiara: icone scure, non si tocca
+                        Integer c = themeIconColor();
+                        if (c != null) p.args[2] = c;
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) { XposedBridge.log("[ Obsidian ] StatusbarIcons: onDarkChanged hook failed: " + t); }
 
         // Quick-QS height via resource (fallback; overridden dynamically in hookBrightnessCtrl)
         try {
