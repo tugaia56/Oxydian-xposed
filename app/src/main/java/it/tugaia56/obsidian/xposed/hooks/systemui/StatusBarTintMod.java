@@ -100,6 +100,40 @@ public class StatusBarTintMod extends XposedMods {
         hookBatteryPercent(lpparam);
     }
 
+    /**
+     * Chip dell'orologio crDroid, stile "Contorno" (statusbar_clock_chip = 2): il bordo e' "system_accent1_300", che di notte il
+     * sistema prende dalla variante _dark e che i colori fissi del Theme (applicati dopo l'avvio) non raggiungono se SystemUI ha
+     * gia' disegnato il chip. Qui il bordo prende l'accento del Theme (persist.oxytheme.accent) direttamente.
+     */
+    private static void applyChipStroke(Object clockObj) {
+        try {
+            if (!(clockObj instanceof android.view.View)) return;
+            android.view.View v = (android.view.View) clockObj;
+            Integer acc = readProp("persist.oxytheme.accent");
+            if (acc == null) return;
+            int style = android.provider.Settings.System.getInt(v.getContext().getContentResolver(), "statusbar_clock_chip", 0);
+            if (style != 2) return;
+            android.graphics.drawable.Drawable bg = v.getBackground();
+            if (bg == null) return;
+            bg = bg.mutate();
+            int w = Math.max(1, Math.round(v.getResources().getDisplayMetrics().density));
+            int color = acc | 0xFF000000;
+            if (bg instanceof android.graphics.drawable.LayerDrawable) {
+                android.graphics.drawable.LayerDrawable ld = (android.graphics.drawable.LayerDrawable) bg;
+                for (int i = 0; i < ld.getNumberOfLayers(); i++) {
+                    android.graphics.drawable.Drawable d = ld.getDrawable(i);
+                    if (d instanceof android.graphics.drawable.GradientDrawable) {
+                        ((android.graphics.drawable.GradientDrawable) d).setStroke(w, color);
+                    }
+                }
+            } else if (bg instanceof android.graphics.drawable.GradientDrawable) {
+                ((android.graphics.drawable.GradientDrawable) bg).setStroke(w, color);
+            }
+        } catch (Throwable ignored) {
+            // mai far cadere SystemUI
+        }
+    }
+
     /** L'orologio riceve la tinta da Clock.onDarkChanged(areas, darkIntensity, tint): con barra scura si usa il colore dell'orologio. */
     private static void hookClock(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
@@ -113,7 +147,22 @@ public class StatusBarTintMod extends XposedMods {
                         if (((Float) param.args[1]) < 0.5f) param.args[2] = c | 0xFF000000;
                     } catch (Throwable ignored) {}
                 }
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) {
+                    applyChipStroke(param.thisObject);
+                }
             });
+            // il chip nasce (setBackgroundResource) dopo la prima tinta: si colora anche li'
+            try {
+                XposedHelpers.findAndHookMethod(android.view.View.class, "setBackgroundResource", int.class, new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) {
+                        if (clock.isInstance(param.thisObject)) applyChipStroke(param.thisObject);
+                    }
+                });
+            } catch (Throwable t) {
+                XposedBridge.log("StatusBarTintMod: chip background hook failed: " + t);
+            }
         } catch (Throwable t) {
             XposedBridge.log("StatusBarTintMod: clock hook failed: " + t);
         }
