@@ -545,6 +545,16 @@ public class QsHeaderClock extends XposedMods {
     // ── Update logic ───────────────────────────────────────────────────────────
 
     private void updateClockView() {
+        // 2026-11-06: i contenitori di intestazioni gia' distrutte non venivano mai tolti dalla lista: a ogni cambio di overlay
+        // (l'intestazione viene ricreata) se ne aggiungeva uno e ogni aggiornamento ricostruiva TUTTI gli orologi accumulati
+        // sul thread principale di SystemUI (visto in un ANR: removeAllViews -> TextClock.onDetachedFromWindow).
+        // Oltre 4 si scartano i piu' vecchi che non sono piu' collegati alla finestra.
+        if (mContainers.size() > 4) {
+            for (java.util.Iterator<LinearLayout> it = mContainers.iterator();
+                 it.hasNext() && mContainers.size() > 4; ) {
+                if (!it.next().isAttachedToWindow()) it.remove();
+            }
+        }
         if (mContainers.isEmpty()) return;
         for (LinearLayout container : mContainers) {
             container.removeAllViews();
