@@ -124,6 +124,68 @@ public class ACalendarPlusMod extends XposedMods {
         return mReady;
     }
 
+    private static int fillColor(android.graphics.drawable.Drawable d) {
+        try {
+            if (d instanceof android.graphics.drawable.ColorDrawable) return ((android.graphics.drawable.ColorDrawable) d).getColor();
+            if (d instanceof android.graphics.drawable.ShapeDrawable) return ((android.graphics.drawable.ShapeDrawable) d).getPaint().getColor();
+            if (d instanceof android.graphics.drawable.GradientDrawable) {
+                android.content.res.ColorStateList cs = ((android.graphics.drawable.GradientDrawable) d).getColor();
+                if (cs != null) return cs.getDefaultColor();
+            }
+        } catch (Throwable ignored) {}
+        return 0;
+    }
+
+    /**
+     * Striscia di oggi (stile "Solo data"): il testo e' dentro due contenitori e il secondo ha come sfondo un PaintDrawable nero
+     * colorato da un filtro (il colore dichiarato del disegno e' nero, non l'accento). L'app mette il testo nero sui colori chiari:
+     * si usa il colore del giorno come negli altri giorni (sabato arancione, domenica rosso), bianco per gli altri.
+     */
+    private void whitenTextOnAccent(android.widget.TextView tv) {
+        try {
+            if (!ensureReady() || tv.getBackground() != null) return;
+            android.view.ViewParent p = tv.getParent();
+            for (int i = 0; i < 3 && p instanceof android.view.View; i++) {
+                android.view.View pv = (android.view.View) p;
+                android.graphics.drawable.Drawable bg = pv.getBackground();
+                if (bg instanceof android.graphics.drawable.PaintDrawable) {
+                    String t = String.valueOf(tv.getText()).toLowerCase();
+                    int col = 0xFFFFFFFF;
+                    if (t.contains("sab") || t.contains("sat")) col = 0xFFFF9800;
+                    else if (t.contains("dom") || t.contains("sun")) col = 0xFFFF0000;
+                    tv.setTextColor(col);
+                    // sfondo della striscia: accento con l'opacita' di "Opacita' tocco" (l'app disegna il colore sempre pieno)
+                    bg.setAlpha((mRipple >>> 24) & 0xFF);
+                    // parti del testo con uno stile proprio (span dell'app che rimettono il nero): si rifa' il testo tenendo solo
+                    // grandezza, grassetto e carattere, con il nostro colore su tutto
+                    CharSequence cs = tv.getText();
+                    if (cs instanceof android.text.Spanned) {
+                        android.text.Spanned sd = (android.text.Spanned) cs;
+                        StripColorSpan[] mine = sd.getSpans(0, sd.length(), StripColorSpan.class);
+                        if (mine.length > 0 && mine[0].getForegroundColor() == col) return;   // gia' fatto
+                        android.text.SpannableString ns = new android.text.SpannableString(cs.toString());
+                        for (Object o : sd.getSpans(0, sd.length(), Object.class)) {
+                            if (o instanceof android.text.style.RelativeSizeSpan || o instanceof android.text.style.AbsoluteSizeSpan
+                                    || o instanceof android.text.style.StyleSpan || o instanceof android.text.style.TypefaceSpan
+                                    || o instanceof android.text.style.ScaleXSpan)
+                                ns.setSpan(o, sd.getSpanStart(o), sd.getSpanEnd(o), sd.getSpanFlags(o));
+                        }
+                        ns.setSpan(new StripColorSpan(col), 0, ns.length(), android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                        tv.setText(ns);
+                    }
+                    return;
+                }
+                if (bg != null) return;   // un altro sfondo prima: non e' la striscia
+                p = pv.getParent();
+            }
+        } catch (Throwable ignored) {}
+    }
+
+    /** Colore del testo della striscia di oggi (sostituito e riaggiunto a ogni aggiornamento). */
+    private static final class StripColorSpan extends android.text.style.ForegroundColorSpan {
+        StripColorSpan(int c) { super(c); }
+    }
+
     private static long key(int attr, int color) {
         return ((long) attr << 32) | (color & 0xFFFFFFFFL);
     }
@@ -264,6 +326,71 @@ public class ACalendarPlusMod extends XposedMods {
         };
         XposedBridge.hookAllMethods(android.view.View.class, "setBackground", headerBg);
         XposedBridge.hookAllMethods(android.view.View.class, "setBackgroundDrawable", headerBg);
+        // Colore "Oggi" (Aspetto > Oggi > Colore): se e' il viola della tavolozza (#ba68c8) l'app lo legge dalle sue impostazioni e lo
+        // disegna da se': si sostituisce qui con l'accento del Theme (l'opacita' di "Opacita' tocco" si applica al disegno della striscia)
+        try {
+            Class<?> spi = XposedHelpers.findClass("android.app.SharedPreferencesImpl", lpparam.classLoader);
+            XposedBridge.hookAllMethods(spi, "getInt", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) {
+                    try {
+                        if (param.args.length < 1 || !(param.args[0] instanceof String)) return;
+                        String k = (String) param.args[0];
+                        if (!k.toLowerCase().contains("today")) return;
+                        Object r = param.getResult();
+                        if ("todayColor".equals(k) && r instanceof Integer && (((Integer) r) & 0xFFFFFF) == 0xBA68C8 && ensureReady()) {
+                            param.setResult((((Integer) r) & 0xFF000000) | (mAccent & 0xFFFFFF));
+                        }
+                    } catch (Throwable ignored) {}
+                }
+            });
+            XposedBridge.hookAllMethods(spi, "getString", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) {
+                    try {
+                        if (param.args.length < 1 || !(param.args[0] instanceof String)) return;
+                        String k = (String) param.args[0];
+                        if (!"todayColor".equals(k)) return;
+                        Object r = param.getResult();
+                        if (!(r instanceof String)) return;
+                        int c = (int) Long.parseLong(((String) r).trim());
+                        if ((c & 0xFFFFFF) == 0xBA68C8 && ensureReady()) param.setResult(String.valueOf(0xFF000000 | (mAccent & 0xFFFFFF)));
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] ACalendarPlusMod: preference hook failed: " + t);
+        }
+        // Striscia di oggi con lo sfondo accento: l'app sceglie da sola il testo nero sui colori chiari; si preferisce il bianco.
+        // Solo per un testo senza sfondo proprio dentro un contenitore con sfondo pieno uguale all'accento (le barre degli
+        // eventi hanno lo sfondo sul testo stesso e restano come sono).
+        XposedBridge.hookAllMethods(android.widget.TextView.class, "setTextColor", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) {
+                try {
+                    if (param.args.length == 0 || !(param.args[0] instanceof Integer)) return;
+                    int c = (Integer) param.args[0];
+                    if (((c >>> 24) & 0xFF) < 0xC0 || android.graphics.Color.luminance(c) > 0.3f) return;   // solo nero / colori scuri quasi opachi
+                    final android.widget.TextView tv = (android.widget.TextView) param.thisObject;
+                    tv.post(() -> whitenTextOnAccent(tv));
+                } catch (Throwable ignored) {}
+            }
+        });
+        // il testo della striscia viene impostato anche dopo il colore: si rifa' il controllo a ogni setText (solo se e' la striscia)
+        XposedBridge.hookAllMethods(android.widget.TextView.class, "setText", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) {
+                try {
+                    final android.widget.TextView tv = (android.widget.TextView) param.thisObject;
+                    if (tv.getBackground() != null) return;
+                    android.view.ViewParent p = tv.getParent();
+                    if (!(p instanceof android.view.View)) return;
+                    android.view.ViewParent pp = ((android.view.View) p).getParent();
+                    if (!(pp instanceof android.view.View) || !(((android.view.View) pp).getBackground() instanceof android.graphics.drawable.PaintDrawable)) return;
+                    tv.post(() -> whitenTextOnAccent(tv));
+                } catch (Throwable ignored) {}
+            }
+        });
         log("hook aCalendar+ installati");
     }
 }
