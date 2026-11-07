@@ -1,0 +1,18 @@
+Aggiunto:
+- Quale file scaricare: Oxydian-release-1.1.12.apk è per i OnePlus con OxygenOS (ambito LSPosed completo). Oxydian-Android-release-1.1.12.apk è per le ROM Android puro (crDroid, Android 17...), con solo Impostazioni e SystemUI nell'ambito di LSPosed
+- Perché serve su Android 17: Oxydian Theme lavora con gli overlay, che possono solo sostituire risorse. Quello che Android disegna nel codice non lo raggiunge un overlay, quindi su Android 17 il modulo lo aggancia: la finestra trasparente di Impostazioni, i colori della barra di stato (SystemUI colora icone e orologio nel codice e disegna la percentuale della batteria con Compose), la tinta dello sfondo delle notifiche e l'opacità del pannello
+- Android 17: la finestra di Impostazioni mostra lo sfondo del telefono dietro le pagine quando nel Theme si sceglie uno sfondo con trasparenza
+- Android 17: opacità del pannello notifiche / tasti rapidi scelta nel Theme. Il modulo ferma anche l'errore NaN di SystemUI (BackgroundBlurAlphaSync) che mandava in crash SystemUI a ogni avvio e metteva LSPosed in modalità sicura
+- Android 17: un solo colore per icone della barra di stato e orologio, più colore orologio e colore della percentuale batteria separati, scelti nel Theme. Il bordo del chip orologio di crDroid segue l'accento del Theme, anche subito dopo l'avvio
+- Android 17: stili delle notifiche dal Theme (tinta di sistema e sfocatura di crDroid tolte quando si sceglie uno stile)
+- OxygenOS: orologio, percentuale della batteria e icone classiche della barra di stato (Non disturbare, sveglia, Bluetooth...) seguono i colori del Theme; icona della batteria e della ricarica seguono il colore delle icone
+- OxygenOS: pagina Sfondi e stile: le card Schermo sempre acceso / Carattere / Altro prendono lo sfondo di sistema (il grigio era uno strato nero con sopra un bianco al 15%)
+- Mod dei colori per altre app (da aggiungere all'ambito di LSPosed): Box, Call Recorder, Claude, Dreo, Drive, F-Droid, APKMirror, Discord, Alexa
+- Gestione notifiche: la barra di modifica dei "Programmi" segue lo sfondo del tema; gli interruttori COUI restano visibili quando primo piano e sfondo sono uguali
+Aggiornato:
+- Questa versione ha lo stesso codice della 1.1.11: cambiano solo le note, più chiare (quale file scaricare)
+- Le mod partono una volta per pacchetto (Discord caricava prima un altro plugin e bloccava le mod dell'app)
+- Sulle ROM non OxygenOS non si installano hook globali (zygote/risorse)
+- OxygenOS, orologio dell'intestazione dei tasti rapidi: i vecchi contenitori dell'orologio vengono scartati (la lista cresceva e rallentava SystemUI)
+Rimosso:
+- Hook ora coperti dal Theme: colori delle superfici di Droid-ify, APKUpdater e Drive
