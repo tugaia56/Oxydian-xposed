@@ -5,6 +5,7 @@
         <item>android</item>
         <item>com.android.systemui</item>
         <item>com.android.settings</item>
+        <item>it.tugaia56.oxydian.theme</item>
         <item>com.android.launcher</item>
         <item>com.google.android.apps.messaging</item>
         <item>com.google.android.contacts</item>
