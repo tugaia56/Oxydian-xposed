@@ -17,8 +17,8 @@ android {
         applicationId  = "it.tugaia56.oxydian"
         minSdk         = 31
         targetSdk      = 34
-        versionCode    = 113
-        versionName    = "1.1.11"
+        versionCode    = 114
+        versionName    = "1.1.12"
         buildConfigField("int", "MIN_SDK_VERSION", "$minSdk")
     }
     // Due file dello stesso modulo (stesso pacchetto e stessa firma, non si installano insieme): l'elenco "consigliate" di
