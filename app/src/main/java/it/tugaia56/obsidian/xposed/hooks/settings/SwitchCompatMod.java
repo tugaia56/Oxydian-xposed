@@ -45,7 +45,18 @@ public class SwitchCompatMod extends XposedMods {
                 @Override protected void beforeHookedMethod(MethodHookParam p) {
                     try {
                         if (CouiSwitchMod.variant().isEmpty()) return;
-                        setAlpha(p.thisObject, 0);
+                        if (p.thisObject.getClass() == cls) {
+                            setAlpha(p.thisObject, 0);
+                        } else {
+                            // MaterialSwitch e simili: barra e tondo si rifanno a ogni invalidate() e l'alfa non basta; per la
+                            // durata del disegno originale si mettono disegni trasparenti (senza setter, quindi senza invalidate)
+                            Object trk = XposedHelpers.getObjectField(p.thisObject, "mTrackDrawable");
+                            Object thb = XposedHelpers.getObjectField(p.thisObject, "mThumbDrawable");
+                            p.setObjectExtra("oxy_trk", trk);
+                            p.setObjectExtra("oxy_thb", thb);
+                            XposedHelpers.setObjectField(p.thisObject, "mTrackDrawable", new android.graphics.drawable.ColorDrawable(0));
+                            XposedHelpers.setObjectField(p.thisObject, "mThumbDrawable", new android.graphics.drawable.ColorDrawable(0));
+                        }
                     } catch (Throwable ignored) {}
                 }
 
@@ -53,7 +64,12 @@ public class SwitchCompatMod extends XposedMods {
                     try {
                         String var = CouiSwitchMod.variant();
                         if (var.isEmpty()) return;
-                        setAlpha(p.thisObject, 255);
+                        if (p.thisObject.getClass() == cls) setAlpha(p.thisObject, 255);
+                        else {
+                            Object trk = p.getObjectExtra("oxy_trk"), thb = p.getObjectExtra("oxy_thb");
+                            if (trk != null) XposedHelpers.setObjectField(p.thisObject, "mTrackDrawable", trk);
+                            if (thb != null) XposedHelpers.setObjectField(p.thisObject, "mThumbDrawable", thb);
+                        }
                         drawStyled((View) p.thisObject, (Canvas) p.args[0], var);
                     } catch (Throwable t) {
                         XposedBridge.log("[ Obsidian ] SwitchCompatMod draw: " + t);
@@ -68,7 +84,9 @@ public class SwitchCompatMod extends XposedMods {
     private static void setAlpha(Object sw, int a) {
         for (String f : new String[]{"mTrackDrawable", "mThumbDrawable"}) {
             Object dr = XposedHelpers.getObjectField(sw, f);
-            if (dr instanceof Drawable) ((Drawable) dr).setAlpha(a);
+            if (!(dr instanceof Drawable)) continue;
+            Drawable d = (Drawable) dr;
+            d.setAlpha(a);
         }
     }
 
