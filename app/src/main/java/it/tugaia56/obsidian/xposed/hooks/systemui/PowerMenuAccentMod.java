@@ -26,6 +26,9 @@ public class PowerMenuAccentMod extends XposedMods {
 
     private static final float BORDER_DP = 1.5f;
     private volatile boolean mBorder = false;
+    private volatile boolean mGlass = false;
+    /** Opacita' del riempimento delle schede con "vetro" (0-255): la ROM sfoca gia' lo sfondo dietro il menu. */
+    private static final int GLASS_ALPHA = 0xA0;
 
     /** Funzioni Compose attive (in pila): 1 = PowerMenuContainer, 2 = RestartChoiceMenu, 3 = RestartOptionTile. */
     private static final ThreadLocal<ArrayList<int[]>> sStack = ThreadLocal.withInitial(ArrayList::new);
@@ -38,6 +41,7 @@ public class PowerMenuAccentMod extends XposedMods {
     public void updatePrefs(String... Key) {
         if (Xprefs == null) return;
         mBorder = Xprefs.getBoolean("power_menu_border", false);
+        mGlass = Xprefs.getBoolean("power_menu_glass", false);
     }
 
     @Override
@@ -101,15 +105,30 @@ public class PowerMenuAccentMod extends XposedMods {
             // Surface senza bordo (modifier, shape, ...): il primo di ogni scheda riceve il bordo accento
             XposedBridge.hookAllMethods(surfaceKt, "Surface-T9BRK9s", new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam p) {
-                    if (!mBorder) return;
+                    if (!mBorder && !mGlass) return;
                     int[] t = top();
-                    if (t == null || (t[0] != 1 && t[0] != 2) || t[1] != 0 || p.args.length < 2) return;
+                    if (t == null || (t[0] != 1 && t[0] != 2) || t[1] != 0 || p.args.length < 4) return;
                     t[1] = 1;
-                    try {
-                        p.args[0] = XposedHelpers.callStaticMethod(borderKt, "border-xT4_qwU",
-                                p.args[0], BORDER_DP, composeColor(accent()), p.args[1]);
-                    } catch (Throwable e) {
-                        XposedBridge.log("[ Obsidian ] PowerMenuAccentMod border: " + e);
+                    if (mBorder) {
+                        try {
+                            p.args[0] = XposedHelpers.callStaticMethod(borderKt, "border-xT4_qwU",
+                                    p.args[0], BORDER_DP, composeColor(accent()), p.args[1]);
+                        } catch (Throwable e) {
+                            XposedBridge.log("[ Obsidian ] PowerMenuAccentMod border: " + e);
+                        }
+                    }
+                    if (mGlass) {
+                        try {
+                            // colore del riempimento (indice 2) solo se passato davvero (bit "predefinito" spento nell'ultima maschera)
+                            int last = p.args.length - 1;
+                            boolean explicit = !(p.args[last] instanceof Integer) || (((Integer) p.args[last]) & 0x4) == 0;
+                            if (explicit && p.args[2] instanceof Long) {
+                                long c = (Long) p.args[2];
+                                p.args[2] = (c & 0x00FFFFFFFFFFFFFFL) | (((long) GLASS_ALPHA) << 56);
+                            }
+                        } catch (Throwable e) {
+                            XposedBridge.log("[ Obsidian ] PowerMenuAccentMod glass: " + e);
+                        }
                     }
                 }
             });
