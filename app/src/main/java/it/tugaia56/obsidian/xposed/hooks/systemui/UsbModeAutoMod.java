@@ -59,20 +59,25 @@ public class UsbModeAutoMod extends XposedMods {
                     Context ctx = ctxOf(p.thisObject);
                     if (ctx != null && p.args.length > 0 && p.args[0] instanceof Long)
                         Settings.Global.putLong(ctx.getContentResolver(), KEY, (Long) p.args[0]);
-                } catch (Throwable ignored) {}
+                } catch (Throwable t) { XposedBridge.log("[ Obsidian ] UsbModeAutoMod save: " + t); }
             }
         });
-        // con l'opzione accesa e una scelta ricordata: niente finestra, si riapplica la scelta
+        // con l'opzione accesa la finestra non compare: si riapplica la modalità ricordata. Se non c'e' ancora una scelta
+        // ricordata, quella in uso adesso (argomento: funzioni USB correnti) diventa la scelta
         XposedBridge.hookAllMethods(c, "showDialog", new XC_MethodHook() {
             @Override protected void beforeHookedMethod(MethodHookParam p) {
                 if (!mOn) return;
                 try {
                     Context ctx = ctxOf(p.thisObject);
                     if (ctx == null || p.args.length < 1 || !(p.args[0] instanceof Long)) return;
+                    long cur = (Long) p.args[0];
                     long saved = Settings.Global.getLong(ctx.getContentResolver(), KEY, -1L);
-                    if (saved < 0) return;   // nessuna scelta ancora: la finestra compare
+                    if (saved < 0) {
+                        saved = cur;
+                        Settings.Global.putLong(ctx.getContentResolver(), KEY, saved);
+                    }
                     p.setResult(null);
-                    XposedHelpers.callMethod(p.thisObject, "applyUsbFunction", saved, (Long) p.args[0]);
+                    if (saved != cur) XposedHelpers.callMethod(p.thisObject, "applyUsbFunction", saved, cur);
                 } catch (Throwable t) {
                     XposedBridge.log("[ Obsidian ] UsbModeAutoMod: " + t);
                 }
