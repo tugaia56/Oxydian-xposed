@@ -416,6 +416,8 @@
     <string name="nav_misc_settings_entry_summary">Aggiunge la voce Oxydian nelle Impostazioni di sistema</string>
     <string name="nav_misc_search_border">Bordo nel campo Cerca di Impostazioni</string>
     <string name="nav_misc_search_border_summary">Contorno colore accento attorno al campo Cerca nella pagina principale di Impostazioni</string>
+    <string name="nav_misc_powermenu_border">Bordo nel menù di spegnimento</string>
+    <string name="nav_misc_powermenu_border_summary">Contorno colore accento attorno al menù di spegnimento e alla finestra Riavvia (ROM Android pure, come RisingOS)</string>
     <string name="nav_screenshot_enabler">Abilita Screenshot</string>
     <string name="nav_screenshot_enabler_summary">Consente screenshot e registrazione schermo nelle app che normalmente li bloccano</string>
     <string name="nav_corepatch">Core Patch</string>

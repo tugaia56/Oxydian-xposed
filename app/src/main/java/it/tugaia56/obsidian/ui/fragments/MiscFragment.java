@@ -78,6 +78,14 @@ public class MiscFragment extends Fragment {
         searchBorderItem.onChanged = () ->
                 ObsidianPrefs.putBoolean("settings_search_border", searchBorderItem.checked);
 
+        SwitchWidgetAdapter.SwitchItem pmBorderItem = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.nav_misc_powermenu_border),
+                getString(R.string.nav_misc_powermenu_border_summary),
+                ObsidianPrefs.getBoolean("power_menu_border", false),
+                null);
+        pmBorderItem.onChanged = () ->
+                ObsidianPrefs.putBoolean("power_menu_border", pmBorderItem.checked);
+
         SwitchWidgetAdapter.SwitchItem screenshotItem = new SwitchWidgetAdapter.SwitchItem(
                 getString(R.string.nav_screenshot_enabler),
                 getString(R.string.nav_screenshot_enabler_summary),
@@ -93,7 +101,7 @@ public class MiscFragment extends Fragment {
         };
 
         SwitchWidgetAdapter togglesAdapter = new SwitchWidgetAdapter(
-                List.of(rotationItem, usbItem, settingsEntryItem, searchBorderItem, screenshotItem));
+                List.of(rotationItem, usbItem, settingsEntryItem, searchBorderItem, pmBorderItem, screenshotItem));
 
         List<NavAdapter.NavItem> items = List.of(
 

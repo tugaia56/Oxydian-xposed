@@ -419,6 +419,8 @@
     <string name="nav_misc_settings_entry_summary">Adds Oxydian entry to system Settings</string>
     <string name="nav_misc_search_border">Border on Settings search field</string>
     <string name="nav_misc_search_border_summary">Accent-coloured outline around the Search pill on the Settings home page</string>
+    <string name="nav_misc_powermenu_border">Border on the power menu</string>
+    <string name="nav_misc_powermenu_border_summary">Accent-coloured outline around the power menu and the Restart window (pure Android ROMs, e.g. RisingOS)</string>
     <string name="nav_screenshot_enabler">Enable Screenshot</string>
     <string name="nav_screenshot_enabler_summary">Allow screenshots and screen recording in apps that normally block them</string>
     <string name="nav_corepatch">Core Patch</string>
