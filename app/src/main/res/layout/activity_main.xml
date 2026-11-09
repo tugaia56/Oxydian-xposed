@@ -70,18 +70,28 @@
         android:id="@+id/nav_divider"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        app:layout_constraintBottom_toTopOf="@id/bottom_nav"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav_host"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_nav"
+    <!-- La barra sta dentro un contenitore e 3 dp sopra il fondo della finestra: alcune ROM (RisingOS: LiquidTabBars) trasformano
+         in "pillola di vetro" fluttuante ogni barra di navigazione appoggiata sul fondo, che copre la fine delle pagine e
+         cambia i colori scelti. Staccata di 3 dp la ROM la lascia com'e'. -->
+    <FrameLayout
+        android:id="@+id/bottom_nav_host"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:menu="@menu/bottom_nav_menu"
-        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_nav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            app:menu="@menu/bottom_nav_menu"
+            app:labelVisibilityMode="labeled" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

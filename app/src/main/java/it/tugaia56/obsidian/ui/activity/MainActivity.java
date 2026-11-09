@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
         });
 
         getSupportFragmentManager().addOnBackStackChangedListener(
-                () -> mBottomNav.setVisibility(View.VISIBLE));
+                () -> navHost().setVisibility(View.VISIBLE));
 
         // L'aggiornamento automatico è acceso di serie: una sola volta si chiede il permesso per le
         // notifiche (Android 13+), altrimenti l'avviso di una nuova versione non potrebbe comparire.
@@ -267,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
         ActionBar ab = getSupportActionBar();
         if (ab != null) ab.setBackgroundDrawable(new ColorDrawable(bg));
         applyNavBarColor();
-        mBottomNav.setVisibility(View.VISIBLE);
+        navHost().setVisibility(View.VISIBLE);
         int count = getSupportFragmentManager().getBackStackEntryCount();
         if (count > 0) {
             String title = getSupportFragmentManager()
@@ -857,9 +857,15 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
         } catch (Throwable ignored) {}
     }
 
+    /** Contenitore della barra in basso (vedi activity_main.xml): visibilita' e fondo vanno insieme alla barra. */
+    private View navHost() {
+        return (View) mBottomNav.getParent();
+    }
+
     private void applyNavBarColor() {
         if (ObsidianTheme.bgAlpha() != null) {
             mBottomNav.setBackgroundColor(ObsidianTheme.windowBg());
+            navHost().setBackgroundColor(ObsidianTheme.windowBg());
             if (mNavDivider != null) mNavDivider.setBackgroundColor(0x33FFFFFF);
             return;
         }
@@ -867,6 +873,7 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
         if (!bgOn) return;
         int bgColor = ObsidianPrefs.getInt("DST_BACKGROUND", 0xFF1A1A2E) | 0xFF000000;
         mBottomNav.setBackgroundColor(bgColor);
+        navHost().setBackgroundColor(bgColor);
         if (mNavDivider != null) {
             mNavDivider.setBackgroundColor(ColorUtils.adjustColor(bgColor, 25) | 0xFF000000);
         }
