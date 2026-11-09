@@ -762,7 +762,7 @@
     <string name="clock_text_small_summary">Mostra questo testo al 70% della dimensione</string>
     <string name="none">Nessuno</string>
     <string name="remove_usb_dialog">Rimuovi dialogo USB</string>
-    <string name="remove_usb_dialog_summary">Seleziona silenziosamente "Nessun trasferimento" alla connessione USB</string>
+    <string name="remove_usb_dialog_summary">Seleziona silenziosamente "Nessun trasferimento" alla connessione USB (ROM Android pure: riapplica la scelta precedente)</string>
     <string name="remove_low_battery">Rimuovi notifica batteria scarica</string>
     <string name="remove_low_battery_summary">Nasconde dialogo e notifica di batteria scarica</string>
     <string name="remove_charging_complete">Rimuovi notifica carica completata</string>

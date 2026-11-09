@@ -130,6 +130,7 @@ public class ModPacks {
             mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.ShadeTransparencyMod.class);
             mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.StatusBarTintMod.class);   // colore unico icone barra di stato e orologio
             mods.add(DstNotifStyleMod.class);   // toglie la tinta di sistema allo sfondo delle notifiche quando c'e' uno stile scelto
+            mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.UsbModeAutoMod.class);   // "Seleziona la modalita' USB": ricorda la scelta e toglie la finestra
             return mods;
         }
         if (Constants.Packages.SETTINGS.equals(packageName)

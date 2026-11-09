@@ -761,7 +761,7 @@
     <string name="clock_text_small_summary">Display this text at 70% size</string>
     <string name="none">None</string>
     <string name="remove_usb_dialog">Remove USB Dialog</string>
-    <string name="remove_usb_dialog_summary">Silently selects "No data transfer" on USB connect</string>
+    <string name="remove_usb_dialog_summary">Silently selects "No data transfer" on USB connect (pure Android ROMs: reuses your last choice)</string>
     <string name="remove_low_battery">Remove Low Battery Notification</string>
     <string name="remove_low_battery_summary">Hides low battery warning dialogs and notifications</string>
     <string name="remove_charging_complete">Remove Charging Complete Notification</string>
