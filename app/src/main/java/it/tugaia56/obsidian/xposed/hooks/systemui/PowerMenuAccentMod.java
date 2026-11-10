@@ -25,6 +25,10 @@ import it.tugaia56.obsidian.xposed.utils.AccentUtil;
 public class PowerMenuAccentMod extends XposedMods {
 
     private static final float BORDER_DP = 1.5f;
+    /** Quanto spostare a destra "Scorri per riavviare": meta' del cerchio (56 dp), cosi' sta al centro dello spazio libero. */
+    private static final float HINT_SHIFT_DP = 28f;
+    /** Vero mentre la finestra del menu di spegnimento (GlobalActionsComposeDialog) e' aperta. */
+    private static volatile boolean sMenuOpen = false;
     private volatile boolean mBorder = false;
     private volatile boolean mGlass = false;
     /** Opacita' del riempimento delle schede con "vetro" (0-255): la ROM sfoca gia' lo sfondo dietro il menu. */
@@ -70,7 +74,7 @@ public class PowerMenuAccentMod extends XposedMods {
     private static XC_MethodHook scope(final int id) {
         return new XC_MethodHook() {
             @Override protected void beforeHookedMethod(MethodHookParam p) {
-                sStack.get().add(new int[]{id, 0});   // [id, bordo gia' dato]
+                sStack.get().add(new int[]{id, 0, 0});   // [id, bordo gia' dato, Text visti]
             }
             @Override protected void afterHookedMethod(MethodHookParam p) {
                 ArrayList<int[]> st = sStack.get();
@@ -97,9 +101,43 @@ public class PowerMenuAccentMod extends XposedMods {
         final Class<?> borderKt = XposedHelpers.findClassIfExists("androidx.compose.foundation.BorderKt", cl);
         final Class<?> iconKt = XposedHelpers.findClassIfExists("androidx.compose.material3.IconKt", cl);
 
+        // finestra del menu aperta/chiusa: serve per "Annulla" della schermata di conferma, che non passa dalle funzioni agganciate qui sotto
+        try {
+            final Class<?> dlg = XposedHelpers.findClass("com.android.systemui.globalactions.compose.GlobalActionsComposeDialog", cl);
+            XposedBridge.hookAllMethods(dlg, "onCreate", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) { sMenuOpen = true; }
+            });
+            XposedBridge.hookAllMethods(android.app.Dialog.class, "dismiss", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) { if (dlg.isInstance(p.thisObject)) sMenuOpen = false; }
+            });
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] PowerMenuAccentMod dialog flag: " + t);
+        }
         try { XposedBridge.hookAllMethods(dialogKt, "PowerMenuContainer", scope(1)); } catch (Throwable ignored) {}
         try { XposedBridge.hookAllMethods(dialogKt, "RestartChoiceMenu", scope(2)); } catch (Throwable ignored) {}
         try { XposedBridge.hookAllMethods(dialogKt, "RestartOptionTile", scope(3)); } catch (Throwable ignored) {}
+        // schermata intera (anche la conferma "Scorri per ..." con "Annulla" sotto): 5
+        try { XposedBridge.hookAllMethods(dialogKt, "GlobalActionsScreen", scope(5)); } catch (Throwable ignored) {}
+        // cursore "Scorri per spegnere/riavviare": nome con suffisso (hash) che puo' cambiare, si cerca per prefisso
+        try {
+            for (java.lang.reflect.Method m : dialogKt.getDeclaredMethods()) {
+                if (m.getName().startsWith("ConfirmationSliderView")) {
+                    XposedBridge.hookMethod(m, new XC_MethodHook() {
+                        @Override protected void beforeHookedMethod(MethodHookParam p) throws Throwable {
+                            sStack.get().add(new int[]{4, 0, 0});
+                            // (titolo, scritta, icona, J colore del cerchio, ...): il cerchio prende l'accento
+                            try {
+                                if (p.args.length > 3 && p.args[3] instanceof Long) p.args[3] = composeColor(accent());
+                            } catch (Throwable ignored) {}
+                        }
+                        @Override protected void afterHookedMethod(MethodHookParam p) throws Throwable {
+                            ArrayList<int[]> st = sStack.get();
+                            if (!st.isEmpty()) st.remove(st.size() - 1);
+                        }
+                    });
+                }
+            }
+        } catch (Throwable ignored) {}
 
         if (surfaceKt != null && borderKt != null) {
             // Surface senza bordo (modifier, shape, ...): il primo di ogni scheda riceve il bordo accento
@@ -135,12 +173,65 @@ public class PowerMenuAccentMod extends XposedMods {
         }
         // "Annulla" (Cancel) nella finestra Riavvia: colore accento
         final Class<?> textKt = XposedHelpers.findClassIfExists("androidx.compose.material3.TextKt", cl);
+        final Class<?> offsetKt = XposedHelpers.findClassIfExists("androidx.compose.foundation.layout.OffsetKt", cl);
+        final Class<?> backgroundKt = XposedHelpers.findClassIfExists("androidx.compose.foundation.BackgroundKt", cl);
+        final Object rect;
+        {
+            Object c = null;
+            try { c = XposedHelpers.getStaticObjectField(XposedHelpers.findClass("androidx.compose.ui.graphics.RectangleShapeKt", cl), "RectangleShape"); } catch (Throwable ignored) {}
+            rect = c;
+        }
+        // cerchio del cursore di conferma: sfondo in accento (l'unico sfondo del cursore che non e' rettangolare: la pista lo e')
+        if (backgroundKt != null && rect != null) {
+            XposedBridge.hookAllMethods(backgroundKt, "background-bw27NRU", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    int[] t = top();
+                    if (t == null || t[0] != 4 || p.args.length < 3 || p.args[2] == rect) return;
+                    try { p.args[1] = composeColor(accent()); } catch (Throwable ignored) {}
+                }
+            });
+        }
         if (textKt != null) {
             XposedBridge.hookAllMethods(textKt, "Text-Nvy7gAk", new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam p) {
                     int[] t = top();
-                    if (t == null || t[0] != 2 || p.args.length < 8 || !(p.args[0] instanceof String)) return;
+                    if (p.args.length < 8 || !(p.args[0] instanceof String)) return;
                     String x = (String) p.args[0];
+                    if (t == null || t[0] == 1 || t[0] == 5) {
+                        if (sMenuOpen && (x.equals("Annulla") || x.equals("Cancel"))) {
+                            try {
+                                p.args[2] = composeColor(accent());
+                                int last = p.args.length - 1;
+                                if (p.args[last] instanceof Integer) p.args[last] = ((Integer) p.args[last]) & ~0x4;
+                            } catch (Throwable ignored) {}
+                        }
+                        return;
+                    }
+                    if (t[0] == 4) {
+                        // cursore di conferma: 1o testo = titolo (accento), 2o = "Scorri per riavviare" (spostato a destra: lo spazio
+                        // libero e' quello dopo il cerchio, largo 56 dp)
+                        // "Annulla" sotto il cursore: accento
+                        if (x.equals("Annulla") || x.equals("Cancel")) {
+                            try {
+                                p.args[2] = composeColor(accent());
+                                int last = p.args.length - 1;
+                                if (p.args[last] instanceof Integer) p.args[last] = ((Integer) p.args[last]) & ~0x4;
+                            } catch (Throwable ignored) {}
+                            return;
+                        }
+                        int n = ++t[2];
+                        try {
+                            if (n == 1) {
+                                p.args[2] = composeColor(accent());
+                                int last = p.args.length - 1;
+                                if (p.args[last] instanceof Integer) p.args[last] = ((Integer) p.args[last]) & ~0x4;
+                            } else if (n == 2 && offsetKt != null) {
+                                p.args[1] = XposedHelpers.callStaticMethod(offsetKt, "offset-VpY3zN4", p.args[1], HINT_SHIFT_DP, 0f);
+                            }
+                        } catch (Throwable ignored) {}
+                        return;
+                    }
+                    if (t[0] != 2 && t[0] != 5) return;
                     if (!x.equals("Annulla") && !x.equals("Cancel")) return;
                     try {
                         p.args[2] = composeColor(accent());
@@ -151,13 +242,14 @@ public class PowerMenuAccentMod extends XposedMods {
             });
         }
         if (iconKt != null) {
-            // icone delle opzioni della finestra Riavvia: tinta accento (si toglie il bit "tint predefinito" dalla maschera)
+            // icone delle opzioni della finestra Riavvia e del cursore di conferma: tinta accento (si toglie il bit "tint predefinito" dalla maschera)
             XposedBridge.hookAllMethods(iconKt, "Icon-ww6aTOc", new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam p) {
                     int[] t = top();
-                    if (t == null || t[0] != 3 || p.args.length < 7) return;
+                    if (t == null || (t[0] != 3 && t[0] != 4) || p.args.length < 7) return;
                     try {
-                        p.args[3] = composeColor(accent());
+                        // cursore di conferma: icona bianca sul cerchio accento; finestra Riavvia: icone in accento
+                        p.args[3] = t[0] == 4 ? 0xFFFFFFFF00000000L : composeColor(accent());
                         int last = p.args.length - 1;
                         if (p.args[last] instanceof Integer) p.args[last] = ((Integer) p.args[last]) & ~0x8;
                     } catch (Throwable ignored) {}
