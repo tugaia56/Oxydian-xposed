@@ -36,6 +36,9 @@ public class PowerMenuItalianMod extends XposedMods {
         IT.put("Resize", "Ridimensiona");
         IT.put("Device Controls", "Controlli dispositivi");
         IT.put("Emergency", "Emergenza");
+        // lettore multimediale nel pannello delle notifiche (RisingOS)
+        IT.put("Open player", "Apri il lettore");
+        IT.put("No active media", "Nessun contenuto in riproduzione");
     }
 
     public PowerMenuItalianMod(Context context) {
@@ -52,6 +55,15 @@ public class PowerMenuItalianMod extends XposedMods {
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
+        // scritte nel codice mostrate da normali TextView (lettore multimediale del pannello)
+        XposedBridge.hookAllMethods(android.widget.TextView.class, "setText", new XC_MethodHook() {
+            @Override protected void beforeHookedMethod(MethodHookParam p) {
+                if (p.args.length == 0 || !(p.args[0] instanceof CharSequence)) return;
+                String t = IT.get(p.args[0].toString());
+                if (t == null || !"it".equals(Locale.getDefault().getLanguage())) return;
+                p.args[0] = t;
+            }
+        });
         Class<?> textKt = XposedHelpers.findClassIfExists("androidx.compose.material3.TextKt", lpparam.classLoader);
         if (textKt == null) return;
         XposedBridge.hookAllMethods(textKt, "Text-Nvy7gAk", new XC_MethodHook() {
