@@ -63,18 +63,35 @@ public class LockScreenMiscMods extends XposedMods {
     // ── SOS button ───────────────────────────────────────────────────────────
 
     private void hookSosButton(XC_LoadPackage.LoadPackageParam lp) {
+        // Tastierino PIN a viste (RisingOS, crDroid): il controller mostra il pulsante in modo asincrono dopo l'aggiornamento, quindi
+        // si intercetta View.setVisibility e, se la vista e' il pulsante Emergenza, si forza GONE
+        try {
+            final Class<?> btn = XposedHelpers.findClassIfExists("com.android.keyguard.EmergencyButton", lp.classLoader);
+            if (btn != null) {
+                XposedHelpers.findAndHookMethod(View.class, "setVisibility", int.class, new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) {
+                        if (mHideSos && btn.isInstance(p.thisObject)) p.args[0] = View.GONE;
+                    }
+                });
+            }
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] LockScreenMiscMods: EmergencyButton visibility hook failed: " + t);
+        }
         // Tastierino PIN in Compose (Android 16/17 puro): il pulsante Emergenza arriva da BouncerActionButtonInteractor.actionButton
         // (un Flow): con l'opzione accesa lo si sostituisce con un flusso che emette solo "nessun pulsante"
         try {
             Class<?> inter = XposedHelpers.findClassIfExists("com.android.systemui.bouncer.domain.interactor.BouncerActionButtonInteractor", lp.classLoader);
+            XposedBridge.log("[ Obsidian ] LockScreenMiscMods: BouncerActionButtonInteractor class=" + inter + " hideSos=" + mHideSos);
             if (inter != null) {
                 XposedBridge.hookAllConstructors(inter, new XC_MethodHook() {
                     @Override protected void afterHookedMethod(MethodHookParam p) {
+                        XposedBridge.log("[ Obsidian ] LockScreenMiscMods: BouncerActionButtonInteractor created, hideSos=" + mHideSos);
                         if (!mHideSos) return;
                         try {
                             Class<?> flowKt = XposedHelpers.findClass("kotlinx.coroutines.flow.FlowKt", lp.classLoader);
                             Object empty = XposedHelpers.callStaticMethod(flowKt, "flowOf", new Class<?>[]{Object.class}, new Object[]{null});
                             XposedHelpers.setObjectField(p.thisObject, "actionButton", empty);
+                            XposedBridge.log("[ Obsidian ] LockScreenMiscMods: bouncer emergency button hidden");
                         } catch (Throwable t) {
                             XposedBridge.log("[ Obsidian ] LockScreenMiscMods: hide bouncer emergency failed: " + t);
                         }
@@ -88,6 +105,7 @@ public class LockScreenMiscMods extends XposedMods {
         // o lo nasconde da solo: dopo il suo aggiornamento lo si rimette a GONE quando l'opzione e' accesa
         try {
             Class<?> ctrl = XposedHelpers.findClassIfExists("com.android.keyguard.EmergencyButtonController", lp.classLoader);
+            XposedBridge.log("[ Obsidian ] LockScreenMiscMods: EmergencyButtonController class=" + ctrl);
             if (ctrl != null) {
                 hookAllMethods(ctrl, "updateEmergencyCallButton", new XC_MethodHook() {
                     @Override protected void afterHookedMethod(MethodHookParam p) {
