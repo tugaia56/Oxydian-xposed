@@ -63,6 +63,24 @@ public class LockScreenMiscMods extends XposedMods {
     // ── SOS button ───────────────────────────────────────────────────────────
 
     private void hookSosButton(XC_LoadPackage.LoadPackageParam lp) {
+        // Android puro recente (RisingOS, crDroid): il pulsante e' governato da EmergencyButtonController, che lo mostra
+        // o lo nasconde da solo: dopo il suo aggiornamento lo si rimette a GONE quando l'opzione e' accesa
+        try {
+            Class<?> ctrl = XposedHelpers.findClassIfExists("com.android.keyguard.EmergencyButtonController", lp.classLoader);
+            if (ctrl != null) {
+                hookAllMethods(ctrl, "updateEmergencyCallButton", new XC_MethodHook() {
+                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                        if (!mHideSos) return;
+                        try {
+                            Object v = XposedHelpers.getObjectField(p.thisObject, "mView");
+                            if (v instanceof View) ((View) v).setVisibility(View.GONE);
+                        } catch (Throwable ignored) {}
+                    }
+                });
+            }
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] LockScreenMiscMods: EmergencyButtonController hook failed: " + t);
+        }
         try {
             if (Build.VERSION.SDK_INT >= 36) {
                 Class<?> cls = XposedHelpers.findClass("com.android.keyguard.EmergencyButton", lp.classLoader);
