@@ -19,6 +19,9 @@ import it.tugaia56.obsidian.xposed.XposedMods;
 public class ShadeTransparencyMod extends XposedMods {
 
     private static final String PROP = "persist.oxytheme.shade_alpha";
+    private static final String PROP_TINT = "persist.oxytheme.shade_tint";   // "1": sfondo del pannello con il colore dell'accento
+    private static final String PROP_ACCENT = "persist.oxytheme.accent";      // accento del Theme, esadecimale
+    private static volatile int sTint = 0;                                    // ARGB opaco dell'accento, 0 = spento
     private static volatile float sFactor = 1f;
     private static volatile long sRead = 0;
 
@@ -47,6 +50,16 @@ public class ShadeTransparencyMod extends XposedMods {
             if (p >= 5 && p < 100) f = p / 100f;
         } catch (Throwable ignored) {}
         sFactor = f;
+        // sfondo con l'accento (Theme > Pannello rapido e notifiche > Colore accento): l'opacita' e' sempre la percentuale scelta
+        int tint = 0;
+        try {
+            Class<?> sp = Class.forName("android.os.SystemProperties");
+            if ("1".equals(XposedHelpers.callStaticMethod(sp, "get", PROP_TINT, "0"))) {
+                String h = String.valueOf(XposedHelpers.callStaticMethod(sp, "get", PROP_ACCENT, "")).trim();
+                if (!h.isEmpty()) tint = 0xFF000000 | ((int) Long.parseLong(h, 16) & 0xFFFFFF);
+            }
+        } catch (Throwable ignored) {}
+        sTint = tint;
         return f;
     }
 
@@ -75,6 +88,25 @@ public class ShadeTransparencyMod extends XposedMods {
             // classe assente su altre versioni: niente da fare
         }
         Class<?> scrimView = XposedHelpers.findClass("com.android.systemui.scrim.ScrimView", lpparam.classLoader);
+        // Sfondo con l'accento: dopo che ScrimView ha calcolato il suo colore (blend con la tinta di sistema) si mette l'accento nel
+        // suo disegno; solo per i veli dietro il pannello e sotto le notifiche (quello davanti, blocco e PIN, resta com'e')
+        XposedBridge.hookAllMethods(scrimView, "updateColorWithTint", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) {
+                try {
+                    factor();
+                    int tint = sTint;
+                    if (tint == 0) return;
+                    Object nameObj = XposedHelpers.getObjectField(param.thisObject, "mScrimName");
+                    String name = nameObj == null ? "" : String.valueOf(nameObj);
+                    if (!(name.contains("behind") || name.contains("notifications"))) return;
+                    Object d = XposedHelpers.getObjectField(param.thisObject, "mDrawable");
+                    if (d != null) XposedHelpers.callMethod(d, "setColor", tint, false);
+                } catch (Throwable t) {
+                    // mai far cadere SystemUI
+                }
+            }
+        });
         XposedBridge.hookAllMethods(scrimView, "setViewAlpha", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
