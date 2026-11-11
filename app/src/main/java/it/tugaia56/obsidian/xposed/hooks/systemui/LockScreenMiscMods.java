@@ -63,6 +63,27 @@ public class LockScreenMiscMods extends XposedMods {
     // ── SOS button ───────────────────────────────────────────────────────────
 
     private void hookSosButton(XC_LoadPackage.LoadPackageParam lp) {
+        // Tastierino PIN in Compose (Android 16/17 puro): il pulsante Emergenza arriva da BouncerActionButtonInteractor.actionButton
+        // (un Flow): con l'opzione accesa lo si sostituisce con un flusso che emette solo "nessun pulsante"
+        try {
+            Class<?> inter = XposedHelpers.findClassIfExists("com.android.systemui.bouncer.domain.interactor.BouncerActionButtonInteractor", lp.classLoader);
+            if (inter != null) {
+                XposedBridge.hookAllConstructors(inter, new XC_MethodHook() {
+                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                        if (!mHideSos) return;
+                        try {
+                            Class<?> flowKt = XposedHelpers.findClass("kotlinx.coroutines.flow.FlowKt", lp.classLoader);
+                            Object empty = XposedHelpers.callStaticMethod(flowKt, "flowOf", new Class<?>[]{Object.class}, new Object[]{null});
+                            XposedHelpers.setObjectField(p.thisObject, "actionButton", empty);
+                        } catch (Throwable t) {
+                            XposedBridge.log("[ Obsidian ] LockScreenMiscMods: hide bouncer emergency failed: " + t);
+                        }
+                    }
+                });
+            }
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] LockScreenMiscMods: BouncerActionButtonInteractor hook failed: " + t);
+        }
         // Android puro recente (RisingOS, crDroid): il pulsante e' governato da EmergencyButtonController, che lo mostra
         // o lo nasconde da solo: dopo il suo aggiornamento lo si rimette a GONE quando l'opzione e' accesa
         try {
