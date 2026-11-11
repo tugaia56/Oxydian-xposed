@@ -40,11 +40,18 @@ public class ShadeTransparencyMod extends XposedMods {
         if (now - sRead < 2000) return sFactor;
         sRead = now;
         float f = 1f;
+        // Android puro: con la sfocatura delle finestre accesa lo sfondo del pannello diventa "vetro" (velo quasi trasparente, 5%: la
+        // sfocatura fa il resto, come su RisingOS); con la sfocatura spenta resta quello del sistema. Niente piu' scelta nel Theme.
         try {
             Class<?> sp = Class.forName("android.os.SystemProperties");
-            String v = (String) XposedHelpers.callStaticMethod(sp, "get", PROP, "100");
-            int p = Integer.parseInt(v.trim());
-            if (p >= 5 && p < 100) f = p / 100f;
+            boolean supported = "1".equals(String.valueOf(XposedHelpers.callStaticMethod(sp, "get", "ro.surface_flinger.supports_background_blur", "0")));
+            Object app = XposedHelpers.callStaticMethod(Class.forName("android.app.ActivityThread"), "currentApplication");
+            // RisingOS ha gia' il suo vetro: li' non si tocca niente
+            boolean rising = !String.valueOf(XposedHelpers.callStaticMethod(sp, "get", "ro.rising.build.version", "")).isEmpty();
+            if (supported && !rising && app != null) {
+                android.content.ContentResolver cr = ((android.content.Context) app).getContentResolver();
+                if (android.provider.Settings.Global.getInt(cr, "disable_window_blurs", 0) == 0) f = 0.05f;
+            }
         } catch (Throwable ignored) {}
         sFactor = f;
         return f;
