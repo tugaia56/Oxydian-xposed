@@ -142,6 +142,21 @@ public class ContactsMod extends XposedMods {
         return w >= 48 * mDensity && w <= 72 * mDensity && h >= 28 * mDensity && h <= 38 * mDensity;
     }
 
+    /** Barra di navigazione in basso (senza la pillola della ROM): piena, larga tutto lo schermo, alta 56-90 dp. */
+    private boolean isBottomBar(Paint p, float w, float h) {
+        if (p.getStyle() != Paint.Style.FILL || p.getShader() != null || (p.getColor() >>> 24) != 255) return false;
+        return w >= mScreenW * 0.98f && h >= 56 * mDensity && h <= 90 * mDensity;
+    }
+
+    private Paint mLine;
+    /** Linea accento sul bordo alto della barra. */
+    private void topLine(Canvas cv, float l, float t, float r) {
+        if (mLine == null) { mLine = new Paint(Paint.ANTI_ALIAS_FLAG); mLine.setStyle(Paint.Style.FILL); }
+        mLine.setColor(mAccent);
+        mBusy.set(Boolean.TRUE);
+        try { cv.drawRect(l, t, r, t + Math.max(1f, mDensity), mLine); } finally { mBusy.remove(); }
+    }
+
     /** Sfondo dell'app: forma grande e piena nel colore "contenitore" della palette di sistema (piu' chiaro dello sfondo del Theme). */
     private boolean isBg(Paint p, float w, float h) {
         if (mContainer == 0 || p.getStyle() != Paint.Style.FILL || p.getShader() != null) return false;
@@ -181,6 +196,12 @@ public class ContactsMod extends XposedMods {
                         l = rc.left; t = rc.top; r = rc.right; b = rc.bottom;
                     } else return;
                     float w = r - l, h = b - t;
+                    if (isBottomBar(p, w, h)) {
+                        param.setObjectExtra("oc", p.getColor());
+                        param.setObjectExtra("bar", new float[]{l, t, r});
+                        p.setColor(mBg);
+                        return;
+                    }
                     if (isBg(p, w, h)) {
                         param.setObjectExtra("oc", p.getColor());
                         p.setColor(mBg);
@@ -205,6 +226,8 @@ public class ContactsMod extends XposedMods {
                     Object[] a = param.args;
                     Paint p = a.length == 7 ? (Paint) a[6] : (Paint) a[3];
                     p.setColor((Integer) oc);
+                    Object bar = param.getObjectExtra("bar");
+                    if (bar != null) { float[] f = (float[]) bar; topLine((Canvas) param.thisObject, f[0], f[1], f[2]); return; }
                     if (!mBorder || param.getObjectExtra("card") == null) return;
                     mBusy.set(Boolean.TRUE);
                     try {
@@ -238,6 +261,12 @@ public class ContactsMod extends XposedMods {
                     }
                     RectF b = new RectF();
                     path.computeBounds(b, true);
+                    if (isBottomBar(p, b.width(), b.height())) {
+                        param.setObjectExtra("oc", p.getColor());
+                        param.setObjectExtra("bar", new float[]{b.left, b.top, b.right});
+                        p.setColor(mBg);
+                        return;
+                    }
                     if (isBg(p, b.width(), b.height())) {
                         param.setObjectExtra("oc", p.getColor());
                         p.setColor(mBg);
@@ -261,6 +290,8 @@ public class ContactsMod extends XposedMods {
                     if (oc == null) return;
                     Paint p = (Paint) param.args[1];
                     p.setColor((Integer) oc);
+                    Object bar = param.getObjectExtra("bar");
+                    if (bar != null) { float[] f = (float[]) bar; topLine((Canvas) param.thisObject, f[0], f[1], f[2]); return; }
                     if (!mBorder || param.getObjectExtra("card") == null) return;
                     mBusy.set(Boolean.TRUE);
                     try {
@@ -301,6 +332,18 @@ public class ContactsMod extends XposedMods {
                             param.setObjectExtra("oc", c);
                             p.setColor(mBg);
                         }
+                    } else if ("drawRect".equals(param.method.getName())) {
+                        Object[] a = param.args;
+                        float l, t, r, b2;
+                        if (a.length >= 5 && a[0] instanceof Float) { l = (Float) a[0]; t = (Float) a[1]; r = (Float) a[2]; b2 = (Float) a[3]; }
+                        else if (a[0] instanceof RectF) { l = ((RectF) a[0]).left; t = ((RectF) a[0]).top; r = ((RectF) a[0]).right; b2 = ((RectF) a[0]).bottom; }
+                        else if (a[0] instanceof android.graphics.Rect) { l = ((android.graphics.Rect) a[0]).left; t = ((android.graphics.Rect) a[0]).top; r = ((android.graphics.Rect) a[0]).right; b2 = ((android.graphics.Rect) a[0]).bottom; }
+                        else return;
+                        if (isBottomBar(p, r - l, b2 - t)) {
+                            param.setObjectExtra("oc", c);
+                            param.setObjectExtra("bar", new float[]{l, t, r});
+                            p.setColor(mBg);
+                        }
                     }
                 } catch (Throwable ignored) {}
             }
@@ -310,6 +353,8 @@ public class ContactsMod extends XposedMods {
                     if (oc == null) return;
                     Paint p = paintOf(param.args);
                     if (p != null) p.setColor((Integer) oc);
+                    Object bar = param.getObjectExtra("bar");
+                    if (bar != null) { float[] f = (float[]) bar; topLine((Canvas) param.thisObject, f[0], f[1], f[2]); }
                 } catch (Throwable ignored) {}
             }
         };
