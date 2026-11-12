@@ -128,6 +128,7 @@ public class ModPacks {
         if (Constants.Packages.SYSTEM_UI.equals(packageName) && !XPLauncher.isOplusRom()) {
             // Android puro: solo la trasparenza del pannello (il resto dei mod di SystemUI e' di OxygenOS)
             mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.ShadeTransparencyMod.class);
+            mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.PinKeyPressedMod.class);   // tasto PIN premuto in accento subito, anche al PIN iniziale
             mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.StatusBarTintMod.class);   // colore unico icone barra di stato e orologio
             mods.add(DstNotifStyleMod.class);   // toglie la tinta di sistema allo sfondo delle notifiche quando c'e' uno stile scelto
             mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.UsbModeAutoMod.class);   // "Seleziona la modalita' USB": ricorda la scelta e toglie la finestra
