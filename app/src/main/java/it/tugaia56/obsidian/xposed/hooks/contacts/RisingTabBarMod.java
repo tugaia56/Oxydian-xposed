@@ -96,10 +96,10 @@ public class RisingTabBarMod extends XposedMods {
         return (0.299f * ((c >> 16) & 0xFF) + 0.587f * ((c >> 8) & 0xFF) + 0.114f * (c & 0xFF)) / 255f;
     }
 
-    /** Card: forma piena e opaca, larga (70-98% dello schermo), alta 40-400 dp, di colore scuro. */
+    /** Card: forma piena e opaca, larga (70-98% dello schermo), alta 40-650 dp, di colore scuro. */
     private boolean isCard(Paint p, float w, float h) {
         if (p.getStyle() != Paint.Style.FILL || p.getShader() != null || (p.getColor() >>> 24) != 255) return false;
-        if (w < mScreenW * 0.7f || w > mScreenW * 0.985f || h < 40 * mDensity || h > 400 * mDensity) return false;
+        if (w < mScreenW * 0.7f || w > mScreenW * 0.985f || h < 40 * mDensity || h > 650 * mDensity) return false;
         if ((p.getColor() & 0xFFFFFF) == (mBg & 0xFFFFFF)) return false;
         float l = luma(p.getColor());
         return l > 0.05f && l < 0.45f;
