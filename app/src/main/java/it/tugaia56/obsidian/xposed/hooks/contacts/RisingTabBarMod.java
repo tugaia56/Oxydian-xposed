@@ -3,6 +3,10 @@ package it.tugaia56.obsidian.xposed.hooks.contacts;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
@@ -39,6 +43,9 @@ public class RisingTabBarMod extends XposedMods {
     private float mDensity = 3f;
     private float mScreenW = 1080f;
     private long mAt = 0;
+    private static final Object NO_FILTER = new Object();
+    private Paint mStroke;
+    private final ThreadLocal<Boolean> mBusy = new ThreadLocal<>();
 
     public RisingTabBarMod(Context context) {
         super(context);
@@ -83,6 +90,26 @@ public class RisingTabBarMod extends XposedMods {
             }
             if (acc != 0) mAccent = acc;
         } catch (Throwable ignored) {}
+    }
+
+    private static float luma(int c) {
+        return (0.299f * ((c >> 16) & 0xFF) + 0.587f * ((c >> 8) & 0xFF) + 0.114f * (c & 0xFF)) / 255f;
+    }
+
+    /** Card: forma piena e opaca, larga (70-98% dello schermo), alta 40-400 dp, di colore scuro. */
+    private boolean isCard(Paint p, float w, float h) {
+        if (p.getStyle() != Paint.Style.FILL || p.getShader() != null || (p.getColor() >>> 24) != 255) return false;
+        if (w < mScreenW * 0.7f || w > mScreenW * 0.985f || h < 40 * mDensity || h > 400 * mDensity) return false;
+        if ((p.getColor() & 0xFFFFFF) == (mBg & 0xFFFFFF)) return false;
+        float l = luma(p.getColor());
+        return l > 0.05f && l < 0.45f;
+    }
+
+    private Paint stroke() {
+        if (mStroke == null) { mStroke = new Paint(Paint.ANTI_ALIAS_FLAG); mStroke.setStyle(Paint.Style.STROKE); }
+        mStroke.setStrokeWidth(Math.max(1f, mDensity));
+        mStroke.setColor(mAccent);
+        return mStroke;
     }
 
     private static final int TAG_WATCH = 0x4f787954;
@@ -140,6 +167,82 @@ public class RisingTabBarMod extends XposedMods {
         };
         for (String m : new String[]{"onStart", "onPostResume", "onWindowFocusChanged", "onResume"}) {
             try { XposedBridge.hookAllMethods(Activity.class, m, onShow); } catch (Throwable ignored) {}
+        }
+        // bordo accento attorno alle card (forme larghe, piene e scure disegnate dall'app)
+        XC_MethodHook cardRR = new XC_MethodHook() {
+            @Override protected void beforeHookedMethod(MethodHookParam param) {
+                try {
+                    if (mBusy.get() != null) return;
+                    Object[] a = param.args;
+                    Paint p; float w, h;
+                    if (a.length == 7 && a[6] instanceof Paint) { p = (Paint) a[6]; w = (Float) a[2] - (Float) a[0]; h = (Float) a[3] - (Float) a[1]; }
+                    else if (a.length == 4 && a[0] instanceof RectF && a[3] instanceof Paint) { p = (Paint) a[3]; w = ((RectF) a[0]).width(); h = ((RectF) a[0]).height(); }
+                    else return;
+                    refresh();
+                    if (isCard(p, w, h)) {
+                        param.setObjectExtra("card", Boolean.TRUE);
+                        param.setObjectExtra("oc", p.getColor());
+                        param.setObjectExtra("cf", p.getColorFilter() == null ? NO_FILTER : p.getColorFilter());
+                        p.setColorFilter(null);   // le card hanno una tinta (filtro colore) che copre il colore: si toglie solo per il disegno
+                        p.setColor(mBg);
+                    }
+                } catch (Throwable ignored) {}
+            }
+            @Override protected void afterHookedMethod(MethodHookParam param) {
+                try {
+                    if (param.getObjectExtra("card") == null) return;
+                    Object[] a = param.args;
+                    Paint pp = a.length == 7 ? (Paint) a[6] : (Paint) a[3];
+                    pp.setColor((Integer) param.getObjectExtra("oc"));
+                    Object cf = param.getObjectExtra("cf");
+                    pp.setColorFilter(cf == NO_FILTER ? null : (android.graphics.ColorFilter) cf);
+                    Canvas cv = (Canvas) param.thisObject;
+                    mBusy.set(Boolean.TRUE);
+                    try {
+                        if (a.length == 7) {
+                            float inset = Math.max(1f, mDensity) / 2f;
+                            cv.drawRoundRect((Float) a[0] + inset, (Float) a[1] + inset, (Float) a[2] - inset, (Float) a[3] - inset, (Float) a[4], (Float) a[5], stroke());
+                        } else cv.drawRoundRect((RectF) a[0], (Float) a[1], (Float) a[2], stroke());
+                    } finally { mBusy.remove(); }
+                } catch (Throwable ignored) {}
+            }
+        };
+        XC_MethodHook cardPath = new XC_MethodHook() {
+            @Override protected void beforeHookedMethod(MethodHookParam param) {
+                try {
+                    if (mBusy.get() != null || param.args.length != 2 || !(param.args[0] instanceof Path) || !(param.args[1] instanceof Paint)) return;
+                    Paint p = (Paint) param.args[1];
+                    if (p.getStyle() != Paint.Style.FILL) return;
+                    RectF b = new RectF();
+                    ((Path) param.args[0]).computeBounds(b, true);
+                    refresh();
+                    if (isCard(p, b.width(), b.height())) {
+                        param.setObjectExtra("card", Boolean.TRUE);
+                        param.setObjectExtra("oc", p.getColor());
+                        param.setObjectExtra("cf", p.getColorFilter() == null ? NO_FILTER : p.getColorFilter());
+                        p.setColorFilter(null);
+                        p.setColor(mBg);
+                    }
+                } catch (Throwable ignored) {}
+            }
+            @Override protected void afterHookedMethod(MethodHookParam param) {
+                try {
+                    if (param.getObjectExtra("card") == null) return;
+                    Paint pp = (Paint) param.args[1];
+                    pp.setColor((Integer) param.getObjectExtra("oc"));
+                    Object cf = param.getObjectExtra("cf");
+                    pp.setColorFilter(cf == NO_FILTER ? null : (android.graphics.ColorFilter) cf);
+                    mBusy.set(Boolean.TRUE);
+                    try { ((Canvas) param.thisObject).drawPath((Path) param.args[0], stroke()); } finally { mBusy.remove(); }
+                } catch (Throwable ignored) {}
+            }
+        };
+        for (String cls : new String[]{"android.graphics.Canvas", "android.graphics.BaseRecordingCanvas", "android.graphics.RecordingCanvas"}) {
+            try {
+                Class<?> c = Class.forName(cls);
+                XposedBridge.hookAllMethods(c, "drawRoundRect", cardRR);
+                XposedBridge.hookAllMethods(c, "drawPath", cardPath);
+            } catch (Throwable ignored) {}
         }
     }
 }
