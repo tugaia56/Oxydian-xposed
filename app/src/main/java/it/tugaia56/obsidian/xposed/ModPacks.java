@@ -165,6 +165,9 @@ public class ModPacks {
         if (ContactsMod.PKG.equals(packageName)) {
             mods.add(ContactsMod.class);
         }
+        if (it.tugaia56.obsidian.xposed.hooks.contacts.RisingTabBarMod.handles(packageName)) {
+            mods.add(it.tugaia56.obsidian.xposed.hooks.contacts.RisingTabBarMod.class);   // RisingOS: spegne la pillola di vetro della barra in basso
+        }
         if (GarminConnectMod.PKG.equals(packageName) || GarminConnectMod.PKG_IQ.equals(packageName)) {
             mods.add(GarminConnectMod.class);
         }

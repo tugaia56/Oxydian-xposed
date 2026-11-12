@@ -63,7 +63,8 @@ public class XPLauncher {
             if (lpparam.packageName.equals(Constants.Packages.SETTINGS) || lpparam.packageName.equals(Constants.Packages.SYSTEM_UI)
                     // Contatti e Messaggi di Google: i loro mod lavorano sul disegno dell'app (Compose), non sono di OxygenOS
                     || lpparam.packageName.equals(it.tugaia56.obsidian.xposed.hooks.contacts.ContactsMod.PKG)
-                    || lpparam.packageName.equals(it.tugaia56.obsidian.xposed.hooks.messages.MessagesBubbleMod.PKG)) hookOtherPackage(lpparam);
+                    || lpparam.packageName.equals(it.tugaia56.obsidian.xposed.hooks.messages.MessagesBubbleMod.PKG)
+                    || it.tugaia56.obsidian.xposed.hooks.contacts.RisingTabBarMod.handles(lpparam.packageName)) hookOtherPackage(lpparam);
             return;
         }
         log("[ Obsidian ] handleLoadPackage: " + lpparam.packageName);
