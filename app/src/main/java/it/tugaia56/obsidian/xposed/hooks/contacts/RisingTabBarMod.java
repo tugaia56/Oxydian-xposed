@@ -128,12 +128,32 @@ public class RisingTabBarMod extends XposedMods {
         });
     }
 
+    private void recolorLabels(View v, int id) {
+        if (v instanceof android.widget.TextView && v.getId() == id) {
+            android.widget.TextView tv = (android.widget.TextView) v;
+            if (tv.getCurrentTextColor() != mAccent) tv.setTextColor(mAccent);
+            return;
+        }
+        if (v instanceof android.view.ViewGroup) {
+            android.view.ViewGroup g = (android.view.ViewGroup) v;
+            for (int i = 0; i < g.getChildCount(); i++) recolorLabels(g.getChildAt(i), id);
+        }
+    }
+
     private void tint(Activity act, View decor) {
         refresh();
         int id = act.getResources().getIdentifier("navigation_bar", "id", act.getPackageName());
         if (id == 0) return;
         View bar = decor.findViewById(id);
         if (bar == null) return;
+        // scritta della scheda attiva: accento pieno (di serie e' una trasparenza dell'accento). La vista con la scritta grande e' quella della
+        // scheda selezionata; si rifa a ogni layout perche' l'app la rimette al cambio di scheda
+        try {
+            int largeId = act.getResources().getIdentifier("navigation_bar_item_large_label_view", "id", act.getPackageName());
+            if (largeId != 0) recolorLabels(bar, largeId);
+        } catch (Throwable t) {
+            if (bar.getTag(TAG_BAR + 3) == null) { bar.setTag(TAG_BAR + 3, Boolean.TRUE); XposedBridge.log("[ Obsidian ] RisingTabBarMod label colour: " + t); }
+        }
         Object mine = bar.getTag(TAG_BAR);
         if (mine != null && bar.getBackground() == mine && mine instanceof LayerDrawable
                 && ((Integer) bar.getTag(TAG_BAR + 1)) == (mBg ^ mAccent)) return;
