@@ -45,6 +45,9 @@ public class ContactsMod extends XposedMods {
     private volatile int mAccent = 0xFF908DFF;
     private volatile int mFillNoBorder = 0xFF2B2F3A;
     private long mPropsAt = 0;
+    private volatile int mBg = BLUE_GRAY_DARK;          // sfondo del Theme (system_background_dark)
+    private volatile int mContainer = 0;                // colore "contenitore" che l'app usa come sfondo (system_surface_container_dark)
+    private static final int APP_BLUE = 0xFF0091FF;     // blu fisso di icona e scritta della scheda selezionata
     private float mDensity = 3f;
     private float mScreenW = 1080f;
     private Paint mStroke;
@@ -107,6 +110,10 @@ public class ContactsMod extends XposedMods {
             mScreenW = r.getDisplayMetrics().widthPixels;
             int id = r.getIdentifier("button_material_dark", "color", "android");
             if (id != 0) mFillNoBorder = r.getColor(id, null);
+            id = r.getIdentifier("system_background_dark", "color", "android");
+            if (id != 0) mBg = 0xFF000000 | (r.getColor(id, null) & 0xFFFFFF);
+            id = r.getIdentifier("system_surface_container_dark", "color", "android");
+            if (id != 0) mContainer = 0xFF000000 | (r.getColor(id, null) & 0xFFFFFF);
         } catch (Throwable ignored) {}
     }
 
@@ -118,7 +125,10 @@ public class ContactsMod extends XposedMods {
     private boolean isCard(Paint p, float w, float h) {
         if (p.getStyle() != Paint.Style.FILL || p.getShader() != null) return false;
         int c = p.getColor();
-        if ((c >>> 24) != 255) return false;
+        // le righe dei contatti sono semitrasparenti (colore di superficie al 70%): si accettano anche quelle
+        if ((c >>> 24) < 128) return false;
+        // la barra di navigazione in basso (alta 64 dp) non e' una card
+        if (Math.abs(h / mDensity - 64f) < 1.5f) return false;
         // niente barra di navigazione a tutta larghezza: le card dei contatti hanno un margine ai lati
         if (w < mScreenW * 0.7f || w > mScreenW * 0.985f || h < 40 * mDensity || h > 160 * mDensity) return false;
         float l = luma(c);
@@ -130,6 +140,13 @@ public class ContactsMod extends XposedMods {
         if (p.getStyle() != Paint.Style.FILL || p.getShader() != null) return false;
         if ((p.getColor() >>> 24) < 200) return false;
         return w >= 48 * mDensity && w <= 72 * mDensity && h >= 28 * mDensity && h <= 38 * mDensity;
+    }
+
+    /** Sfondo dell'app: forma grande e piena nel colore "contenitore" della palette di sistema (piu' chiaro dello sfondo del Theme). */
+    private boolean isBg(Paint p, float w, float h) {
+        if (mContainer == 0 || p.getStyle() != Paint.Style.FILL || p.getShader() != null) return false;
+        if (p.getColor() != mContainer) return false;
+        return w >= mScreenW * 0.7f && h >= 20 * mDensity;
     }
 
     private int fill() {
@@ -164,6 +181,11 @@ public class ContactsMod extends XposedMods {
                         l = rc.left; t = rc.top; r = rc.right; b = rc.bottom;
                     } else return;
                     float w = r - l, h = b - t;
+                    if (isBg(p, w, h)) {
+                        param.setObjectExtra("oc", p.getColor());
+                        p.setColor(mBg);
+                        return;
+                    }
                     if (isPill(p, w, h)) {
                         param.setObjectExtra("oc", p.getColor());
                         p.setColor(mAccent);
@@ -209,8 +231,18 @@ public class ContactsMod extends XposedMods {
                     Path path = (Path) param.args[0];
                     Paint p = (Paint) param.args[1];
                     if (p.getStyle() != Paint.Style.FILL || p.getShader() != null) return;
+                    if (p.getColor() == APP_BLUE) {
+                        param.setObjectExtra("oc", p.getColor());
+                        p.setColor(mAccent);
+                        return;
+                    }
                     RectF b = new RectF();
                     path.computeBounds(b, true);
+                    if (isBg(p, b.width(), b.height())) {
+                        param.setObjectExtra("oc", p.getColor());
+                        p.setColor(mBg);
+                        return;
+                    }
                     if (isPill(p, b.width(), b.height())) {
                         param.setObjectExtra("oc", p.getColor());
                         p.setColor(mAccent);
@@ -239,14 +271,83 @@ public class ContactsMod extends XposedMods {
                 } catch (Throwable ignored) {}
             }
         };
+        // drawRect: lo sfondo a tutto schermo; drawTextRun/drawText: la scritta della scheda selezionata (blu fisso -> accento)
+        XC_MethodHook paintSwap = new XC_MethodHook() {
+            private Paint paintOf(Object[] a) {
+                for (int i = a.length - 1; i >= 0; i--) if (a[i] instanceof Paint) return (Paint) a[i];
+                return null;
+            }
+            @Override protected void beforeHookedMethod(MethodHookParam param) {
+                try {
+                    if (mBusy.get() != null) return;
+                    Paint p = paintOf(param.args);
+                    if (p == null) return;
+                    refreshProps();
+                    int c = p.getColor();
+                    if (c == APP_BLUE) {
+                        param.setObjectExtra("oc", c);
+                        p.setColor(mAccent);
+                        return;
+                    }
+                    if (c == mContainer && mContainer != 0 && "drawRect".equals(param.method.getName())
+                            && p.getStyle() == Paint.Style.FILL && p.getShader() == null) {
+                        Object[] a = param.args;
+                        float w, h;
+                        if (a.length >= 5 && a[0] instanceof Float) { w = (Float) a[2] - (Float) a[0]; h = (Float) a[3] - (Float) a[1]; }
+                        else if (a[0] instanceof RectF) { w = ((RectF) a[0]).width(); h = ((RectF) a[0]).height(); }
+                        else if (a[0] instanceof android.graphics.Rect) { w = ((android.graphics.Rect) a[0]).width(); h = ((android.graphics.Rect) a[0]).height(); }
+                        else return;
+                        if (w >= mScreenW * 0.7f && h >= 20 * mDensity) {
+                            param.setObjectExtra("oc", c);
+                            p.setColor(mBg);
+                        }
+                    }
+                } catch (Throwable ignored) {}
+            }
+            @Override protected void afterHookedMethod(MethodHookParam param) {
+                try {
+                    Object oc = param.getObjectExtra("oc");
+                    if (oc == null) return;
+                    Paint p = paintOf(param.args);
+                    if (p != null) p.setColor((Integer) oc);
+                } catch (Throwable ignored) {}
+            }
+        };
         for (String cls : new String[]{"android.graphics.Canvas", "android.graphics.BaseRecordingCanvas",
                 "android.graphics.RecordingCanvas"}) {
             try {
                 Class<?> c = Class.forName(cls);
                 XposedBridge.hookAllMethods(c, "drawRoundRect", roundRect);
                 XposedBridge.hookAllMethods(c, "drawPath", drawPath);
+                XposedBridge.hookAllMethods(c, "drawRect", paintSwap);
+                XposedBridge.hookAllMethods(c, "drawTextRun", paintSwap);
+                XposedBridge.hookAllMethods(c, "drawText", paintSwap);
             } catch (Throwable ignored) {}
         }
+        // RisingOS "LiquidTabBars": trasforma la barra in basso in una pillola di vetro che copre il pulsante + e la colora di blu.
+        // Nei Contatti si spegne: il suo onLayout non fa niente, cosi' resta la barra normale dell'app.
+        try {
+            Class<?> liquid = Class.forName("com.android.internal.penguin.glass.LiquidTabBars");
+            XposedBridge.hookAllMethods(liquid, "onLayout", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam param) { param.setResult(null); }
+            });
+            XposedBridge.log("[ Obsidian ] ContactsMod: LiquidTabBars off");
+        } catch (Throwable t) { XposedBridge.log("[ Obsidian ] ContactsMod: LiquidTabBars hook failed: " + t); }
+        // icona della scheda selezionata: Compose la colora con un filtro (tinta); il blu fisso diventa l'accento
+        XC_MethodHook filterColor = new XC_MethodHook() {
+            @Override protected void beforeHookedMethod(MethodHookParam param) {
+                try {
+                    if (param.args.length > 0 && param.args[0] instanceof Integer && (((Integer) param.args[0]) & 0xFFFFFF) == (APP_BLUE & 0xFFFFFF)) {
+                        refreshProps();
+                        param.args[0] = (((Integer) param.args[0]) & 0xFF000000) | (mAccent & 0xFFFFFF);
+                    }
+                } catch (Throwable ignored) {}
+            }
+        };
+        try { XposedHelpers.findAndHookMethod(Paint.class, "setColor", int.class, filterColor); } catch (Throwable ignored) {}
+        try { XposedBridge.hookAllMethods(android.graphics.ColorFilter.class, "tint", filterColor); } catch (Throwable ignored) {}
+        try { XposedBridge.hookAllConstructors(android.graphics.PorterDuffColorFilter.class, filterColor); } catch (Throwable ignored) {}
+        try { XposedBridge.hookAllConstructors(android.graphics.BlendModeColorFilter.class, filterColor); } catch (Throwable ignored) {}
 
         // Pulsante + e scheda selezionata: View normali, si tingono con l'accento a ogni layout.
         // Quando l'activity compare: piu' punti di aggancio, perche' alcuni onResume sono "inlined" dal runtime.
