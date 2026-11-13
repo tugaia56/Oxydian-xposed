@@ -28,10 +28,10 @@ public class AppColorRemapMod extends XposedMods {
     private static final int ACC = 0;   // segnaposto: accento
     private static final Map<String, int[][]> MAP = new HashMap<>();
     // card riempite con un filtro colore di questo colore: sfondo del Theme + bordo accento
-    private static final Map<String, Integer> CARD = new HashMap<>();
+    private static final Map<String, int[]> CARD = new HashMap<>();
     static {
         MAP.put("com.google.android.apps.weather", new int[][]{{0xFFDBCAFB, ACC}, {0xFF4D4169, 0xFFFFFFFF}, {0xFFFF9993, 0xFFFFFFFF}});
-        CARD.put("com.google.android.apps.weather", 0xFF871F21);
+        CARD.put("com.google.android.apps.weather", new int[]{0xFF871F21, 0xFF101319, 0xFF0E0E0E});
     }
 
     public static boolean handles(String pkg) { return MAP.containsKey(pkg); }
@@ -130,27 +130,41 @@ public class AppColorRemapMod extends XposedMods {
             });
         } catch (Throwable t) { XposedBridge.log("[ Obsidian ] AppColorRemapMod setColorFilter: " + t); }
         // Card che il Meteo riempie con un filtro colore (es. avviso rosso): sfondo del Theme + bordo accento
-        final Integer cardFrom = CARD.get(lpparam.packageName);
+        final int[] cardFrom = CARD.get(lpparam.packageName);
         if (cardFrom != null) {
             try {
                 XposedBridge.hookAllMethods(Class.forName("android.graphics.BaseRecordingCanvas"), "drawRoundRect", new XC_MethodHook() {
+                    private boolean isCardColor(int c) {
+                        for (int f : cardFrom) if ((c & 0xFFFFFF) == (f & 0xFFFFFF)) return true;
+                        return false;
+                    }
                     @Override protected void beforeHookedMethod(MethodHookParam param) {
                         try {
                             int pi = param.args.length - 1;
                             if (!(param.args[pi] instanceof Paint)) return;
+                            Object[] a = param.args;
+                            float wpx = a[0] instanceof android.graphics.RectF ? ((android.graphics.RectF) a[0]).width() : (Float) a[2] - (Float) a[0];
+                            if (wpx < Resources.getSystem().getDisplayMetrics().widthPixels * 0.6f) return;   // solo card grandi
                             Paint P = (Paint) param.args[pi];
                             android.graphics.ColorFilter cf = P.getColorFilter();
-                            if (cf == null) return;
-                            int c; Object mode;
-                            if (cf instanceof android.graphics.BlendModeColorFilter) { c = ((android.graphics.BlendModeColorFilter) cf).getColor(); mode = ((android.graphics.BlendModeColorFilter) cf).getMode(); }
-                            else if (cf instanceof android.graphics.PorterDuffColorFilter) { c = (Integer) XposedHelpers.callMethod(cf, "getColor"); mode = XposedHelpers.callMethod(cf, "getMode"); }
-                            else return;
-                            if ((c & 0xFFFFFF) != (cardFrom & 0xFFFFFF)) return;
-                            refreshAccent();
-                            Paint np = new Paint(P);
-                            np.setColorFilter(mode instanceof android.graphics.BlendMode
-                                    ? new android.graphics.BlendModeColorFilter(mBg, (android.graphics.BlendMode) mode)
-                                    : new android.graphics.PorterDuffColorFilter(mBg, (android.graphics.PorterDuff.Mode) mode));
+                            Paint np = null;
+                            if (cf != null) {
+                                int c; Object mode;
+                                if (cf instanceof android.graphics.BlendModeColorFilter) { c = ((android.graphics.BlendModeColorFilter) cf).getColor(); mode = ((android.graphics.BlendModeColorFilter) cf).getMode(); }
+                                else if (cf instanceof android.graphics.PorterDuffColorFilter) { c = (Integer) XposedHelpers.callMethod(cf, "getColor"); mode = XposedHelpers.callMethod(cf, "getMode"); }
+                                else return;
+                                if (!isCardColor(c)) return;
+                                refreshAccent();
+                                np = new Paint(P);
+                                np.setColorFilter(mode instanceof android.graphics.BlendMode
+                                        ? new android.graphics.BlendModeColorFilter(mBg, (android.graphics.BlendMode) mode)
+                                        : new android.graphics.PorterDuffColorFilter(mBg, (android.graphics.PorterDuff.Mode) mode));
+                            } else if (P.getShader() == null && isCardColor(P.getColor())) {
+                                refreshAccent();
+                                np = new Paint(P);
+                                np.setColor((P.getColor() & 0xFF000000) | (mBg & 0xFFFFFF));
+                            }
+                            if (np == null) return;
                             param.args[pi] = np;
                             param.setObjectExtra("card", Boolean.TRUE);
                         } catch (Throwable ignored) {}
