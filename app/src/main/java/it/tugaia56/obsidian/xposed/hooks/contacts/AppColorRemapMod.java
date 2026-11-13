@@ -17,7 +17,7 @@ import it.tugaia56.obsidian.xposed.XposedMods;
 /**
  * App di Google scritte in Compose: i colori non passano dalle risorse, quindi un overlay non li cambia. Qui si sostituiscono, solo in
  * queste app, alcuni colori esatti nel momento in cui l'app li assegna a un pennello (Paint.setColor) o a un filtro colore
- * (tinta delle icone). ACC = accento scelto nel Theme (persist.oxytheme.accent).
+ * (tinta delle icone). ACC = accento scelto nel Theme (persist.oxytheme.accent), BG = sfondo del Theme, BTN = button_material_dark.
  *
  *  - Meteo (com.google.android.apps.weather): il pulsante di ricerca della localita' (lilla #dbcafb) diventa accento; la card rossa
  *    (filtro #871f21) prende lo sfondo del Theme con bordo accento e il suo testo (#ff9993) diventa bianco.
@@ -26,11 +26,15 @@ import it.tugaia56.obsidian.xposed.XposedMods;
 public class AppColorRemapMod extends XposedMods {
 
     private static final int ACC = 0;   // segnaposto: accento
+    private static final int BG = 1;    // segnaposto: sfondo del Theme (system_background_dark)
+    private static final int BTN = 2;   // segnaposto: button_material_dark
     private static final Map<String, int[][]> MAP = new HashMap<>();
     // card riempite con un filtro colore di questo colore: sfondo del Theme + bordo accento
     private static final Map<String, int[]> CARD = new HashMap<>();
     static {
         MAP.put("com.google.android.apps.weather", new int[][]{{0xFFDBCAFB, ACC}, {0xFF4D4169, 0xFFFFFFFF}, {0xFFFF9993, 0xFFFFFFFF}});
+        // Sicurezza personale: le pagine Impostazioni e il testo di "Configura" non seguono le risorse (restano i colori originali)
+        MAP.put("com.google.android.apps.safetyhub", new int[][]{{0xFF292D36, BG}, {0xFF131314, BG}, {0xFF101319, BTN}, {0xFF303030, 0xFFFFFFFF}});
         CARD.put("com.google.android.apps.weather", new int[]{0xFF871F21, 0xFF101319, 0xFF0E0E0E});
     }
 
@@ -38,6 +42,7 @@ public class AppColorRemapMod extends XposedMods {
 
     private volatile int mAccent = 0xFFE05D00;
     private volatile int mBg = 0xFF1B2029;
+    private volatile int mBtn = 0xFF242832;
     private long mAt = 0;
     private int[][] mRules = new int[0][];
 
@@ -56,6 +61,8 @@ public class AppColorRemapMod extends XposedMods {
             Resources r0 = app0 != null ? app0.getResources() : Resources.getSystem();
             int id0 = r0.getIdentifier("system_background_dark", "color", "android");
             if (id0 != 0) mBg = 0xFF000000 | (r0.getColor(id0, null) & 0xFFFFFF);
+            int id1 = r0.getIdentifier("button_material_dark", "color", "android");
+            if (id1 != 0) mBtn = 0xFF000000 | (r0.getColor(id1, null) & 0xFFFFFF);
         } catch (Throwable ignored) {}
         try {
             Class<?> sp = Class.forName("android.os.SystemProperties");
@@ -74,7 +81,7 @@ public class AppColorRemapMod extends XposedMods {
         for (int[] rule : mRules) {
             if ((c & 0xFFFFFF) == (rule[0] & 0xFFFFFF)) {
                 refreshAccent();
-                int to = rule[1] == ACC ? mAccent : rule[1];
+                int to = rule[1] == ACC ? mAccent : rule[1] == BG ? mBg : rule[1] == BTN ? mBtn : rule[1];
                 return (c & 0xFF000000) | (to & 0xFFFFFF);
             }
         }
