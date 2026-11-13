@@ -132,59 +132,77 @@ public class AppColorRemapMod extends XposedMods {
         // Card che il Meteo riempie con un filtro colore (es. avviso rosso): sfondo del Theme + bordo accento
         final int[] cardFrom = CARD.get(lpparam.packageName);
         if (cardFrom != null) {
+            XC_MethodHook cardHook = new XC_MethodHook() {
+                private boolean isCardColor(int c) {
+                    for (int f : cardFrom) if ((c & 0xFFFFFF) == (f & 0xFFFFFF)) return true;
+                    return false;
+                }
+                /** larghezza della forma in pixel (-1 se non si sa) */
+                private float widthOf(String m, Object[] a) {
+                    try {
+                        if (m.equals("drawRoundRect") || m.equals("drawOval"))
+                            return a[0] instanceof android.graphics.RectF ? ((android.graphics.RectF) a[0]).width() : (Float) a[2] - (Float) a[0];
+                        if (m.equals("drawCircle")) return 2 * (Float) a[2];
+                        if (m.equals("drawPath")) { android.graphics.RectF q = new android.graphics.RectF(); ((android.graphics.Path) a[0]).computeBounds(q, true); return q.width(); }
+                    } catch (Throwable ignored) {}
+                    return -1;
+                }
+                @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    try {
+                        int pi = param.args.length - 1;
+                        if (!(param.args[pi] instanceof Paint)) return;
+                        float wpx = widthOf(param.method.getName(), param.args);
+                        if (wpx < Resources.getSystem().getDisplayMetrics().widthPixels * 0.4f) return;   // solo card e tessere grandi
+                        Paint P = (Paint) param.args[pi];
+                        android.graphics.ColorFilter cf = P.getColorFilter();
+                        Paint np = null;
+                        if (cf != null) {
+                            int c; Object mode;
+                            if (cf instanceof android.graphics.BlendModeColorFilter) { c = ((android.graphics.BlendModeColorFilter) cf).getColor(); mode = ((android.graphics.BlendModeColorFilter) cf).getMode(); }
+                            else if (cf instanceof android.graphics.PorterDuffColorFilter) { c = (Integer) XposedHelpers.callMethod(cf, "getColor"); mode = XposedHelpers.callMethod(cf, "getMode"); }
+                            else return;
+                            if (!isCardColor(c)) return;
+                            refreshAccent();
+                            np = new Paint(P);
+                            np.setColorFilter(mode instanceof android.graphics.BlendMode
+                                    ? new android.graphics.BlendModeColorFilter(mBg, (android.graphics.BlendMode) mode)
+                                    : new android.graphics.PorterDuffColorFilter(mBg, (android.graphics.PorterDuff.Mode) mode));
+                        } else if (P.getShader() == null && P.getStyle() == Paint.Style.FILL && ((P.getColor() >>> 24) == 0xFF) && (isCardColor(P.getColor()) || (P.getColor() & 0xFFFFFF) == 0x1B2029)) {
+                            refreshAccent();
+                            np = new Paint(P);
+                            np.setColor((P.getColor() & 0xFF000000) | (mBg & 0xFFFFFF));
+                        }
+                        if (np == null) return;
+                        param.args[pi] = np;
+                        param.setObjectExtra("card", Boolean.TRUE);
+                    } catch (Throwable ignored) {}
+                }
+                @Override protected void afterHookedMethod(MethodHookParam param) {
+                    try {
+                        if (param.getObjectExtra("card") == null) return;
+                        Object[] a = param.args;
+                        String m = param.method.getName();
+                        float w = 1.5f * Resources.getSystem().getDisplayMetrics().density;
+                        Paint sp = new Paint(Paint.ANTI_ALIAS_FLAG);
+                        sp.setStyle(Paint.Style.STROKE);
+                        sp.setStrokeWidth(w);
+                        sp.setColor(mAccent);
+                        android.graphics.Canvas cv = (android.graphics.Canvas) param.thisObject;
+                        if (m.equals("drawPath")) { cv.drawPath((android.graphics.Path) a[0], sp); return; }
+                        if (m.equals("drawCircle")) { cv.drawCircle((Float) a[0], (Float) a[1], Math.max(0, (Float) a[2] - w / 2), sp); return; }
+                        float l, t, r, b;
+                        if (a[0] instanceof android.graphics.RectF) { android.graphics.RectF q = (android.graphics.RectF) a[0]; l = q.left; t = q.top; r = q.right; b = q.bottom; }
+                        else { l = (Float) a[0]; t = (Float) a[1]; r = (Float) a[2]; b = (Float) a[3]; }
+                        if (m.equals("drawOval")) { cv.drawOval(l + w / 2, t + w / 2, r - w / 2, b - w / 2, sp); return; }
+                        float rx, ry;
+                        if (a[0] instanceof android.graphics.RectF) { rx = (Float) a[1]; ry = (Float) a[2]; } else { rx = (Float) a[4]; ry = (Float) a[5]; }
+                        cv.drawRoundRect(l + w / 2, t + w / 2, r - w / 2, b - w / 2, Math.max(0, rx - w / 2), Math.max(0, ry - w / 2), sp);
+                    } catch (Throwable ignored) {}
+                }
+            };
             try {
-                XposedBridge.hookAllMethods(Class.forName("android.graphics.BaseRecordingCanvas"), "drawRoundRect", new XC_MethodHook() {
-                    private boolean isCardColor(int c) {
-                        for (int f : cardFrom) if ((c & 0xFFFFFF) == (f & 0xFFFFFF)) return true;
-                        return false;
-                    }
-                    @Override protected void beforeHookedMethod(MethodHookParam param) {
-                        try {
-                            int pi = param.args.length - 1;
-                            if (!(param.args[pi] instanceof Paint)) return;
-                            Object[] a = param.args;
-                            float wpx = a[0] instanceof android.graphics.RectF ? ((android.graphics.RectF) a[0]).width() : (Float) a[2] - (Float) a[0];
-                            if (wpx < Resources.getSystem().getDisplayMetrics().widthPixels * 0.6f) return;   // solo card grandi
-                            Paint P = (Paint) param.args[pi];
-                            android.graphics.ColorFilter cf = P.getColorFilter();
-                            Paint np = null;
-                            if (cf != null) {
-                                int c; Object mode;
-                                if (cf instanceof android.graphics.BlendModeColorFilter) { c = ((android.graphics.BlendModeColorFilter) cf).getColor(); mode = ((android.graphics.BlendModeColorFilter) cf).getMode(); }
-                                else if (cf instanceof android.graphics.PorterDuffColorFilter) { c = (Integer) XposedHelpers.callMethod(cf, "getColor"); mode = XposedHelpers.callMethod(cf, "getMode"); }
-                                else return;
-                                if (!isCardColor(c)) return;
-                                refreshAccent();
-                                np = new Paint(P);
-                                np.setColorFilter(mode instanceof android.graphics.BlendMode
-                                        ? new android.graphics.BlendModeColorFilter(mBg, (android.graphics.BlendMode) mode)
-                                        : new android.graphics.PorterDuffColorFilter(mBg, (android.graphics.PorterDuff.Mode) mode));
-                            } else if (P.getShader() == null && isCardColor(P.getColor())) {
-                                refreshAccent();
-                                np = new Paint(P);
-                                np.setColor((P.getColor() & 0xFF000000) | (mBg & 0xFFFFFF));
-                            }
-                            if (np == null) return;
-                            param.args[pi] = np;
-                            param.setObjectExtra("card", Boolean.TRUE);
-                        } catch (Throwable ignored) {}
-                    }
-                    @Override protected void afterHookedMethod(MethodHookParam param) {
-                        try {
-                            if (param.getObjectExtra("card") == null) return;
-                            Object[] a = param.args;
-                            float l, t, r, b, rx, ry;
-                            if (a[0] instanceof android.graphics.RectF) { android.graphics.RectF q = (android.graphics.RectF) a[0]; l = q.left; t = q.top; r = q.right; b = q.bottom; rx = (Float) a[1]; ry = (Float) a[2]; }
-                            else { l = (Float) a[0]; t = (Float) a[1]; r = (Float) a[2]; b = (Float) a[3]; rx = (Float) a[4]; ry = (Float) a[5]; }
-                            float w = 1.5f * Resources.getSystem().getDisplayMetrics().density;
-                            Paint sp = new Paint(Paint.ANTI_ALIAS_FLAG);
-                            sp.setStyle(Paint.Style.STROKE);
-                            sp.setStrokeWidth(w);
-                            sp.setColor(mAccent);
-                            ((android.graphics.Canvas) param.thisObject).drawRoundRect(l + w / 2, t + w / 2, r - w / 2, b - w / 2, Math.max(0, rx - w / 2), Math.max(0, ry - w / 2), sp);
-                        } catch (Throwable ignored) {}
-                    }
-                });
+                Class<?> rc = Class.forName("android.graphics.BaseRecordingCanvas");
+                for (String m : new String[]{"drawRoundRect", "drawOval", "drawCircle", "drawPath"}) XposedBridge.hookAllMethods(rc, m, cardHook);
             } catch (Throwable t) { XposedBridge.log("[ Obsidian ] AppColorRemapMod card: " + t); }
         }
         XposedBridge.log("[ Obsidian ] AppColorRemapMod: rules for " + lpparam.packageName);
