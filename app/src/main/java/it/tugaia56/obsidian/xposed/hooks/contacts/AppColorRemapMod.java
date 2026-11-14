@@ -35,8 +35,8 @@ public class AppColorRemapMod extends XposedMods {
     private static final Map<String, int[]> CARD = new HashMap<>();
     static {
         MAP.put("com.google.android.apps.weather", new int[][]{{0xFFDBCAFB, ACC}, {0xFF4D4169, 0xFFFFFFFF}, {0xFFFF9993, 0xFFFFFFFF}});
-        // Solid Explorer: il suo overlay non si puo' piu' fare (le risorse hanno due pacchetti e il primo non e' il suo). tema Material: 583b68/dbcafb -> accento; tema Onice (usato dall'utente): sfondo nero 000000 e intestazione 171717 -> sfondo del Theme; l'accento del Theme e' anche tra i colori primario/secondario
-        MAP.put("pl.solidexplorer2", new int[][]{{0xFF583B68, ACC}, {0xFFDBCAFB, ACC}, {0xFF000000, BG}, {0xFF171717, BG}});
+        // Solid Explorer: il suo overlay non si puo' piu' fare (le risorse hanno due pacchetti e il primo non e' il suo). tema Material: 583b68/dbcafb -> accento; tema Scuro (usato dall'utente, primario/secondario scelti nell'app): sfondo grigio 303030 -> sfondo del Theme; l'accento del Theme e' anche tra i colori primario/secondario
+        MAP.put("pl.solidexplorer2", new int[][]{{0xFF583B68, ACC}, {0xFFDBCAFB, ACC}, {0xFF303030, BG}});
         // Sicurezza personale: le pagine Impostazioni e il testo di "Configura" non seguono le risorse (restano i colori originali)
         MAP.put("com.google.android.apps.safetyhub", new int[][]{{0xFF292D36, BG}, {0xFF131314, BG}, {0xFF101319, BTN}, {0xFF303030, 0xFFFFFFFF}});
         CARD.put("com.google.android.apps.weather", new int[]{0xFF871F21, 0xFF101319, 0xFF0E0E0E});
@@ -216,14 +216,94 @@ public class AppColorRemapMod extends XposedMods {
                 for (String m : new String[]{"drawRoundRect", "drawOval", "drawCircle", "drawPath"}) XposedBridge.hookAllMethods(rc, m, cardHook);
             } catch (Throwable t) { XposedBridge.log("[ Obsidian ] AppColorRemapMod card: " + t); }
         }
-        if ("pl.solidexplorer2".equals(lpparam.packageName)) installSolidExplorer();
+        if ("pl.solidexplorer2".equals(lpparam.packageName)) installSolidExplorer(lpparam);
         XposedBridge.log("[ Obsidian ] AppColorRemapMod: rules for " + lpparam.packageName);
     }
 
     /**
      * Solid Explorer: l'accento del Theme al posto del viola #673ab7 nel selettore di colore primario/secondario.
      */
-    private void installSolidExplorer() {
+    private void installSolidExplorer(final XC_LoadPackage.LoadPackageParam lpparam0) {
+        // colori di sfondo sostituiti alla creazione del drawable (su OxygenOS 16 gli sfondi non passano dalle chiamate di disegno che si intercettano)
+        try {
+            XposedBridge.hookAllConstructors(android.graphics.drawable.ColorDrawable.class, new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    try { if (param.args.length == 1 && param.args[0] instanceof Integer) param.args[0] = remap((Integer) param.args[0]); } catch (Throwable ignored) {}
+                }
+            });
+            XposedBridge.hookAllMethods(android.graphics.drawable.ColorDrawable.class, "setColor", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    try { if (param.args.length == 1 && param.args[0] instanceof Integer) param.args[0] = remap((Integer) param.args[0]); } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) { XposedBridge.log("[ Obsidian ] AppColorRemapMod Solid ColorDrawable: " + t); }
+        try {
+            Class<?> msd = Class.forName("com.google.android.material.shape.MaterialShapeDrawable", false, lpparam0.classLoader);
+            XposedBridge.hookAllMethods(msd, "setFillColor", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    try {
+                        if (param.args.length == 1 && param.args[0] instanceof android.content.res.ColorStateList) {
+                            android.content.res.ColorStateList cs = (android.content.res.ColorStateList) param.args[0];
+                            int c = cs.getDefaultColor(), m = remap(c);
+                            if (m != c) param.args[0] = android.content.res.ColorStateList.valueOf(m);
+                        }
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) { XposedBridge.log("[ Obsidian ] AppColorRemapMod Solid MaterialShapeDrawable: " + t); }
+        // colori di risorsa (sfondi da @color/...): si sostituiscono quando il sistema carica la risorsa
+        try {
+            XposedBridge.hookAllMethods(Class.forName("android.content.res.ResourcesImpl"), "loadDrawable", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam param) {
+                    try {
+                        Object r = param.getResult();
+                        if (r instanceof android.graphics.drawable.ColorDrawable) {
+                            int c = ((android.graphics.drawable.ColorDrawable) r).getColor(), m = remap(c);
+                            if (m != c) param.setResult(new android.graphics.drawable.ColorDrawable(m));
+                        }
+                    } catch (Throwable ignored) {}
+                }
+            });
+            XposedBridge.hookAllMethods(Resources.class, "getColor", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam param) {
+                    try {
+                        Object r = param.getResult();
+                        if (r instanceof Integer) { int c = (Integer) r, m = remap(c); if (m != c) param.setResult(m); }
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) { XposedBridge.log("[ Obsidian ] AppColorRemapMod Solid resources: " + t); }
+        // sfondi a forma (<shape><solid>) e a colore: si sostituisce il riempimento quando il drawable viene assegnato alla vista
+        try {
+            XC_MethodHook bgHook = new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    try {
+                        Object d = param.args.length > 0 ? param.args[0] : null;
+                        if (d instanceof android.graphics.drawable.GradientDrawable) {
+                            android.graphics.drawable.GradientDrawable g = (android.graphics.drawable.GradientDrawable) d;
+                            android.content.res.ColorStateList cs = g.getColor();
+                            if (cs == null) return;
+                            int c = cs.getDefaultColor(), m = remap(c);
+                            if (m == c) return;
+                            android.graphics.drawable.GradientDrawable mg = (android.graphics.drawable.GradientDrawable) g.mutate();
+                            mg.setColor(m);
+                            param.args[0] = mg;
+                        } else if (d instanceof android.graphics.drawable.ColorDrawable) {
+                            android.graphics.drawable.ColorDrawable cd = (android.graphics.drawable.ColorDrawable) d;
+                            int c = cd.getColor(), m = remap(c);
+                            if (m != c) param.args[0] = new android.graphics.drawable.ColorDrawable(m);
+                        }
+                    } catch (Throwable ignored) {}
+                }
+            };
+            XposedBridge.hookAllMethods(android.view.View.class, "setBackground", bgHook);
+            XposedBridge.hookAllMethods(android.view.View.class, "setBackgroundDrawable", bgHook);
+            XposedBridge.hookAllMethods(android.view.View.class, "setBackgroundColor", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    try { param.args[0] = remap((Integer) param.args[0]); } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) { XposedBridge.log("[ Obsidian ] AppColorRemapMod Solid background: " + t); }
         // sostituzione dei colori nel momento del disegno (su Android 16 Paint.setColor chiamato dal framework non passa dal nostro hook)
         try {
             XC_MethodHook drawHook = new XC_MethodHook() {
