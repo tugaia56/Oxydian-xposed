@@ -35,8 +35,8 @@ public class AppColorRemapMod extends XposedMods {
     private static final Map<String, int[]> CARD = new HashMap<>();
     static {
         MAP.put("com.google.android.apps.weather", new int[][]{{0xFFDBCAFB, ACC}, {0xFF4D4169, 0xFFFFFFFF}, {0xFFFF9993, 0xFFFFFFFF}});
-        // Solid Explorer: il suo overlay non si puo' piu' fare (le risorse hanno due pacchetti e il primo non e' il suo). tema Material: 583b68/dbcafb -> accento; l'utente usa il tema Onice dell'app (intestazione scura gia' sua), quindi niente altro: solo l'accento del Theme tra i colori primario/secondario
-        MAP.put("pl.solidexplorer2", new int[][]{{0xFF583B68, ACC}, {0xFFDBCAFB, ACC}});
+        // Solid Explorer: il suo overlay non si puo' piu' fare (le risorse hanno due pacchetti e il primo non e' il suo). tema Material: 583b68/dbcafb -> accento; tema Onice (usato dall'utente): sfondo nero 000000 e intestazione 171717 -> sfondo del Theme; l'accento del Theme e' anche tra i colori primario/secondario
+        MAP.put("pl.solidexplorer2", new int[][]{{0xFF583B68, ACC}, {0xFFDBCAFB, ACC}, {0xFF000000, BG}, {0xFF171717, BG}});
         // Sicurezza personale: le pagine Impostazioni e il testo di "Configura" non seguono le risorse (restano i colori originali)
         MAP.put("com.google.android.apps.safetyhub", new int[][]{{0xFF292D36, BG}, {0xFF131314, BG}, {0xFF101319, BTN}, {0xFF303030, 0xFFFFFFFF}});
         CARD.put("com.google.android.apps.weather", new int[]{0xFF871F21, 0xFF101319, 0xFF0E0E0E});
@@ -224,6 +224,32 @@ public class AppColorRemapMod extends XposedMods {
      * Solid Explorer: l'accento del Theme al posto del viola #673ab7 nel selettore di colore primario/secondario.
      */
     private void installSolidExplorer() {
+        // sostituzione dei colori nel momento del disegno (su Android 16 Paint.setColor chiamato dal framework non passa dal nostro hook)
+        try {
+            XC_MethodHook drawHook = new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    try {
+                        Object[] a = param.args;
+                        if (param.method.getName().equals("drawColor")) {
+                            if (a.length > 0 && a[0] instanceof Integer) { int c = (Integer) a[0]; int m = remap(c); if (m != c) a[0] = m; }
+                            return;
+                        }
+                        int pi = a.length - 1;
+                        if (!(a[pi] instanceof android.graphics.Paint)) return;
+                        android.graphics.Paint P = (android.graphics.Paint) a[pi];
+                        if (P.getShader() != null) return;
+                        int c = P.getColor(), m = remap(c);
+                        if (m == c) return;
+                        android.graphics.Paint np = new android.graphics.Paint(P);
+                        np.setColor(m);
+                        a[pi] = np;
+                    } catch (Throwable ignored) {}
+                }
+            };
+            Class<?> rc = Class.forName("android.graphics.BaseRecordingCanvas");
+            for (String m : new String[]{"drawRect", "drawRoundRect", "drawPath", "drawOval", "drawCircle", "drawArc", "drawPaint", "drawColor", "drawText", "drawTextRun"})
+                XposedBridge.hookAllMethods(rc, m, drawHook);
+        } catch (Throwable t) { XposedBridge.log("[ Obsidian ] AppColorRemapMod Solid draw: " + t); }
         // selettore colori: il 4o dei 20 colori (viola #673ab7) diventa l'accento del Theme
         try {
             XposedBridge.hookAllMethods(Resources.class, "getIntArray", new XC_MethodHook() {
