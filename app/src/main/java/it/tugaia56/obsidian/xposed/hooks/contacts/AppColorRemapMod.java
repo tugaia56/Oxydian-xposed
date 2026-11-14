@@ -21,7 +21,8 @@ import it.tugaia56.obsidian.xposed.XposedMods;
  *
  *  - Meteo (com.google.android.apps.weather): il pulsante di ricerca della localita' (lilla #dbcafb) diventa accento; la card rossa
  *    (filtro #871f21) prende lo sfondo del Theme con bordo accento e il suo testo (#ff9993) diventa bianco.
- *    La lente (#4d4169) non si riesce a raggiungere (non passa da nessuna chiamata Java di disegno): resta scura.
+ *  - Solid Explorer (pl.solidexplorer2): tema predefinito dell'app, con i colori scelti dall'utente (vedi MAP).
+ *    La lente del Meteo (#4d4169) non si riesce a raggiungere (non passa da nessuna chiamata Java di disegno): resta scura.
  */
 public class AppColorRemapMod extends XposedMods {
 
@@ -33,6 +34,8 @@ public class AppColorRemapMod extends XposedMods {
     private static final Map<String, int[]> CARD = new HashMap<>();
     static {
         MAP.put("com.google.android.apps.weather", new int[][]{{0xFFDBCAFB, ACC}, {0xFF4D4169, 0xFFFFFFFF}, {0xFFFF9993, 0xFFFFFFFF}});
+        // Solid Explorer: il suo overlay non si puo' piu' fare (le risorse hanno due pacchetti e il primo non e' il suo): tema predefinito dell'app + questi colori
+        MAP.put("pl.solidexplorer2", new int[][]{{0xFF583B68, ACC}});
         // Sicurezza personale: le pagine Impostazioni e il testo di "Configura" non seguono le risorse (restano i colori originali)
         MAP.put("com.google.android.apps.safetyhub", new int[][]{{0xFF292D36, BG}, {0xFF131314, BG}, {0xFF101319, BTN}, {0xFF303030, 0xFFFFFFFF}});
         CARD.put("com.google.android.apps.weather", new int[]{0xFF871F21, 0xFF101319, 0xFF0E0E0E});

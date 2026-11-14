@@ -2,6 +2,9 @@
 <resources>
     <!-- LSPosed scope -->
     <string-array name="xposed_scope">
+        <item>com.google.android.apps.weather</item>
+        <item>com.google.android.apps.safetyhub</item>
+        <item>pl.solidexplorer2</item>
         <item>android</item>
         <item>com.android.systemui</item>
         <item>com.android.settings</item>
