@@ -35,7 +35,7 @@ public class AppColorRemapMod extends XposedMods {
     static {
         MAP.put("com.google.android.apps.weather", new int[][]{{0xFFDBCAFB, ACC}, {0xFF4D4169, 0xFFFFFFFF}, {0xFFFF9993, 0xFFFFFFFF}});
         // Solid Explorer: il suo overlay non si puo' piu' fare (le risorse hanno due pacchetti e il primo non e' il suo): tema predefinito dell'app + questi colori
-        MAP.put("pl.solidexplorer2", new int[][]{{0xFF583B68, ACC}});
+        MAP.put("pl.solidexplorer2", new int[][]{{0xFF583B68, ACC}, {0xFFDBCAFB, ACC}});
         // Sicurezza personale: le pagine Impostazioni e il testo di "Configura" non seguono le risorse (restano i colori originali)
         MAP.put("com.google.android.apps.safetyhub", new int[][]{{0xFF292D36, BG}, {0xFF131314, BG}, {0xFF101319, BTN}, {0xFF303030, 0xFFFFFFFF}});
         CARD.put("com.google.android.apps.weather", new int[]{0xFF871F21, 0xFF101319, 0xFF0E0E0E});
