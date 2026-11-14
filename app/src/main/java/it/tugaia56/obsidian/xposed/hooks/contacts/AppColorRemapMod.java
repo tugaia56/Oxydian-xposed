@@ -35,8 +35,8 @@ public class AppColorRemapMod extends XposedMods {
     private static final Map<String, int[]> CARD = new HashMap<>();
     static {
         MAP.put("com.google.android.apps.weather", new int[][]{{0xFFDBCAFB, ACC}, {0xFF4D4169, 0xFFFFFFFF}, {0xFFFF9993, 0xFFFFFFFF}});
-        // Solid Explorer: il suo overlay non si puo' piu' fare (le risorse hanno due pacchetti e il primo non e' il suo). tema Material: 583b68/dbcafb -> accento; tema Scuro (usato dall'utente, primario/secondario scelti nell'app): sfondo grigio 303030 -> sfondo del Theme; l'accento del Theme e' anche tra i colori primario/secondario
-        MAP.put("pl.solidexplorer2", new int[][]{{0xFF583B68, ACC}, {0xFFDBCAFB, ACC}, {0xFF303030, BG}});
+        // Solid Explorer: il suo overlay non si puo' piu' fare (le risorse hanno due pacchetti e il primo non e' il suo). tema Material: 583b68/dbcafb -> accento; temi Scuro (sfondo 303030) e Onice (sfondo nero 000000, intestazione 171717): -> sfondo del Theme; primario/secondario si scelgono nell'app; l'accento del Theme e' anche tra i colori primario/secondario
+        MAP.put("pl.solidexplorer2", new int[][]{{0xFF583B68, ACC}, {0xFFDBCAFB, ACC}, {0xFF303030, BG}, {0xFF000000, BG}, {0xFF171717, BG}});
         // Sicurezza personale: le pagine Impostazioni e il testo di "Configura" non seguono le risorse (restano i colori originali)
         MAP.put("com.google.android.apps.safetyhub", new int[][]{{0xFF292D36, BG}, {0xFF131314, BG}, {0xFF101319, BTN}, {0xFF303030, 0xFFFFFFFF}});
         CARD.put("com.google.android.apps.weather", new int[]{0xFF871F21, 0xFF101319, 0xFF0E0E0E});
