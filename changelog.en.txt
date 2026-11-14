@@ -1,0 +1,13 @@
+Added:
+- Which file to download: Oxydian-release-1.1.13.apk is for OnePlus phones with OxygenOS (full LSPosed scope). Oxydian-Android-release-1.1.13.apk is for pure Android ROMs (RisingOS, crDroid, Android 17...): its LSPosed scope lists Settings, SystemUI and the app mods below
+- New app mods: Google Weather (search button in the accent, red alert card and weather tiles in the Theme background with an accent border), Personal Safety (settings pages in the Theme colours, white text on accent buttons) and Solid Explorer (Theme accent in the primary/secondary colour picker, first-run page and + button in the accent, Dark and Onyx themes in the Theme background). Add them to the LSPosed scope (the recommended list has them)
+- Contacts, Messages and Clock mods also on pure Android: Contacts and Clock get a flat bottom bar in the Theme background with an accent line, cards in the Theme colours (Clock cards with an accent border), accent labels, and RisingOS glass bar pill off
+- RisingOS power menu: texts translated into Italian, accent border, "glass" look option, restart slider with the accent knob
+- Android: the "Select USB mode" window remembers the last mode and can be hidden
+- Android: Emergency button hidden on the PIN keypad (RisingOS, crDroid) when "Hide SOS" is on
+- Android: the pressed PIN key takes the Theme accent straight away, also at the first PIN screen after boot
+- Android: the notification shade becomes glass (5%) automatically when window blur is on (not on RisingOS)
+- aCalendar+: the "today" highlight follows the Theme accent
+- LSPosed recommended scope: Oxydian Theme app, Solid Explorer, Weather and Personal Safety (the Android build lists all its app mods)
+Changed:
+- Switches in the Theme style now also work on MaterialSwitch (Material rebuilds track and thumb on every redraw)

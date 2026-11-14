@@ -1,0 +1,13 @@
+Aggiunto:
+- Quale file scaricare: Oxydian-release-1.1.13.apk è per i OnePlus con OxygenOS (ambito LSPosed completo). Oxydian-Android-release-1.1.13.apk è per le ROM Android puro (RisingOS, crDroid, Android 17...): nel suo ambito LSPosed ci sono Impostazioni, SystemUI e le mod delle app qui sotto
+- Nuove mod per le app: Google Meteo (pulsante di ricerca in accento, card di allerta rossa e tessere del meteo con lo sfondo del Theme e bordo accento), Sicurezza personale (pagine Impostazioni nei colori del Theme, testo bianco sui pulsanti accento) e Solid Explorer (accento del Theme tra i colori primario/secondario, pagina iniziale e pulsante + in accento, temi Scuro e Onice con lo sfondo del Theme). Aggiungile all'ambito di LSPosed (sono nell'elenco consigliato)
+- Mod di Contatti, Messaggi e Orologio anche su Android puro: Contatti e Orologio hanno la barra in basso piatta con lo sfondo del Theme e una riga accento, card nei colori del Theme (con bordo accento nell'Orologio), etichette in accento, e la pillola di vetro di RisingOS spenta
+- Menù di spegnimento di RisingOS: testi tradotti in italiano, bordo accento, opzione effetto vetro, cursore di riavvio con il pomello accento
+- Android: la finestra "Seleziona modalità USB" ricorda l'ultima modalità e si può nascondere
+- Android: pulsante Emergenza nascosto sul tastierino del PIN (RisingOS, crDroid) quando "Nascondi SOS" è acceso
+- Android: il tasto premuto del PIN prende subito l'accento del Theme, anche alla prima schermata del PIN dopo l'avvio
+- Android: il pannello delle notifiche diventa vetro (5%) da solo quando la sfocatura delle finestre è accesa (non su RisingOS)
+- aCalendar+: l'evidenziazione di "oggi" segue l'accento del Theme
+- Ambito consigliato di LSPosed: app Oxydian Theme, Solid Explorer, Meteo e Sicurezza personale (la versione Android elenca tutte le sue mod per le app)
+Aggiornato:
+- Gli interruttori nello stile del Theme funzionano anche con MaterialSwitch (Material rifà barra e tondo a ogni ridisegno)
