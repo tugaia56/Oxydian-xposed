@@ -34,8 +34,8 @@ public class AppColorRemapMod extends XposedMods {
     private static final Map<String, int[]> CARD = new HashMap<>();
     static {
         MAP.put("com.google.android.apps.weather", new int[][]{{0xFFDBCAFB, ACC}, {0xFF4D4169, 0xFFFFFFFF}, {0xFFFF9993, 0xFFFFFFFF}});
-        // Solid Explorer: il suo overlay non si puo' piu' fare (le risorse hanno due pacchetti e il primo non e' il suo): tema predefinito dell'app + questi colori
-        MAP.put("pl.solidexplorer2", new int[][]{{0xFF583B68, ACC}, {0xFFDBCAFB, ACC}});
+        // Solid Explorer: il suo overlay non si puo' piu' fare (le risorse hanno due pacchetti e il primo non e' il suo). Temi dell'app: Material (583b68/dbcafb -> accento) e Scuro (sfondo 303030 -> sfondo del Theme, finestre 424242 -> button_material_dark); gli accenti del tema Scuro si regolano nell'app
+        MAP.put("pl.solidexplorer2", new int[][]{{0xFF583B68, ACC}, {0xFFDBCAFB, ACC}, {0xFF303030, BG}, {0xFF424242, BTN}});
         // Sicurezza personale: le pagine Impostazioni e il testo di "Configura" non seguono le risorse (restano i colori originali)
         MAP.put("com.google.android.apps.safetyhub", new int[][]{{0xFF292D36, BG}, {0xFF131314, BG}, {0xFF101319, BTN}, {0xFF303030, 0xFFFFFFFF}});
         CARD.put("com.google.android.apps.weather", new int[]{0xFF871F21, 0xFF101319, 0xFF0E0E0E});
@@ -215,6 +215,98 @@ public class AppColorRemapMod extends XposedMods {
                 for (String m : new String[]{"drawRoundRect", "drawOval", "drawCircle", "drawPath"}) XposedBridge.hookAllMethods(rc, m, cardHook);
             } catch (Throwable t) { XposedBridge.log("[ Obsidian ] AppColorRemapMod card: " + t); }
         }
+        if ("pl.solidexplorer2".equals(lpparam.packageName)) installSolidExplorer();
         XposedBridge.log("[ Obsidian ] AppColorRemapMod: rules for " + lpparam.packageName);
+    }
+
+    /**
+     * Solid Explorer (tema Scuro): intestazione e barra di stato con il colore del Theme (come il suo tema Onice, ma con gli accenti regolabili), e l'accento del Theme come ultimo colore del selettore di colore primario/secondario.
+     */
+    private void installSolidExplorer() {
+        // barra del titolo = ColorDrawable a tutta larghezza e alto 48-150 dp: si disegna con lo sfondo del Theme
+        try {
+            XposedHelpers.findAndHookMethod(android.graphics.drawable.ColorDrawable.class, "draw", android.graphics.Canvas.class, new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    try {
+                        android.graphics.drawable.ColorDrawable d = (android.graphics.drawable.ColorDrawable) param.thisObject;
+                        android.graphics.Rect b = d.getBounds();
+                        android.util.DisplayMetrics dm = Resources.getSystem().getDisplayMetrics();
+                        if (b.width() < dm.widthPixels * 0.95f) return;
+                        // barra del titolo (48-150 dp) oppure fondo della finestra a schermo intero (e' quello che si vede sotto la barra di stato e il titolo)
+                        boolean bar = b.height() >= 48 * dm.density && b.height() <= 150 * dm.density;
+                        boolean full = b.height() >= dm.heightPixels * 0.9f;
+                        if (!bar && !full) return;
+                        int c = d.getColor();
+                        if ((c >>> 24) != 0xFF) return;
+                        refreshAccent();
+                        if ((c & 0xFFFFFF) == (mBg & 0xFFFFFF)) return;
+                        android.graphics.Paint p = new android.graphics.Paint();
+                        p.setColor(mBg);
+                        ((android.graphics.Canvas) param.args[0]).drawRect(b, p);
+                        param.setResult(null);
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) { XposedBridge.log("[ Obsidian ] AppColorRemapMod Solid header: " + t); }
+        // intestazione (AppBarLayout) e striscia sotto la barra di stato: rettangoli pieni a tutta larghezza, alti 24-200 dp (o schermo intero),
+        // disegnati con il colore primario scelto nell'app -> si disegnano con lo sfondo del Theme (come il tema Onice, ma con gli accenti regolabili)
+        try {
+            XC_MethodHook barHook = new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    try {
+                        String m = param.method.getName();
+                        Object[] a = param.args;
+                        int pi = a.length - 1;
+                        if (!(a[pi] instanceof android.graphics.Paint)) return;
+                        android.graphics.Paint P = (android.graphics.Paint) a[pi];
+                        if (P.getStyle() != android.graphics.Paint.Style.FILL || P.getShader() != null || P.getColorFilter() != null) return;
+                        int c = P.getColor();
+                        if ((c >>> 24) != 0xFF) return;
+                        float w, h;
+                        if (m.equals("drawPath")) {
+                            android.graphics.RectF q = new android.graphics.RectF();
+                            ((android.graphics.Path) a[0]).computeBounds(q, true);
+                            w = q.width(); h = q.height();
+                        } else if (a[0] instanceof android.graphics.RectF) {
+                            w = ((android.graphics.RectF) a[0]).width(); h = ((android.graphics.RectF) a[0]).height();
+                        } else if (a[0] instanceof android.graphics.Rect) {
+                            w = ((android.graphics.Rect) a[0]).width(); h = ((android.graphics.Rect) a[0]).height();
+                        } else if (a[0] instanceof Float) {
+                            w = (Float) a[2] - (Float) a[0]; h = (Float) a[3] - (Float) a[1];
+                        } else return;
+                        android.util.DisplayMetrics dm = Resources.getSystem().getDisplayMetrics();
+                        if (w < dm.widthPixels * 0.95f) return;
+                        boolean bar = h >= 24 * dm.density && h <= 200 * dm.density;
+                        boolean full = h >= dm.heightPixels * 0.9f;
+                        if (!bar && !full) return;
+                        refreshAccent();
+                        if ((c & 0xFFFFFF) == (mBg & 0xFFFFFF)) return;
+                        android.graphics.Paint np = new android.graphics.Paint(P);
+                        np.setColor(mBg);
+                        a[pi] = np;
+                    } catch (Throwable ignored) {}
+                }
+            };
+            Class<?> rc = Class.forName("android.graphics.BaseRecordingCanvas");
+            for (String m : new String[]{"drawRect", "drawRoundRect", "drawPath"}) XposedBridge.hookAllMethods(rc, m, barHook);
+        } catch (Throwable t) { XposedBridge.log("[ Obsidian ] AppColorRemapMod Solid bar: " + t); }
+        // selettore colori: l'ultimo dei 20 colori (grigio scuro) diventa l'accento del Theme
+        try {
+            XposedBridge.hookAllMethods(Resources.class, "getIntArray", new XC_MethodHook() {
+                private int mId = -1;
+                @Override protected void afterHookedMethod(MethodHookParam param) {
+                    try {
+                        if (mId == -1) mId = ((Resources) param.thisObject).getIdentifier("theme_colors", "array", "pl.solidexplorer2");
+                        if (mId == 0 || (Integer) param.args[0] != mId) return;
+                        int[] a = (int[]) param.getResult();
+                        if (a == null || a.length < 2) return;
+                        refreshAccent();
+                        int[] copy = a.clone();
+                        copy[copy.length - 1] = mAccent;
+                        param.setResult(copy);
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) { XposedBridge.log("[ Obsidian ] AppColorRemapMod Solid palette: " + t); }
     }
 }
