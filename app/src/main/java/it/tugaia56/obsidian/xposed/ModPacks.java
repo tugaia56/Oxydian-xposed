@@ -135,6 +135,7 @@ public class ModPacks {
             mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.PowerMenuTileMod.class);   // menu di spegnimento Compose: icona piu' piccola e piu' spazio al testo nei tasti larghi
             mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.PowerMenuItalianMod.class);   // menu di spegnimento Compose: scritte nel codice tradotte in italiano
             mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.PowerMenuAccentMod.class);   // menu di spegnimento Compose: bordo accento (opzione) e icone Riavvia in accento
+            mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.RisingFpScaleMod.class);   // RisingOS: cursore "Ridimensionamento icona impronta" sull'icona scelta in Impostazioni risingOS
             return mods;
         }
         if (Constants.Packages.SETTINGS.equals(packageName)

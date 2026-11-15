@@ -117,7 +117,8 @@ public class DstTabFragment extends Fragment {
                         "pin", "icone", "icons", "overlay")
         );
 
-        NavAdapter navAdapter = new NavAdapter(items);
+        NavAdapter navAdapter = new NavAdapter(
+                it.tugaia56.obsidian.ui.PureAndroidFilter.filter(requireContext(), items));
         rv.setAdapter(navAdapter);
     }
 

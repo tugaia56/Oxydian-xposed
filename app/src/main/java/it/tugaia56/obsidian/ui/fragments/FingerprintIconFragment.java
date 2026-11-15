@@ -135,10 +135,16 @@ public class FingerprintIconFragment extends Fragment {
 
         SliderWidgetAdapter scaleAdapter = scaleRow();
 
-        List<RecyclerView.Adapter<?>> chain = new ArrayList<>(toggleChain);
-        GroupUtils.addGroup(chain, List.of(colorRow()));
-        chain.add(navAdapter);
-        chain.add(scaleAdapter);
+        List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
+        if (it.tugaia56.obsidian.ui.PureAndroidFilter.active()) {
+            // Android puro (RisingOS): le icone le sceglie la ROM, qui resta solo la misura
+            chain.add(scaleAdapter);
+        } else {
+            chain.addAll(toggleChain);
+            GroupUtils.addGroup(chain, List.of(colorRow()));
+            chain.add(navAdapter);
+            chain.add(scaleAdapter);
+        }
         rv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
 

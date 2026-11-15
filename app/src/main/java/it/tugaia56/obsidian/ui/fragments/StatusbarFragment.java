@@ -53,8 +53,8 @@ public class StatusbarFragment extends Fragment {
 
         mNavItems.clear();
 
-        // 1. Orologio & Calendario
-        mNavItems.add(new NavAdapter.NavItem(
+        // 1. Orologio & Calendario (su Android puro non funziona: nascosto)
+        if (!it.tugaia56.obsidian.ui.PureAndroidFilter.active()) mNavItems.add(new NavAdapter.NavItem(
                 R.drawable.ic_clock,
                 getString(R.string.section_clock_date),
                 getString(R.string.nav_clock_date_summary),

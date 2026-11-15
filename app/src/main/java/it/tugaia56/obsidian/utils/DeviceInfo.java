@@ -22,6 +22,11 @@ public final class DeviceInfo {
         return os + " · " + market;
     }
 
+    /** True su ROM diverse da OxygenOS/ColorOS (RisingOS, crDroid...): stessa regola di XPLauncher.isOplusRom. */
+    public static boolean isPureAndroid() {
+        return sysProp("ro.build.version.oplusrom").isEmpty() && sysProp("ro.build.version.opporom").isEmpty();
+    }
+
     /** Riepilogo per il log di diagnostica: modello, build ROM, Android, versione Oxydian. */
     public static String diagnosticSummary() {
         String nl = System.lineSeparator();

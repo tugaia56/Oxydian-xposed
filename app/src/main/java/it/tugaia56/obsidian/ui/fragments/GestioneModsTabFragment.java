@@ -125,7 +125,8 @@ public class GestioneModsTabFragment extends Fragment {
                         "posizione", "position", "colore", "color")
         );
 
-        NavAdapter navAdapter = new NavAdapter(items);
+        NavAdapter navAdapter = new NavAdapter(
+                it.tugaia56.obsidian.ui.PureAndroidFilter.filter(requireContext(), items));
         rv.setAdapter(navAdapter);
     }
 

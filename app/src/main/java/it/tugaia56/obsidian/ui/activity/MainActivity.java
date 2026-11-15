@@ -821,6 +821,9 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
                 PowerMenuFragment::new, getString(R.string.nav_misc_power_menu),
                 "power menu", "accensione", "spegnimento", "menù accensione"));
 
+        if (it.tugaia56.obsidian.ui.PureAndroidFilter.active()) {
+            all.removeIf(e -> it.tugaia56.obsidian.ui.PureAndroidFilter.hiddenPage(e.pageSupplier));
+        }
         return all;
     }
 

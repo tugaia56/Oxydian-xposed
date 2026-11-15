@@ -103,7 +103,8 @@ public class HomeFragment extends Fragment {
                                 getString(R.string.nav_settings)))
         );
 
-        rv.setAdapter(new ConcatAdapter(headerAdapter, new NavAdapter(items)));
+        rv.setAdapter(new ConcatAdapter(headerAdapter, new NavAdapter(
+                it.tugaia56.obsidian.ui.PureAndroidFilter.filter(requireContext(), items))));
     }
 
     private void navigate(Fragment fragment, String title) {
