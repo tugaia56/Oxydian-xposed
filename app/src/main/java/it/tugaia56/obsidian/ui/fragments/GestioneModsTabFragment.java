@@ -125,8 +125,27 @@ public class GestioneModsTabFragment extends Fragment {
                         "posizione", "position", "colore", "color")
         );
 
-        NavAdapter navAdapter = new NavAdapter(
+        List<NavAdapter.NavItem> shown = new java.util.ArrayList<>(
                 it.tugaia56.obsidian.ui.PureAndroidFilter.filter(requireContext(), items));
+        if (it.tugaia56.obsidian.ui.PureAndroidFilter.active()) {
+            // Android puro: il tab Oxydian non c'e' (era vuoto), le sue card stanno qui
+            shown.add(new NavAdapter.NavItem(
+                    R.drawable.ic_settings,
+                    getString(R.string.nav_boot_log), getString(R.string.nav_boot_log_summary),
+                    () -> navigate(new BootLogFragment(), getString(R.string.nav_boot_log)),
+                    0xFFFF6E40, "avvio", "boot", "log"));
+            shown.add(new NavAdapter.NavItem(
+                    R.drawable.ic_settings,
+                    getString(R.string.nav_misc), getString(R.string.nav_misc_summary_pure),
+                    () -> navigate(new MiscFragment(), getString(R.string.nav_misc)),
+                    0xFFFF6E40, "varie", "misc", "usb", "accensione", "power menu"));
+            shown.add(new NavAdapter.NavItem(
+                    R.drawable.ic_drawing,
+                    getString(R.string.nav_oxytheme), getString(R.string.nav_oxytheme_summary),
+                    () -> it.tugaia56.obsidian.utils.OxydianThemeLauncher.open(requireContext()),
+                    0xFF7C4DFF, "substratum", "tema", "theme", "accento", "accent", "sfondo", "colore", "pin", "icone", "overlay"));
+        }
+        NavAdapter navAdapter = new NavAdapter(shown);
         rv.setAdapter(navAdapter);
     }
 

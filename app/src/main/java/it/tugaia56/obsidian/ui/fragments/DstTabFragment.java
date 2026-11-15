@@ -119,16 +119,6 @@ public class DstTabFragment extends Fragment {
 
         List<NavAdapter.NavItem> shown = new java.util.ArrayList<>(
                 it.tugaia56.obsidian.ui.PureAndroidFilter.filter(requireContext(), items));
-        if (it.tugaia56.obsidian.ui.PureAndroidFilter.active()) {
-            // Android puro: la card "Log di avvio" di Varie sta qui nella Home
-            shown.add(0, new NavAdapter.NavItem(
-                    R.drawable.ic_settings,
-                    getString(R.string.nav_boot_log),
-                    getString(R.string.nav_boot_log_summary),
-                    () -> navigate(new BootLogFragment(), getString(R.string.nav_boot_log)),
-                    0xFFFF6E40,
-                    "avvio", "boot", "log"));
-        }
         NavAdapter navAdapter = new NavAdapter(shown);
         rv.setAdapter(navAdapter);
     }

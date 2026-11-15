@@ -127,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
         setContentView(R.layout.activity_main);
 
         mBottomNav             = findViewById(R.id.bottom_nav);
+        // Android puro: il tab Oxydian resterebbe vuoto (Varie, Log di avvio e Oxydian Theme stanno in Mods)
+        if (it.tugaia56.obsidian.ui.PureAndroidFilter.active() && mBottomNav.getMenu().findItem(R.id.tab_dst) != null)
+            mBottomNav.getMenu().findItem(R.id.tab_dst).setVisible(false);
         applyAccentChrome();
         // l'accento di Oxy Theme si legge da root in secondo piano: quando cambia, titolo e barra si aggiornano
         it.tugaia56.obsidian.utils.ThemeOverride.setOnChange(this::applyAccentChrome);
@@ -823,6 +826,10 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
 
         if (it.tugaia56.obsidian.ui.PureAndroidFilter.active()) {
             all.removeIf(e -> it.tugaia56.obsidian.ui.PureAndroidFilter.hiddenPage(e.pageSupplier));
+            // il tab Oxydian non c'e': le voci che ci portavano vanno al tab Mods
+            all.replaceAll(e -> e.tabId == R.id.tab_dst
+                    ? new SearchEntry(e.title, e.subtitle, e.iconRes, e.accentColor, R.id.tab_mods, e.pageSupplier, e.pageTitle, e.keywords)
+                    : e);
         }
         return all;
     }
@@ -887,7 +894,7 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
         return switch (value) {
             case "mods" -> R.id.tab_mods;
             case "settings" -> R.id.tab_settings;
-            default -> R.id.tab_dst;
+            default -> it.tugaia56.obsidian.ui.PureAndroidFilter.active() ? R.id.tab_mods : R.id.tab_dst;
         };
     }
 

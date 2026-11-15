@@ -195,7 +195,7 @@ public class SettingsGeneralFragment extends Fragment {
         return switch (value) {
             case "mods" -> getString(R.string.tab_mods);
             case "settings" -> getString(R.string.tab_settings);
-            default -> getString(R.string.tab_dst);
+            default -> it.tugaia56.obsidian.ui.PureAndroidFilter.active() ? getString(R.string.tab_mods) : getString(R.string.tab_dst);
         };
     }
 
@@ -204,15 +204,18 @@ public class SettingsGeneralFragment extends Fragment {
         int currentIdx = 0;
         for (int i = 0; i < TAB_VALUES.length; i++) if (TAB_VALUES[i].equals(current)) currentIdx = i;
 
-        String[] entries = {
-                getString(R.string.tab_dst), getString(R.string.tab_mods), getString(R.string.tab_settings)
-        };
+        boolean pure = it.tugaia56.obsidian.ui.PureAndroidFilter.active();   // Android puro: niente tab Oxydian
+        String[] entries = pure
+                ? new String[]{getString(R.string.tab_mods), getString(R.string.tab_settings)}
+                : new String[]{getString(R.string.tab_dst), getString(R.string.tab_mods), getString(R.string.tab_settings)};
+        if (pure) currentIdx = "settings".equals(current) ? 1 : 0;
+        final int off = pure ? 1 : 0;
         final int[] selected = {currentIdx};
         androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.settings_default_tab_title)
                 .setSingleChoiceItems(entries, currentIdx, (d, which) -> selected[0] = which)
                 .setPositiveButton(R.string.apply, (d, w) -> {
-                    ObsidianPrefs.putString(MainActivity.KEY_DEFAULT_TAB, TAB_VALUES[selected[0]]);
+                    ObsidianPrefs.putString(MainActivity.KEY_DEFAULT_TAB, TAB_VALUES[selected[0] + off]);
                     rebuild();
                 })
                 .setNegativeButton(R.string.close, null)
