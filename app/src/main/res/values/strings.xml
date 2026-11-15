@@ -1418,6 +1418,6 @@
     <string name="logs_delete_title">Delete saved logs</string>
     <string name="health_delete_title">Delete saved status files</string>
     <string name="backup_delete_title">Delete backups</string>
-    <string name="notif_buttons_accent">Notification buttons in accent</string>
-    <string name="notif_buttons_accent_summary">Clear all and Manage with the accent background and white text</string>
+    <string name="notif_buttons_custom_summary">Change the look of the Clear all and Manage buttons</string>
+    <string name="notif_buttons_text_color">Button text colour</string>
 </resources>

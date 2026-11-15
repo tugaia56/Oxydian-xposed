@@ -104,18 +104,6 @@ public class StatusbarFragment extends Fragment {
                     getString(R.string.statusbar_app_icon_scale),
                     ObsidianPrefs.getInt("statusbar_notification_app_icon_scale", 100), 50, 200, "%", 100,
                     value -> ObsidianPrefs.putInt("statusbar_notification_app_icon_scale", value)));
-            SwitchWidgetAdapter.SwitchItem accentBtn = new SwitchWidgetAdapter.SwitchItem(
-                    getString(R.string.notif_buttons_accent), getString(R.string.notif_buttons_accent_summary),
-                    ObsidianPrefs.getBoolean("customizeClearButton", false), null);
-            accentBtn.onChanged = () -> {
-                ObsidianPrefs.putBoolean("customizeClearButton", accentBtn.checked);
-                if (accentBtn.checked) {   // sfondo = accento, testo bianco
-                    ObsidianPrefs.putBoolean("linkBackgroundAccent", true);
-                    ObsidianPrefs.putBoolean("linkIconAccent", false);
-                    ObsidianPrefs.putInt("clearButtonIconColor", 0xFFFFFFFF);
-                }
-            };
-            rows.add(accentBtn);
             String[] entries = getResources().getStringArray(R.array.notif_default_expansion_entries);
             int cur = 0;
             try { cur = Integer.parseInt(ObsidianPrefs.getString("notificationDefaultExpansion", "0")); } catch (NumberFormatException ignored) {}
@@ -134,6 +122,30 @@ public class StatusbarFragment extends Fragment {
                             .setNegativeButton(R.string.cancel, null)
                             .show()));
             it.tugaia56.obsidian.ui.adapters.GroupUtils.addGroup(chain, rows);
+            // Pulsanti in fondo alle notifiche (Cancella tutto, Gestisci, Cronologia): stesse opzioni di OxygenOS
+            chain.add(new SectionTitleAdapter(List.of(getString(R.string.customize_clear_all_button))));
+            List<Object> btnRows = new ArrayList<>();
+            SwitchWidgetAdapter.SwitchItem custom = new SwitchWidgetAdapter.SwitchItem(
+                    getString(R.string.customize_clear_all_button), getString(R.string.notif_buttons_custom_summary),
+                    ObsidianPrefs.getBoolean("customizeClearButton", false), null);
+            custom.onChanged = () -> {
+                ObsidianPrefs.putBoolean("customizeClearButton", custom.checked);
+                if (custom.checked && !ObsidianPrefs.getBoolean("notifButtonsInit", false)) {   // prima volta: sfondo accento, testo bianco
+                    ObsidianPrefs.putBoolean("notifButtonsInit", true);
+                    ObsidianPrefs.putBoolean("linkBackgroundAccent", true);
+                    ObsidianPrefs.putBoolean("linkIconAccent", false);
+                    ObsidianPrefs.putInt("clearButtonIconColor", 0xFFFFFFFF);
+                }
+                render();
+            };
+            btnRows.add(custom);
+            if (custom.checked) {
+                btnRows.add(colorModeRow(getString(R.string.clear_all_bg_color), "linkBackgroundAccent",
+                        "clearButtonBgColor", 0xFF8C8C8C, DIALOG_BG));
+                btnRows.add(colorModeRow(getString(R.string.notif_buttons_text_color), "linkIconAccent",
+                        "clearButtonIconColor", 0xFFFFFFFF, DIALOG_FG));
+            }
+            it.tugaia56.obsidian.ui.adapters.GroupUtils.addGroup(chain, btnRows);
         }
         mRv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
@@ -184,6 +196,54 @@ public class StatusbarFragment extends Fragment {
                 null);
         item.onChanged = () -> ObsidianPrefs.putBoolean(prefKey, item.checked);
         return item;
+    }
+
+    // ── Colore dei pulsanti (accento / personalizzato) ─────────────────────────────────────────
+
+    private static final int DIALOG_BG = "clearButtonBgColor".hashCode();
+    private static final int DIALOG_FG = "clearButtonIconColor".hashCode();
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        org.greenrobot.eventbus.EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        org.greenrobot.eventbus.EventBus.getDefault().unregister(this);
+    }
+
+    @org.greenrobot.eventbus.Subscribe(threadMode = org.greenrobot.eventbus.ThreadMode.MAIN)
+    public void onColorSelected(it.tugaia56.obsidian.ui.events.ColorSelectedEvent event) {
+        if (event.dialogId() == DIALOG_BG) { ObsidianPrefs.putInt("clearButtonBgColor", event.color()); render(); }
+        else if (event.dialogId() == DIALOG_FG) { ObsidianPrefs.putInt("clearButtonIconColor", event.color()); render(); }
+    }
+
+    private it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter.ListItem colorModeRow(String title, String accentKey,
+                                                                                    String colorKey, int colorDef, int dialogId) {
+        String label = ObsidianPrefs.getBoolean(accentKey, false) ? getString(R.string.color_mode_accent)
+                : String.format(java.util.Locale.US, "#%06X", ObsidianPrefs.getInt(colorKey, colorDef) & 0xFFFFFF);
+        return new it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter.ListItem(title, label, () -> {
+            String[] entries = { getString(R.string.color_mode_accent), getString(R.string.color_mode_custom) };
+            int current = ObsidianPrefs.getBoolean(accentKey, false) ? 0 : 1;
+            final int[] selected = {current};
+            it.tugaia56.obsidian.utils.ObsidianTheme.themeDialog(new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(title)
+                    .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
+                    .setPositiveButton(R.string.apply, (d, w) -> {
+                        boolean accent = selected[0] == 0;
+                        ObsidianPrefs.putBoolean(accentKey, accent);
+                        render();
+                        if (!accent && getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).showColorPickerDialog(
+                                    dialogId, ObsidianPrefs.getInt(colorKey, colorDef), true, true, true);
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, null)
+                    .show());
+        });
     }
 
     private void navigate(Fragment fragment, String title) {
