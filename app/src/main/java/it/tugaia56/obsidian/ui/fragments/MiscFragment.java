@@ -96,7 +96,7 @@ public class MiscFragment extends Fragment {
 
         SwitchWidgetAdapter.SwitchItem screenshotItem = new SwitchWidgetAdapter.SwitchItem(
                 getString(R.string.nav_screenshot_enabler),
-                getString(R.string.nav_screenshot_enabler_summary),
+                it.tugaia56.obsidian.ui.PureAndroidFilter.active() ? getString(R.string.nav_screenshot_enabler_summary_pure) : getString(R.string.nav_screenshot_enabler_summary),
                 ObsidianPrefs.getBoolean("DST_SCREENSHOT_ENABLER_ON", false),
                 null);
         screenshotItem.onChanged = () -> {
@@ -141,7 +141,7 @@ public class MiscFragment extends Fragment {
                 new NavAdapter.NavItem(
                         R.drawable.ic_settings,
                         getString(R.string.nav_corepatch),
-                        getString(R.string.nav_corepatch_summary),
+                        it.tugaia56.obsidian.ui.PureAndroidFilter.active() ? getString(R.string.nav_corepatch_summary_pure) : getString(R.string.nav_corepatch_summary),
                         () -> navigate(new CorePatchFragment(),
                                 getString(R.string.nav_corepatch))),
 

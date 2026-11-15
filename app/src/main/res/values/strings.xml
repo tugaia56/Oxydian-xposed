@@ -1421,4 +1421,6 @@
     <string name="notif_buttons_custom_summary">Change the look of the Clear all and Manage buttons</string>
     <string name="notif_buttons_text_color">Button text colour</string>
     <string name="nav_misc_summary_pure">USB dialog, power menu border and glass, screenshots, Core Patch</string>
+    <string name="nav_screenshot_enabler_summary_pure">Allow screenshots and screen recording in apps that block them. Needs System (framework) ticked in the Vector/LSPosed scope, then a reboot</string>
+    <string name="nav_corepatch_summary_pure">Allow downgrading apps. Needs System (framework) ticked in the Vector/LSPosed scope, then a reboot</string>
 </resources>

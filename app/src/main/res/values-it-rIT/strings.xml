@@ -1393,4 +1393,6 @@
     <string name="notif_buttons_custom_summary">Cambia l\'aspetto dei pulsanti "Cancella tutto" e "Gestisci"</string>
     <string name="notif_buttons_text_color">Colore testo pulsanti</string>
     <string name="nav_misc_summary_pure">Finestra USB, bordo e vetro del menù, screenshot, Core Patch</string>
+    <string name="nav_screenshot_enabler_summary_pure">Consente screenshot e registrazione schermo nelle app che li bloccano. Serve la spunta su Sistema (framework) tra gli ambiti di Vector/LSPosed, poi un riavvio</string>
+    <string name="nav_corepatch_summary_pure">Consente il downgrade delle app. Serve la spunta su Sistema (framework) tra gli ambiti di Vector/LSPosed, poi un riavvio</string>
 </resources>
