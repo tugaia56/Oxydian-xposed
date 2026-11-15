@@ -92,7 +92,7 @@ public class ModHealthFragment extends Fragment {
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.mod_health_title))));
         GroupUtils.addGroup(chain, List.of(
-                new ListWidgetAdapter.ListItem(getString(R.string.mod_health_intro), null, null)));
+                new ListWidgetAdapter.ListItem(getString(it.tugaia56.obsidian.ui.PureAndroidFilter.active() ? R.string.mod_health_intro_pure : R.string.mod_health_intro), null, null)));
 
         for (ProcessGroup g : groups()) {
             List<ModEntry> entries = readEntries(g.pkg());
