@@ -118,6 +118,7 @@ public class NotificationMods extends XposedMods {
             statusBarIconView = findClass("com.android.systemui.statusbar.StatusBarIconView", lp.classLoader);
         } catch (Throwable t) { return; }
 
+        hookAppIconUntint(statusBarIconView);
         hookAllMethods(statusBarIconView, "getIcon", new XC_MethodHook() {
             @Override protected void afterHookedMethod(MethodHookParam param) {
                 if (!mAppIconOn) return;
@@ -139,10 +140,51 @@ public class NotificationMods extends XposedMods {
                     Canvas c = new Canvas(bmp);
                     appIcon.setBounds(0, 0, size, size);
                     appIcon.draw(c);
-                    param.setResult(new BitmapDrawable(mContext.getResources(), bmp));
+                    param.setResult(new AppIconDrawable(mContext.getResources(), bmp));
                 } catch (Throwable ignored) {}
             }
         });
+    }
+
+    /** Icona dell'app usata al posto di quella piccola della notifica: marcata per poterle togliere la tinta (vedi sotto). */
+    private static final class AppIconDrawable extends BitmapDrawable {
+        AppIconDrawable(android.content.res.Resources r, Bitmap b) { super(r, b); }
+    }
+
+    /**
+     * Android puro (RisingOS): SystemUI colora di bianco ogni icona della barra di stato (tinta + filtro colore), e l'icona
+     * dell'app, a colori e non trasparente, diventa un cerchio bianco. Alle sole icone create qui si toglie tinta e filtro.
+     * Su OxygenOS non serve (li' l'icona resta a colori) e non si tocca niente.
+     */
+    private void hookAppIconUntint(Class<?> sbiv) {
+        if (it.tugaia56.obsidian.xposed.XPLauncher.isOplusRom()) return;
+        try {
+            hookAllMethods(ImageView.class, "setImageTintList", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    try {
+                        if (sbiv.isInstance(p.thisObject) && ((ImageView) p.thisObject).getDrawable() instanceof AppIconDrawable) p.args[0] = null;
+                    } catch (Throwable ignored) {}
+                }
+            });
+            hookAllMethods(ImageView.class, "setImageDrawable", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    try {
+                        if (sbiv.isInstance(p.thisObject) && p.args[0] instanceof AppIconDrawable) {
+                            ((ImageView) p.thisObject).setImageTintList(null);
+                            ((ImageView) p.thisObject).clearColorFilter();
+                        }
+                    } catch (Throwable ignored) {}
+                }
+            });
+            XC_MethodHook noTint = new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    if (p.thisObject instanceof AppIconDrawable) p.setResult(null);
+                }
+            };
+            hookAllMethods(BitmapDrawable.class, "setColorFilter", noTint);
+            hookAllMethods(BitmapDrawable.class, "setTintList", noTint);
+            hookAllMethods(BitmapDrawable.class, "setTint", noTint);
+        } catch (Throwable t) { log("[ Obsidian ] NotificationMods app icon untint: " + t); }
     }
 
     // ── Default expansion ────────────────────────────────────────────────────
