@@ -54,6 +54,8 @@ public class XPLauncher {
     }
 
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
+        // protezione contro il ciclo di riavvio di SystemUI (vedi SafeGuard): livello 3 = nessun hook in SystemUI
+        if (SafeGuard.isSystemUi() && SafeGuard.level() >= 3) return;
         if (!isOplusRom()) {
             if (lpparam.packageName.equals(Constants.Packages.FRAMEWORK) && "android".equals(lpparam.processName)) {
                 log("[ Obsidian ] ROM diversa da OxygenOS/ColorOS: nessuna mod attiva");
@@ -137,7 +139,7 @@ public class XPLauncher {
     }
 
     private void hookOtherPackage(XC_LoadPackage.LoadPackageParam lpparam) {
-        if ("com.android.systemui".equals(lpparam.packageName)) {
+        if ("com.android.systemui".equals(lpparam.packageName) && SafeGuard.level() < 2) {
             it.tugaia56.obsidian.xposed.hooks.systemui.DstNotifBgView.hook(lpparam);
         }
         if ("com.oplus.appplatform".equals(lpparam.packageName)) {

@@ -86,7 +86,18 @@ public class ModPacks {
             "com.coloros.video"
     ));
 
+    /** Mod del pacchetto, ridotte dalla protezione contro il ciclo di riavvio di SystemUI (vedi SafeGuard). */
     public static List<Class<? extends XposedMods>> getMods(String packageName) {
+        List<Class<? extends XposedMods>> mods = allMods(packageName);
+        if (Constants.Packages.SYSTEM_UI.equals(packageName)) {
+            int lv = SafeGuard.level();
+            if (lv >= 2) mods.clear();
+            else if (lv == 1) mods.removeIf(SafeGuard::isHotMod);
+        }
+        return mods;
+    }
+
+    private static List<Class<? extends XposedMods>> allMods(String packageName) {
         List<Class<? extends XposedMods>> mods = new ArrayList<>();
         if (Constants.Packages.SYSTEM_UI.equals(packageName) && XPLauncher.isOplusRom()) {
             mods.add(MonetFreeze.class);
