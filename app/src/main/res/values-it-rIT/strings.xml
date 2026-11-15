@@ -1392,5 +1392,5 @@
     <string name="backup_delete_title">Elimina i backup</string>
     <string name="notif_buttons_custom_summary">Cambia l\'aspetto dei pulsanti "Cancella tutto" e "Gestisci"</string>
     <string name="notif_buttons_text_color">Colore testo pulsanti</string>
-    <string name="nav_misc_summary_pure">Finestra USB, bordo e vetro del menù di spegnimento</string>
+    <string name="nav_misc_summary_pure">Finestra USB, bordo e vetro del menù, screenshot, Core Patch</string>
 </resources>

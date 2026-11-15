@@ -112,7 +112,7 @@ public class MiscFragment extends Fragment {
         // le card arancioni utili (Log di avvio) stanno nella Home
         boolean pure = it.tugaia56.obsidian.ui.PureAndroidFilter.active();
         SwitchWidgetAdapter togglesAdapter = new SwitchWidgetAdapter(pure
-                ? List.of(usbItem, pmBorderItem, pmGlassItem)
+                ? List.of(usbItem, pmBorderItem, pmGlassItem, screenshotItem)
                 : List.of(rotationItem, usbItem, settingsEntryItem, searchBorderItem, pmBorderItem, pmGlassItem, screenshotItem));
 
         List<NavAdapter.NavItem> items = List.of(
@@ -152,7 +152,10 @@ public class MiscFragment extends Fragment {
                         () -> navigate(new LuckyExtrasFragment(),
                                 getString(R.string.nav_lucky_extras)))
         );
-        if (pure) { rv.setAdapter(togglesAdapter); return; }
+        if (pure) {   // Android puro: i due interruttori + la card Core Patch (la quarta della lista)
+            rv.setAdapter(new ConcatAdapter(togglesAdapter, new NavAdapter(items.subList(3, 4), 0xFFFF6E40)));
+            return;
+        }
         rv.setAdapter(new ConcatAdapter(togglesAdapter, new NavAdapter(items, 0xFFFF6E40))); // deep orange accent, colore categoria "Varie"
     }
 

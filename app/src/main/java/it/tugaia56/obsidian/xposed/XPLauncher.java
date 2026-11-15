@@ -59,6 +59,10 @@ public class XPLauncher {
         if (!isOplusRom()) {
             if (lpparam.packageName.equals(Constants.Packages.FRAMEWORK) && "android".equals(lpparam.processName)) {
                 log("[ Obsidian ] ROM diversa da OxygenOS/ColorOS: nessuna mod attiva");
+                // unica eccezione nel framework: Core Patch e Abilita screenshot (classi Android normali, solo in system_server;
+                // senza il "Sistema" nell'ambito di Vector non scattano, e di serie sono spente)
+                try { CorePatchMod.install(lpparam); } catch (Throwable t) { log("[ Obsidian ] CorePatchMod.install failed: " + t); }
+                try { ScreenshotEnablerMod.install(lpparam); } catch (Throwable t) { log("[ Obsidian ] ScreenshotEnablerMod.install failed: " + t); }
             }
             // unica eccezione: Impostazioni (finestra trasparente, vedi SettingsWindowTransparencyMod); ModPacks
             // restituisce solo quella mod, tutto il resto del modulo resta spento su queste ROM
