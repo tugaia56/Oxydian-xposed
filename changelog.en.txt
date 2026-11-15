@@ -9,5 +9,7 @@ Added:
 - Android: the notification shade becomes glass (5%) automatically when window blur is on (not on RisingOS)
 - aCalendar+: the "today" highlight follows the Theme accent
 - LSPosed recommended scope: Oxydian Theme app, Solid Explorer, Weather and Personal Safety (the Android build lists all its app mods)
+- Pure Android (RisingOS, crDroid): the app hides the pages of mods that only work on OxygenOS (Launcher, AOD, panel, lock screen, volume, Power menu, Clock and Date). Status bar: SIM icons and notification options (coloured app icons, scale, default expansion) on a single page
+- RisingOS: the "Fingerprint icon size" slider resizes the icon chosen in RisingOS Settings
 Changed:
 - Switches in the Theme style now also work on MaterialSwitch (Material rebuilds track and thumb on every redraw)

@@ -9,5 +9,7 @@ Aggiunto:
 - Android: il pannello delle notifiche diventa vetro (5%) da solo quando la sfocatura delle finestre è accesa (non su RisingOS)
 - aCalendar+: l'evidenziazione di "oggi" segue l'accento del Theme
 - Ambito consigliato di LSPosed: app Oxydian Theme, Solid Explorer, Meteo e Sicurezza personale (la versione Android elenca tutte le sue mod per le app)
+- Android puro (RisingOS, crDroid): l'app nasconde le pagine delle mod che funzionano solo su OxygenOS (Launcher, AOD, pannello, schermata di blocco, volume, menù Accensione, Orologio e Data). Barra di stato: icone SIM e opzioni delle notifiche (icone app a colori, scala, espansione predefinita) in un'unica pagina
+- RisingOS: il cursore "Ridimensionamento icona impronta digitale" cambia la misura dell'icona scelta in Impostazioni risingOS
 Aggiornato:
 - Gli interruttori nello stile del Theme funzionano anche con MaterialSwitch (Material rifà barra e tondo a ogni ridisegno)
