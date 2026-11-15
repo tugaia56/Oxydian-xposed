@@ -61,8 +61,8 @@ public class StatusbarFragment extends Fragment {
                 () -> navigate(new ClockDateFragment(),
                         getString(R.string.section_clock_date))));
 
-        // 2. Notifiche
-        mNavItems.add(new NavAdapter.NavItem(
+        // 2. Notifiche (su Android puro le opzioni funzionanti stanno qui sotto, senza la scheda)
+        if (!it.tugaia56.obsidian.ui.PureAndroidFilter.active()) mNavItems.add(new NavAdapter.NavItem(
                 R.drawable.ic_notifications,
                 getString(R.string.section_statusbar_notifs),
                 getString(R.string.section_statusbar_notifs_summary),
@@ -76,7 +76,54 @@ public class StatusbarFragment extends Fragment {
                 List.of(getString(R.string.section_statusbar_icons)));
         SwitchWidgetAdapter iconSwitches = new SwitchWidgetAdapter(buildIconSwitches());
 
-        rv.setAdapter(new ConcatAdapter(mNavAdapter, iconSection, iconSwitches));
+        mRv = rv;
+        mIconSection = iconSection;
+        mIconSwitches = iconSwitches;
+        render();
+    }
+
+    private RecyclerView mRv;
+    private SectionTitleAdapter mIconSection;
+    private SwitchWidgetAdapter mIconSwitches;
+
+    private void render() {
+        List<RecyclerView.Adapter<?>> chain = new ArrayList<>();
+        chain.add(mNavAdapter);
+        chain.add(mIconSection);
+        chain.add(mIconSwitches);
+        if (it.tugaia56.obsidian.ui.PureAndroidFilter.active()) {
+            // Android puro: delle opzioni di Notifiche restano quelle con hook su classi Android normali
+            chain.add(new SectionTitleAdapter(List.of(getString(R.string.section_statusbar_notifs))));
+            List<Object> rows = new ArrayList<>();
+            SwitchWidgetAdapter.SwitchItem appIcon = new SwitchWidgetAdapter.SwitchItem(
+                    getString(R.string.statusbar_use_app_icon), getString(R.string.statusbar_use_app_icon_summary),
+                    ObsidianPrefs.getBoolean("statusbar_notification_app_icon", false), null);
+            appIcon.onChanged = () -> ObsidianPrefs.putBoolean("statusbar_notification_app_icon", appIcon.checked);
+            rows.add(appIcon);
+            rows.add(new it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter.SliderItem(
+                    getString(R.string.statusbar_app_icon_scale),
+                    ObsidianPrefs.getInt("statusbar_notification_app_icon_scale", 100), 50, 200, "%", 100,
+                    value -> ObsidianPrefs.putInt("statusbar_notification_app_icon_scale", value)));
+            String[] entries = getResources().getStringArray(R.array.notif_default_expansion_entries);
+            int cur = 0;
+            try { cur = Integer.parseInt(ObsidianPrefs.getString("notificationDefaultExpansion", "0")); } catch (NumberFormatException ignored) {}
+            final int curF = cur;
+            rows.add(new it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter.ListItem(
+                    getString(R.string.notif_default_expansion_title),
+                    entries[(curF >= 0 && curF < entries.length) ? curF : 0],
+                    () -> new android.app.AlertDialog.Builder(requireContext())
+                            .setTitle(R.string.notif_default_expansion_title)
+                            .setSingleChoiceItems(entries, curF, null)
+                            .setPositiveButton(R.string.apply, (d, w) -> {
+                                int sel = ((android.app.AlertDialog) d).getListView().getCheckedItemPosition();
+                                ObsidianPrefs.putString("notificationDefaultExpansion", String.valueOf(sel));
+                                render();
+                            })
+                            .setNegativeButton(R.string.cancel, null)
+                            .show()));
+            it.tugaia56.obsidian.ui.adapters.GroupUtils.addGroup(chain, rows);
+        }
+        mRv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
 
     // ── Icon switch items ─────────────────────────────────────────────────────
