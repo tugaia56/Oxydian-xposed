@@ -61,8 +61,13 @@ public class XPLauncher {
                 log("[ Obsidian ] ROM diversa da OxygenOS/ColorOS: nessuna mod attiva");
                 // unica eccezione nel framework: Core Patch e Abilita screenshot (classi Android normali, solo in system_server;
                 // senza il "Sistema" nell'ambito di Vector non scattano, e di serie sono spente)
-                try { CorePatchMod.install(lpparam); } catch (Throwable t) { log("[ Obsidian ] CorePatchMod.install failed: " + t); }
-                try { ScreenshotEnablerMod.install(lpparam); } catch (Throwable t) { log("[ Obsidian ] ScreenshotEnablerMod.install failed: " + t); }
+                StringBuilder health = new StringBuilder();
+                try { CorePatchMod.install(lpparam); health.append("CorePatchMod=OK"); }
+                catch (Throwable t) { log("[ Obsidian ] CorePatchMod.install failed: " + t); health.append("CorePatchMod=FAIL:").append(t.getClass().getSimpleName()).append("::").append(sanitizeReason(String.valueOf(t.getMessage()))); }
+                health.append(';');
+                try { ScreenshotEnablerMod.install(lpparam); health.append("ScreenshotEnablerMod=OK"); }
+                catch (Throwable t) { log("[ Obsidian ] ScreenshotEnablerMod.install failed: " + t); health.append("ScreenshotEnablerMod=FAIL:").append(t.getClass().getSimpleName()).append("::").append(sanitizeReason(String.valueOf(t.getMessage()))); }
+                recordFrameworkHealth(health.toString());
             }
             // unica eccezione: Impostazioni (finestra trasparente, vedi SettingsWindowTransparencyMod); ModPacks
             // restituisce solo quella mod, tutto il resto del modulo resta spento su queste ROM
@@ -180,6 +185,35 @@ public class XPLauncher {
             Log.d("ObsidianXP", "hookOtherPackage FAILED for " + lpparam.packageName + ": " + t);
             log("[ Obsidian ] hookOtherPackage failed for " + lpparam.packageName + ": " + t.getMessage());
         }
+    }
+
+    /** Android puro: scrive lo stato delle mod del framework per "Stato Oxydian" (in system_server non c'e' il solito
+     *  initContext): aspetta il contesto di sistema e il provider delle preferenze, poi salva la riga. */
+    private void recordFrameworkHealth(String line) {
+        new Thread(() -> {
+            try {
+                Context ctx = null;
+                for (int i = 0; i < 60 && ctx == null; i++) {
+                    try {
+                        Object at = Class.forName("android.app.ActivityThread").getMethod("currentActivityThread").invoke(null);
+                        if (at != null) ctx = (Context) at.getClass().getMethod("getSystemContext").invoke(at);
+                    } catch (Throwable ignored) {}
+                    if (ctx == null) Thread.sleep(2000);
+                }
+                if (ctx == null) return;
+                XPrefs.init(ctx);
+                for (int i = 0; i < 90; i++) {
+                    try {
+                        Xprefs.getBoolean("LoadTestBooleanValue", false);
+                        Xprefs.edit()
+                                .putString("mod_health_android", line)
+                                .putLong("mod_health_android_ts", System.currentTimeMillis())
+                                .apply();
+                        return;
+                    } catch (Throwable ignored) { Thread.sleep(2000); }
+                }
+            } catch (Throwable ignored) {}
+        }, "ObsidianFwHealth").start();
     }
 
     /** Pacchetti del processo per cui i mod sono gia' stati avviati. */
