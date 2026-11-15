@@ -19,6 +19,14 @@ public final class DeviceInfo {
         java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+)")
                 .matcher(sysProp("ro.build.version.oplusrom"));
         if (m.find()) os = "OOS " + m.group(1);
+        else if (isPureAndroid()) {
+            // ROM diversa da OxygenOS: nome della ROM + versione di Android
+            String rom = !sysProp("ro.rising.build.version").isEmpty() ? "RisingOS"
+                    : !sysProp("ro.crdroid.version").isEmpty() ? "crDroid"
+                    : !sysProp("ro.lineage.version").isEmpty() ? "LineageOS" : "Android";
+            os = rom.equals("Android") ? "Android " + android.os.Build.VERSION.RELEASE
+                    : rom + " · Android " + android.os.Build.VERSION.RELEASE;
+        }
         return os + " · " + market;
     }
 

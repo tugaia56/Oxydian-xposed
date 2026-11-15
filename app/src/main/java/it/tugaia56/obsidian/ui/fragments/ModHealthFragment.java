@@ -49,6 +49,10 @@ public class ModHealthFragment extends Fragment {
     private record ModEntry(String name, boolean ok, String exceptionType, String message) {}
 
     private List<ProcessGroup> groups() {
+        // Android puro: Launcher e Sistema (framework) sono mod di OxygenOS, qui non si caricano e non hanno niente da mostrare
+        if (it.tugaia56.obsidian.ui.PureAndroidFilter.active()) return List.of(
+                new ProcessGroup(Constants.Packages.SYSTEM_UI, "SystemUI"),
+                new ProcessGroup(Constants.Packages.SETTINGS, getString(R.string.mod_health_process_settings)));
         return List.of(
                 new ProcessGroup(Constants.Packages.SYSTEM_UI, "SystemUI"),
                 new ProcessGroup(Constants.Packages.SETTINGS, getString(R.string.mod_health_process_settings)),
