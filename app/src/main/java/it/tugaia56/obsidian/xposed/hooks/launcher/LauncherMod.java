@@ -774,13 +774,11 @@ public class LauncherMod extends XposedMods {
 
         try {
             Class<?> oplusHotseat = findClass("com.android.launcher3.OplusHotseat", cl);
-            XposedBridge.log("[ Obsidian - LauncherMod DIAG ] OplusHotseat hook attached OK");
 
             hookAllMethods(oplusHotseat, "init", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
                     try {
-                        XposedBridge.log("[ Obsidian - LauncherMod DIAG ] OplusHotseat.init called, bg=" + mDockBackground + " material=" + mDockBackgroundMaterial);
                         if (mDockBackground) {
                             callMethod(param.thisObject, "setDockerBackground");
                         } else if (mDockBackgroundMaterial) {
@@ -821,7 +819,6 @@ public class LauncherMod extends XposedMods {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
                     try {
-                        XposedBridge.log("[ Obsidian - LauncherMod DIAG ] OplusHotseat.onDraw called, bg=" + mDockBackground + " material=" + mDockBackgroundMaterial);
                         if (mDockBackground) {
                             callMethod(param.thisObject, "setDockerBackground");
                         } else if (!mDockBackgroundMaterial) {
@@ -836,7 +833,7 @@ public class LauncherMod extends XposedMods {
                 }
             });
         } catch (Throwable t) {
-            XposedBridge.log("[ Obsidian - LauncherMod DIAG ] OplusHotseat not found: " + t);
+            XposedBridge.log("[ Obsidian - LauncherMod ] OplusHotseat not found: " + t);
         }
     }
 

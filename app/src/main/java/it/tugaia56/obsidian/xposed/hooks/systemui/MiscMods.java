@@ -114,7 +114,6 @@ public class MiscMods extends XposedMods {
     private int mPowerMenuHandlerCropCx = 50;
     private int mPowerMenuHandlerCropCy = 50;
     private int mPowerMenuHandlerCropZoom = 100;
-    private boolean mDiagHandlerRectLogged = false; // log mHandlerRectF's real size once — vedi drawHandlerImage
 
     // Pillolone background image ("power_menu_bg_mode" == "image") — file written by
     // PowerMenuFragment to the same relative path. Cached and only re-decoded when the file's
@@ -933,11 +932,6 @@ public class MiscMods extends XposedMods {
             RectF rectF = (RectF) rectFObj;
             if (rectF.width() <= 0 || rectF.height() <= 0) return;
 
-            if (!mDiagHandlerRectLogged) {
-                mDiagHandlerRectLogged = true;
-                XposedBridge.log("[ Obsidian ] MiscMods DIAG mHandlerRectF w=" + rectF.width()
-                        + " h=" + rectF.height() + " aspect=" + (rectF.width() / rectF.height()));
-            }
 
             // "Scala Immagine" (mPowerMenuHandlerScale) rimossa 2026-09-15 — sovrapposta allo
             // stesso effetto già ottenibile con "Zoom" (che sotto 100% rimpicciolisce già
