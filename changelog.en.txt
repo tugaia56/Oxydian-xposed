@@ -9,7 +9,10 @@ Added:
 - Android: the notification shade becomes glass (5%) automatically when window blur is on (not on RisingOS)
 - aCalendar+: the "today" highlight follows the Theme accent
 - LSPosed recommended scope: Oxydian Theme app, Solid Explorer, Weather and Personal Safety (the Android build lists all its app mods)
-- Pure Android (RisingOS, crDroid): the app hides the pages of mods that only work on OxygenOS (Launcher, AOD, panel, lock screen, volume, Power menu, Clock and Date). Status bar: SIM icons and notification options (coloured app icons, scale, default expansion) on a single page
+- Pure Android (RisingOS, crDroid): the app hides the pages of mods that only work on OxygenOS (Launcher, AOD, panel, lock screen, volume, Power menu, Battery, notification and toast styles, Clock and Date) and the Oxydian tab, which would be empty: Boot log, Misc and Oxydian Theme are in the Mods tab. The header shows the ROM name (RisingOS, crDroid...) and Oxydian Status no longer lists the Launcher
+- Status bar on pure Android: SIM icons, notification options (coloured app icons, scale, default expansion) and the notification buttons (Clear all, Manage) with a background and text colour of your choice, all on a single page
+- Core Patch and Enable screenshot also work on pure Android (tested on RisingOS: app downgrade and a screenshot of an incognito tab). They need "System (framework)" in the LSPosed/Vector scope (it is in the Android build's recommended list) and a reboot; they are off by default
+- Protection against System UI restart loops: if System UI restarts 4 times in 40 seconds, Oxydian switches off groups of hooks step by step (levels 1-3) until the phone is stable. The level can be read in /data/user_de/0/com.android.systemui/cache/oxydian_guard.txt
 - RisingOS: the "Fingerprint icon size" slider resizes the icon chosen in RisingOS Settings
 Changed:
 - Switches in the Theme style now also work on MaterialSwitch (Material rebuilds track and thumb on every redraw)
