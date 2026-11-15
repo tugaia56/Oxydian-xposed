@@ -108,8 +108,12 @@ public class MiscFragment extends Fragment {
             }).start();
         };
 
-        SwitchWidgetAdapter togglesAdapter = new SwitchWidgetAdapter(
-                List.of(rotationItem, usbItem, settingsEntryItem, searchBorderItem, pmBorderItem, pmGlassItem, screenshotItem));
+        // Android puro (RisingOS): restano la finestra USB e il bordo/vetro del menu di spegnimento (le altre sono mod di OxygenOS);
+        // le card arancioni utili (Log di avvio) stanno nella Home
+        boolean pure = it.tugaia56.obsidian.ui.PureAndroidFilter.active();
+        SwitchWidgetAdapter togglesAdapter = new SwitchWidgetAdapter(pure
+                ? List.of(usbItem, pmBorderItem, pmGlassItem)
+                : List.of(rotationItem, usbItem, settingsEntryItem, searchBorderItem, pmBorderItem, pmGlassItem, screenshotItem));
 
         List<NavAdapter.NavItem> items = List.of(
 
@@ -148,6 +152,7 @@ public class MiscFragment extends Fragment {
                         () -> navigate(new LuckyExtrasFragment(),
                                 getString(R.string.nav_lucky_extras)))
         );
+        if (pure) { rv.setAdapter(togglesAdapter); return; }
         rv.setAdapter(new ConcatAdapter(togglesAdapter, new NavAdapter(items, 0xFFFF6E40))); // deep orange accent, colore categoria "Varie"
     }
 

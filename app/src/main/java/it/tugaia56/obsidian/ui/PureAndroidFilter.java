@@ -30,7 +30,7 @@ public final class PureAndroidFilter {
 
     /** Prefissi dei nomi delle pagine (Fragment) da nascondere. */
     private static final String[] HIDDEN_PAGE_PREFIXES = {
-            "Launcher", "Aod", "Qs", "Clock", "PowerMenu", "Battery", "ThemeStyle", "Gradient", "QuickSettings", "LockScreenOptions", "Lockscreen",
+            "Launcher", "Aod", "Qs", "Clock", "PowerMenu", "Battery", "ThemeStyle", "Gradient", "GestureNavigation", "CorePatch", "LuckyExtras", "QuickSettings", "LockScreenOptions", "Lockscreen",
             "FingerprintPreset", "Volume", "DeviceWidget"
     };
 
