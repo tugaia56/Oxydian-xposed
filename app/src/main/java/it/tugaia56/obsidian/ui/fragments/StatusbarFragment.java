@@ -106,9 +106,9 @@ public class StatusbarFragment extends Fragment {
                 getString(R.string.hide_sim2_icon),
                 getString(R.string.hide_sim_icon_summary),
                 "OBS_STATUSBAR_HIDE_SIM2");
-        // Android puro (RisingOS): doppio tocco, luminosita' e Bluetooth della barra di stato li gestisce gia' la ROM
+        // Android puro (RisingOS): doppio tocco, luminosita', Bluetooth e finestrella degli appunti li gestisce gia' la ROM
         List<SwitchWidgetAdapter.SwitchItem> all = it.tugaia56.obsidian.ui.PureAndroidFilter.active()
-                ? List.of(s4, s5, s6) : List.of(s1, s2, s3, s4, s5, s6);
+                ? List.of(s5, s6) : List.of(s1, s2, s3, s4, s5, s6);
         for (int i = 0; i < all.size(); i++) {
             all.get(i).groupPos = i == 0 ? it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.TOP
                     : i == all.size() - 1 ? it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.BOTTOM
