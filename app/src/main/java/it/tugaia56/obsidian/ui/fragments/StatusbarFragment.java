@@ -106,13 +106,15 @@ public class StatusbarFragment extends Fragment {
                 getString(R.string.hide_sim2_icon),
                 getString(R.string.hide_sim_icon_summary),
                 "OBS_STATUSBAR_HIDE_SIM2");
-        s1.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.TOP;
-        s2.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.MIDDLE;
-        s3.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.MIDDLE;
-        s4.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.MIDDLE;
-        s5.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.MIDDLE;
-        s6.groupPos = it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.BOTTOM;
-        return List.of(s1, s2, s3, s4, s5, s6);
+        // Android puro (RisingOS): doppio tocco, luminosita' e Bluetooth della barra di stato li gestisce gia' la ROM
+        List<SwitchWidgetAdapter.SwitchItem> all = it.tugaia56.obsidian.ui.PureAndroidFilter.active()
+                ? List.of(s4, s5, s6) : List.of(s1, s2, s3, s4, s5, s6);
+        for (int i = 0; i < all.size(); i++) {
+            all.get(i).groupPos = i == 0 ? it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.TOP
+                    : i == all.size() - 1 ? it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.BOTTOM
+                    : it.tugaia56.obsidian.utils.ObsidianTheme.GroupPos.MIDDLE;
+        }
+        return all;
     }
 
     private SwitchWidgetAdapter.SwitchItem makePrefSwitch(String title, String summary,
