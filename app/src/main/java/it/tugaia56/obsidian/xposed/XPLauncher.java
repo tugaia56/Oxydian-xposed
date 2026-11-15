@@ -55,6 +55,7 @@ public class XPLauncher {
 
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         // protezione contro il ciclo di riavvio di SystemUI (vedi SafeGuard): livello 3 = nessun hook in SystemUI
+        SafeGuard.init(lpparam.processName);
         if (SafeGuard.isSystemUi() && SafeGuard.level() >= 3) return;
         if (!isOplusRom()) {
             if (lpparam.packageName.equals(Constants.Packages.FRAMEWORK) && "android".equals(lpparam.processName)) {

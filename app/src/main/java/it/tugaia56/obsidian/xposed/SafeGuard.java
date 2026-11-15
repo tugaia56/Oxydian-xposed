@@ -42,11 +42,26 @@ public final class SafeGuard {
     private static boolean sSystemUi;
     private static int sLevel;
 
+    /** Con il nome del processo dato da Xposed (handleLoadPackage): e' il modo sicuro. */
+    public static synchronized void init(String processName) {
+        if (sInited) return;
+        if (processName == null || processName.isEmpty()) { init(); return; }
+        doInit(processName);
+    }
+
+    /** Senza nome: si legge /proc/self/cmdline, ma solo se il processo ha gia' il suo nome. Quando Xposed chiama initZygote
+     *  il processo si chiama ancora "zygote"/"<pre-initialized>": allora non si decide niente (e non si ricorda la risposta). */
     public static synchronized void init() {
         if (sInited) return;
+        String c = cmdline();
+        if (c == null || c.isEmpty() || c.startsWith("zygote") || c.startsWith("<pre")) return;
+        doInit(c);
+    }
+
+    private static void doInit(String processName) {
         sInited = true;
         try {
-            sSystemUi = SYSTEMUI.equals(cmdline());
+            sSystemUi = SYSTEMUI.equals(processName);
             if (!sSystemUi) return;
             File f = new File(FILE);
             String build = BuildConfig.VERSION_NAME + "/" + REV;
@@ -119,10 +134,10 @@ public final class SafeGuard {
     }
 
     /** True se siamo nel processo di SystemUI. */
-    public static boolean isSystemUi() { init(); return sSystemUi; }
+    public static boolean isSystemUi() { init(); return sInited && sSystemUi; }
 
     /** Livello di protezione (0 fuori da SystemUI). */
-    public static int level() { init(); return sSystemUi ? sLevel : 0; }
+    public static int level() { init(); return sInited && sSystemUi ? sLevel : 0; }
 
     /** Mod con hook su metodi molto usati di Android: si spengono dal livello 1. */
     public static boolean isHotMod(Class<?> mod) {
