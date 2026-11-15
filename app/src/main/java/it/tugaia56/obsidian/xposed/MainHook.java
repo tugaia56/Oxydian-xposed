@@ -17,6 +17,7 @@ public class MainHook implements IXposedHookLoadPackage, IXposedHookInitPackageR
     @Override
     public void initZygote(StartupParam p) throws Throwable {
         if (!XPLauncher.isOplusRom()) return;   // altre ROM (Android puro): niente hook globali
+        if (SafeGuard.level() >= 3) return;     // protezione ciclo SystemUI (vedi SafeGuard)
         resourceManager.initZygote(p);
     }
 
@@ -40,7 +41,7 @@ public class MainHook implements IXposedHookLoadPackage, IXposedHookInitPackageR
 
     @Override
     public void handleInitPackageResources(XC_InitPackageResources.InitPackageResourcesParam rp) throws Throwable {
-        if (SafeGuard.level() >= 3) return;   // protezione ciclo SystemUI (vedi SafeGuard)
+        if (SafeGuard.level() >= 2) return;   // protezione ciclo SystemUI (vedi SafeGuard)
         if (!XPLauncher.isOplusRom()) {
             // Android puro: solo i colori dell'app Contatti di Google (il resto del modulo resta spento)
             if (it.tugaia56.obsidian.xposed.hooks.contacts.ContactsMod.PKG.equals(rp.packageName))

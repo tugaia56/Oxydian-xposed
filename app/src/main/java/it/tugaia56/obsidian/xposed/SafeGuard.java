@@ -14,6 +14,8 @@ import it.tugaia56.obsidian.BuildConfig;
 /**
  * Protezione contro i cicli di riavvio di SystemUI causati dagli hook del modulo.
  *
+ * Livelli (v2): 1 = spente le mod con hook su metodi molto usati; 2 = spente tutte le mod di SystemUI E i ritocchi alle risorse
+ * (handleInitPackageResources); 3 = il modulo non fa niente (nemmeno gli hook iniziali di initZygote).
  * Su alcuni telefoni (OnePlus 13 indiano, OxygenOS 16.0.1.304) SystemUI cade ogni 2-3 secondi con un errore di memoria (ART/GC)
  * appena il modulo e' attivo in SystemUI. Qui si contano gli avvii di SystemUI: se partono 6 volte in 40 secondi (un ciclo)
  * si sale di livello, e al livello successivo si spengono piu' hook:
@@ -28,10 +30,10 @@ public final class SafeGuard {
     private SafeGuard() {}
 
     /** Cambiarlo azzera il livello di tutti (nuova prova). */
-    private static final String REV = "g1";
+    private static final String REV = "g2";
     private static final String SYSTEMUI = "com.android.systemui";
     private static final String FILE = "/data/user_de/0/com.android.systemui/cache/oxydian_guard.txt";
-    private static final int LOOP_STARTS = 6;
+    private static final int LOOP_STARTS = 4;
     private static final long LOOP_WINDOW_MS = 40_000;
     private static final long STABLE_AFTER_MS = 120_000;
     private static final int MAX_LEVEL = 3;
