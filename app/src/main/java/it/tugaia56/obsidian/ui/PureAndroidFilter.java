@@ -25,12 +25,12 @@ public final class PureAndroidFilter {
             R.string.nav_launcher, R.string.nav_aod, R.string.nav_quick_settings,
             R.string.nav_quick_settings_panel, R.string.nav_lock_clock_new, R.string.nav_lock_weather,
             R.string.nav_lock_widgets, R.string.nav_lock_screen_options,
-            R.string.dark_shadow_preset_rvd /* volume */
+            R.string.nav_misc_power_menu, R.string.dark_shadow_preset_rvd /* volume */
     };
 
     /** Prefissi dei nomi delle pagine (Fragment) da nascondere. */
     private static final String[] HIDDEN_PAGE_PREFIXES = {
-            "Launcher", "Aod", "Qs", "Clock", "QuickSettings", "LockScreenOptions", "Lockscreen",
+            "Launcher", "Aod", "Qs", "Clock", "PowerMenu", "QuickSettings", "LockScreenOptions", "Lockscreen",
             "FingerprintPreset", "Volume", "DeviceWidget"
     };
 
