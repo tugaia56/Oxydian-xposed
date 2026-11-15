@@ -1390,4 +1390,6 @@
     <string name="logs_delete_title">Elimina i log salvati</string>
     <string name="health_delete_title">Elimina i file di stato salvati</string>
     <string name="backup_delete_title">Elimina i backup</string>
+    <string name="notif_buttons_accent">Pulsanti notifiche in accento</string>
+    <string name="notif_buttons_accent_summary">Cancella tutto e Gestisci con sfondo accento e testo bianco</string>
 </resources>

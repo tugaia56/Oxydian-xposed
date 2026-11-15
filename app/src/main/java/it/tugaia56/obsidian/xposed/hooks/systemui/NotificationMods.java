@@ -96,7 +96,7 @@ public class NotificationMods extends XposedMods {
         if (Key.length > 0) {
             switch (Key[0]) {
                 case PREF_CUSTOMIZE_CLEAR, PREF_LINK_BG_ACCENT, PREF_CLEAR_BG_COLOR,
-                     PREF_LINK_ICON_ACCENT, PREF_CLEAR_ICON_COLOR -> updateClearButton();
+                     PREF_LINK_ICON_ACCENT, PREF_CLEAR_ICON_COLOR -> { updateClearButton(); refreshFooter(); }
             }
         }
     }
@@ -108,6 +108,7 @@ public class NotificationMods extends XposedMods {
         hookAppIcon(lp);
         hookExpansion(lp);
         hookClearButton(lp);
+        if (!it.tugaia56.obsidian.xposed.XPLauncher.isOplusRom()) hookFooter(lp);
     }
 
     // ── App icon ──────────────────────────────────────────────────────────────
@@ -300,6 +301,61 @@ public class NotificationMods extends XposedMods {
             mClearAllButton.setImageTintList(null);
             if (mDefaultClearIcon != null) mClearAllButton.setImageDrawable(mDefaultClearIcon);
             if (mDefaultClearBg != null) mClearAllButton.setBackground(mDefaultClearBg);
+        }
+    }
+
+    // ── Pulsanti in fondo alle notifiche (Android puro, RisingOS) ───────────────────────────────
+
+    private java.lang.ref.WeakReference<Object> mFooter;
+
+    /** Accento del Theme (persist.oxytheme.accent) se c'e', altrimenti quello delle preferenze. */
+    private int footerAccent() {
+        try {
+            Class<?> sp = Class.forName("android.os.SystemProperties");
+            String v = String.valueOf(de.robv.android.xposed.XposedHelpers.callStaticMethod(sp, "get", "persist.oxytheme.accent", "")).trim();
+            if (v.length() >= 6) return 0xFF000000 | (int) Long.parseLong(v.substring(v.length() - 6), 16);
+        } catch (Throwable ignored) {}
+        return mAccent;
+    }
+
+    /** FooterView di SystemUI: i pulsanti "Cancella tutto", "Gestisci" e "Cronologia" sono scuri. Con "Personalizza pulsante"
+     *  acceso prendono sfondo (tinta, cosi' la forma resta) e testo scelti. */
+    private void hookFooter(XC_LoadPackage.LoadPackageParam lp) {
+        Class<?> fv = tryFindClass(lp, "com.android.systemui.statusbar.notification.footer.ui.view.FooterView");
+        if (fv == null) { log("[ Obsidian ] NotificationMods: FooterView not found"); return; }
+        XC_MethodHook h = new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam p) {
+                mFooter = new java.lang.ref.WeakReference<>(p.thisObject);
+                applyFooter(p.thisObject);
+            }
+        };
+        for (String m : new String[]{"onFinishInflate", "updateColors", "updateColors$2", "onConfigurationChanged"}) {
+            try { hookAllMethods(fv, m, h); } catch (Throwable ignored) {}
+        }
+        log("[ Obsidian ] NotificationMods: FooterView hooked");
+    }
+
+    private void refreshFooter() {
+        Object f = mFooter != null ? mFooter.get() : null;
+        if (f instanceof android.view.View) ((android.view.View) f).post(() -> applyFooter(f));
+    }
+
+    private void applyFooter(Object footer) {
+        if (!mCustomizeClear) return;
+        int bg = mLinkBgAccent ? footerAccent() : mClearBgColor;
+        int fg = mLinkIconAccent ? footerAccent() : mClearIconColor;
+        for (String field : new String[]{"mClearAllButton", "mSettingsButton", "mHistoryButton"}) {
+            try {
+                Object b = getObjectField(footer, field);
+                if (!(b instanceof android.view.View)) continue;
+                android.view.View v = (android.view.View) b;
+                v.setBackgroundTintList(ColorStateList.valueOf(bg));
+                if (v instanceof android.widget.TextView) {
+                    android.widget.TextView tv = (android.widget.TextView) v;
+                    tv.setTextColor(fg);
+                    tv.setCompoundDrawableTintList(ColorStateList.valueOf(fg));
+                }
+            } catch (Throwable ignored) {}
         }
     }
 

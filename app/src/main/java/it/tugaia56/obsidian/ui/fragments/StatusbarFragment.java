@@ -104,6 +104,18 @@ public class StatusbarFragment extends Fragment {
                     getString(R.string.statusbar_app_icon_scale),
                     ObsidianPrefs.getInt("statusbar_notification_app_icon_scale", 100), 50, 200, "%", 100,
                     value -> ObsidianPrefs.putInt("statusbar_notification_app_icon_scale", value)));
+            SwitchWidgetAdapter.SwitchItem accentBtn = new SwitchWidgetAdapter.SwitchItem(
+                    getString(R.string.notif_buttons_accent), getString(R.string.notif_buttons_accent_summary),
+                    ObsidianPrefs.getBoolean("customizeClearButton", false), null);
+            accentBtn.onChanged = () -> {
+                ObsidianPrefs.putBoolean("customizeClearButton", accentBtn.checked);
+                if (accentBtn.checked) {   // sfondo = accento, testo bianco
+                    ObsidianPrefs.putBoolean("linkBackgroundAccent", true);
+                    ObsidianPrefs.putBoolean("linkIconAccent", false);
+                    ObsidianPrefs.putInt("clearButtonIconColor", 0xFFFFFFFF);
+                }
+            };
+            rows.add(accentBtn);
             String[] entries = getResources().getStringArray(R.array.notif_default_expansion_entries);
             int cur = 0;
             try { cur = Integer.parseInt(ObsidianPrefs.getString("notificationDefaultExpansion", "0")); } catch (NumberFormatException ignored) {}

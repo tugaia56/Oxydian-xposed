@@ -88,7 +88,7 @@ public class ModPacks {
 
     public static List<Class<? extends XposedMods>> getMods(String packageName) {
         List<Class<? extends XposedMods>> mods = new ArrayList<>();
-        if (Constants.Packages.SYSTEM_UI.equals(packageName)) {
+        if (Constants.Packages.SYSTEM_UI.equals(packageName) && XPLauncher.isOplusRom()) {
             mods.add(MonetFreeze.class);
             mods.add(QsBackground.class);
             mods.add(QsHeaderImage.class);
@@ -136,6 +136,7 @@ public class ModPacks {
             mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.PowerMenuItalianMod.class);   // menu di spegnimento Compose: scritte nel codice tradotte in italiano
             mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.PowerMenuAccentMod.class);   // menu di spegnimento Compose: bordo accento (opzione) e icone Riavvia in accento
             mods.add(SimIconHideMod.class);   // nasconde l'icona di una SIM
+            mods.add(NotificationMods.class);   // icone app a colori nella barra di stato e espansione predefinita delle notifiche
             mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.RisingFpScaleMod.class);   // RisingOS: cursore "Ridimensionamento icona impronta" sull'icona scelta in Impostazioni risingOS
             return mods;
         }
