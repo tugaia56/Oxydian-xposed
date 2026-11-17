@@ -121,6 +121,11 @@ public class StatusbarFragment extends Fragment {
                             })
                             .setNegativeButton(R.string.cancel, null)
                             .show()));
+            SwitchWidgetAdapter.SwitchItem expandAccent = new SwitchWidgetAdapter.SwitchItem(
+                    getString(R.string.notif_expand_accent), getString(R.string.notif_expand_accent_summary),
+                    ObsidianPrefs.getBoolean("notifExpandAccent", false), null);
+            expandAccent.onChanged = () -> ObsidianPrefs.putBoolean("notifExpandAccent", expandAccent.checked);
+            rows.add(expandAccent);
             it.tugaia56.obsidian.ui.adapters.GroupUtils.addGroup(chain, rows);
             // Pulsanti in fondo alle notifiche (Cancella tutto, Gestisci, Cronologia): stesse opzioni di OxygenOS
             chain.add(new SectionTitleAdapter(List.of(getString(R.string.customize_clear_all_button))));

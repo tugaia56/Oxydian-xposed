@@ -52,12 +52,14 @@ public class NotificationMods extends XposedMods {
     private static final String PREF_CLEAR_ICON_COLOR  = "clearButtonIconColor";
     private static final String PREF_ACCENT1           = "DST_ACCENT1";
     private static final String PREF_HIDE_CLEAR_ALL    = "OBS_NOTIF_HIDE_CLEAR_ALL";
+    private static final String PREF_EXPAND_ACCENT     = "notifExpandAccent";
 
     private boolean mAppIconOn = false;
     private float mAppIconScale = 1f;
     private int mDefaultExpansion = DEFAULT;
     private boolean mCustomizeClear = false;
     private boolean mHideClearAll = false;
+    private boolean mExpandAccent = false;
     private boolean mLinkBgAccent = false;
     private boolean mLinkIconAccent = false;
     private int mClearBgColor = 0xFF8C8C8C;
@@ -85,6 +87,7 @@ public class NotificationMods extends XposedMods {
         } catch (Throwable ignored) { mDefaultExpansion = DEFAULT; }
 
         mHideClearAll    = Xprefs.getBoolean(PREF_HIDE_CLEAR_ALL, false);
+        mExpandAccent    = Xprefs.getBoolean(PREF_EXPAND_ACCENT, false);
         mCustomizeClear  = Xprefs.getBoolean(PREF_CUSTOMIZE_CLEAR, false);
         mLinkBgAccent    = Xprefs.getBoolean(PREF_LINK_BG_ACCENT, false);
         mLinkIconAccent  = Xprefs.getBoolean(PREF_LINK_ICON_ACCENT, false);
@@ -108,7 +111,7 @@ public class NotificationMods extends XposedMods {
         hookAppIcon(lp);
         hookExpansion(lp);
         hookClearButton(lp);
-        if (!it.tugaia56.obsidian.xposed.XPLauncher.isOplusRom()) hookFooter(lp);
+        if (!it.tugaia56.obsidian.xposed.XPLauncher.isOplusRom()) { hookFooter(lp); hookExpandButton(lp); }
     }
 
     // ── App icon ──────────────────────────────────────────────────────────────
@@ -357,6 +360,40 @@ public class NotificationMods extends XposedMods {
                 }
             } catch (Throwable ignored) {}
         }
+    }
+
+    // ── Pulsante freccia a destra di ogni notifica (Android puro) ─────────────────────────────
+
+    /** NotificationExpandButton (framework): la "pillola" grigia con la freccia. Con l'opzione accesa prende lo sfondo accento. */
+    private void hookExpandButton(XC_LoadPackage.LoadPackageParam lp) {
+        Class<?> eb = tryFindClass(lp, "com.android.internal.widget.NotificationExpandButton");
+        if (eb == null) { log("[ Obsidian ] NotificationMods: NotificationExpandButton not found"); return; }
+        XC_MethodHook h = new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam p) {
+                if (!mExpandAccent || !(p.thisObject instanceof android.view.View)) return;
+                final android.view.View v = (android.view.View) p.thisObject;
+                applyExpandButton(v);
+                v.post(() -> applyExpandButton(v));   // dopo eventuali altri colori impostati nello stesso passaggio
+            }
+        };
+        for (String m : new String[]{"onFinishInflate", "onAttachedToWindow", "setExpanded", "setDefaultPillColor", "setHighlightPillColor",
+                "setDefaultTextColor", "setHighlightTextColor", "updateExpandedState", "setNumber", "setColorFilter"}) {
+            try { hookAllMethods(eb, m, h); } catch (Throwable ignored) {}
+        }
+        log("[ Obsidian ] NotificationMods: NotificationExpandButton hooked");
+    }
+
+    private void applyExpandButton(android.view.View button) {
+        try {
+            android.content.res.Resources r = button.getResources();
+            int accent = footerAccent();
+            android.view.View pill = button.findViewById(r.getIdentifier("expand_button_pill", "id", "android"));
+            if (pill != null) pill.setBackgroundTintList(ColorStateList.valueOf(accent));
+            android.view.View icon = button.findViewById(r.getIdentifier("expand_button_icon", "id", "android"));
+            if (icon instanceof ImageView) ((ImageView) icon).setColorFilter(0xFFFFFFFF);
+            android.view.View num = button.findViewById(r.getIdentifier("expand_button_number", "id", "android"));
+            if (num instanceof android.widget.TextView) ((android.widget.TextView) num).setTextColor(0xFFFFFFFF);
+        } catch (Throwable ignored) {}
     }
 
     // ── Utility ──────────────────────────────────────────────────────────────

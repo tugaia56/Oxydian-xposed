@@ -787,6 +787,8 @@
     <string name="notif_always_collapse">Comprimi sempre</string>
     <string name="notif_per_app">Scelta per app</string>
     <string name="notif_show_buttons">Mostra il pulsante espandi e comprimi</string>
+    <string name="notif_expand_accent">Frecce delle notifiche in accento</string>
+    <string name="notif_expand_accent_summary">Il pulsante freccia a destra di ogni notifica prende il colore accento (solo Android)</string>
     <string name="notif_show_buttons_summary">Mostra il pulsante di espandi/comprimi nel pannello notifiche</string>
     <string name="customize_clear_all_button">Personalizza Pulsante Notifiche</string>
     <string name="customize_clear_all_button_summary">Cambia l\'aspetto del pulsante "Cancella tutto"</string>

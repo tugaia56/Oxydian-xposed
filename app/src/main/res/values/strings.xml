@@ -786,6 +786,8 @@
     <string name="notif_always_collapse">Always Collapse</string>
     <string name="notif_per_app">Per-App Choice</string>
     <string name="notif_show_buttons">Show Expand and Collapse Button</string>
+    <string name="notif_expand_accent">Accent colour on the expand arrows</string>
+    <string name="notif_expand_accent_summary">The arrow button on the right of each notification gets the accent colour (Android only)</string>
     <string name="notif_show_buttons_summary">Show expand and collapse button in the notification panel</string>
     <string name="customize_clear_all_button">Customize Notification Button</string>
     <string name="customize_clear_all_button_summary">Changes the appearance of the "Clear all" button</string>
