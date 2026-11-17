@@ -113,7 +113,7 @@ public class MiscFragment extends Fragment {
         boolean pure = it.tugaia56.obsidian.ui.PureAndroidFilter.active();
         SwitchWidgetAdapter togglesAdapter = new SwitchWidgetAdapter(pure
                 ? List.of(usbItem, pmBorderItem, pmGlassItem, screenshotItem)
-                : List.of(rotationItem, usbItem, settingsEntryItem, searchBorderItem, pmBorderItem, pmGlassItem, screenshotItem));
+                : List.of(rotationItem, usbItem, settingsEntryItem, searchBorderItem, screenshotItem));   // bordo/vetro del menu di spegnimento: solo Android puro
 
         List<NavAdapter.NavItem> items = List.of(
 
