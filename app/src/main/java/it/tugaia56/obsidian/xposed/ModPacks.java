@@ -148,6 +148,7 @@ public class ModPacks {
             mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.PowerMenuAccentMod.class);   // menu di spegnimento Compose: bordo accento (opzione) e icone Riavvia in accento
             mods.add(SimIconHideMod.class);   // nasconde l'icona di una SIM
             mods.add(NotificationMods.class);   // icone app a colori nella barra di stato e espansione predefinita delle notifiche
+            mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.LockScreenStatusBarHideMod.class);   // "Nascondi barra di stato" della schermata di blocco
             mods.add(it.tugaia56.obsidian.xposed.hooks.systemui.RisingFpScaleMod.class);   // RisingOS: cursore "Ridimensionamento icona impronta" sull'icona scelta in Impostazioni risingOS
             return mods;
         }

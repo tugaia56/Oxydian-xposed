@@ -85,6 +85,8 @@ public class LockScreenOptionsFragment extends Fragment {
 
         // ── Sfocatura Schermata di Blocco (blur nativo OOS — stessi pref del pannello
         // QS, si vede anche qui perché ScrimViewExImp è condiviso tra le due superfici) ──
+        // sfocatura dello sfondo: solo OxygenOS (su Android puro la mod non viene caricata)
+        if (!it.tugaia56.obsidian.ui.PureAndroidFilter.active()) {
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.qs_blur_lockscreen_section))));
         SwitchWidgetAdapter.SwitchItem lockBlurSwitch = gatingSwitch(
                 getString(R.string.qs_blur_enable_switch), getString(R.string.qs_blur_enable_switch_summary), PREF_BLUR_ON);
@@ -101,14 +103,11 @@ public class LockScreenOptionsFragment extends Fragment {
             blurRows.add(sliderItem(getString(R.string.qs_blur_max_amount), PREF_BLUR_MAX, 0, 100, 100, "%"));
         }
         GroupUtils.addGroup(chain, blurRows);
+        }
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.nav_lock_misc))));
         SwitchWidgetAdapter.SwitchItem lockIconItem = prefSwitch(
                 getString(R.string.lockscreen_hide_lock_icon), getString(R.string.lockscreen_hide_lock_icon_summary), "lockscreen_hide_lock_icon");
-        SwitchWidgetAdapter.SwitchItem leftItem = prefSwitch(
-                getString(R.string.lockscreen_affordance_remove_left), getString(R.string.lockscreen_affordance_remove_left_summary), "lockscreen_affordance_remove_left");
-        SwitchWidgetAdapter.SwitchItem rightItem = prefSwitch(
-                getString(R.string.lockscreen_affordance_remove_right), getString(R.string.lockscreen_affordance_remove_right_summary), "lockscreen_affordance_remove_right");
         SwitchWidgetAdapter.SwitchItem sosItem = prefSwitch(
                 getString(R.string.lockscreen_hide_sos), getString(R.string.lockscreen_hide_sos_summary),
                 "lockscreen_hide_sos");
@@ -121,9 +120,12 @@ public class LockScreenOptionsFragment extends Fragment {
         SwitchWidgetAdapter.SwitchItem powerMenuItem = prefSwitch(
                 getString(R.string.lockscreen_hide_power_menu), getString(R.string.lockscreen_hide_power_menu_summary),
                 "lockscreen_hide_power_menu");
-        GroupUtils.addGroup(chain, List.of(
-                lockIconItem, leftItem, rightItem, sosItem, carrierItem,
-                carrierReplacementItem(), statusbarItem, powerMenuItem));
+        List<Object> miscRows = new java.util.ArrayList<>(List.of(
+                lockIconItem, sosItem, carrierItem,
+                carrierReplacementItem(), statusbarItem));
+        // Nascondi menu accensione: solo OxygenOS (RisingOS ha la sua impostazione "Menu di accensione" nelle Impostazioni)
+        if (!it.tugaia56.obsidian.ui.PureAndroidFilter.active()) miscRows.add(powerMenuItem);
+        GroupUtils.addGroup(chain, miscRows);
 
         // ── Sfondo con Effetto Profondità: apre l'editor nativo di OxygenOS, non un
         // hook nostro — vedi il commento in testa alla classe. ──

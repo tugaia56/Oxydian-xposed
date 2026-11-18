@@ -33,8 +33,9 @@ public class LockScreenButtonsMods extends XposedMods {
     public void updatePrefs(String... Key) {
         if (Xprefs == null) return;
         mHideLockIcon          = Xprefs.getBoolean("lockscreen_hide_lock_icon", false);
-        mRemoveLeftAffordance  = Xprefs.getBoolean("lockscreen_affordance_remove_left", false);
-        mRemoveRightAffordance = Xprefs.getBoolean("lockscreen_affordance_remove_right", false);
+        // "Rimuovi pulsante sinistro/destro": tolti dal modulo (le ROM lo permettono da sole nelle impostazioni); un vecchio valore salvato non ha piu' effetto
+        mRemoveLeftAffordance  = false;
+        mRemoveRightAffordance = false;
     }
 
     @Override
