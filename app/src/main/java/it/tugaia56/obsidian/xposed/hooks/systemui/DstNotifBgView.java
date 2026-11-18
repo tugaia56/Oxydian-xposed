@@ -91,6 +91,22 @@ public class DstNotifBgView {
             } catch (Throwable t) {
                 XposedBridge.log("[ Obsidian ] DstNotifBgView: setBlurBackgroundEnabled hook FAILED: " + t);
             }
+            // RisingOS: sulla schermata di blocco ogni notifica ha uno sfondo sfocato della ROM ("Axion", AxBlurBackgroundRenderer)
+            // che prende il posto del disegno dello stile (niente bordo): con uno stile attivo lo si spegne, come per crDroid
+            try {
+                Class<?> act = lpparam.classLoader.loadClass("com.android.systemui.statusbar.notification.row.ActivatableNotificationView");
+                XposedBridge.hookAllMethods(act, "shouldUseAxBlurBackground", new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam p) {
+                        try {
+                            if (Boolean.TRUE.equals(p.getResult()) && !it.tugaia56.obsidian.xposed.XPLauncher.isOplusRom()
+                                    && DstNotifStyle.isEnabled()) p.setResult(Boolean.FALSE);
+                        } catch (Throwable ignored) {}
+                    }
+                });
+            } catch (Throwable t) {
+                // non e' RisingOS: classe/metodo non presenti, niente da fare
+            }
             // Android 17: setTint(int) dipinge tutto lo sfondo di un solo colore (e presume che il primo strato sia un GradientDrawable):
             // cancellerebbe contorno e accento dello stile. Con lo stile applicato si salta e si tiene solo il colore.
             try {
