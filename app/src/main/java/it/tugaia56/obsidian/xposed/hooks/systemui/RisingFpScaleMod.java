@@ -26,7 +26,8 @@ public class RisingFpScaleMod extends XposedMods {
 
     private static volatile float sScale = 1.0f;
     private static volatile long sRead = 0;
-    private boolean mUnclipped = false;
+    private boolean mLoggedNoView = false;
+    private final java.util.Set<View> mUnclipped = java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
 
     public RisingFpScaleMod(Context context) {
         super(context);
@@ -76,7 +77,7 @@ public class RisingFpScaleMod extends XposedMods {
                         c.save();
                         c.scale(s, s, b.exactCenterX(), b.exactCenterY());
                         p.setObjectExtra("fpScaled", Boolean.TRUE);
-                        if (s > 1.0f && !mUnclipped) unclip((Drawable) p.thisObject);
+                        if (s > 1.0f) unclip((Drawable) p.thisObject);
                     } catch (Throwable ignored) {}
                 }
                 @Override protected void afterHookedMethod(MethodHookParam p) {
@@ -91,17 +92,30 @@ public class RisingFpScaleMod extends XposedMods {
         }
     }
 
-    /** L'icona ingrandita esce dai limiti della view: si spegne il ritaglio della view e dei suoi 3 genitori. */
+    /** L'icona ingrandita esce dai limiti della view: si spegne il ritaglio della view e di TUTTI i suoi genitori, fino alla finestra.
+     *  Si rifa' per ogni view (l'icona viene ricreata ad ogni blocco/sblocco), non una volta sola. */
     private void unclip(Drawable d) {
-        mUnclipped = true;
+        // l'icona puo' stare dentro altri disegni (wrapper, layer): si risale la catena fino alla view
         Drawable.Callback cb = d.getCallback();
-        if (!(cb instanceof View)) return;
+        for (int k = 0; k < 10 && cb instanceof Drawable; k++) cb = ((Drawable) cb).getCallback();
+        if (!(cb instanceof View)) {
+            if (!mLoggedNoView) { mLoggedNoView = true; XposedBridge.log("[ Obsidian ] RisingFpScaleMod: nessuna view per l'icona, callback=" + (cb == null ? "null" : cb.getClass().getName())); }
+            return;
+        }
         View v = (View) cb;
-        for (int i = 0; i < 4 && v != null; i++) {
-            if (v instanceof android.view.ViewGroup) {
-                ((android.view.ViewGroup) v).setClipChildren(false);
-                ((android.view.ViewGroup) v).setClipToPadding(false);
-            }
+        if (!mUnclipped.add(v)) return;
+        StringBuilder chain = new StringBuilder();
+        for (View q = v; q != null; ) { chain.append(q.getClass().getSimpleName()).append(" > "); ViewParent qp = q.getParent(); q = qp instanceof View ? (View) qp : null; }
+        XposedBridge.log("[ Obsidian ] RisingFpScaleMod: libero il ritaglio di " + chain + " (view " + v.getWidth() + "x" + v.getHeight() + ")");
+        for (int i = 0; i < 20 && v != null; i++) {
+            try {
+                v.setClipBounds(null);
+                v.setClipToOutline(false);
+                if (v instanceof android.view.ViewGroup) {
+                    ((android.view.ViewGroup) v).setClipChildren(false);
+                    ((android.view.ViewGroup) v).setClipToPadding(false);
+                }
+            } catch (Throwable ignored) {}
             ViewParent pa = v.getParent();
             v = pa instanceof View ? (View) pa : null;
         }
