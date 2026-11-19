@@ -163,6 +163,8 @@
     <string name="nav_lock_buttons_summary">Nascondi icona lucchetto e pulsanti di scorciatoia in basso</string>
     <string name="lockscreen_hide_lock_icon">Nascondi icona lucchetto</string>
     <string name="lockscreen_hide_lock_icon_summary">Nasconde l\'icona del lucchetto sulla schermata di blocco</string>
+    <string name="lockscreen_hide_face_icon">Nascondi icona riconoscimento viso</string>
+    <string name="lockscreen_hide_face_icon_summary">Nasconde la faccina del riconoscimento del volto sulla schermata di blocco</string>
     <string name="lockscreen_affordance_remove_left">Rimuovi Pulsante Sinistro</string>
     <string name="lockscreen_affordance_remove_left_summary">Rimuove la scorciatoia in basso a sinistra (es. fotocamera/torcia)</string>
     <string name="lockscreen_affordance_remove_right">Rimuovi Pulsante Destro</string>

@@ -276,6 +276,45 @@ public class QsTilesCustomizeMod extends XposedMods {
         }
     }
 
+    /** Forma NATIVA dei riquadri piccoli del pannello Classico (Impostazioni > Impostazioni rapide, qs_personality_shape_type: 6 forme).
+     *  Il drawable e' dentro un TileDrawableWrapper che ha un "path provider" (RoundRect / Oval / Path): gli si chiede il contorno vero
+     *  della view e lo si usa per il bordo, ristretto dell'inset. Null se non si riesce (resta il rettangolo arrotondato). */
+    private android.graphics.Path nativeShapePath(Drawable d, android.graphics.Rect bounds, float inset) {
+        try {
+            Object wrapper = d.getCallback();
+            if (wrapper == null || wrapper instanceof View) return null;
+            Object pp = callMethod(wrapper, "getPathProvider");
+            if (!(pp instanceof ViewOutlineProvider provider)) return null;
+            Object up = (wrapper instanceof Drawable wd) ? wd.getCallback() : null;
+            if (!(up instanceof View view) || view.getWidth() <= 0 || view.getHeight() <= 0) return null;
+            Outline o = new Outline();
+            provider.getOutline(view, o);
+            android.graphics.RectF area = new android.graphics.RectF(bounds.left + inset, bounds.top + inset, bounds.right - inset, bounds.bottom - inset);
+            android.graphics.Path pa = null;
+            try { pa = (android.graphics.Path) de.robv.android.xposed.XposedHelpers.getObjectField(o, "mPath"); } catch (Throwable ignored) {}
+            if (pa != null && !pa.isEmpty()) {
+                android.graphics.RectF pb = new android.graphics.RectF();
+                pa.computeBounds(pb, true);
+                if (pb.width() <= 0 || pb.height() <= 0) return null;
+                android.graphics.Path out = new android.graphics.Path(pa);
+                android.graphics.Matrix m = new android.graphics.Matrix();
+                m.setRectToRect(pb, area, android.graphics.Matrix.ScaleToFit.FILL);
+                out.transform(m);
+                return out;
+            }
+            float rad = -1f;
+            try { rad = de.robv.android.xposed.XposedHelpers.getFloatField(o, "mRadius"); } catch (Throwable ignored) {}
+            if (rad < 0f) return null;
+            // raggio dell'outline della view, ristretto dell'inset (cerchio/ovale: tutto il mezzo lato)
+            float rr = Math.max(0f, Math.min(rad, Math.min(area.width(), area.height()) / 2f));
+            android.graphics.Path out = new android.graphics.Path();
+            out.addRoundRect(area, rr, rr, android.graphics.Path.Direction.CW);
+            return out;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
     /** Costruisce il Path della forma scelta in "Forma riquadri" dentro bounds — un solo punto sia
      *  per disegnarla (drawShaped) sia per ritagliare il contenuto nativo sulla stessa sagoma
      *  (clipShaped, cursori/media — 2026-09-23 "lo sfondo esce dal bordo"). */
@@ -1396,9 +1435,18 @@ public class QsTilesCustomizeMod extends XposedMods {
                             // 2026-09-29: stesso fix gemello del blocco "mixcolor tile border draw"
                             // più sotto — bounds ristretti di "inset" ma raggio pieno facevano
                             // sporgere lo sfondo oltre la curva del bordo agli angoli.
+                            // Pannello Classico: con "Forma riquadri" accesa i riquadri piccoli sono ritagliati nella forma scelta (ottagono, ecc.)
+                            // ma il bordo dei "riquadri base" restava un rettangolo: si disegna con la stessa forma
+                            android.graphics.Path gNative = (!gIcon && !gWide && !mTileShapeOn) ? nativeShapePath((Drawable) p.thisObject, bounds, inset) : null;
+                            if (gNative != null) {
+                                canvas.drawPath(gNative, paint);
+                            } else if (mTileShapeOn && !gIcon && !gWide) {
+                                drawShaped(canvas, bounds, paint);
+                            } else {
                             float borderRadius = Math.max(0f, radius - inset);
                             canvas.drawRoundRect(bounds.left + inset, bounds.top + inset,
                                     bounds.right - inset, bounds.bottom - inset, borderRadius, borderRadius, paint);
+                            }
                         }
                     } catch (Throwable t) { dbg("tile border draw failed: " + t); }
                 }
@@ -1602,9 +1650,14 @@ public class QsTilesCustomizeMod extends XposedMods {
                                 // che esce dal bordo usato in raggio"). Riducendo il raggio del
                                 // bordo della stessa quantità dell'inset, le due curve restano
                                 // concentriche — stesso principio di un bordo CSS/inset-shadow.
+                                android.graphics.Path mNative = smallRoundTile ? nativeShapePath((Drawable) p.thisObject, bounds, inset) : null;
+                                if (mNative != null) {
+                                    canvas.drawPath(mNative, paint);
+                                } else {
                                 float borderRadius = Math.max(0f, radius - inset);
                                 canvas.drawRoundRect(bounds.left + inset, bounds.top + inset,
                                         bounds.right - inset, bounds.bottom - inset, borderRadius, borderRadius, paint);
+                                }
                             }
                         }
                     } catch (Throwable t) { dbg("mixcolor tile border draw failed: " + t); }

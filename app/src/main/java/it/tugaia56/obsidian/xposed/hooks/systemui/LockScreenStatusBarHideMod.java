@@ -20,6 +20,7 @@ import it.tugaia56.obsidian.xposed.XposedMods;
 public class LockScreenStatusBarHideMod extends XposedMods {
 
     private static volatile boolean sHide = false;
+    private static volatile boolean sHideCarrier = false;
     private static volatile long sRead = 0;
 
     public LockScreenStatusBarHideMod(Context context) {
@@ -30,6 +31,7 @@ public class LockScreenStatusBarHideMod extends XposedMods {
     public void updatePrefs(String... Key) {
         if (Xprefs == null) return;
         sHide = Xprefs.getBoolean("lockscreen_hide_statusbar", false);
+        sHideCarrier = Xprefs.getBoolean("lockscreen_hide_carrier", false);
         applyNow();
     }
 
@@ -72,6 +74,19 @@ public class LockScreenStatusBarHideMod extends XposedMods {
                     } catch (Throwable ignored) {}
                 }
             });
+            // "Nascondi operatore": solo la scritta dell'operatore (mCarrierLabel) della barra del blocco
+            XC_MethodHook carrier = new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam p) {
+                    try {
+                        if (!sHideCarrier) return;
+                        Object label = XposedHelpers.getObjectField(p.thisObject, "mCarrierLabel");
+                        if (label instanceof View) ((View) label).setVisibility(View.GONE);
+                    } catch (Throwable ignored) {}
+                }
+            };
+            for (String m : new String[]{"onFinishInflate", "updateVisibilities", "updateLayoutParamsNoCutout", "updateCarrierLabelMargin", "onConfigurationChanged"}) {
+                try { XposedBridge.hookAllMethods(cls, m, carrier); } catch (Throwable ignored) {}
+            }
             XposedBridge.log("[ Obsidian ] LockScreenStatusBarHideMod: hooked KeyguardStatusBarView");
         } catch (Throwable t) {
             XposedBridge.log("[ Obsidian ] LockScreenStatusBarHideMod: hook failed: " + t);

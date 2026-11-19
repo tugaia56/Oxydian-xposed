@@ -107,7 +107,9 @@ public class LockScreenOptionsFragment extends Fragment {
 
         chain.add(new SectionTitleAdapter(List.of(getString(R.string.nav_lock_misc))));
         SwitchWidgetAdapter.SwitchItem lockIconItem = prefSwitch(
-                getString(R.string.lockscreen_hide_lock_icon), getString(R.string.lockscreen_hide_lock_icon_summary), "lockscreen_hide_lock_icon");
+                getString(it.tugaia56.obsidian.ui.PureAndroidFilter.active() ? R.string.lockscreen_hide_face_icon : R.string.lockscreen_hide_lock_icon),
+                getString(it.tugaia56.obsidian.ui.PureAndroidFilter.active() ? R.string.lockscreen_hide_face_icon_summary : R.string.lockscreen_hide_lock_icon_summary),
+                "lockscreen_hide_lock_icon");
         SwitchWidgetAdapter.SwitchItem sosItem = prefSwitch(
                 getString(R.string.lockscreen_hide_sos), getString(R.string.lockscreen_hide_sos_summary),
                 "lockscreen_hide_sos");
@@ -121,8 +123,10 @@ public class LockScreenOptionsFragment extends Fragment {
                 getString(R.string.lockscreen_hide_power_menu), getString(R.string.lockscreen_hide_power_menu_summary),
                 "lockscreen_hide_power_menu");
         List<Object> miscRows = new java.util.ArrayList<>(List.of(
-                lockIconItem, sosItem, carrierItem,
+                lockIconItem, carrierItem,
                 carrierReplacementItem(), statusbarItem));
+        // Nascondi SOS: solo OxygenOS
+        if (!it.tugaia56.obsidian.ui.PureAndroidFilter.active()) miscRows.add(sosItem);
         // Nascondi menu accensione: solo OxygenOS (RisingOS ha la sua impostazione "Menu di accensione" nelle Impostazioni)
         if (!it.tugaia56.obsidian.ui.PureAndroidFilter.active()) miscRows.add(powerMenuItem);
         GroupUtils.addGroup(chain, miscRows);
