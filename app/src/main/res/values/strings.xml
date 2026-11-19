@@ -168,6 +168,8 @@
     <string name="lockscreen_hide_lock_icon_summary">Hides the lock icon on the lock screen</string>
     <string name="lockscreen_hide_face_icon">Hide face unlock icon</string>
     <string name="lockscreen_hide_face_icon_summary">Hides the face recognition icon on the lock screen</string>
+    <string name="lockscreen_keep_seen">Keep seen notifications</string>
+    <string name="lockscreen_keep_seen_summary">Keep showing notifications on the lock screen after unlocking and locking again</string>
     <string name="lockscreen_affordance_remove_left">Remove Left Affordance</string>
     <string name="lockscreen_affordance_remove_left_summary">Removes the bottom-left shortcut (e.g. camera/flashlight)</string>
     <string name="lockscreen_affordance_remove_right">Remove Right Affordance</string>

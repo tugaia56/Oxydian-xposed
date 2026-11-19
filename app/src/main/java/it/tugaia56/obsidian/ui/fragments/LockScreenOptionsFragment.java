@@ -127,6 +127,9 @@ public class LockScreenOptionsFragment extends Fragment {
                 carrierReplacementItem(), statusbarItem));
         // Nascondi SOS: solo OxygenOS
         if (!it.tugaia56.obsidian.ui.PureAndroidFilter.active()) miscRows.add(sosItem);
+        // Mantieni le notifiche viste (da OC): solo OxygenOS 16+
+        if (!it.tugaia56.obsidian.ui.PureAndroidFilter.active() && android.os.Build.VERSION.SDK_INT >= 36)
+            miscRows.add(prefSwitch(getString(R.string.lockscreen_keep_seen), getString(R.string.lockscreen_keep_seen_summary), "lockscreen_keep_seen_notifications"));
         // Nascondi menu accensione: solo OxygenOS (RisingOS ha la sua impostazione "Menu di accensione" nelle Impostazioni)
         if (!it.tugaia56.obsidian.ui.PureAndroidFilter.active()) miscRows.add(powerMenuItem);
         GroupUtils.addGroup(chain, miscRows);

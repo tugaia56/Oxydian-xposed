@@ -165,6 +165,8 @@
     <string name="lockscreen_hide_lock_icon_summary">Nasconde l\'icona del lucchetto sulla schermata di blocco</string>
     <string name="lockscreen_hide_face_icon">Nascondi icona riconoscimento viso</string>
     <string name="lockscreen_hide_face_icon_summary">Nasconde la faccina del riconoscimento del volto sulla schermata di blocco</string>
+    <string name="lockscreen_keep_seen">Mantieni le notifiche viste</string>
+    <string name="lockscreen_keep_seen_summary">Continua a mostrare le notifiche sulla schermata di blocco dopo aver sbloccato e bloccato di nuovo</string>
     <string name="lockscreen_affordance_remove_left">Rimuovi Pulsante Sinistro</string>
     <string name="lockscreen_affordance_remove_left_summary">Rimuove la scorciatoia in basso a sinistra (es. fotocamera/torcia)</string>
     <string name="lockscreen_affordance_remove_right">Rimuovi Pulsante Destro</string>

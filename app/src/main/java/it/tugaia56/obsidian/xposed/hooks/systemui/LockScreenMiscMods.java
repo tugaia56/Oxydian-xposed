@@ -36,6 +36,7 @@ public class LockScreenMiscMods extends XposedMods {
     private boolean mHideSos          = false;
     private boolean mHideCarrier      = false;
     private boolean mHideStatusbar    = false;
+    private boolean mKeepSeenNotifs   = false;   // OC: lockscreen_keep_seen_notifications (OOS16+)
     private String  mCarrierReplacement = "";
 
     private TextView mCarrierText = null;
@@ -48,6 +49,7 @@ public class LockScreenMiscMods extends XposedMods {
         mHideSos             = Xprefs.getBoolean("lockscreen_hide_sos", false);
         mHideCarrier         = Xprefs.getBoolean("lockscreen_hide_carrier", false);
         mHideStatusbar       = Xprefs.getBoolean("lockscreen_hide_statusbar", false);
+        mKeepSeenNotifs      = Xprefs.getBoolean("lockscreen_keep_seen_notifications", false);
         mCarrierReplacement  = Xprefs.getString("lockscreen_carrier_replacement", "");
         applyCarrierText();
     }
@@ -57,7 +59,27 @@ public class LockScreenMiscMods extends XposedMods {
         if (!SYSTEM_UI.equals(lp.packageName)) return;
         hookSosButton(lp);
         hookCarrier(lp);
+        hookSeenNotifications(lp);
         hookLockscreenLayout();
+    }
+
+    // ── Notifiche viste (da OC) ─────────────────────────────────────────────
+    /** OxygenOS 16+: di solito le notifiche gia' viste spariscono dalla schermata di blocco dopo uno sblocco. OplusNotificationDebug
+     *  .getSkipCheckPostedBeforeLock decide se saltare quel controllo ("pubblicata prima del blocco"): con l'opzione si risponde sempre vero. */
+    private void hookSeenNotifications(XC_LoadPackage.LoadPackageParam lp) {
+        if (Build.VERSION.SDK_INT < 36) return;
+        try {
+            Class<?> dbg = XposedHelpers.findClassIfExists("com.oplus.systemui.notification.debug.OplusNotificationDebug", lp.classLoader);
+            if (dbg == null) { XposedBridge.log("[ Obsidian ] LockScreenMiscMods: OplusNotificationDebug not found"); return; }
+            hookAllMethods(dbg, "getSkipCheckPostedBeforeLock", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    if (mKeepSeenNotifs) p.setResult(true);
+                }
+            });
+            XposedBridge.log("[ Obsidian ] LockScreenMiscMods: hooked getSkipCheckPostedBeforeLock");
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] LockScreenMiscMods: keep seen notifications hook failed: " + t);
+        }
     }
 
     // ── SOS button ───────────────────────────────────────────────────────────
