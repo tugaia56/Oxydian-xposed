@@ -164,6 +164,10 @@ public class StatusbarNotifsFragment extends Fragment {
                         getString(R.string.remove_low_battery_summary),
                         "remove_low_battery_notification"),
                 prefSwitch(
+                        getString(R.string.mute_low_battery_sound),
+                        getString(R.string.mute_low_battery_sound_summary),
+                        "mute_low_battery_sound"),
+                prefSwitch(
                         getString(R.string.remove_charging_complete),
                         getString(R.string.remove_charging_complete_summary),
                         "remove_charging_complete_notification"),

@@ -773,6 +773,8 @@
     <string name="remove_usb_dialog_summary">Seleziona silenziosamente "Nessun trasferimento" alla connessione USB (ROM Android pure: riapplica la scelta precedente)</string>
     <string name="remove_low_battery">Rimuovi notifica batteria scarica</string>
     <string name="remove_low_battery_summary">Nasconde dialogo e notifica di batteria scarica</string>
+    <string name="mute_low_battery_sound">Silenzia suono batteria scarica</string>
+    <string name="mute_low_battery_sound_summary">Silenzia il suono che si sente quando la batteria e scarica o critica</string>
     <string name="remove_charging_complete">Rimuovi notifica carica completata</string>
     <string name="remove_charging_complete_summary">Nasconde la notifica "Carica completata"</string>
     <string name="remove_flashlight_notif">Rimuovi notifica torcia</string>

@@ -28,6 +28,7 @@ public class StatusbarMods extends XposedMods {
 
     private boolean mRemoveUsb           = false;
     private boolean mRemoveLowBattery    = false;
+    private boolean mMuteLowBatterySound = false;   // da OC: mute_low_battery_sound
     private boolean mRemoveChargingDone  = false;
     private boolean mRemoveFlashlight    = false;
     private boolean mRemoveDevMode       = false;
@@ -39,6 +40,7 @@ public class StatusbarMods extends XposedMods {
         if (Xprefs == null) return;
         mRemoveUsb          = Xprefs.getBoolean("remove_usb_dialog",                       false);
         mRemoveLowBattery   = Xprefs.getBoolean("remove_low_battery_notification",          false);
+        mMuteLowBatterySound = Xprefs.getBoolean("mute_low_battery_sound",                  false);
         mRemoveChargingDone = Xprefs.getBoolean("remove_charging_complete_notification",    false);
         mRemoveFlashlight   = Xprefs.getBoolean("remove_flashlight_notification",           false);
         mRemoveDevMode      = Xprefs.getBoolean("remove_dev_mode",                          false);
@@ -117,6 +119,22 @@ public class StatusbarMods extends XposedMods {
                 if (mRemoveLowBattery) p.setResult(null);
             }
         });
+
+        // Silenzia il suono di batteria scarica / critica (da OC): playPowerUISound(flag, ...) con flag 0 (scarica) e 2 (critica)
+        try {
+            Class<?> soundUtil = tryFindClass(lp, "com.oplus.systemui.statusbar.notification.power.OplusPowerUISoundUtil");
+            if (soundUtil != null) {
+                hookAllMethods(soundUtil, "playPowerUISound", new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) {
+                        if (!mMuteLowBatterySound || p.args.length == 0 || !(p.args[0] instanceof Integer)) return;
+                        int flag = (Integer) p.args[0];
+                        if (flag == 0 || flag == 2) p.setResult(null);
+                    }
+                });
+            }
+        } catch (Throwable t) {
+            log("[ Obsidian ] StatusbarMods: mute low battery sound hook failed: " + t);
+        }
     }
 
     // ── Flashlight notification ───────────────────────────────────────────────
