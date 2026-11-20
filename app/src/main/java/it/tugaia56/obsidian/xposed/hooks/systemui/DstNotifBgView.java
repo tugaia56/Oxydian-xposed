@@ -219,6 +219,34 @@ public class DstNotifBgView {
             } catch (Throwable t) {
                 XposedBridge.log("[ Obsidian ] DstNotifBgView: row radius hook FAILED: " + t);
             }
+            // Le righe di sistema (OplusCustomRow: USB, debug...) danno il raggio al proprio sfondo con setRadius(top, bottom, ...)
+            // usando la misura notification_corner_radius (16 dp) per conto loro: il cambio della misura non le raggiunge e
+            // restavano piu' strette (misurato 2026-11-20: ~44 px contro ~58 px delle altre). Con lo stile attivo, stesso raggio per tutte.
+            try {
+                if (it.tugaia56.obsidian.xposed.XPLauncher.isOplusRom()) {
+                    int nSet = XposedBridge.hookAllMethods(cls, "setRadius", new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam p) {
+                            try {
+                                View v = (View) p.thisObject;
+                                boolean isNight = (v.getResources().getConfiguration().uiMode
+                                        & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                                        == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+                                if (!isNight) return;
+                                float r = DstNotifStyle.styledCornerPx(v.getResources().getDisplayMetrics().density);
+                                if (r < 0f) return;
+                                int f = 0;
+                                for (int i = 0; i < p.args.length && f < 2; i++) {
+                                    if (p.args[i] instanceof Float) { p.args[i] = r; f++; }
+                                }
+                            } catch (Throwable ignored) {}
+                        }
+                    }).size();
+                    XposedBridge.log("[ Obsidian ] DstNotifBgView: background setRadius hooks=" + nSet);
+                }
+            } catch (Throwable t) {
+                XposedBridge.log("[ Obsidian ] DstNotifBgView: setRadius hook FAILED: " + t);
+            }
             // su OxygenOS il metodo si chiama setCustomBackground(Drawable), su Android 17 setCustomBackground$1()
             int n = 0;
             for (java.lang.reflect.Method m : cls.getDeclaredMethods()) {
