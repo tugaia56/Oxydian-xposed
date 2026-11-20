@@ -148,12 +148,16 @@ public class DstNotifBgView {
                         } catch (Throwable ignored) {}
                     }
                 };
+                int nRow = 0;
                 for (String m : new String[]{"getTopCornerRadius", "getBottomCornerRadius", "getMaxRadius"}) {
-                    try { XposedBridge.hookAllMethods(eov, m, radiusHook); } catch (Throwable ignored) {}
+                    try { nRow += XposedBridge.hookAllMethods(eov, m, radiusHook).size(); } catch (Throwable ignored) {}
                 }
+                XposedBridge.log("[ Obsidian ] DstNotifBgView: row radius hooks=" + nRow);
                 // OxygenOS ha un secondo ritaglio, sullo sfondo stesso (NotificationBackgroundViewExtImp.draw usa
                 // clipTopRadius/clipBottomRadius): senza questo l'ultima notifica resta con il bordo sottile agli angoli.
-                Class<?> ext = lpparam.classLoader.loadClass("com.oplus.systemui.statusbar.notification.row.NotificationBackgroundViewExtImp");
+                Class<?> ext = null;
+                try { ext = lpparam.classLoader.loadClass("com.oplus.systemui.statusbar.notification.row.NotificationBackgroundViewExtImp"); }
+                catch (Throwable t) { XposedBridge.log("[ Obsidian ] DstNotifBgView: NotificationBackgroundViewExtImp NOT FOUND: " + t); }
                 XC_MethodHook extHook = new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam p) {
@@ -169,9 +173,11 @@ public class DstNotifBgView {
                         } catch (Throwable ignored) {}
                     }
                 };
-                for (String m : new String[]{"setClipTopRadius", "setClipBottomRadius", "updateRadius"}) {
-                    try { XposedBridge.hookAllMethods(ext, m, extHook); } catch (Throwable ignored) {}
+                int nExt = 0;
+                if (ext != null) for (String m : new String[]{"setClipTopRadius", "setClipBottomRadius", "updateRadius"}) {
+                    try { nExt += XposedBridge.hookAllMethods(ext, m, extHook).size(); } catch (Throwable ignored) {}
                 }
+                XposedBridge.log("[ Obsidian ] DstNotifBgView: background clip hooks=" + nExt);
                 // Terzo ritaglio: "smooth clip" (angoli a curva continua) per alcune righe, taglia piu' di un cerchio dello
                 // stesso raggio e assottiglia il bordo agli angoli: con lo stile attivo si usa il ritaglio circolare normale.
                 XC_MethodHook smoothHook = new XC_MethodHook() {
@@ -189,6 +195,7 @@ public class DstNotifBgView {
                         } catch (Throwable ignored) {}
                     }
                 };
+                int nSmooth = 0;
                 for (String cn : new String[]{
                         "com.android.systemui.statusbar.notification.row.OplusExpandableOutlineViewEx",
                         "com.oplus.systemui.statusbar.notification.row.OplusActivatableNotificationViewExImpl",
@@ -199,10 +206,12 @@ public class DstNotifBgView {
                             if (m.getName().equals("shouldUseSmoothClip") && m.getParameterTypes().length == 0
                                     && !java.lang.reflect.Modifier.isAbstract(m.getModifiers())) {
                                 XposedBridge.hookMethod(m, smoothHook);
+                                nSmooth++;
                             }
                         }
-                    } catch (Throwable ignored) {}
+                    } catch (Throwable t) { XposedBridge.log("[ Obsidian ] DstNotifBgView: smooth clip class " + cn + " NOT FOUND"); }
                 }
+                XposedBridge.log("[ Obsidian ] DstNotifBgView: smooth clip hooks=" + nSmooth);
             } catch (IllegalStateException notOos) {
                 // non OxygenOS: niente da fare
             } catch (Throwable t) {

@@ -214,10 +214,20 @@ public class DstNotifStyle {
             XposedBridge.log("[ Obsidian ] DstNotifStyle.preload(file): preset=" + sPreset
                     + " corner=" + sCornerDp);
         } catch (Throwable t) {
-            XposedBridge.log("[ Obsidian ] DstNotifStyle.preload(file) ERROR: " + t + " — trying props");
-            preloadFromProps();
+            // File illeggibile (SystemUI non puo' aprire i prefs dell'app, EACCES): si ripiega sulle proprieta' di sistema.
+            // Prima l'errore faceva "consumare" la data del file e le proprieta' non venivano piu' rilette: cambiare
+            // raggio/stile delle notifiche non aveva effetto fino al riavvio della UI. Ora si riprova (al massimo ogni 3 s).
+            sFileMtime = -1; sFileLen = -1;
+            long now = android.os.SystemClock.elapsedRealtime();
+            if (!sFileErrLogged) {
+                sFileErrLogged = true;
+                XposedBridge.log("[ Obsidian ] DstNotifStyle.preload(file) ERROR: " + t + " — trying props");
+            }
+            if (now - sPropsAt > 3000) { sPropsAt = now; preloadFromProps(); }
         }
     }
+
+    private static volatile boolean sFileErrLogged = false;
 
     private static void preloadFromProps() {
         try {
