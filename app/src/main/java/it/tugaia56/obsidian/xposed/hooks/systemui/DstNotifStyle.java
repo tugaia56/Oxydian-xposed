@@ -302,7 +302,9 @@ public class DstNotifStyle {
         overrideFromTheme();
         if (sPreset == null) return null;
         if (density <= 0f) density = 3.0f;
-        // Il preset "Immagine" dipende dal file foto: non si mette in cache
+        // Le copie da ConstantState.newDrawable() sono GradientDrawable normali (senza il blocco di setCornerRadius) e
+        // seguono i raggi di OxygenOS: con notification_corner_radius gia' portata al nostro raggio (applyPreloaded) il bordo
+        // combacia col ritaglio di ogni riga, ultima compresa (con il blocco il bordo veniva tagliato agli angoli).
         boolean cacheable = !"DSTNFNIMG".equals(sPreset);
         String key = sPreset + "|" + sAccent + "|" + sBg + "|" + density + "|" + sCornerDp + "|"
                 + sTexSizePct + "|" + sTexAlphaPct + "|" + sTexColor + "|" + sTexBorderOn + "|"
@@ -360,6 +362,18 @@ public class DstNotifStyle {
                         texColor, texBorderOn, texBorderColor, imgOffsetY);
             }
         };
+
+        // Come fa Oxygen Customizer (RoundnessManager): il raggio delle notifiche di OxygenOS viene dalla misura
+        // notification_corner_radius, che comanda ritaglio e sfondo. Con lo stile attivo la si porta al nostro raggio.
+        if (it.tugaia56.obsidian.xposed.XPLauncher.isOplusRom()) {
+            try {
+                rp.res.setReplacement(PKG_SYSTEMUI, "dimen", "notification_corner_radius",
+                        new XResources.DimensionReplacement(sCornerDp, android.util.TypedValue.COMPLEX_UNIT_DIP));
+                XposedBridge.log("[ Obsidian ] DstNotifStyle: notification_corner_radius -> " + sCornerDp + "dp");
+            } catch (Throwable t) {
+                XposedBridge.log("[ Obsidian ] DstNotifStyle: notification_corner_radius replace FAILED: " + t);
+            }
+        }
 
         for (String drawableName : NOTIF_DRAWABLES) {
             try {

@@ -137,7 +137,9 @@ public class DstNotifBgView {
                     protected void afterHookedMethod(MethodHookParam p) {
                         try {
                             if (!(p.thisObject instanceof View)) return;
-                            if (!p.thisObject.getClass().getName().contains("ExpandableNotificationRow")) return;
+                            // righe normali e notifiche di sistema (OplusCustomRow: USB, debug, ecc., derivano da ExpandableOutlineView)
+                            String cn = p.thisObject.getClass().getName();
+                            if (!cn.contains("ExpandableNotificationRow") && !cn.contains("OplusCustomRow")) return;
                             View v = (View) p.thisObject;
                             boolean isNight = (v.getResources().getConfiguration().uiMode
                                     & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
