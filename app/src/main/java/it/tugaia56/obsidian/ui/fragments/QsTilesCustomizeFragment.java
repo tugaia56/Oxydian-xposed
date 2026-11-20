@@ -317,8 +317,7 @@ public class QsTilesCustomizeFragment extends Fragment {
 
             List<Object> rows = new ArrayList<>();
             mSingleColorKeys.put(203, KEY_BRIGHTNESS_ICON_COLOR);
-            rows.add(singleChoiceRow(getString(R.string.qs_tiles_brightness_icon_title), KEY_BRIGHTNESS_ICON_MODE,
-                    R.array.qs_brightness_icon_entries,
+            rows.add(iconColorChoiceRow(getString(R.string.qs_tiles_brightness_icon_title), KEY_BRIGHTNESS_ICON_MODE,
                     idx -> { if (idx == 4) openColorPicker(203, KEY_BRIGHTNESS_ICON_COLOR); }));
             rows.add(gatingSwitch(getString(R.string.qs_tiles_brightness_custom_title), getString(R.string.qs_tiles_slider_custom_summary), KEY_BRIGHTNESS_CUSTOM_ON));
             if (brightnessOn) {
@@ -362,8 +361,7 @@ public class QsTilesCustomizeFragment extends Fragment {
             mSingleColorKeys.put(204, KEY_VOLUME_ICON_COLOR);
             // Stessa preferenza di VolumePanelMod (qs_volume_icon_mode/_custom_color) — voce
             // duplicata qui su richiesta esplicita, non è un secondo controllo indipendente.
-            rows.add(singleChoiceRow(getString(R.string.qs_tiles_brightness_icon_title_volume), KEY_VOLUME_ICON_MODE,
-                    R.array.qs_brightness_icon_entries,
+            rows.add(iconColorChoiceRow(getString(R.string.qs_tiles_brightness_icon_title_volume), KEY_VOLUME_ICON_MODE,
                     idx -> { if (idx == 4) openColorPicker(204, KEY_VOLUME_ICON_COLOR); }));
             rows.add(gatingSwitch(getString(R.string.qs_tiles_volume_custom_title), getString(R.string.qs_tiles_slider_custom_summary), KEY_VOLUME_SLIDER_CUSTOM_ON));
             if (volumeOn) {
@@ -669,6 +667,43 @@ public class QsTilesCustomizeFragment extends Fragment {
         return new ListWidgetAdapter.ListItem(
                 title, choiceLabel(key, entriesArrayRes),
                 () -> showSingleChoiceDialog(title, key, entriesArrayRes, onSelected));
+    }
+
+    /** Valori salvati per "Colore icona" (cursori Luminosita'/Volume): 0 predefinito, 2 bianca,
+     *  3 accento, 4 personalizzata. Il vecchio 1 "Scuro" non si offre piu' (si usa Predefinito):
+     *  i numeri restano quelli di prima, cosi' le scelte gia' salvate non cambiano. */
+    private static final int[] ICON_MODE_VALUES = {0, 2, 3, 4};
+
+    private String[] iconModeLabels() {
+        String[] all = getResources().getStringArray(R.array.qs_brightness_icon_entries);
+        String[] r = new String[ICON_MODE_VALUES.length];
+        for (int i = 0; i < r.length; i++) r[i] = all[ICON_MODE_VALUES[i]];
+        return r;
+    }
+
+    private int iconModePos(String key) {
+        int v = 0;
+        try { v = Integer.parseInt(ObsidianPrefs.getString(key, "0")); } catch (NumberFormatException ignored) {}
+        for (int i = 0; i < ICON_MODE_VALUES.length; i++) if (ICON_MODE_VALUES[i] == v) return i;
+        return 0; // anche il vecchio "Scuro" (1) conta come Predefinito
+    }
+
+    private ListWidgetAdapter.ListItem iconColorChoiceRow(String title, String key,
+                                                          java.util.function.IntConsumer onSelected) {
+        return new ListWidgetAdapter.ListItem(title, iconModeLabels()[iconModePos(key)], () -> {
+            final int[] selected = {iconModePos(key)};
+            ObsidianTheme.themeDialog(new android.app.AlertDialog.Builder(requireContext())
+                    .setTitle(title)
+                    .setSingleChoiceItems(iconModeLabels(), selected[0], (d, which) -> selected[0] = which)
+                    .setPositiveButton(R.string.apply, (d, w) -> {
+                        int value = ICON_MODE_VALUES[selected[0]];
+                        ObsidianPrefs.putString(key, String.valueOf(value));
+                        rebuild();
+                        if (onSelected != null) onSelected.accept(value);
+                    })
+                    .setNegativeButton(R.string.cancel, null)
+                    .show());
+        });
     }
 
     private String choiceLabel(String key, int entriesArrayRes) {

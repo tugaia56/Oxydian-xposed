@@ -650,9 +650,12 @@ public class QsTilesCustomizeMod extends XposedMods {
         mLabelColor = Xprefs.getBoolean(KEY_LABEL_COLOR + "_use_accent", false)
                 ? appAccentColor() : Xprefs.getInt(KEY_LABEL_COLOR, 0xFFFFFFFF);
 
+        // 1 = vecchio "Scuro", non piu' offerto: conta come Predefinito (0)
         mBrightnessIconMode = parseInt(Xprefs.getString(KEY_BRIGHTNESS_ICON_MODE, "0"), 0);
+        if (mBrightnessIconMode == 1) mBrightnessIconMode = 0;
         mBrightnessIconColor = Xprefs.getInt(KEY_BRIGHTNESS_ICON_COLOR, 0xFFFFFFFF);
         mVolumeIconMode = parseInt(Xprefs.getString(KEY_VOLUME_ICON_MODE, "0"), 0);
+        if (mVolumeIconMode == 1) mVolumeIconMode = 0;
         mVolumeIconColor = Xprefs.getInt(KEY_VOLUME_ICON_COLOR, 0xFFFFFFFF);
         mBrightnessCustomOn = Xprefs.getBoolean(KEY_BRIGHTNESS_CUSTOM_ON, false);
         mBrightnessMode = parseInt(Xprefs.getString(KEY_BRIGHTNESS_MODE, "0"), 0);

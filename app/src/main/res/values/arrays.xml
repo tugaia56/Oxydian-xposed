@@ -932,7 +932,7 @@
         <item>Custom Color</item>
     </string-array>
     <string-array name="qs_brightness_icon_entries">
-        <item>Default</item>
+        <item>Default (Stock)</item>
         <item>Dark</item>
         <item>White</item>
         <item>Accent</item>

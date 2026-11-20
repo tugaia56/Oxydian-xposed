@@ -182,6 +182,7 @@ public class VolumePanelMod extends XposedMods {
         mBgImageCropCy = Xprefs.getInt(PREF_BG_IMAGE_CROP_CY, 50);
         mBgImageCropSize = Xprefs.getInt(PREF_BG_IMAGE_CROP_SIZE, 100);
         try { mIconMode = Integer.parseInt(Xprefs.getString(PREF_ICON_MODE, "0")); } catch (Throwable t) { mIconMode = 0; }
+        if (mIconMode == 1) mIconMode = 0; // vecchio "Scuro", non piu' offerto: come Predefinito
         mIconColor      = Xprefs.getInt(PREF_ICON_COLOR, 0xFFFFFFFF);
         mBorderOn         = Xprefs.getBoolean(PREF_BORDER_ON, false);
         mBorderUseAccent  = Xprefs.getBoolean(PREF_BORDER_USE_ACCENT, true);

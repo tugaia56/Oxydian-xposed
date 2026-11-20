@@ -373,25 +373,37 @@ public class VolumePanelColorsFragment extends Fragment {
         }
     }
 
+    /** Valori salvati: 0 predefinito, 2 bianca, 3 accento, 4 personalizzata. Il vecchio 1
+     *  "Scuro" non si offre piu' (si usa Predefinito); i numeri restano quelli di prima. */
+    private static final int[] ICON_MODE_VALUES = {0, 2, 3, 4};
+
+    private String[] iconModeLabels() {
+        String[] all = getResources().getStringArray(R.array.qs_brightness_icon_entries);
+        String[] r = new String[ICON_MODE_VALUES.length];
+        for (int i = 0; i < r.length; i++) r[i] = all[ICON_MODE_VALUES[i]];
+        return r;
+    }
+
+    private int iconModePos() {
+        int v = 0;
+        try { v = Integer.parseInt(ObsidianPrefs.getString(PREF_ICON_MODE, "0")); } catch (NumberFormatException ignored) {}
+        for (int i = 0; i < ICON_MODE_VALUES.length; i++) if (ICON_MODE_VALUES[i] == v) return i;
+        return 0;
+    }
+
     private ListWidgetAdapter.ListItem iconModeItem() {
-        String[] entries = getResources().getStringArray(R.array.qs_brightness_icon_entries);
-        int idx = 0;
-        try { idx = Integer.parseInt(ObsidianPrefs.getString(PREF_ICON_MODE, "0")); } catch (NumberFormatException ignored) {}
-        String summary = (idx >= 0 && idx < entries.length) ? entries[idx] : entries[0];
         return new ListWidgetAdapter.ListItem(
-                getString(R.string.qs_tiles_brightness_icon_title_volume), summary,
+                getString(R.string.qs_tiles_brightness_icon_title_volume), iconModeLabels()[iconModePos()],
                 this::showIconModeDialog);
     }
 
     private void showIconModeDialog() {
-        String[] entries = getResources().getStringArray(R.array.qs_brightness_icon_entries);
-        int current = 0;
-        try { current = Integer.parseInt(ObsidianPrefs.getString(PREF_ICON_MODE, "0")); } catch (NumberFormatException ignored) {}
-        final int[] selected = {current};
+        final int[] selected = {iconModePos()};
         ObsidianTheme.themeDialog(new android.app.AlertDialog.Builder(requireContext())
                 .setTitle(R.string.qs_tiles_brightness_icon_title_volume)
-                .setSingleChoiceItems(entries, current, (d, which) -> selected[0] = which)
+                .setSingleChoiceItems(iconModeLabels(), selected[0], (d, which) -> selected[0] = which)
                 .setPositiveButton(R.string.apply, (d, w) -> {
+                    selected[0] = ICON_MODE_VALUES[selected[0]];
                     ObsidianPrefs.putString(PREF_ICON_MODE, String.valueOf(selected[0]));
                     rebuild();
                     // Apre subito il picker su "Personalizzata" invece di lasciare una riga
