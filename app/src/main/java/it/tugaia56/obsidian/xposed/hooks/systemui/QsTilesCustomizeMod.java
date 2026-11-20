@@ -1582,7 +1582,15 @@ public class QsTilesCustomizeMod extends XposedMods {
                             android.graphics.Canvas nc = (android.graphics.Canvas) p.args[0];
                             android.graphics.Paint nPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
                             nPaint.setStyle(android.graphics.Paint.Style.FILL);
-                            nPaint.setColor(WIDE_CARD_NEUTRAL_FILL);
+                            // Con "Riquadri grandi -> Sfondo" acceso (mTileBgBaseOn) il riempimento usa i colori scelti (attivo/inattivo):
+                            // su alcune versioni (OOS 16.1, segnalato 2026-11-19 su OnePlus 13R) le card larghe passano da qui e non dal
+                            // percorso "base", e restavano sul grigio neutro ignorando i colori. Senza lo switch resta il grigio neutro.
+                            int nFill = WIDE_CARD_NEUTRAL_FILL;
+                            if (mTileBgBaseOn) {
+                                boolean nActive = isDrawableStateActive((Drawable) p.thisObject, lp);
+                                nFill = nActive ? (mTileBgBaseAccent ? appAccentColor() : mTileBgBaseActive) : mTileBgBaseInactive;
+                            }
+                            nPaint.setColor(nFill);
                             // Segue "Riquadri grandi -> Raggio" (mTileRadiusBaseDp), non
                             // getCornerRadius() (raggio nativo del drawable, scollegato dallo slider)
                             // né la forma di "Forma riquadri" (esclusa dai riquadri grandi 2026-09-26).
