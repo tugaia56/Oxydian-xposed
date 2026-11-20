@@ -464,7 +464,7 @@
     <string name="qs_tiles_hide_labels_title">Sembunyikan Label QS</string>
     <string name="qs_tiles_label_color_title">Warna Teks QS Kustom</string>
     <string name="qs_tiles_brightness_section">Penggeser QS</string>
-    <string name="qs_tiles_brightness_icon_title">Ubah warna ikon kecerahan otomatis</string>
+    <string name="qs_tiles_brightness_icon_title">Ubah warna ikon kecerahan</string>
     <string name="qs_tiles_brightness_icon_color_title">Warna Kustom</string>
     <string name="qs_tiles_brightness_icon_title_volume">Ubah warna ikon volume</string>
     <string name="qs_tiles_brightness_custom_title">Sesuaikan Penggeser QS</string>

@@ -464,7 +464,7 @@
     <string name="qs_tiles_hide_labels_title">QS-Beschriftungen ausblenden</string>
     <string name="qs_tiles_label_color_title">Eigene QS-Textfarbe</string>
     <string name="qs_tiles_brightness_section">QS-Regler</string>
-    <string name="qs_tiles_brightness_icon_title">Farbe des Icons für automatische Helligkeit ändern</string>
+    <string name="qs_tiles_brightness_icon_title">Farbe des Helligkeits-Icons ändern</string>
     <string name="qs_tiles_brightness_icon_color_title">Eigene Farbe</string>
     <string name="qs_tiles_brightness_icon_title_volume">Farbe des Lautstärke-Icons ändern</string>
     <string name="qs_tiles_brightness_custom_title">QS-Regler anpassen</string>

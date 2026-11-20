@@ -464,7 +464,7 @@
     <string name="qs_tiles_hide_labels_title">QS Etiketlerini Gizle</string>
     <string name="qs_tiles_label_color_title">Özel QS Metin Rengi</string>
     <string name="qs_tiles_brightness_section">QS Kaydırıcıları</string>
-    <string name="qs_tiles_brightness_icon_title">Otomatik parlaklık simgesi rengini değiştir</string>
+    <string name="qs_tiles_brightness_icon_title">Parlaklık simgesi rengini değiştir</string>
     <string name="qs_tiles_brightness_icon_color_title">Özel Renk</string>
     <string name="qs_tiles_brightness_icon_title_volume">Ses simgesi rengini değiştir</string>
     <string name="qs_tiles_brightness_custom_title">QS Kaydırıcılarını Özelleştir</string>

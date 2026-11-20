@@ -474,7 +474,7 @@
     <string name="qs_tiles_hide_labels_title">Приховати підписи QS</string>
     <string name="qs_tiles_label_color_title">Власний колір тексту QS</string>
     <string name="qs_tiles_brightness_section">Повзунки QS</string>
-    <string name="qs_tiles_brightness_icon_title">Змінити колір іконки авто-яскравості</string>
+    <string name="qs_tiles_brightness_icon_title">Змінити колір іконки яскравості</string>
     <string name="qs_tiles_brightness_icon_color_title">Власний колір</string>
     <string name="qs_tiles_brightness_icon_title_volume">Змінити колір іконки гучності</string>
     <string name="qs_tiles_brightness_custom_title">Налаштувати повзунки QS</string>

@@ -464,7 +464,7 @@
     <string name="qs_tiles_hide_labels_title">隐藏 QS 标签</string>
     <string name="qs_tiles_label_color_title">自定义 QS 文字颜色</string>
     <string name="qs_tiles_brightness_section">QS 滑块</string>
-    <string name="qs_tiles_brightness_icon_title">更改自动亮度图标颜色</string>
+    <string name="qs_tiles_brightness_icon_title">更改亮度图标颜色</string>
     <string name="qs_tiles_brightness_icon_color_title">自定义颜色</string>
     <string name="qs_tiles_brightness_icon_title_volume">更改音量图标颜色</string>
     <string name="qs_tiles_brightness_custom_title">自定义 QS 滑块</string>

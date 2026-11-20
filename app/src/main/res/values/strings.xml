@@ -563,7 +563,7 @@
     <string name="qs_tiles_brightness_slider_summary">Color, background, radius and icon of the Brightness slider</string>
     <string name="qs_tiles_volume_slider_title">Volume Slider Tile</string>
     <string name="qs_tiles_volume_slider_summary">Color, background, radius and icon of the Volume slider</string>
-    <string name="qs_tiles_brightness_icon_title">Change auto-brightness icon color</string>
+    <string name="qs_tiles_brightness_icon_title">Change brightness icon color</string>
     <string name="qs_tiles_brightness_icon_color_title">Custom Color</string>
     <string name="qs_tiles_brightness_icon_title_volume">Change volume icon color</string>
     <string name="qs_tiles_brightness_custom_title">Customize slider color</string>

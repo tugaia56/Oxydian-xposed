@@ -474,7 +474,7 @@
     <string name="qs_tiles_hide_labels_title">Ẩn nhãn QS</string>
     <string name="qs_tiles_label_color_title">Màu văn bản QS tùy chỉnh</string>
     <string name="qs_tiles_brightness_section">Thanh trượt QS</string>
-    <string name="qs_tiles_brightness_icon_title">Đổi màu biểu tượng độ sáng tự động</string>
+    <string name="qs_tiles_brightness_icon_title">Đổi màu biểu tượng độ sáng</string>
     <string name="qs_tiles_brightness_icon_color_title">Màu tùy chỉnh</string>
     <string name="qs_tiles_brightness_icon_title_volume">Đổi màu biểu tượng âm lượng</string>
     <string name="qs_tiles_brightness_custom_title">Tùy chỉnh thanh trượt QS</string>

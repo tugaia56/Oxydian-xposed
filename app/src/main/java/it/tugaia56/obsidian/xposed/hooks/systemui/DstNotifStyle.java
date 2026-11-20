@@ -118,6 +118,12 @@ public class DstNotifStyle {
 
     private static volatile String sPreset    = null;
 
+    /** Raggio (px) delle card notifica con lo stile attivo, -1 se nessuno stile. Legge solo i valori gia'
+     *  caricati (nessun I/O): viene chiamato a ogni disegno del ritaglio delle righe. */
+    public static float styledCornerPx(float density) {
+        return sPreset != null ? sCornerDp * density : -1f;
+    }
+
     /** Called by DstNotifStyleMod to check if a preset is active. */
     public static boolean isEnabled() { overrideFromTheme(); return sPreset != null; }
 

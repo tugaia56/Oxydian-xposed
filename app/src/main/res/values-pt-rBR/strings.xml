@@ -464,7 +464,7 @@
     <string name="qs_tiles_hide_labels_title">Ocultar rótulos QS</string>
     <string name="qs_tiles_label_color_title">Cor de texto QS personalizada</string>
     <string name="qs_tiles_brightness_section">Controles deslizantes QS</string>
-    <string name="qs_tiles_brightness_icon_title">Alterar cor do ícone de brilho automático</string>
+    <string name="qs_tiles_brightness_icon_title">Alterar cor do ícone de brilho</string>
     <string name="qs_tiles_brightness_icon_color_title">Cor personalizada</string>
     <string name="qs_tiles_brightness_icon_title_volume">Alterar cor do ícone de volume</string>
     <string name="qs_tiles_brightness_custom_title">Personalizar controles deslizantes QS</string>

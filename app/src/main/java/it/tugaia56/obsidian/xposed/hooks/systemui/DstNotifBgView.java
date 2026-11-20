@@ -125,6 +125,89 @@ public class DstNotifBgView {
             } catch (Throwable t) {
                 XposedBridge.log("[ Obsidian ] DstNotifBgView: setTint hook FAILED: " + t);
             }
+            // Il ritaglio (outline/clip) di ogni riga notifica usa i suoi raggi (angoli interni del gruppo piccoli, esterni grandi):
+            // se il bordo dello stile ha un raggio piu' grande viene tagliato agli angoli. Con lo stile attivo il ritaglio usa
+            // lo stesso raggio dello stile, per tutti e quattro gli angoli (segnalato 2026-11-20: bordo nascosto agli angoli).
+            // Solo OxygenOS: il percorso del ritaglio e' stato verificato sul codice di SystemUI OOS 16.
+            try {
+                if (!it.tugaia56.obsidian.xposed.XPLauncher.isOplusRom()) throw new IllegalStateException("not OOS");
+                Class<?> eov = lpparam.classLoader.loadClass("com.android.systemui.statusbar.notification.row.ExpandableOutlineView");
+                XC_MethodHook radiusHook = new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam p) {
+                        try {
+                            if (!(p.thisObject instanceof View)) return;
+                            if (!p.thisObject.getClass().getName().contains("ExpandableNotificationRow")) return;
+                            View v = (View) p.thisObject;
+                            boolean isNight = (v.getResources().getConfiguration().uiMode
+                                    & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                                    == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+                            if (!isNight) return; // di giorno lo stile non si applica (vedi currentDrawable)
+                            float r = DstNotifStyle.styledCornerPx(v.getResources().getDisplayMetrics().density);
+                            if (r >= 0f) p.setResult(r);
+                        } catch (Throwable ignored) {}
+                    }
+                };
+                for (String m : new String[]{"getTopCornerRadius", "getBottomCornerRadius", "getMaxRadius"}) {
+                    try { XposedBridge.hookAllMethods(eov, m, radiusHook); } catch (Throwable ignored) {}
+                }
+                // OxygenOS ha un secondo ritaglio, sullo sfondo stesso (NotificationBackgroundViewExtImp.draw usa
+                // clipTopRadius/clipBottomRadius): senza questo l'ultima notifica resta con il bordo sottile agli angoli.
+                Class<?> ext = lpparam.classLoader.loadClass("com.oplus.systemui.statusbar.notification.row.NotificationBackgroundViewExtImp");
+                XC_MethodHook extHook = new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam p) {
+                        try {
+                            android.content.res.Resources sys = android.content.res.Resources.getSystem();
+                            boolean isNight = (sys.getConfiguration().uiMode
+                                    & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                                    == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+                            if (!isNight) return;
+                            float r = DstNotifStyle.styledCornerPx(sys.getDisplayMetrics().density);
+                            if (r < 0f) return;
+                            for (int i = 0; i < p.args.length; i++) if (p.args[i] instanceof Float) p.args[i] = r;
+                        } catch (Throwable ignored) {}
+                    }
+                };
+                for (String m : new String[]{"setClipTopRadius", "setClipBottomRadius", "updateRadius"}) {
+                    try { XposedBridge.hookAllMethods(ext, m, extHook); } catch (Throwable ignored) {}
+                }
+                // Terzo ritaglio: "smooth clip" (angoli a curva continua) per alcune righe, taglia piu' di un cerchio dello
+                // stesso raggio e assottiglia il bordo agli angoli: con lo stile attivo si usa il ritaglio circolare normale.
+                XC_MethodHook smoothHook = new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam p) {
+                        try {
+                            if (!Boolean.TRUE.equals(p.getResult())) return;
+                            android.content.res.Resources sys = android.content.res.Resources.getSystem();
+                            boolean isNight = (sys.getConfiguration().uiMode
+                                    & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                                    == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+                            if (isNight && DstNotifStyle.styledCornerPx(sys.getDisplayMetrics().density) >= 0f) {
+                                p.setResult(Boolean.FALSE);
+                            }
+                        } catch (Throwable ignored) {}
+                    }
+                };
+                for (String cn : new String[]{
+                        "com.android.systemui.statusbar.notification.row.OplusExpandableOutlineViewEx",
+                        "com.oplus.systemui.statusbar.notification.row.OplusActivatableNotificationViewExImpl",
+                        "com.oplus.systemui.statusbar.notification.row.OplusExpandableOutlineViewExImpl"}) {
+                    try {
+                        Class<?> c = lpparam.classLoader.loadClass(cn);
+                        for (java.lang.reflect.Method m : c.getDeclaredMethods()) {
+                            if (m.getName().equals("shouldUseSmoothClip") && m.getParameterTypes().length == 0
+                                    && !java.lang.reflect.Modifier.isAbstract(m.getModifiers())) {
+                                XposedBridge.hookMethod(m, smoothHook);
+                            }
+                        }
+                    } catch (Throwable ignored) {}
+                }
+            } catch (IllegalStateException notOos) {
+                // non OxygenOS: niente da fare
+            } catch (Throwable t) {
+                XposedBridge.log("[ Obsidian ] DstNotifBgView: row radius hook FAILED: " + t);
+            }
             // su OxygenOS il metodo si chiama setCustomBackground(Drawable), su Android 17 setCustomBackground$1()
             int n = 0;
             for (java.lang.reflect.Method m : cls.getDeclaredMethods()) {
