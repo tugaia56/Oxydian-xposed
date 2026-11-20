@@ -228,8 +228,11 @@ public class LockscreenWidgetsFragment extends Fragment {
         if (mBgSwitchExpanded) bgRows.add(bgItem());
         GroupUtils.addGroup(chain, bgRows);
 
-        chain.add(new SectionTitleAdapter(List.of(getString(R.string.misc_category))));
+        // "Varie": scala e margine seguono "Abilita Widget". Il link alle Impostazioni Meteo di OC
+        // qui non serve (da noi Meteo ha gia' la sua pagina in Schermata di Blocco): senza widget
+        // abilitati la sezione sarebbe vuota, quindi si mostra solo con "Abilita Widget" acceso.
         if (mWidgetsEnabledExpanded) {
+            chain.add(new SectionTitleAdapter(List.of(getString(R.string.misc_category))));
             GroupUtils.addGroup(chain, List.of(
                     sliderItem(getString(R.string.widgets_scale), KEY_SCALE, 50, 100, 100, "%"),
                     sliderItem(getString(R.string.lockscreen_clock_top_margin_title), KEY_TOP_MARGIN, -50, 200, 0, "dp")));
