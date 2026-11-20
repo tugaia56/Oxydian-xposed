@@ -62,7 +62,7 @@ public class DeviceWidgetSettingsFragment extends Fragment {
     };
     private static final int[] DEFAULT_TYPE = {1, 2, 0, 0, 0, 0}; // Batteria, RAM, resto Nessuno
 
-    private static final String[] TYPE_LABELS = {"Nessuno", "Batteria", "RAM", "Volume", "Temperatura", "Wi-Fi", "Bluetooth"};
+    private static final String[] TYPE_LABELS = {"Nessuno", "Batteria", "RAM", "Volume", "Temperatura", "Wi-Fi", "Bluetooth", "Spazio", "Non disturbare"};
 
     private RecyclerView mRv;
     private boolean mColorExpanded = false;
@@ -197,6 +197,8 @@ public class DeviceWidgetSettingsFragment extends Fragment {
             case 4 -> DeviceStatGaugeView.StatType.TEMPERATURE;
             case 5 -> DeviceStatGaugeView.StatType.WIFI;
             case 6 -> DeviceStatGaugeView.StatType.BLUETOOTH;
+            case 7 -> DeviceStatGaugeView.StatType.STORAGE;
+            case 8 -> DeviceStatGaugeView.StatType.DND;
             default -> DeviceStatGaugeView.StatType.BATTERY;
         };
     }
@@ -208,6 +210,8 @@ public class DeviceWidgetSettingsFragment extends Fragment {
             case TEMPERATURE -> R.drawable.ic_widget_temperature;
             case WIFI -> R.drawable.ic_widget_wifi;
             case BLUETOOTH -> R.drawable.ic_widget_bluetooth;
+            case STORAGE -> R.drawable.ic_widget_storage;
+            case DND -> R.drawable.ic_widget_dnd;
             default -> R.drawable.ic_battery;
         };
     }
@@ -226,14 +230,25 @@ public class DeviceWidgetSettingsFragment extends Fragment {
         return (idx >= 0 && idx < TYPE_LABELS.length) ? TYPE_LABELS[idx] : TYPE_LABELS[0];
     }
 
+    /** Ordine mostrato nella lista: "Nessuno" in alto, poi alfabetico. I numeri salvati restano
+     *  quelli di TYPE_LABELS (non si rinumera, cosi' le scelte gia' fatte non cambiano). */
+    private static final int[] TYPE_ORDER = {0, 1, 6, 8, 2, 7, 4, 3, 5};
+    // Nessuno, Batteria, Bluetooth, Non disturbare, RAM, Spazio, Temperatura, Volume, Wi-Fi
+
     private void showTypeDialog(String title, String key, int defaultType) {
         int current = typeIndex(key, defaultType);
-        final int[] selected = {current};
+        String[] labels = new String[TYPE_ORDER.length];
+        int pos = 0;
+        for (int i = 0; i < TYPE_ORDER.length; i++) {
+            labels[i] = TYPE_LABELS[TYPE_ORDER[i]];
+            if (TYPE_ORDER[i] == current) pos = i;
+        }
+        final int[] selected = {pos};
         ObsidianTheme.themeDialog(new AlertDialog.Builder(requireContext())
                 .setTitle(title)
-                .setSingleChoiceItems(TYPE_LABELS, current, (d, which) -> selected[0] = which)
+                .setSingleChoiceItems(labels, pos, (d, which) -> selected[0] = which)
                 .setPositiveButton(R.string.apply, (d, w) -> {
-                    ObsidianPrefs.putString(key, String.valueOf(selected[0]));
+                    ObsidianPrefs.putString(key, String.valueOf(TYPE_ORDER[selected[0]]));
                     rebuild();
                 })
                 .setNegativeButton(R.string.cancel, null)

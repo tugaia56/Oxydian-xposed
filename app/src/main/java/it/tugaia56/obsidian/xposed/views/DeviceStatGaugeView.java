@@ -28,7 +28,7 @@ import android.view.View;
  */
 public class DeviceStatGaugeView extends View {
 
-    public enum StatType { BATTERY, RAM, VOLUME, TEMPERATURE, WIFI, BLUETOOTH }
+    public enum StatType { BATTERY, RAM, VOLUME, TEMPERATURE, WIFI, BLUETOOTH, STORAGE, DND }
     public enum Style { CIRCULAR, LINEAR }
 
     private static final int POLL_INTERVAL_MS = 2000;
@@ -64,6 +64,8 @@ public class DeviceStatGaugeView extends View {
             else if (mType == StatType.VOLUME) setPercent(readVolumePercent());
             else if (mType == StatType.WIFI) setPercent(readWifiPercent());
             else if (mType == StatType.BLUETOOTH) setPercent(readBluetoothPercent());
+            else if (mType == StatType.STORAGE) setPercent(readStoragePercent());
+            else if (mType == StatType.DND) setPercent(readDndPercent());
             mHandler.postDelayed(this, POLL_INTERVAL_MS);
         }
     };
@@ -111,6 +113,8 @@ public class DeviceStatGaugeView extends View {
         else if (mType == StatType.TEMPERATURE) setPercent(Math.max(0, Math.min(mBatteryTempC, 100)));
         else if (mType == StatType.WIFI) setPercent(readWifiPercent());
         else if (mType == StatType.BLUETOOTH) setPercent(readBluetoothPercent());
+        else if (mType == StatType.STORAGE) setPercent(readStoragePercent());
+        else if (mType == StatType.DND) setPercent(readDndPercent());
         // BATTERY aggiornata solo dal broadcast — valore iniziale arriva alla prima ricezione
         // "sticky" del registerReceiver (ACTION_BATTERY_CHANGED è sempre sticky).
     }
@@ -130,6 +134,24 @@ public class DeviceStatGaugeView extends View {
         try {
             BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
             return adapter != null && adapter.isEnabled() ? 100 : 0;
+        } catch (Throwable t) { return 0; }
+    }
+
+    /** Spazio usato della memoria interna (/data), in percentuale. */
+    private int readStoragePercent() {
+        try {
+            android.os.StatFs fs = new android.os.StatFs(android.os.Environment.getDataDirectory().getPath());
+            long total = fs.getTotalBytes();
+            if (total <= 0) return 0;
+            return (int) (((total - fs.getAvailableBytes()) * 100) / total);
+        } catch (Throwable t) { return 0; }
+    }
+
+    /** Non disturbare: 100 se e' acceso (qualsiasi filtro diverso da "tutto"), 0 se e' spento. */
+    private int readDndPercent() {
+        try {
+            android.app.NotificationManager nm = (android.app.NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            return nm != null && nm.getCurrentInterruptionFilter() != android.app.NotificationManager.INTERRUPTION_FILTER_ALL ? 100 : 0;
         } catch (Throwable t) { return 0; }
     }
 
@@ -193,7 +215,7 @@ public class DeviceStatGaugeView extends View {
     private String centerText() {
         if (mPercent < 0) return "…";
         if (mType == StatType.TEMPERATURE) return mPercent + "°";
-        if (mType == StatType.BLUETOOTH) return mPercent > 0 ? "ON" : "OFF";
+        if (mType == StatType.BLUETOOTH || mType == StatType.DND) return mPercent > 0 ? "ON" : "OFF";
         return mPercent + "%";
     }
 

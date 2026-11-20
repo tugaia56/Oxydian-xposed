@@ -654,6 +654,8 @@ public class LockscreenWidgetsMod extends XposedMods {
             case 4 -> DeviceStatGaugeView.StatType.TEMPERATURE;
             case 5 -> DeviceStatGaugeView.StatType.WIFI;
             case 6 -> DeviceStatGaugeView.StatType.BLUETOOTH;
+            case 7 -> DeviceStatGaugeView.StatType.STORAGE;
+            case 8 -> DeviceStatGaugeView.StatType.DND;
             default -> DeviceStatGaugeView.StatType.BATTERY;
         };
         gauge.setType(type);
@@ -665,6 +667,8 @@ public class LockscreenWidgetsMod extends XposedMods {
             case TEMPERATURE -> "ic_widget_temperature";
             case WIFI -> "ic_widget_wifi";
             case BLUETOOTH -> "ic_widget_bluetooth";
+            case STORAGE -> "ic_widget_storage";
+            case DND -> "ic_widget_dnd";
             default -> "ic_battery";
         }));
     }
