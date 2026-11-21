@@ -274,6 +274,17 @@ public class ThemeStyleFragment extends Fragment {
      *  Finestre Dialogo) + "Regolazioni Notifiche a texture" (che apre a sua volta il proprio
      *  dialogo Dimensione/Opacità/Colore/Bordo). Le card restano le stesse di prima, solo
      *  spostate qui dentro invece di essere righe a sé nella lista principale. */
+    /** Ricostruisce la lista del dialogo "Regolazione Raggio Angoli" (valori aggiornati dopo una scelta). */
+    private Runnable mCornerMenuRefresh;
+
+    /** Voce con il valore impostato ("N dp") come summary in colore accento. */
+    private ListWidgetAdapter.ListItem cornerItem(int titleRes, String prefKey, int defaultDp, Runnable onClick) {
+        ListWidgetAdapter.ListItem item = new ListWidgetAdapter.ListItem(
+                getString(titleRes), ObsidianPrefs.getInt(prefKey, defaultDp) + " dp", onClick);
+        item.useAccentColor = true;
+        return item;
+    }
+
     private void showMiscSettingsDialog(String[] cornerNames) {
         RecyclerView rv = new RecyclerView(requireContext());
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -282,24 +293,6 @@ public class ThemeStyleFragment extends Fragment {
         rv.setClipToPadding(false);
         rv.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        ListWidgetAdapter.ListItem notifCornerItem = new ListWidgetAdapter.ListItem(
-                getString(R.string.nav_notif_corner),
-                getString(R.string.nav_notif_corner_summary),
-                () -> showCornerPickerDialog(cornerNames));
-        notifCornerItem.useAccentColor = false;
-
-        ListWidgetAdapter.ListItem toastCornerItem = new ListWidgetAdapter.ListItem(
-                getString(R.string.nav_toast_corner),
-                getString(R.string.nav_toast_corner_summary),
-                () -> showCornerPickerDialog(cornerNames, PREF_TOAST_CORNER, 24, R.string.nav_toast_corner));
-        toastCornerItem.useAccentColor = false;
-
-        ListWidgetAdapter.ListItem dlgCornerItem = new ListWidgetAdapter.ListItem(
-                getString(R.string.nav_dlg_corner),
-                getString(R.string.nav_dlg_corner_summary),
-                () -> showCornerPickerDialog(cornerNames, PREF_DLG_CORNER, 14, R.string.nav_dlg_corner));
-        dlgCornerItem.useAccentColor = false;
 
         final boolean[] on = {ObsidianPrefs.getBoolean(PREF_CORNER_ON, true)};
         final Runnable[] build = new Runnable[1];
@@ -315,18 +308,26 @@ public class ThemeStyleFragment extends Fragment {
             };
             RecyclerView.Adapter<?> top = new SwitchWidgetAdapter(List.of(sw));
             if (on[0]) {
+                ListWidgetAdapter.ListItem notifCornerItem = cornerItem(R.string.nav_notif_corner,
+                        PREF_NOTIF_CORNER, 24, () -> showCornerPickerDialog(cornerNames));
+                ListWidgetAdapter.ListItem toastCornerItem = cornerItem(R.string.nav_toast_corner,
+                        PREF_TOAST_CORNER, 24, () -> showCornerPickerDialog(cornerNames, PREF_TOAST_CORNER, 24, R.string.nav_toast_corner));
+                ListWidgetAdapter.ListItem dlgCornerItem = cornerItem(R.string.nav_dlg_corner,
+                        PREF_DLG_CORNER, 14, () -> showCornerPickerDialog(cornerNames, PREF_DLG_CORNER, 14, R.string.nav_dlg_corner));
                 rv.setAdapter(new ConcatAdapter(top, new ListWidgetAdapter(List.of(notifCornerItem, toastCornerItem, dlgCornerItem))));
             } else {
                 rv.setAdapter(top);
             }
         };
         build[0].run();
+        mCornerMenuRefresh = build[0];
 
         AlertDialog dlg = new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.nav_misc_settings)
                 .setView(rv)
                 .setPositiveButton(R.string.close, null)
                 .show();
+        dlg.setOnDismissListener(d -> mCornerMenuRefresh = null);
         applyDialogBg(dlg);
         fixButtonCaps(dlg);
     }
@@ -764,12 +765,14 @@ public class ThemeStyleFragment extends Fragment {
                     // ricarica, serve il riavvio completo del telefono (bug 2026-09-02).
                     if (PREF_DLG_CORNER.equals(prefKey)) AppUtils.showRebootReminder(requireContext());
                     else AppUtils.showRestartReminder(requireContext());
+                    if (mCornerMenuRefresh != null) mCornerMenuRefresh.run();
                 })
                 .setNeutralButton(R.string.reset, (d, w) -> {
                     ObsidianPrefs.remove(prefKey);
                     DstFabricatedUtil.saveBootProps();
                     if (PREF_DLG_CORNER.equals(prefKey)) AppUtils.showRebootReminder(requireContext());
                     else AppUtils.showRestartReminder(requireContext());
+                    if (mCornerMenuRefresh != null) mCornerMenuRefresh.run();
                 })
                 .setNegativeButton(R.string.close, null)
                 .show();
