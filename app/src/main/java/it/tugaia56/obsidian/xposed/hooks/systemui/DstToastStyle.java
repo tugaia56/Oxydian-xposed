@@ -84,6 +84,7 @@ public class DstToastStyle {
             sBg     = parseInt(parseAttr(xml, PREF_BG,      "value"), 0xFF1B2029);
             int corner = parseInt(parseAttr(xml, PREF_CORNER, "value"), DEFAULT_CORNER_DP);
             sCornerDp = (corner > 0) ? corner : DEFAULT_CORNER_DP;
+            if ("false".equals(parseAttr(xml, "DST_CORNER_ENABLED", "value"))) sCornerDp = DEFAULT_CORNER_DP; // raggio del modulo spento
             XposedBridge.log("[ Obsidian ] DstToastStyle.preload(file): preset=" + sPreset);
         } catch (Throwable t) {
             XposedBridge.log("[ Obsidian ] DstToastStyle.preload(file) ERROR: " + t + " — trying props");
@@ -107,6 +108,7 @@ public class DstToastStyle {
                 try {
                     int c = Integer.parseInt(cornStr);
                     sCornerDp = (c > 0) ? c : DEFAULT_CORNER_DP;
+                    if ("0".equals((String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.corner_on", "1"))) sCornerDp = DEFAULT_CORNER_DP;
                 } catch (NumberFormatException ignored) {}
             }
             XposedBridge.log("[ Obsidian ] DstToastStyle.preload(props): preset=" + sPreset);

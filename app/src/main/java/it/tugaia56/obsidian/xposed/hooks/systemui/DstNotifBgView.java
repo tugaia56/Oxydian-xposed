@@ -39,7 +39,7 @@ public class DstNotifBgView {
                         boolean isNight = (v.getResources().getConfiguration().uiMode
                                 & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
                                 == android.content.res.Configuration.UI_MODE_NIGHT_YES;
-                        Drawable d = DstNotifStyle.currentDrawable(density, isNight);
+                        Drawable d = DstNotifStyle.currentDrawable(density, isNight, v.getResources());
                         if (d != null) p.args[0] = d;
                     } catch (Throwable t) {
                         XposedBridge.log("[ Obsidian ] DstNotifBgView build ERROR: " + t);
@@ -56,7 +56,7 @@ public class DstNotifBgView {
                         boolean isNight = (v.getResources().getConfiguration().uiMode
                                 & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
                                 == android.content.res.Configuration.UI_MODE_NIGHT_YES;
-                        Drawable d = DstNotifStyle.currentDrawable(density, isNight);
+                        Drawable d = DstNotifStyle.currentDrawable(density, isNight, v.getResources());
                         if (d == null) return;
                         Object old = XposedHelpers.getObjectField(v, "mBackground");
                         if (old instanceof Drawable) ((Drawable) old).setCallback(null);

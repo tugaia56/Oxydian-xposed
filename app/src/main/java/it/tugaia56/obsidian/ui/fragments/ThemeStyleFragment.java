@@ -62,6 +62,7 @@ import it.tugaia56.obsidian.xposed.hooks.systemui.DstToastStyle;
 public class ThemeStyleFragment extends Fragment {
 
     private static final String PREF_NOTIF_PRESET = "DST_PRESET_NOTIF";
+    private static final String PREF_CORNER_ON = "DST_CORNER_ENABLED";
     private static final String PREF_NOTIF_CORNER = "DST_NOTIF_CORNER";
     private static final String PREF_TOAST_PRESET = "DST_PRESET_TOAST";
     private static final String PREF_TOAST_CORNER = "DST_TOAST_CORNER";
@@ -223,6 +224,12 @@ public class ThemeStyleFragment extends Fragment {
 
         mNavItems.add(new NavAdapter.NavItem(
                 R.drawable.ic_ui_styles,
+                getString(R.string.nav_notif_texture_settings),
+                getString(R.string.nav_notif_texture_settings_summary),
+                this::showTextureSettingsDialog));
+
+        mNavItems.add(new NavAdapter.NavItem(
+                R.drawable.ic_ui_styles,
                 getString(R.string.nav_gradient_border),
                 getString(R.string.nav_gradient_border_summary),
                 () -> {
@@ -294,15 +301,26 @@ public class ThemeStyleFragment extends Fragment {
                 () -> showCornerPickerDialog(cornerNames, PREF_DLG_CORNER, 14, R.string.nav_dlg_corner));
         dlgCornerItem.useAccentColor = false;
 
-        ListWidgetAdapter.ListItem textureItem = new ListWidgetAdapter.ListItem(
-                getString(R.string.nav_notif_texture_settings),
-                getString(R.string.nav_notif_texture_settings_summary),
-                this::showTextureSettingsDialog);
-        textureItem.useAccentColor = false;
-
-        RecyclerView.Adapter<?> adapter = new ListWidgetAdapter(
-                List.of(notifCornerItem, toastCornerItem, dlgCornerItem, textureItem));
-        rv.setAdapter(adapter);
+        final boolean[] on = {ObsidianPrefs.getBoolean(PREF_CORNER_ON, true)};
+        final Runnable[] build = new Runnable[1];
+        build[0] = () -> {
+            SwitchWidgetAdapter.SwitchItem sw = new SwitchWidgetAdapter.SwitchItem(
+                    getString(R.string.corner_switch_title), getString(R.string.corner_switch_summary), on[0], null);
+            sw.onChanged = () -> {
+                on[0] = sw.checked;
+                ObsidianPrefs.putBoolean(PREF_CORNER_ON, on[0]);
+                DstFabricatedUtil.saveBootProps();
+                AppUtils.showRestartReminder(requireContext());
+                build[0].run();
+            };
+            RecyclerView.Adapter<?> top = new SwitchWidgetAdapter(List.of(sw));
+            if (on[0]) {
+                rv.setAdapter(new ConcatAdapter(top, new ListWidgetAdapter(List.of(notifCornerItem, toastCornerItem, dlgCornerItem))));
+            } else {
+                rv.setAdapter(top);
+            }
+        };
+        build[0].run();
 
         AlertDialog dlg = new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.nav_misc_settings)

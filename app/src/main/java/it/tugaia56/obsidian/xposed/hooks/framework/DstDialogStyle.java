@@ -90,6 +90,7 @@ public class DstDialogStyle {
             sBg        = parseInt(parseAttr(xml, PREF_BG,      "value"), 0xFF1B2029);
             int corner = parseInt(parseAttr(xml, PREF_CORNER, "value"), DEFAULT_CORNER_DP);
             sCornerDp  = (corner > 0) ? corner : DEFAULT_CORNER_DP;
+            if ("false".equals(parseAttr(xml, "DST_CORNER_ENABLED", "value"))) sCornerDp = DEFAULT_CORNER_DP; // raggio del modulo spento
             sPreloaded = true;
             XposedBridge.log("[ Obsidian ] DstDialogStyle.preload: preset=" + sDlgPreset);
         } catch (Throwable t) {
@@ -127,6 +128,7 @@ public class DstDialogStyle {
                 try {
                     int c = Integer.parseInt(cornStr);
                     sCornerDp = (c > 0) ? c : DEFAULT_CORNER_DP;
+                    if ("0".equals(readProp("persist.obsidian.dst.corner_on", "1"))) sCornerDp = DEFAULT_CORNER_DP;
                 } catch (NumberFormatException ignored) {}
             }
             sPreloaded = true;

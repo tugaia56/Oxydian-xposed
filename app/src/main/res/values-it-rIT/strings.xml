@@ -1063,8 +1063,10 @@
     <string name="nav_notif_style_summary">Stile sfondo personalizzato per le notifiche</string>
     <string name="nav_notif_corner">Raggio Angolo Notifiche</string>
     <string name="nav_notif_corner_summary">Raggio degli angoli per lo sfondo delle notifiche</string>
-    <string name="nav_misc_settings">Regolazioni Varie</string>
-    <string name="nav_misc_settings_summary">Raggio angoli (Notifiche/Toast/Dialogo) e regolazioni texture</string>
+    <string name="corner_switch_title">Raggio angoli del modulo</string>
+    <string name="corner_switch_summary">Acceso: il modulo usa i raggi scelti qui sotto. Spento: il raggio lo decidono il sistema o l\'overlay del Theme Oxydian.</string>
+    <string name="nav_misc_settings">Regolazione Raggio Angoli</string>
+    <string name="nav_misc_settings_summary">Acceso/spento, e raggio angoli di Notifiche, Toast e Dialogo</string>
     <string name="nav_notif_texture_settings">Regolazioni Notifiche a texture</string>
     <string name="nav_toast_corner">Raggio Angolo Toast</string>
     <string name="nav_toast_corner_summary">Raggio degli angoli per lo sfondo dei toast</string>

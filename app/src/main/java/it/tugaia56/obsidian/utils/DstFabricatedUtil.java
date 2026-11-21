@@ -236,6 +236,7 @@ public class DstFabricatedUtil {
             String  svdPreset   = ObsidianPrefs.getString("DST_PRESET_SVD",     "");
             String  toastPreset  = ObsidianPrefs.getString("DST_PRESET_TOAST",  "");
             String  notifPreset  = ObsidianPrefs.getString("DST_PRESET_NOTIF",  "");
+            boolean cornerOn     = ObsidianPrefs.getBoolean("DST_CORNER_ENABLED", true);
             int     notifCorner  = ObsidianPrefs.getInt(   "DST_NOTIF_CORNER",   24);
             int     toastCorner  = ObsidianPrefs.getInt(   "DST_TOAST_CORNER",   24);
             int     dlgCorner    = ObsidianPrefs.getInt(   "DST_DLG_CORNER",     24);
@@ -298,6 +299,7 @@ public class DstFabricatedUtil {
                 "setprop persist.obsidian.dst.svd_preset   \"" + (svdPreset   == null ? "" : svdPreset)   + "\"",
                 "setprop persist.obsidian.dst.toast_preset  \"" + (toastPreset == null ? "" : toastPreset) + "\"",
                 "setprop persist.obsidian.dst.notif_preset  \"" + (notifPreset == null ? "" : notifPreset) + "\"",
+                "setprop persist.obsidian.dst.corner_on     " + (cornerOn ? "1" : "0"),
                 "setprop persist.obsidian.dst.notif_corner  " + notifCorner,
                 "setprop persist.obsidian.dst.toast_corner  " + toastCorner,
                 "setprop persist.obsidian.dst.dlg_corner    " + dlgCorner,

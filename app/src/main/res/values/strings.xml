@@ -1205,8 +1205,10 @@
     <string name="nav_notif_style_summary">Custom background style for notifications</string>
     <string name="nav_notif_corner">Notification Corner Radius</string>
     <string name="nav_notif_corner_summary">Corner radius for notification background</string>
-    <string name="nav_misc_settings">Various Adjustments</string>
-    <string name="nav_misc_settings_summary">Corner radius (Notifications/Toast/Dialog) and texture settings</string>
+    <string name="corner_switch_title">Module corner radius</string>
+    <string name="corner_switch_summary">On: the module uses the radii chosen below. Off: the system, or the Oxydian Theme overlay, decides the radius.</string>
+    <string name="nav_misc_settings">Corner Radius Settings</string>
+    <string name="nav_misc_settings_summary">On/off, and the corner radius of Notifications, Toast and Dialogs</string>
     <string name="nav_notif_texture_settings">Texture Notification Adjustments</string>
     <string name="nav_toast_corner">Toast Corner Radius</string>
     <string name="nav_toast_corner_summary">Corner radius for toast background</string>

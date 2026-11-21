@@ -121,7 +121,7 @@ public class DstNotifStyle {
     /** Raggio (px) delle card notifica con lo stile attivo, -1 se nessuno stile. Legge solo i valori gia'
      *  caricati (nessun I/O): viene chiamato a ogni disegno del ritaglio delle righe. */
     public static float styledCornerPx(float density) {
-        return sPreset != null ? sCornerDp * density : -1f;
+        return (sPreset != null && sCornerOn) ? sCornerDp * density : -1f;
     }
 
     /** Called by DstNotifStyleMod to check if a preset is active. */
@@ -154,6 +154,9 @@ public class DstNotifStyle {
     private static volatile int    sAccent    = 0xFF9C27B0;
     private static volatile int    sBg        = 0xFF1B2029;
     private static volatile int    sCornerDp  = DEFAULT_CORNER_DP;
+    /** "Regolazione Raggio Angoli" acceso (di serie): il modulo usa il suo raggio. Spento: lo decidono il sistema o il Theme. */
+    private static volatile boolean sCornerOn = true;
+    private static final String PREF_CORNER_ON = "DST_CORNER_ENABLED";
     private static volatile int    sTexSizePct  = DEFAULT_TEX_SIZE_PCT;
     private static volatile int    sTexAlphaPct = DEFAULT_TEX_ALPHA_PCT;
     private static volatile int    sTexColor       = 0xFF9C27B0; // risolto: sAccent o custom
@@ -195,6 +198,7 @@ public class DstNotifStyle {
             sBg       = parseInt(parseAttr(xml, PREF_BG,      "value"), 0xFF1B2029);
             int corner = parseInt(parseAttr(xml, PREF_CORNER, "value"), DEFAULT_CORNER_DP);
             sCornerDp = (corner > 0) ? corner : DEFAULT_CORNER_DP;
+            sCornerOn = !"false".equals(parseAttr(xml, PREF_CORNER_ON, "value"));
             int texSize  = parseInt(parseAttr(xml, PREF_TEX_SIZE,  "value"), DEFAULT_TEX_SIZE_PCT);
             sTexSizePct  = (texSize > 0) ? texSize : DEFAULT_TEX_SIZE_PCT;
             sTexAlphaPct = parseInt(parseAttr(xml, PREF_TEX_ALPHA, "value"), DEFAULT_TEX_ALPHA_PCT);
@@ -245,6 +249,7 @@ public class DstNotifStyle {
             String texBrdColStr  = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.notif_tex_brd_col",  "");
             String imgOffYStr    = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.notif_img_offset_y", "");
             XposedBridge.log("[ Obsidian ] DstNotifStyle.preloadFromProps: preset='" + preset + "'");
+            sCornerOn = !"0".equals((String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.corner_on", "1"));
             if (preset.isEmpty()) return;
             sPreset = preset;
             if (!a1Str.isEmpty())   { try { sAccent   = Integer.parseInt(a1Str);   } catch (NumberFormatException ignored) {} }
@@ -292,7 +297,20 @@ public class DstNotifStyle {
      * risorse XML sostituibili via XResources — vedi diagnostica DIAG getDrawable).
      * Ritorna null se nessun preset è attivo (nessuna modifica da applicare).
      */
-    public static Drawable currentDrawable(float density, boolean isNight) {
+    public static Drawable currentDrawable(float density, boolean isNight) { return currentDrawable(density, isNight, null); }
+
+    /** Raggio che il sistema (o il Theme) da alle notifiche, in dp: serve quando il raggio del modulo e' spento. */
+    private static int osCornerDp(android.content.res.Resources res, float density) {
+        try {
+            if (res != null) {
+                int id = res.getIdentifier("notification_corner_radius", "dimen", PKG_SYSTEMUI);
+                if (id != 0) { int dp = Math.round(res.getDimension(id) / density); if (dp > 0) return dp; }
+            }
+        } catch (Throwable ignored) {}
+        return DEFAULT_CORNER_DP;
+    }
+
+    public static Drawable currentDrawable(float density, boolean isNight, android.content.res.Resources res) {
         // Con sistema in tema chiaro lasciamo la card notifica stock di OOS (che già la
         // gestisce correttamente in chiaro) invece di applicare un preset pensato/testato solo
         // per lo shade scuro — evita di dover indovinare colori "giusti" per ogni preset in
@@ -302,18 +320,19 @@ public class DstNotifStyle {
         overrideFromTheme();
         if (sPreset == null) return null;
         if (density <= 0f) density = 3.0f;
+        final int cornerDp = sCornerOn ? sCornerDp : osCornerDp(res, density);
         // Le copie da ConstantState.newDrawable() sono GradientDrawable normali (senza il blocco di setCornerRadius) e
         // seguono i raggi di OxygenOS: con notification_corner_radius gia' portata al nostro raggio (applyPreloaded) il bordo
         // combacia col ritaglio di ogni riga, ultima compresa (con il blocco il bordo veniva tagliato agli angoli).
         boolean cacheable = !"DSTNFNIMG".equals(sPreset);
-        String key = sPreset + "|" + sAccent + "|" + sBg + "|" + density + "|" + sCornerDp + "|"
+        String key = sPreset + "|" + sAccent + "|" + sBg + "|" + density + "|" + cornerDp + "|"
                 + sTexSizePct + "|" + sTexAlphaPct + "|" + sTexColor + "|" + sTexBorderOn + "|"
                 + sTexBorderColor + "|" + sImgOffsetY;
         if (cacheable && key.equals(sBuiltKey)) {
             Drawable.ConstantState cs = sBuiltState;
             if (cs != null) return cs.newDrawable();
         }
-        Drawable d = buildNotifBg(sPreset, sAccent, sBg, density, sCornerDp, sTexSizePct, sTexAlphaPct,
+        Drawable d = buildNotifBg(sPreset, sAccent, sBg, density, cornerDp, sTexSizePct, sTexAlphaPct,
                 sTexColor, sTexBorderOn, sTexBorderColor, sImgOffsetY);
         if (cacheable && d != null && d.getConstantState() != null) {
             sBuiltState = d.getConstantState();
@@ -365,7 +384,7 @@ public class DstNotifStyle {
 
         // Come fa Oxygen Customizer (RoundnessManager): il raggio delle notifiche di OxygenOS viene dalla misura
         // notification_corner_radius, che comanda ritaglio e sfondo. Con lo stile attivo la si porta al nostro raggio.
-        if (it.tugaia56.obsidian.xposed.XPLauncher.isOplusRom()) {
+        if (it.tugaia56.obsidian.xposed.XPLauncher.isOplusRom() && sCornerOn) {
             try {
                 rp.res.setReplacement(PKG_SYSTEMUI, "dimen", "notification_corner_radius",
                         new XResources.DimensionReplacement(sCornerDp, android.util.TypedValue.COMPLEX_UNIT_DIP));
