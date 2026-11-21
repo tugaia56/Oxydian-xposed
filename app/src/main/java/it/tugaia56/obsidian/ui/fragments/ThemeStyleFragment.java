@@ -812,7 +812,7 @@ public class ThemeStyleFragment extends Fragment {
 
     private String getDlgPresetLabel() {
         String saved = ObsidianPrefs.getString(PREF_DLG_PRESET, null);
-        if (saved == null) return getString(R.string.dst_none);
+        if (saved == null || saved.isEmpty()) return getString(R.string.dst_none);   // vuoto = Nessuno, come assente
         int[] nameRes = {
             R.string.dst_dlg_ht,  R.string.dst_dlg_hto,
             R.string.dst_dlg_lt,  R.string.dst_dlg_lyo,
@@ -864,7 +864,7 @@ public class ThemeStyleFragment extends Fragment {
         if (w == null) return;
         String preset = ObsidianPrefs.getString(PREF_DLG_PRESET, null);
         android.graphics.drawable.Drawable bg;
-        if (preset != null) {
+        if (preset != null && !preset.isEmpty()) {   // vuoto = Nessuno: sfondo normale (prima un valore vuoto dava un dialogo trasparente)
             float density = getResources().getDisplayMetrics().density;
             int cornerDp = ObsidianPrefs.getInt(PREF_DLG_CORNER, 14);
             bg = DstDialogStyle.buildDrawable(preset, currentAccent(), currentBg(), density, cornerDp);
