@@ -260,6 +260,10 @@ public class DstNotifStyle {
             String imgOffYStr    = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.notif_img_offset_y", "");
             XposedBridge.log("[ Obsidian ] DstNotifStyle.preloadFromProps: preset='" + preset + "'");
             sCornerOn = !"0".equals((String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.corner_on", "1"));
+            // il raggio vale anche senza stile ("Nessuno"): va letto prima di uscire
+            if (!cornStr.isEmpty()) {
+                try { int c0 = Integer.parseInt(cornStr); sCornerDp = (c0 > 0) ? c0 : DEFAULT_CORNER_DP; } catch (NumberFormatException ignored) {}
+            }
             if (preset.isEmpty()) return;
             sPreset = preset;
             if (!a1Str.isEmpty())   { try { sAccent   = Integer.parseInt(a1Str);   } catch (NumberFormatException ignored) {} }
@@ -360,6 +364,8 @@ public class DstNotifStyle {
         XposedBridge.log("[ Obsidian ] DstNotifStyle.applyPreloaded: after preload preset=" + sPreset);
         // Come fa Oxygen Customizer (RoundnessManager): il raggio delle notifiche di OxygenOS viene dalla misura
         // notification_corner_radius, che comanda ritaglio e sfondo. Con lo stile attivo la si porta al nostro raggio.
+        XposedBridge.log("[ Obsidian ] DstNotifStyle: radius dimen check oos=" + it.tugaia56.obsidian.xposed.XPLauncher.isOplusRom()
+                + " cornerOn=" + sCornerOn + " dp=" + sCornerDp);
         if (it.tugaia56.obsidian.xposed.XPLauncher.isOplusRom() && sCornerOn) {
             try {
                 rp.res.setReplacement(PKG_SYSTEMUI, "dimen", "notification_corner_radius",

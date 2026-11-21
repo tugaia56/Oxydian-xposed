@@ -314,7 +314,13 @@ public class ThemeStyleFragment extends Fragment {
                         PREF_TOAST_CORNER, 24, () -> showCornerPickerDialog(cornerNames, PREF_TOAST_CORNER, 24, R.string.nav_toast_corner));
                 ListWidgetAdapter.ListItem dlgCornerItem = cornerItem(R.string.nav_dlg_corner,
                         PREF_DLG_CORNER, 14, () -> showCornerPickerDialog(cornerNames, PREF_DLG_CORNER, 14, R.string.nav_dlg_corner));
-                rv.setAdapter(new ConcatAdapter(top, new ListWidgetAdapter(List.of(notifCornerItem, toastCornerItem, dlgCornerItem))));
+                int vn = ObsidianPrefs.getInt(PREF_NOTIF_CORNER, 24), vt = ObsidianPrefs.getInt(PREF_TOAST_CORNER, 24), vd = ObsidianPrefs.getInt(PREF_DLG_CORNER, 14);
+                ListWidgetAdapter.ListItem allCornerItem = new ListWidgetAdapter.ListItem(
+                        getString(R.string.corner_all_title),
+                        (vn == vt && vn == vd) ? vn + " dp" : getString(R.string.corner_all_mixed),
+                        () -> showAllCornersPickerDialog(cornerNames));
+                allCornerItem.useAccentColor = true;
+                rv.setAdapter(new ConcatAdapter(top, new ListWidgetAdapter(List.of(allCornerItem, notifCornerItem, toastCornerItem, dlgCornerItem))));
             } else {
                 rv.setAdapter(top);
             }
@@ -740,6 +746,32 @@ public class ThemeStyleFragment extends Fragment {
 
     private void showCornerPickerDialog(String[] names) {
         showCornerPickerDialog(names, PREF_NOTIF_CORNER, 24, R.string.nav_notif_corner);
+    }
+
+    /** "Tutti insieme": un solo valore per notifiche, toast e finestre, con un solo promemoria di riavvio. */
+    private void showAllCornersPickerDialog(String[] names) {
+        int cur = ObsidianPrefs.getInt(PREF_NOTIF_CORNER, 24);
+        boolean same = cur == ObsidianPrefs.getInt(PREF_TOAST_CORNER, 24) && cur == ObsidianPrefs.getInt(PREF_DLG_CORNER, 14);
+        int idx = -1;
+        for (int i = 0; i < CORNER_VALUES.length; i++) if (same && CORNER_VALUES[i] == cur) idx = i;
+        final int[] selected = {idx};
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.corner_all_title)
+                .setSingleChoiceItems(names, idx, (d, which) -> selected[0] = which)
+                .setPositiveButton(R.string.apply, (d, w) -> {
+                    if (selected[0] < 0) return;
+                    int v = CORNER_VALUES[selected[0]];
+                    ObsidianPrefs.putInt(PREF_NOTIF_CORNER, v);
+                    ObsidianPrefs.putInt(PREF_TOAST_CORNER, v);
+                    ObsidianPrefs.putInt(PREF_DLG_CORNER, v);
+                    DstFabricatedUtil.saveBootProps();
+                    AppUtils.showRebootReminder(requireContext()); // le finestre di dialogo vogliono il riavvio completo
+                    if (mCornerMenuRefresh != null) mCornerMenuRefresh.run();
+                })
+                .setNegativeButton(R.string.close, null)
+                .show();
+        applyDialogBg(dialog);
+        fixButtonCaps(dialog);
     }
 
     /** Generico — riusato anche per "Raggio Angolo Toast" e "Raggio Finestre Dialogo", stesso
