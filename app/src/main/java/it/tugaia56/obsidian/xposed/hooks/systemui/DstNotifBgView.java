@@ -144,7 +144,7 @@ public class DstNotifBgView {
                             boolean isNight = (v.getResources().getConfiguration().uiMode
                                     & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
                                     == android.content.res.Configuration.UI_MODE_NIGHT_YES;
-                            if (!isNight) return; // di giorno lo stile non si applica (vedi currentDrawable)
+                            if (!DstNotifStyle.radiusApplies(isNight)) return; // con uno stile attivo, di giorno non si applica (vedi currentDrawable)
                             float r = DstNotifStyle.styledCornerPx(v.getResources().getDisplayMetrics().density);
                             if (r >= 0f) p.setResult(r);
                         } catch (Throwable ignored) {}
@@ -168,7 +168,7 @@ public class DstNotifBgView {
                             boolean isNight = (sys.getConfiguration().uiMode
                                     & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
                                     == android.content.res.Configuration.UI_MODE_NIGHT_YES;
-                            if (!isNight) return;
+                            if (!DstNotifStyle.radiusApplies(isNight)) return;
                             float r = DstNotifStyle.styledCornerPx(sys.getDisplayMetrics().density);
                             if (r < 0f) return;
                             for (int i = 0; i < p.args.length; i++) if (p.args[i] instanceof Float) p.args[i] = r;
@@ -191,7 +191,7 @@ public class DstNotifBgView {
                             boolean isNight = (sys.getConfiguration().uiMode
                                     & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
                                     == android.content.res.Configuration.UI_MODE_NIGHT_YES;
-                            if (isNight && DstNotifStyle.isStyleActive()) {
+                            if (DstNotifStyle.smoothClipOff(isNight)) {
                                 p.setResult(Boolean.FALSE);
                             }
                         } catch (Throwable ignored) {}
@@ -232,7 +232,7 @@ public class DstNotifBgView {
                                 boolean isNight = (v.getResources().getConfiguration().uiMode
                                         & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
                                         == android.content.res.Configuration.UI_MODE_NIGHT_YES;
-                                if (!isNight) return;
+                                if (!DstNotifStyle.radiusApplies(isNight)) return;
                                 float r = DstNotifStyle.styledCornerPx(v.getResources().getDisplayMetrics().density);
                                 if (r < 0f) return;
                                 int f = 0;
