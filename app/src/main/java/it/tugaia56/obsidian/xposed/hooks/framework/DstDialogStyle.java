@@ -138,6 +138,21 @@ public class DstDialogStyle {
         }
     }
 
+    /** Raggio delle finestre di dialogo (misura config_dialogCornerRadius del framework): con l'interruttore "Raggio angoli"
+     *  del modulo acceso vale il raggio scelto anche con stile "Nessuno". Legge le proprieta' di sistema. */
+    private static void applyRadiusDimen(XC_InitPackageResources.InitPackageResourcesParam rp) {
+        try {
+            if ("0".equals(readProp("persist.obsidian.dst.corner_on", "1"))) return;
+            int dp = DEFAULT_CORNER_DP;
+            String c = readProp("persist.obsidian.dst.dlg_corner", "");
+            if (!c.isEmpty()) { try { int v = Integer.parseInt(c); if (v > 0) dp = v; } catch (NumberFormatException ignored) {} }
+            rp.res.setReplacement(PKG_ANDROID, "dimen", "config_dialogCornerRadius",
+                    new XResources.DimensionReplacement(dp, android.util.TypedValue.COMPLEX_UNIT_DIP));
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] DstDialogStyle: config_dialogCornerRadius FAILED: " + t);
+        }
+    }
+
     // ── Called from ResourceManager.handleInitPackageResources ───────────────
 
     public static void applyPreloaded(XC_InitPackageResources.InitPackageResourcesParam rp) {
@@ -146,6 +161,7 @@ public class DstDialogStyle {
         // replacement in OGNI processo perché ogni processo ha la propria resource cache.
         preloadFromFile(); // always re-read — don't rely on stale zygote statics
         if (!sPreloaded || sDlgPreset == null) preloadFromProps(); // EACCES fallback
+        applyRadiusDimen(rp);
         if (!sPreloaded || sDlgPreset == null) return;
 
         try {

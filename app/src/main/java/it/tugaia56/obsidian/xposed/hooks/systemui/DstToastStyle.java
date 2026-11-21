@@ -117,6 +117,25 @@ public class DstToastStyle {
         }
     }
 
+    /** Raggio del toast di OxygenOS (misure oplus_toast_*_radius di SystemUI): con l'interruttore "Raggio angoli" del modulo
+     *  acceso vale il raggio scelto anche con stile "Nessuno". Legge le proprieta' di sistema (leggibili da ogni processo). */
+    private static void applyRadiusDimens(XC_InitPackageResources.InitPackageResourcesParam rp) {
+        try {
+            Class<?> sp = XposedHelpers.findClass("android.os.SystemProperties", null);
+            if ("0".equals((String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.corner_on", "1"))) return;
+            int dp = sCornerDp;
+            String c = (String) XposedHelpers.callStaticMethod(sp, "get", "persist.obsidian.dst.toast_corner", "");
+            if (!c.isEmpty()) { try { int v = Integer.parseInt(c); if (v > 0) dp = v; } catch (NumberFormatException ignored) {} }
+            for (String n : new String[]{"oplus_toast_double_line_radius", "oplus_toast_mutl_line_radius"}) {
+                rp.res.setReplacement(PKG_SYSTEMUI, "dimen", n,
+                        new XResources.DimensionReplacement(dp, android.util.TypedValue.COMPLEX_UNIT_DIP));
+            }
+            XposedBridge.log("[ Obsidian ] DstToastStyle: oplus_toast_*_radius -> " + dp + "dp");
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] DstToastStyle: radius dimens FAILED: " + t);
+        }
+    }
+
     // ── Called from ResourceManager.handleInitPackageResources ───────────────
 
     public static void applyPreloaded(XC_InitPackageResources.InitPackageResourcesParam rp) {
@@ -124,6 +143,7 @@ public class DstToastStyle {
         XposedBridge.log("[ Obsidian ] DstToastStyle.applyPreloaded: CALLED for systemui");
         preloadFromFile();
         XposedBridge.log("[ Obsidian ] DstToastStyle.applyPreloaded: after preload preset=" + sPreset);
+        applyRadiusDimens(rp);
         if (sPreset == null) return;
 
         // Rilettura ad ogni chiamata (non "final" catturato una volta sola) — vedi lo stesso
