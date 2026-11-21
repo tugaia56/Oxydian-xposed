@@ -191,7 +191,7 @@ public class DstNotifBgView {
                             boolean isNight = (sys.getConfiguration().uiMode
                                     & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
                                     == android.content.res.Configuration.UI_MODE_NIGHT_YES;
-                            if (isNight && DstNotifStyle.styledCornerPx(sys.getDisplayMetrics().density) >= 0f) {
+                            if (isNight && DstNotifStyle.isStyleActive()) {
                                 p.setResult(Boolean.FALSE);
                             }
                         } catch (Throwable ignored) {}

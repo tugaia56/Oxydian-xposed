@@ -124,6 +124,9 @@ public class DstNotifStyle {
         return (sPreset != null && sCornerOn) ? sCornerDp * density : -1f;
     }
 
+    /** Uno stile e' attivo (a prescindere da chi decide il raggio): serve a spegnere il ritaglio "liscio" di OxygenOS, che mangia i bordi agli angoli. */
+    public static boolean isStyleActive() { return sPreset != null; }
+
     /** Called by DstNotifStyleMod to check if a preset is active. */
     public static boolean isEnabled() { overrideFromTheme(); return sPreset != null; }
 
