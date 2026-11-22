@@ -76,12 +76,14 @@ android {
         jniLibs.useLegacyPackaging = true
     }
 
-    // Rename output APK to Oxydian-debug.apk / Oxydian-release-<version>.apk (oos) e Oxydian-Android-debug.apk / Oxydian-Android-release-<version>.apk (aosp)
+    // Rename output APK to Oxydian-debug.apk / Oxydian-OxygenOS-release-<version>.apk (oos) e Oxydian-Android-debug.apk / Oxydian-Android-release-<version>.apk (aosp)
     // (debug stays unversioned — reinstall.bat/the "reinstall" task below reference it by that fixed name)
     applicationVariants.all {
         val variant = this
         val suffix = if (variant.buildType.name == "release") "-${variant.versionName}" else ""
-        val prefix = if (variant.flavorName == "aosp") "Oxydian-Android" else "Oxydian"
+        // release: Oxydian-OxygenOS-release-<v>.apk / Oxydian-Android-release-<v>.apk; il debug OxygenOS resta Oxydian-debug.apk (nome fisso, vedi reinstall)
+        val prefix = if (variant.flavorName == "aosp") "Oxydian-Android"
+                     else if (variant.buildType.name == "release") "Oxydian-OxygenOS" else "Oxydian"
         outputs.all {
             val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
             output.outputFileName = "$prefix-${variant.buildType.name}$suffix.apk"

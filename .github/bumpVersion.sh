@@ -25,7 +25,7 @@ echo 'VName<<EOF' >> $GITHUB_ENV
 echo 'Oxydian v'$NEWVERNAME >> $GITHUB_ENV
 echo 'EOF' >> $GITHUB_ENV
 
-echo "ApkName=Oxydian-release-$NEWVERNAME.apk" >> $GITHUB_ENV
+echo "ApkName=Oxydian-OxygenOS-release-$NEWVERNAME.apk" >> $GITHUB_ENV
 echo "ApkNameAndroid=Oxydian-Android-release-$NEWVERNAME.apk" >> $GITHUB_ENV
 
 sed -i 's/versionCode.*/versionCode    = '$NEWVERCODE'/' app/build.gradle.kts
