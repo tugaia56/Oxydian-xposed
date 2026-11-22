@@ -1,0 +1,20 @@
+Added:
+- Which file to download: Oxydian-release-1.1.14.apk is for OnePlus phones with OxygenOS (full LSPosed scope). Oxydian-Android-release-1.1.14.apk is for pure Android ROMs (RisingOS, crDroid, Android 17...)
+- OxygenOS: the old "Misc Settings" page is now "Corner Radius Settings", with an on/off switch, an "All together" entry (one value for notifications, toast and dialogs) and the chosen value shown in the accent colour under each item. Switch off: the Theme (or the system) decides the radius
+- OxygenOS: the radius of notifications, toast and dialogs also works when the style is "None". Notifications and toast follow it after a System UI restart, dialogs after a reboot
+- Lock screen device widget: new types Storage (used space) and Do Not Disturb (ON/OFF); the type list is in alphabetical order
+- Notifications (OxygenOS): option to mute the low battery sound (port from Oxygen Customizer)
+- Lock screen (OxygenOS 16+): option to keep seen notifications (port from Oxygen Customizer)
+- Classic quick settings panel: the tile border follows the native shape (circle, oval, rounded square, octagon, free shapes)
+- RisingOS: the notification style also works on the lock screen
+- Pure Android: accent colour option for the notification expand arrows (Status bar > Notifications), lock screen options without the OxygenOS-only ones, status bar hiding on the lock screen for RisingOS
+Changed:
+- Notification style (OxygenOS): the corner radius setting now works for every notification, system ones included, and the border is no longer cut at the corners of the last notification
+- Notification style (OxygenOS): the style and radius are no longer stale when the preferences file cannot be read (they were until the next System UI restart)
+- Large quick settings tiles (OxygenOS 16.1): wide tiles use the chosen active/inactive colours instead of grey
+- Dialog style: an empty choice counts as "None" (no more transparent dialog backgrounds)
+- Quick settings slider and volume panel icon colour: the "Dark" choice is removed (use Default); an old saved "Dark" behaves as Default
+- Lock screen "Add Widget": the "Misc" title is shown only when widgets are on
+- RisingOS: the enlarged fingerprint icon is no longer clipped
+- Italian: "Menù Accensione" is now "Menù Spegnimento"; OxygenOS hides the power menu options that only work on pure Android
+- Known issue: when you swipe a notification that has a border to the right, the left part of its border disappears while you drag. We tried everything we could think of and could not fix it. It only affects notifications with a border, the ones without are fine
