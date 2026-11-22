@@ -982,8 +982,8 @@
     <string name="nav_notif_style_summary">Estilo de fondo personalizado para las notificaciones</string>
     <string name="nav_notif_corner">Radio de esquina de notificaciones</string>
     <string name="nav_notif_corner_summary">Radio de esquina para el fondo de las notificaciones</string>
-    <string name="nav_misc_settings">Ajustes varios</string>
-    <string name="nav_misc_settings_summary">Radio de esquina (Notificaciones/Toast/Diálogo) y ajustes de textura</string>
+    <string name="nav_misc_settings">Ajustes del radio de esquinas</string>
+    <string name="nav_misc_settings_summary">Activar/desactivar, y el radio de esquinas de notificaciones, toast y diálogos</string>
     <string name="nav_notif_texture_settings">Ajustes de textura de notificaciones</string>
     <string name="nav_toast_corner">Radio de esquina del Toast</string>
     <string name="nav_toast_corner_summary">Radio de esquina para el fondo del toast</string>
@@ -1404,4 +1404,16 @@
     <string name="logs_delete_title">Eliminar registros guardados</string>
     <string name="health_delete_title">Eliminar archivos de estado guardados</string>
     <string name="backup_delete_title">Eliminar copias de seguridad</string>
+    <string name="lockscreen_hide_face_icon">Ocultar el icono de desbloqueo facial</string>
+    <string name="lockscreen_hide_face_icon_summary">Oculta el icono de reconocimiento facial en la pantalla de bloqueo</string>
+    <string name="lockscreen_keep_seen">Mantener las notificaciones vistas</string>
+    <string name="lockscreen_keep_seen_summary">Sigue mostrando las notificaciones en la pantalla de bloqueo después de desbloquear y volver a bloquear</string>
+    <string name="mute_low_battery_sound">Silenciar el sonido de batería baja</string>
+    <string name="mute_low_battery_sound_summary">Silencia el aviso sonoro que suena cuando la batería llega a niveles bajos y críticos</string>
+    <string name="notif_expand_accent">Color de acento en las flechas de expansión</string>
+    <string name="notif_expand_accent_summary">El botón de flecha a la derecha de cada notificación usa el color de acento (solo Android)</string>
+    <string name="corner_all_title">Todos juntos</string>
+    <string name="corner_all_mixed">Valores distintos</string>
+    <string name="corner_switch_title">Radio de esquinas del módulo</string>
+    <string name="corner_switch_summary">Activado: el módulo usa los radios elegidos abajo. Desactivado: el sistema, o el overlay del tema Oxydian, decide el radio.</string>
 </resources>

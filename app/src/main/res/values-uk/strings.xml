@@ -992,8 +992,8 @@
     <string name="nav_notif_style_summary">Власний стиль фону для сповіщень</string>
     <string name="nav_notif_corner">Радіус кутів сповіщень</string>
     <string name="nav_notif_corner_summary">Радіус кутів фону сповіщень</string>
-    <string name="nav_misc_settings">Різні налаштування</string>
-    <string name="nav_misc_settings_summary">Радіус кутів (сповіщення/спливаючі повідомлення/діалог) і налаштування текстури</string>
+    <string name="nav_misc_settings">Налаштування радіуса кутів</string>
+    <string name="nav_misc_settings_summary">Увімк./вимк. і радіус кутів сповіщень, toast та діалогів</string>
     <string name="nav_notif_texture_settings">Налаштування текстури сповіщень</string>
     <string name="nav_toast_corner">Радіус кутів спливаючих повідомлень</string>
     <string name="nav_toast_corner_summary">Радіус кутів фону спливаючих повідомлень</string>
@@ -1404,4 +1404,16 @@
     <string name="logs_delete_title">Видалити збережені журнали</string>
     <string name="health_delete_title">Видалити збережені файли стану</string>
     <string name="backup_delete_title">Видалити резервні копії</string>
+    <string name="lockscreen_hide_face_icon">Сховати значок розблокування за обличчям</string>
+    <string name="lockscreen_hide_face_icon_summary">Ховає значок розпізнавання обличчя на екрані блокування</string>
+    <string name="lockscreen_keep_seen">Зберігати переглянуті сповіщення</string>
+    <string name="lockscreen_keep_seen_summary">Продовжувати показувати сповіщення на екрані блокування після розблокування та повторного блокування</string>
+    <string name="mute_low_battery_sound">Вимкнути звук низького заряду батареї</string>
+    <string name="mute_low_battery_sound_summary">Вимикає сигнал, що лунає при низькому та критичному рівні заряду</string>
+    <string name="notif_expand_accent">Колір акценту для стрілок розгортання</string>
+    <string name="notif_expand_accent_summary">Кнопка-стрілка праворуч від кожного сповіщення отримує колір акценту (лише Android)</string>
+    <string name="corner_all_title">Усі разом</string>
+    <string name="corner_all_mixed">Різні значення</string>
+    <string name="corner_switch_title">Радіус кутів модуля</string>
+    <string name="corner_switch_summary">Увімк.: модуль використовує радіуси, вибрані нижче. Вимк.: радіус визначає система або оверлей теми Oxydian.</string>
 </resources>

@@ -982,8 +982,8 @@
     <string name="nav_notif_style_summary">通知的自定义背景样式</string>
     <string name="nav_notif_corner">通知圆角半径</string>
     <string name="nav_notif_corner_summary">通知背景的圆角半径</string>
-    <string name="nav_misc_settings">其他调整</string>
-    <string name="nav_misc_settings_summary">圆角半径（通知/Toast/对话框）和纹理设置</string>
+    <string name="nav_misc_settings">圆角半径设置</string>
+    <string name="nav_misc_settings_summary">开关，以及通知、Toast 和对话框的圆角半径</string>
     <string name="nav_notif_texture_settings">通知纹理调整</string>
     <string name="nav_toast_corner">Toast 圆角半径</string>
     <string name="nav_toast_corner_summary">Toast 背景的圆角半径</string>
@@ -1404,4 +1404,16 @@
     <string name="logs_delete_title">删除已保存的日志</string>
     <string name="health_delete_title">删除已保存的状态文件</string>
     <string name="backup_delete_title">删除备份</string>
+    <string name="lockscreen_hide_face_icon">隐藏人脸解锁图标</string>
+    <string name="lockscreen_hide_face_icon_summary">在锁屏上隐藏人脸识别图标</string>
+    <string name="lockscreen_keep_seen">保留已查看的通知</string>
+    <string name="lockscreen_keep_seen_summary">解锁后再次锁屏时，继续在锁屏上显示通知</string>
+    <string name="mute_low_battery_sound">静音低电量提示音</string>
+    <string name="mute_low_battery_sound_summary">静音电量低和电量严重不足时播放的提示音</string>
+    <string name="notif_expand_accent">展开箭头使用强调色</string>
+    <string name="notif_expand_accent_summary">每条通知右侧的箭头按钮使用强调色（仅限 Android）</string>
+    <string name="corner_all_title">全部一起</string>
+    <string name="corner_all_mixed">数值不一致</string>
+    <string name="corner_switch_title">模块圆角半径</string>
+    <string name="corner_switch_summary">开启：模块使用下方选择的半径。关闭：由系统或 Oxydian 主题覆盖层决定半径。</string>
 </resources>

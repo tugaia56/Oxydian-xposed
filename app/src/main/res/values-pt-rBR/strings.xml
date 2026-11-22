@@ -982,8 +982,8 @@
     <string name="nav_notif_style_summary">Estilo de fundo personalizado para notificações</string>
     <string name="nav_notif_corner">Raio de canto das notificações</string>
     <string name="nav_notif_corner_summary">Raio de canto do fundo das notificações</string>
-    <string name="nav_misc_settings">Ajustes diversos</string>
-    <string name="nav_misc_settings_summary">Raio de canto (Notificações/Toast/Diálogo) e ajustes de textura</string>
+    <string name="nav_misc_settings">Ajustes do raio dos cantos</string>
+    <string name="nav_misc_settings_summary">Ligar/desligar, e o raio dos cantos de Notificações, Toast e Diálogos</string>
     <string name="nav_notif_texture_settings">Ajustes de textura das notificações</string>
     <string name="nav_toast_corner">Raio de canto do Toast</string>
     <string name="nav_toast_corner_summary">Raio de canto do fundo do toast</string>
@@ -1404,4 +1404,16 @@
     <string name="logs_delete_title">Excluir logs salvos</string>
     <string name="health_delete_title">Excluir arquivos de estado salvos</string>
     <string name="backup_delete_title">Excluir backups</string>
+    <string name="lockscreen_hide_face_icon">Ocultar ícone de desbloqueio facial</string>
+    <string name="lockscreen_hide_face_icon_summary">Oculta o ícone de reconhecimento facial na tela de bloqueio</string>
+    <string name="lockscreen_keep_seen">Manter notificações já vistas</string>
+    <string name="lockscreen_keep_seen_summary">Continua mostrando as notificações na tela de bloqueio depois de desbloquear e bloquear novamente</string>
+    <string name="mute_low_battery_sound">Silenciar som de bateria fraca</string>
+    <string name="mute_low_battery_sound_summary">Silencia o aviso sonoro tocado quando a bateria chega aos níveis baixo e crítico</string>
+    <string name="notif_expand_accent">Cor de destaque nas setas de expansão</string>
+    <string name="notif_expand_accent_summary">O botão de seta à direita de cada notificação recebe a cor de destaque (somente Android)</string>
+    <string name="corner_all_title">Todos juntos</string>
+    <string name="corner_all_mixed">Valores diferentes</string>
+    <string name="corner_switch_title">Raio dos cantos do módulo</string>
+    <string name="corner_switch_summary">Ligado: o módulo usa os raios escolhidos abaixo. Desligado: o sistema, ou o overlay do Tema Oxydian, decide o raio.</string>
 </resources>

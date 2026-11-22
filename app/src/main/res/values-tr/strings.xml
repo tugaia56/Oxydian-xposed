@@ -982,8 +982,8 @@
     <string name="nav_notif_style_summary">Bildirimler için özel arka plan stili</string>
     <string name="nav_notif_corner">Bildirim Köşe Yarıçapı</string>
     <string name="nav_notif_corner_summary">Bildirim arka planı için köşe yarıçapı</string>
-    <string name="nav_misc_settings">Çeşitli Ayarlamalar</string>
-    <string name="nav_misc_settings_summary">Köşe yarıçapı (Bildirimler/Toast/İletişim Kutusu) ve doku ayarları</string>
+    <string name="nav_misc_settings">Köşe Yarıçapı Ayarları</string>
+    <string name="nav_misc_settings_summary">Açık/kapalı ve Bildirimler, Toast ve Diyalogların köşe yarıçapı</string>
     <string name="nav_notif_texture_settings">Bildirim Dokusu Ayarlamaları</string>
     <string name="nav_toast_corner">Toast Köşe Yarıçapı</string>
     <string name="nav_toast_corner_summary">Toast arka planı için köşe yarıçapı</string>
@@ -1404,4 +1404,16 @@
     <string name="logs_delete_title">Kaydedilen günlükleri sil</string>
     <string name="health_delete_title">Kaydedilen durum dosyalarını sil</string>
     <string name="backup_delete_title">Yedekleri sil</string>
+    <string name="lockscreen_hide_face_icon">Yüz tanıma kilit açma simgesini gizle</string>
+    <string name="lockscreen_hide_face_icon_summary">Kilit ekranındaki yüz tanıma simgesini gizler</string>
+    <string name="lockscreen_keep_seen">Görülen bildirimleri koru</string>
+    <string name="lockscreen_keep_seen_summary">Kilit açılıp tekrar kilitlendikten sonra da bildirimleri kilit ekranında göstermeye devam eder</string>
+    <string name="mute_low_battery_sound">Düşük pil sesini sessize al</string>
+    <string name="mute_low_battery_sound_summary">Pil düşük ve kritik seviyelere ulaştığında çalan sesi susturur</string>
+    <string name="notif_expand_accent">Genişletme oklarında vurgu rengi</string>
+    <string name="notif_expand_accent_summary">Her bildirimin sağındaki ok düğmesi vurgu rengini alır (yalnızca Android)</string>
+    <string name="corner_all_title">Hepsi birlikte</string>
+    <string name="corner_all_mixed">Farklı değerler</string>
+    <string name="corner_switch_title">Modül köşe yarıçapı</string>
+    <string name="corner_switch_summary">Açık: modül aşağıda seçilen yarıçapları kullanır. Kapalı: yarıçapı sistem veya Oxydian Tema katmanı belirler.</string>
 </resources>

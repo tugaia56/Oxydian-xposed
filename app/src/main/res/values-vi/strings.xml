@@ -992,8 +992,8 @@
     <string name="nav_notif_style_summary">Kiểu nền tùy chỉnh cho thông báo</string>
     <string name="nav_notif_corner">Bán kính góc thông báo</string>
     <string name="nav_notif_corner_summary">Bán kính góc cho nền thông báo</string>
-    <string name="nav_misc_settings">Điều chỉnh khác</string>
-    <string name="nav_misc_settings_summary">Bán kính góc (Thông báo/Toast/Hộp thoại) và cài đặt họa tiết</string>
+    <string name="nav_misc_settings">Cài đặt bán kính góc</string>
+    <string name="nav_misc_settings_summary">Bật/tắt, và bán kính góc của Thông báo, Toast và Hộp thoại</string>
     <string name="nav_notif_texture_settings">Điều chỉnh họa tiết thông báo</string>
     <string name="nav_toast_corner">Bán kính góc Toast</string>
     <string name="nav_toast_corner_summary">Bán kính góc cho nền toast</string>
@@ -1404,4 +1404,16 @@
     <string name="logs_delete_title">Xóa nhật ký đã lưu</string>
     <string name="health_delete_title">Xóa tệp trạng thái đã lưu</string>
     <string name="backup_delete_title">Xóa bản sao lưu</string>
+    <string name="lockscreen_hide_face_icon">Ẩn biểu tượng mở khóa bằng khuôn mặt</string>
+    <string name="lockscreen_hide_face_icon_summary">Ẩn biểu tượng nhận diện khuôn mặt trên màn hình khóa</string>
+    <string name="lockscreen_keep_seen">Giữ thông báo đã xem</string>
+    <string name="lockscreen_keep_seen_summary">Tiếp tục hiển thị thông báo trên màn hình khóa sau khi mở khóa rồi khóa lại</string>
+    <string name="mute_low_battery_sound">Tắt âm thanh pin yếu</string>
+    <string name="mute_low_battery_sound_summary">Tắt âm báo phát ra khi pin xuống mức thấp và nguy cấp</string>
+    <string name="notif_expand_accent">Màu nhấn cho mũi tên mở rộng</string>
+    <string name="notif_expand_accent_summary">Nút mũi tên bên phải mỗi thông báo dùng màu nhấn (chỉ Android)</string>
+    <string name="corner_all_title">Tất cả cùng lúc</string>
+    <string name="corner_all_mixed">Giá trị khác nhau</string>
+    <string name="corner_switch_title">Bán kính góc của mô-đun</string>
+    <string name="corner_switch_summary">Bật: mô-đun dùng các bán kính chọn bên dưới. Tắt: hệ thống hoặc lớp phủ Oxydian Theme quyết định bán kính.</string>
 </resources>

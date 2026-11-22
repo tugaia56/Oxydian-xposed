@@ -982,8 +982,8 @@
     <string name="nav_notif_style_summary">Eigener Hintergrundstil für Benachrichtigungen</string>
     <string name="nav_notif_corner">Eckenradius der Benachrichtigungen</string>
     <string name="nav_notif_corner_summary">Eckenradius für den Benachrichtigungshintergrund</string>
-    <string name="nav_misc_settings">Verschiedene Anpassungen</string>
-    <string name="nav_misc_settings_summary">Eckenradius (Benachrichtigungen/Toast/Dialog) und Textureinstellungen</string>
+    <string name="nav_misc_settings">Eckenradius-Einstellungen</string>
+    <string name="nav_misc_settings_summary">An/Aus sowie der Eckenradius für Benachrichtigungen, Toast und Dialoge</string>
     <string name="nav_notif_texture_settings">Textureinstellungen für Benachrichtigungen</string>
     <string name="nav_toast_corner">Toast-Eckenradius</string>
     <string name="nav_toast_corner_summary">Eckenradius für den Toast-Hintergrund</string>
@@ -1404,4 +1404,16 @@
     <string name="logs_delete_title">Gespeicherte Protokolle löschen</string>
     <string name="health_delete_title">Gespeicherte Statusdateien löschen</string>
     <string name="backup_delete_title">Backups löschen</string>
+    <string name="lockscreen_hide_face_icon">Face-Unlock-Symbol ausblenden</string>
+    <string name="lockscreen_hide_face_icon_summary">Blendet das Gesichtserkennungssymbol auf dem Sperrbildschirm aus</string>
+    <string name="lockscreen_keep_seen">Gesehene Benachrichtigungen behalten</string>
+    <string name="lockscreen_keep_seen_summary">Benachrichtigungen auf dem Sperrbildschirm weiter anzeigen, nachdem das Gerät entsperrt und wieder gesperrt wurde</string>
+    <string name="mute_low_battery_sound">Ton bei niedrigem Akkustand stummschalten</string>
+    <string name="mute_low_battery_sound_summary">Schaltet den Signalton stumm, der bei niedrigem und kritischem Akkustand abgespielt wird</string>
+    <string name="notif_expand_accent">Akzentfarbe für die Erweiterungspfeile</string>
+    <string name="notif_expand_accent_summary">Der Pfeil-Button rechts neben jeder Benachrichtigung erhält die Akzentfarbe (nur Android)</string>
+    <string name="corner_all_title">Alle zusammen</string>
+    <string name="corner_all_mixed">Unterschiedliche Werte</string>
+    <string name="corner_switch_title">Eckenradius des Moduls</string>
+    <string name="corner_switch_summary">An: Das Modul verwendet die unten gewählten Radien. Aus: Das System oder das Oxydian-Theme-Overlay bestimmt den Radius.</string>
 </resources>

@@ -982,8 +982,8 @@
     <string name="nav_notif_style_summary">Gaya latar belakang kustom untuk notifikasi</string>
     <string name="nav_notif_corner">Radius Sudut Notifikasi</string>
     <string name="nav_notif_corner_summary">Radius sudut untuk latar belakang notifikasi</string>
-    <string name="nav_misc_settings">Berbagai Penyesuaian</string>
-    <string name="nav_misc_settings_summary">Radius sudut (Notifikasi/Toast/Dialog) dan pengaturan tekstur</string>
+    <string name="nav_misc_settings">Pengaturan Radius Sudut</string>
+    <string name="nav_misc_settings_summary">Aktif/nonaktif, dan radius sudut Notifikasi, Toast, dan Dialog</string>
     <string name="nav_notif_texture_settings">Penyesuaian Tekstur Notifikasi</string>
     <string name="nav_toast_corner">Radius Sudut Toast</string>
     <string name="nav_toast_corner_summary">Radius sudut untuk latar belakang toast</string>
@@ -1404,4 +1404,16 @@
     <string name="logs_delete_title">Hapus log tersimpan</string>
     <string name="health_delete_title">Hapus file status tersimpan</string>
     <string name="backup_delete_title">Hapus cadangan</string>
+    <string name="lockscreen_hide_face_icon">Sembunyikan ikon buka kunci wajah</string>
+    <string name="lockscreen_hide_face_icon_summary">Menyembunyikan ikon pengenalan wajah di layar kunci</string>
+    <string name="lockscreen_keep_seen">Pertahankan notifikasi yang sudah dilihat</string>
+    <string name="lockscreen_keep_seen_summary">Tetap menampilkan notifikasi di layar kunci setelah membuka kunci dan mengunci lagi</string>
+    <string name="mute_low_battery_sound">Bisukan suara baterai lemah</string>
+    <string name="mute_low_battery_sound_summary">Membisukan bunyi yang diputar saat baterai mencapai level rendah dan kritis</string>
+    <string name="notif_expand_accent">Warna aksen pada panah perluasan</string>
+    <string name="notif_expand_accent_summary">Tombol panah di sisi kanan setiap notifikasi memakai warna aksen (hanya Android)</string>
+    <string name="corner_all_title">Semua sekaligus</string>
+    <string name="corner_all_mixed">Nilai berbeda</string>
+    <string name="corner_switch_title">Radius sudut modul</string>
+    <string name="corner_switch_summary">Aktif: modul memakai radius yang dipilih di bawah. Nonaktif: sistem, atau overlay Tema Oxydian, yang menentukan radius.</string>
 </resources>
