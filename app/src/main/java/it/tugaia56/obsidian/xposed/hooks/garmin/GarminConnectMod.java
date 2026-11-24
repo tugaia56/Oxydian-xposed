@@ -20,7 +20,7 @@ import it.tugaia56.obsidian.xposed.XposedMods;
  *  - grigi di sfondo (#101010 pagina, #1D1D1D card) -> lo sfondo di sistema (Blue Gray Dark).
  * Il nero di base e tutto il resto (grafici, verde/arancio/rosso) restano com'erano.
  *
- * Nome delle classi legato alla versione dell'app (5.31.1: fq6, 5.30.1: o4.f0): se Garmin cambia il codice va ritrovato. Mod nascosta,
+ * Nome delle classi legato alla versione dell'app (Garmin Connect 5.31.1: fq6, 5.30.1: o4.f0; Connect IQ 2.51.1: ya2, 2.50: nkb): se Garmin cambia il codice va ritrovato. Mod nascosta,
  * sempre attiva, nessuna impostazione. Serve la spunta su Garmin Connect nell'ambito di Oxydian in LSPosed.
  */
 public class GarminConnectMod extends XposedMods {
@@ -48,20 +48,29 @@ public class GarminConnectMod extends XposedMods {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lp) throws Throwable {
         // classe offuscata di Compose (ColorKt) con le funzioni Color(long) e Color(int), per app e versione
-        // (si provano in ordine: il primo che esiste in questa versione dell'app)
-        final String[] classes;
-        final String fnLong, fnInt;
-        if (PKG.equals(lp.packageName)) { classes = new String[]{"fq6", "o4.f0"}; fnLong = "d"; fnInt = "b"; }   // Garmin Connect 5.31.1 (fq6), 5.30.1 (o4.f0)
-        else if (PKG_IQ.equals(lp.packageName)) { classes = new String[]{"nkb"}; fnLong = "e"; fnInt = "d"; }    // Connect IQ 2.50
-        else return;
-        String colorClass = classes[0];
+        // (classe, funzione Color(long), funzione Color(int)): si provano in ordine, il primo che esiste in questa versione dell'app
+        final String[][] candidates;
+        if (PKG.equals(lp.packageName)) {
+            candidates = new String[][]{
+                    {"fq6", "d", "b"},      // Garmin Connect 5.31.1
+                    {"o4.f0", "d", "b"}};   // Garmin Connect 5.30.1
+        } else if (PKG_IQ.equals(lp.packageName)) {
+            candidates = new String[][]{
+                    {"ya2", "f", "e"},      // Connect IQ 2.51.1
+                    {"nkb", "e", "d"}};     // Connect IQ 2.50
+        } else return;
+        String colorClass = candidates[0][0], fnLong = candidates[0][1], fnInt = candidates[0][2];
         try {
             Class<?> cls = null;
-            for (String c : classes) {
-                cls = XposedHelpers.findClassIfExists(c, lp.classLoader);
-                if (cls != null) { colorClass = c; break; }
+            for (String[] c : candidates) {
+                cls = XposedHelpers.findClassIfExists(c[0], lp.classLoader);
+                if (cls != null && XposedHelpers.findMethodExactIfExists(cls, c[1], long.class) != null) {
+                    colorClass = c[0]; fnLong = c[1]; fnInt = c[2];
+                    break;
+                }
+                cls = null;
             }
-            if (cls == null) throw new ClassNotFoundException(classes[0]);
+            if (cls == null) throw new ClassNotFoundException(candidates[0][0]);
             XC_MethodHook asLong = new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam p) {
                     try {
@@ -79,9 +88,10 @@ public class GarminConnectMod extends XposedMods {
                     } catch (Throwable ignored) {}
                 }
             };
-            XposedHelpers.findAndHookMethod(cls, fnLong, long.class, asLong);
-            XposedHelpers.findAndHookMethod(cls, fnInt, int.class, asInt);
-            XposedBridge.log("[ Obsidian ] GarminConnectMod: hooked " + colorClass + "." + fnLong + "(long) / ." + fnInt + "(int) in " + lp.packageName);
+            final String fl = fnLong, fi = fnInt;
+            XposedHelpers.findAndHookMethod(cls, fl, long.class, asLong);
+            XposedHelpers.findAndHookMethod(cls, fi, int.class, asInt);
+            XposedBridge.log("[ Obsidian ] GarminConnectMod: hooked " + colorClass + "." + fl + "(long) / ." + fi + "(int) in " + lp.packageName);
         } catch (Throwable t) {
             XposedBridge.log("[ Obsidian ] GarminConnectMod: colour class " + colorClass
                     + " not found (app version changed?): " + t);
