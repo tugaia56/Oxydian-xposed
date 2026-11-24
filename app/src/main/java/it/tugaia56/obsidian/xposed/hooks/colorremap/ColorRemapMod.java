@@ -127,6 +127,7 @@ public class ColorRemapMod extends XposedMods {
         Map<Integer, Integer> aurora = new HashMap<>();
         aurora.put(0xF2B8B5, ACCENT);
         aurora.put(0x601410, WHITE);
+        aurora.put(0x5E5CA6, ACCENT);  // pillola del tab selezionato della barra in basso
         RULES.put("com.aurora.store", aurora);
     }
 
