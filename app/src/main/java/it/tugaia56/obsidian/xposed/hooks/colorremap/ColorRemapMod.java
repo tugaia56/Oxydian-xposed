@@ -129,6 +129,18 @@ public class ColorRemapMod extends XposedMods {
         aurora.put(0x601410, WHITE);
         aurora.put(0x5E5CA6, ACCENT);  // pillola del tab selezionato della barra in basso
         RULES.put("com.aurora.store", aurora);
+        // Dropbox (com.dropbox.android): le schermate nuove sono Compose con i colori "dig" (design system) scritti nel codice:
+        // neri caldi di pagina e card -> sfondo e tessere, blu -> accento, blu scuro di selezione -> pillola
+        Map<Integer, Integer> dropbox = new HashMap<>();
+        dropbox.put(0x1A1918, PAGE);
+        dropbox.put(0x121211, PAGE);
+        dropbox.put(0x242321, TILE);
+        dropbox.put(0x2D2B29, TILE);
+        dropbox.put(0x313030, TILE);
+        for (int c : new int[]{0x3080FF, 0x0061FA, 0x004DC7, 0x5F9DFF, 0x3984FF, 0x75AAFF, 0x1B7CFF}) dropbox.put(c, ACCENT);
+        for (int c : new int[]{0x002969, 0x003280, 0x003A97}) dropbox.put(c, PILL);
+        dropbox.put(0x00183E, WHITE);  // icona/testo sopra il blu
+        RULES.put("com.dropbox.android", dropbox);
     }
 
     /** Colori che cambiano solo quando l'app li disegna come rettangolo arrotondato (pulsanti, chip): il testo e le icone con lo stesso colore restano come sono. */
