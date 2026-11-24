@@ -20,7 +20,7 @@ import it.tugaia56.obsidian.xposed.XposedMods;
  *  - grigi di sfondo (#101010 pagina, #1D1D1D card) -> lo sfondo di sistema (Blue Gray Dark).
  * Il nero di base e tutto il resto (grafici, verde/arancio/rosso) restano com'erano.
  *
- * Nome delle classi legato alla versione 5.30.1 dell'app: se Garmin cambia il codice va ritrovato. Mod nascosta,
+ * Nome delle classi legato alla versione dell'app (5.31.1: fq6, 5.30.1: o4.f0): se Garmin cambia il codice va ritrovato. Mod nascosta,
  * sempre attiva, nessuna impostazione. Serve la spunta su Garmin Connect nell'ambito di Oxydian in LSPosed.
  */
 public class GarminConnectMod extends XposedMods {
@@ -48,12 +48,20 @@ public class GarminConnectMod extends XposedMods {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lp) throws Throwable {
         // classe offuscata di Compose (ColorKt) con le funzioni Color(long) e Color(int), per app e versione
-        final String colorClass, fnLong, fnInt;
-        if (PKG.equals(lp.packageName)) { colorClass = "o4.f0"; fnLong = "d"; fnInt = "b"; }          // Garmin Connect 5.30.1
-        else if (PKG_IQ.equals(lp.packageName)) { colorClass = "nkb"; fnLong = "e"; fnInt = "d"; }  // Connect IQ 2.50
+        // (si provano in ordine: il primo che esiste in questa versione dell'app)
+        final String[] classes;
+        final String fnLong, fnInt;
+        if (PKG.equals(lp.packageName)) { classes = new String[]{"fq6", "o4.f0"}; fnLong = "d"; fnInt = "b"; }   // Garmin Connect 5.31.1 (fq6), 5.30.1 (o4.f0)
+        else if (PKG_IQ.equals(lp.packageName)) { classes = new String[]{"nkb"}; fnLong = "e"; fnInt = "d"; }    // Connect IQ 2.50
         else return;
+        String colorClass = classes[0];
         try {
-            Class<?> cls = XposedHelpers.findClass(colorClass, lp.classLoader);
+            Class<?> cls = null;
+            for (String c : classes) {
+                cls = XposedHelpers.findClassIfExists(c, lp.classLoader);
+                if (cls != null) { colorClass = c; break; }
+            }
+            if (cls == null) throw new ClassNotFoundException(classes[0]);
             XC_MethodHook asLong = new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam p) {
                     try {
