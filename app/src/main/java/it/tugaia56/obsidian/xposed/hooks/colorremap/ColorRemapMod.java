@@ -129,20 +129,6 @@ public class ColorRemapMod extends XposedMods {
         aurora.put(0x601410, WHITE);
         aurora.put(0x5E5CA6, ACCENT);  // pillola del tab selezionato della barra in basso
         RULES.put("com.aurora.store", aurora);
-        // Curve (com.imaginecurve.curve.prd): le barre seguono il Theme (overlay), ma pagina, card e pulsante sono colori
-        // scritti nel codice (Compose): pagina #121212 e riquadri neri -> sfondo, card #272727 -> tessere,
-        // contenitori piu' chiari -> card, rosso dei pulsanti -> accento (il rosso delle immagini della carta resta)
-        Map<Integer, Integer> curve = new HashMap<>();
-        curve.put(0x121212, PAGE);
-        curve.put(0x000000, PAGE);
-        curve.put(0x272727, TILE);
-        curve.put(0x302C2C, CARD);
-        curve.put(0x3D3636, CARD);
-        curve.put(0x333333, CARD);
-        curve.put(0xCB060D, ACCENT);
-        curve.put(0xFF4242, ACCENT);
-        curve.put(0xEB5D76, ACCENT);
-        RULES.put("com.imaginecurve.curve.prd", curve);
     }
 
     /** Colori che cambiano solo quando l'app li disegna come rettangolo arrotondato (pulsanti, chip): il testo e le icone con lo stesso colore restano come sono. */
