@@ -33,12 +33,12 @@ import it.tugaia56.obsidian.xposed.utils.AccentUtil;
  * i colori fissi vengono sostituiti nel momento in cui l'app li passa alle view (Paint, testo, sfondi, filtri, liste di
  * colori, risorse). Ogni app ha una tabella "colore originale (rgb) -> ruolo": ACCENT = accento del Theme, PAGE = sfondo
  * (background_dark), TILE = tessere e barre (button_material_dark), CARD = card (holo_light_primary_dark), PILL = pillola
- * della barra di navigazione (system_secondary_container_dark), WHITE = bianco. La trasparenza originale resta. Solo con il tema scuro.
+ * della barra di navigazione (system_secondary_container_dark), WHITE = bianco, RED = rosso del Theme (holo_red_dark). La trasparenza originale resta. Solo con il tema scuro.
  * Serve la spunta sull'app nell'ambito di Oxydian in LSPosed. Prima di aggiungere un'app controllare che non abbia PairIP.
  */
 public class ColorRemapMod extends XposedMods {
 
-    private static final int ACCENT = 0, PAGE = 1, TILE = 2, CARD = 3, PILL = 4, WHITE = 5;
+    private static final int ACCENT = 0, PAGE = 1, TILE = 2, CARD = 3, PILL = 4, WHITE = 5, RED = 6;
 
     private static final Map<String, Map<Integer, Integer>> RULES = new HashMap<>();
 
@@ -123,9 +123,9 @@ public class ColorRemapMod extends XposedMods {
         fdroid.put(0xBACF82, ACCENT); // testo verde nelle Impostazioni
         RULES.put("org.fdroid.fdroid", fdroid);
         // Aurora Store (com.aurora.store): il numero degli aggiornamenti (pallino sull'icona Aggiornamenti) e' Compose con i
-        // colori "errore" di Material 3 scritti nel codice: sfondo #f2b8b5 -> accento, numero #601410 -> bianco
+        // colori "errore" di Material 3 scritti nel codice: sfondo #f2b8b5 -> rosso del Theme (holo_red_dark), numero #601410 -> bianco
         Map<Integer, Integer> aurora = new HashMap<>();
-        aurora.put(0xF2B8B5, ACCENT);
+        aurora.put(0xF2B8B5, RED);
         aurora.put(0x601410, WHITE);
         aurora.put(0x5E5CA6, ACCENT);  // pillola del tab selezionato della barra in basso
         RULES.put("com.aurora.store", aurora);
@@ -161,7 +161,7 @@ public class ColorRemapMod extends XposedMods {
     }
 
     private static volatile boolean sReady;
-    private static final int[] sColors = new int[6];
+    private static final int[] sColors = new int[7];
     /** load() legge colori con getColor, che e' agganciato: senza guardia si richiamerebbe all'infinito. */
     private static final ThreadLocal<Boolean> sBusy = new ThreadLocal<>();
 
@@ -197,6 +197,7 @@ public class ColorRemapMod extends XposedMods {
             sColors[CARD] = resColor(res, "holo_light_primary_dark");
             sColors[PILL] = resColor(res, "system_secondary_container_dark");
             sColors[WHITE] = 0xFFFFFF;
+            sColors[RED] = resColor(res, "holo_red_dark");
             sReady = true;
         } catch (Throwable ignored) {
         } finally {
