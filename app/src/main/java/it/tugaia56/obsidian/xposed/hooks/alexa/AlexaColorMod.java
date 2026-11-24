@@ -23,7 +23,7 @@ import it.tugaia56.obsidian.xposed.utils.AccentUtil;
  * Amazon Alexa (com.amazon.dee.app): le schermate sono React Native e i colori del design system "Mosaic" sono scritti nel
  * bundle JavaScript, quindi l'overlay del Theme non li raggiunge (cambia solo le risorse Android). Qui i colori fissi
  * vengono sostituiti nel momento in cui l'app li passa alle view: i blu (#3f88ff dei testi, #1db2f7 di barra volume e
- * link nel pannello del dispositivo, #126dff del tema chiaro) diventano l'accento, il grigio dei pannelli (#272d32) e
+ * link nel pannello del dispositivo, #126dff del tema chiaro, #297bff dei bordi dei pulsanti) diventano l'accento, il grigio dei pannelli (#272d32) e
  * quello delle tessere (#121c23) e il fondo scuro di Profilo e Impostazioni (#010b13) diventano i colori di sfondo del tema, come nell'overlay. La trasparenza resta quella
  * originale. Solo con il tema scuro. Serve la spunta su Alexa nell'ambito di Oxydian in LSPosed.
  */
@@ -74,6 +74,8 @@ public class AlexaColorMod extends XposedMods {
             case 0x3F88FF:
             case 0x1DB2F7:
             case 0x126DFF:
+            case 0x0078BE:   // blu dei pulsanti e degli interruttori (traccia attiva)
+            case 0x297BFF:   // bordo dei pulsanti secondari (es. "Caricare" del Roomba)
                 if (!sReady) load();
                 return sReady ? (c & 0xFF000000) | sAccent : c;
             case 0x272D32:
@@ -84,6 +86,7 @@ public class AlexaColorMod extends XposedMods {
                 return !sReady || sPage < 0 ? c : (c & 0xFF000000) | sPage;
             case 0x05A0D1:   // card azzurra "Completa il tuo profilo": come le tessere
             case 0x121C23:
+            case 0x00173B:   // riempimento blu scuro dei pulsanti secondari e di altri riquadri: come le tessere
                 if (!sReady) load();
                 return !sReady || sTile < 0 ? c : (c & 0xFF000000) | sTile;
             default:
