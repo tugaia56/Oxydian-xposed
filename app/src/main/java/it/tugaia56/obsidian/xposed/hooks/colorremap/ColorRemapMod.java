@@ -57,6 +57,9 @@ public class ColorRemapMod extends XposedMods {
     /** Barra di navigazione propria (libreria) da riempire con il colore delle tessere. */
     private static final Map<String, String> BAR_CLASS = new HashMap<>();
 
+    /** App con pillola del tab attivo disegnata in accento pieno (rettangolo arrotondato largo e basso): si schiarisce verso lo sfondo, cosi' l'icona si vede. */
+    private static final java.util.Set<String> PILL_FIX = new java.util.HashSet<>();
+
     static {
         // Box (com.box.android)
         Map<Integer, Integer> box = new HashMap<>();
@@ -137,6 +140,8 @@ public class ColorRemapMod extends XposedMods {
         dropbox.put(0x242321, TILE);
         dropbox.put(0x2D2B29, TILE);
         dropbox.put(0x313030, TILE);
+        dropbox.put(0x3C4148, TILE);   // sfondo della barra di navigazione in basso
+        PILL_FIX.add("com.dropbox.android");
         for (int c : new int[]{0x3080FF, 0x0061FA, 0x004DC7, 0x5F9DFF, 0x3984FF, 0x75AAFF, 0x1B7CFF}) dropbox.put(c, ACCENT);
         for (int c : new int[]{0x002969, 0x003280, 0x003A97}) dropbox.put(c, PILL);
         dropbox.put(0x00183E, WHITE);  // icona/testo sopra il blu
@@ -633,6 +638,52 @@ public class ColorRemapMod extends XposedMods {
                 });
                 ok++;
             } catch (Throwable t) { log("dark activities", t); }
+        }
+        if (PILL_FIX.contains(lp.packageName)) {
+            try {
+                Class<?> rc = XposedHelpers.findClassIfExists("android.graphics.BaseRecordingCanvas", lp.classLoader);
+                if (rc != null) {
+                    XC_MethodHook pill = new XC_MethodHook() {
+                        @Override protected void beforeHookedMethod(MethodHookParam p) {
+                            try {
+                                if (!night()) return;
+                                if (!sReady) load();
+                                if (!sReady) return;
+                                float l, t, r, b;
+                                Paint paint;
+                                if (p.args.length == 7) {
+                                    l = (Float) p.args[0]; t = (Float) p.args[1]; r = (Float) p.args[2]; b = (Float) p.args[3];
+                                    paint = (Paint) p.args[6];
+                                } else {
+                                    android.graphics.RectF rr = (android.graphics.RectF) p.args[0];
+                                    l = rr.left; t = rr.top; r = rr.right; b = rr.bottom;
+                                    paint = (Paint) p.args[3];
+                                }
+                                if (paint == null || paint.getColor() != (0xFF000000 | sColors[ACCENT])) return;
+                                float dens = Resources.getSystem().getDisplayMetrics().density;
+                                float h = b - t, w = r - l;
+                                if (h < 26 * dens || h > 42 * dens || w < h * 1.5f || w > h * 3.5f) return;
+                                // pillola: meta' accento e meta' colore della barra (opaca)
+                                int acc = sColors[ACCENT], bar = sColors[TILE] < 0 ? 0 : sColors[TILE];
+                                int mix = (((acc >> 16 & 255) + (bar >> 16 & 255)) / 2 << 16) | (((acc >> 8 & 255) + (bar >> 8 & 255)) / 2 << 8) | (((acc & 255) + (bar & 255)) / 2);
+                                p.setObjectExtra("oldPillColor", paint.getColor());
+                                paint.setColor(0xFF000000 | mix);
+                            } catch (Throwable ignored) {}
+                        }
+                        @Override protected void afterHookedMethod(MethodHookParam p) {
+                            try {
+                                Object old = p.getObjectExtra("oldPillColor");
+                                if (old == null) return;
+                                Paint paint = (Paint) (p.args.length == 7 ? p.args[6] : p.args[3]);
+                                paint.setColor((Integer) old);
+                            } catch (Throwable ignored) {}
+                        }
+                    };
+                    XposedHelpers.findAndHookMethod(rc, "drawRoundRect", float.class, float.class, float.class, float.class, float.class, float.class, Paint.class, pill);
+                    XposedHelpers.findAndHookMethod(rc, "drawRoundRect", android.graphics.RectF.class, float.class, float.class, Paint.class, pill);
+                    ok += 2;
+                }
+            } catch (Throwable t) { log("BaseRecordingCanvas.drawRoundRect (pill)", t); }
         }
         final String barName = BAR_CLASS.get(lp.packageName);
         if (barName != null) {
