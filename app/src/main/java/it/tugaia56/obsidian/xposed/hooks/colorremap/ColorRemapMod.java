@@ -122,6 +122,12 @@ public class ColorRemapMod extends XposedMods {
         fdroid.put(0x01315E, WHITE);  // icona sopra il colore primario
         fdroid.put(0xBACF82, ACCENT); // testo verde nelle Impostazioni
         RULES.put("org.fdroid.fdroid", fdroid);
+        // Aurora Store (com.aurora.store): il numero degli aggiornamenti (pallino sull'icona Aggiornamenti) e' Compose con i
+        // colori "errore" di Material 3 scritti nel codice: sfondo #f2b8b5 -> accento, numero #601410 -> bianco
+        Map<Integer, Integer> aurora = new HashMap<>();
+        aurora.put(0xF2B8B5, ACCENT);
+        aurora.put(0x601410, WHITE);
+        RULES.put("com.aurora.store", aurora);
     }
 
     /** Colori che cambiano solo quando l'app li disegna come rettangolo arrotondato (pulsanti, chip): il testo e le icone con lo stesso colore restano come sono. */
