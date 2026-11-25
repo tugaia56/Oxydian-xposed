@@ -81,7 +81,7 @@ public class ColorRemapMod extends XposedMods {
         RULES.put("com.box.android", box);
         // Fotocamera OnePlus (com.oplus.camera): la barra in basso (scatto, miniatura, modalita') e' nera nel codice (vista a colori invertiti)
         RULES.put("com.oplus.camera", new HashMap<Integer, Integer>());
-        VIEW_BG.put("com.oplus.camera", new String[]{"control_panel_layout"});
+        VIEW_BG.put("com.oplus.camera", new String[]{"control_panel_layout", "camera_root"});
         // Firefox (org.mozilla.firefox 160, design "Nova"): menu, barra e altre parti Compose usano la tavolozza scritta nel codice
         // (grigi caldi/viola): pagina, card e viola -> colori del Theme (il resto dei colori segue l'overlay)
         Map<Integer, Integer> firefox = new HashMap<>();
@@ -777,6 +777,43 @@ public class ColorRemapMod extends XposedMods {
                 });
                 ok++;
             } catch (Throwable t) { log("View.onAttachedToWindow (bg)", t); }
+        }
+        if ("com.oplus.camera".equals(lp.packageName)) {
+            // sopra l'anteprima (fascia in alto): e' la superficie GL a darle il nero; subito dopo la sua vista si disegna un rettangolo
+            // con lo sfondo del Theme fino all'inizio dell'anteprima (sotto le icone, che sono disegnate dopo)
+            try {
+                final Paint topFill = new Paint();
+                XposedHelpers.findAndHookMethod(android.view.ViewGroup.class, "drawChild", Canvas.class, android.view.View.class, long.class, new XC_MethodHook() {
+                    private int mGlId, mPrevId;
+                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                        try {
+                            if (sBusy.get() != null || !night()) return;
+                            android.view.View child = (android.view.View) p.args[1];
+                            int id = child.getId();
+                            if (id == android.view.View.NO_ID) return;
+                            if (mGlId == 0) {
+                                Resources r = child.getResources();
+                                mGlId = r.getIdentifier("gl_root_view", "id", lp.packageName);
+                                mPrevId = r.getIdentifier("frame_layout", "id", lp.packageName);
+                            }
+                            if (id != mGlId || mGlId == 0) return;
+                            android.view.ViewGroup parent = (android.view.ViewGroup) p.thisObject;
+                            android.view.View pv = parent.findViewById(mPrevId);
+                            if (pv == null || pv.getVisibility() != android.view.View.VISIBLE) return;
+                            int[] a = new int[2], b = new int[2];
+                            pv.getLocationInWindow(a);
+                            parent.getLocationInWindow(b);
+                            int top = a[1] - b[1];
+                            if (top <= 0) return;
+                            if (!sReady) load();
+                            if (!sReady || sColors[PAGE] < 0) return;
+                            topFill.setColor(0xFF000000 | sColors[PAGE]);
+                            ((Canvas) p.args[0]).drawRect(0, 0, parent.getWidth(), top, topFill);
+                        } catch (Throwable ignored) {}
+                    }
+                });
+                ok++;
+            } catch (Throwable t) { log("ViewGroup.drawChild (camera top)", t); }
         }
         final String barName = BAR_CLASS.get(lp.packageName);
         if (barName != null) {
