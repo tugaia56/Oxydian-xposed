@@ -187,6 +187,7 @@ public class ColorRemapMod extends XposedMods {
         github.put(0x17181C, PAGE);    // sfondo di barre e pagine scritto nel codice
         github.put(0x050505, PAGE);
         RULES.put("com.github.android", github);
+        RULES.put("com.google.android.googlequicksearchbox", new HashMap<>());  // solo per attivare gli hook: le pillole usano BORDER_FILL
     }
 
     /** Colori che cambiano solo quando l'app li disegna come rettangolo arrotondato (pulsanti, chip): il testo e le icone con lo stesso colore restano come sono. */
@@ -205,6 +206,10 @@ public class ColorRemapMod extends XposedMods {
         Map<Integer, Integer> dreoCards = new HashMap<>();
         dreoCards.put(0x303236, TILE);
         BORDER_FILL.put("com.hesung.dreo", dreoCards);
+        // Google (app): pillole sotto la barra Cerca (Cerca, AI Mode, comando vocale, Lens) #2c2e35 -> sfondo del Theme con bordo accento
+        Map<Integer, Integer> googlePills = new HashMap<>();
+        googlePills.put(0x2C2E35, PAGE);
+        BORDER_FILL.put("com.google.android.googlequicksearchbox", googlePills);
     }
 
     /** Barre di navigazione proprie dell'app: classe della vista -> sfondo pieno nel colore delle tessere, a pillola, con bordo accento. */
