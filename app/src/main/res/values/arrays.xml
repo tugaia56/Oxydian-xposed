@@ -89,6 +89,7 @@
         <item>org.mozilla.firefox</item>
         <item>com.android.chrome</item>
         <item>com.dropbox.android</item>
+        <item>com.github.android</item>
         <item>com.hesung.dreo</item>
         <item>com.google.android.apps.docs</item>
         <item>org.fdroid.fdroid</item>

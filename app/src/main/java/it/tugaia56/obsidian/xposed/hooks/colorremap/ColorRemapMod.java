@@ -180,6 +180,10 @@ public class ColorRemapMod extends XposedMods {
         for (int c : new int[]{0x002969, 0x003280, 0x003A97}) dropbox.put(c, PILL);
         dropbox.put(0x00183E, WHITE);  // icona/testo sopra il blu
         RULES.put("com.dropbox.android", dropbox);
+        // GitHub (com.github.android): la barra in alto e' Compose; icone (cerca, aggiorna, nuovo) azzurre #85beff -> accento
+        Map<Integer, Integer> github = new HashMap<>();
+        github.put(0x85BEFF, ACCENT);
+        RULES.put("com.github.android", github);
     }
 
     /** Colori che cambiano solo quando l'app li disegna come rettangolo arrotondato (pulsanti, chip): il testo e le icone con lo stesso colore restano come sono. */
