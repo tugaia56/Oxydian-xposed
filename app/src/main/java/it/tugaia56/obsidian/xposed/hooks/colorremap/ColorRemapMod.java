@@ -67,6 +67,9 @@ public class ColorRemapMod extends XposedMods {
     /** Viste (per id) che prendono come sfondo pieno il colore dello sfondo del Theme (barre nere scritte nel codice). */
     private static final Map<String, String[]> VIEW_BG = new HashMap<>();
 
+    /** Pannelli e pulsanti (per id) con sfondo arrotondato: {id, ruolo del riempimento, raggio dp (0 = cerchio), spessore bordo dp (0 = senza), bordo accento 1/0}. */
+    private static final Map<String, String[][]> VIEW_SHAPES = new HashMap<>();
+
     /** Sfondo a pillola creato dal modulo (serve a riconoscerlo e non rifarlo). */
     private static final class PillBg extends android.graphics.drawable.GradientDrawable {}
 
@@ -82,6 +85,10 @@ public class ColorRemapMod extends XposedMods {
         // Fotocamera OnePlus (com.oplus.camera): la barra in basso (scatto, miniatura, modalita') e' nera nel codice (vista a colori invertiti)
         RULES.put("com.oplus.camera", new HashMap<Integer, Integer>());
         VIEW_BG.put("com.oplus.camera", new String[]{"control_panel_layout", "camera_root"});
+        // finestra delle modalita' (si apre toccando due volte il tab attivo): pannello nel colore dello sfondo con bordo accento, icone nel colore delle tessere
+        VIEW_SHAPES.put("com.oplus.camera", new String[][]{
+                {"oplus_menu_bottom", String.valueOf(PAGE), "24", "1.5", "1"},
+                {"bottom_menu_item", String.valueOf(TILE), "0", "0", "0"}});
         // Firefox (org.mozilla.firefox 160, design "Nova"): menu, barra e altre parti Compose usano la tavolozza scritta nel codice
         // (grigi caldi/viola): pagina, card e viola -> colori del Theme (il resto dei colori segue l'overlay)
         Map<Integer, Integer> firefox = new HashMap<>();
@@ -814,6 +821,41 @@ public class ColorRemapMod extends XposedMods {
                 });
                 ok++;
             } catch (Throwable t) { log("ViewGroup.drawChild (camera top)", t); }
+        }
+        final String[][] shapes = VIEW_SHAPES.get(lp.packageName);
+        if (shapes != null) {
+            try {
+                final int[] shapeIds = new int[shapes.length];
+                XposedHelpers.findAndHookMethod(android.view.View.class, "draw", Canvas.class, new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) {
+                        try {
+                            android.view.View v = (android.view.View) p.thisObject;
+                            int id = v.getId();
+                            if (id == android.view.View.NO_ID || sBusy.get() != null || !night()) return;
+                            if (shapeIds[0] == 0) {
+                                for (int i = 0; i < shapes.length; i++) shapeIds[i] = v.getResources().getIdentifier(shapes[i][0], "id", lp.packageName);
+                            }
+                            String[] sp = null;
+                            for (int i = 0; i < shapes.length; i++) if (shapeIds[i] != 0 && id == shapeIds[i]) sp = shapes[i];
+                            if (sp == null) return;
+                            if (v.getBackground() instanceof PillBg) return;
+                            if (!sReady) load();
+                            int role = Integer.parseInt(sp[1]);
+                            if (!sReady || sColors[role] < 0) return;
+                            float dens = v.getResources().getDisplayMetrics().density;
+                            PillBg gd = new PillBg();
+                            gd.setColor(0xFF000000 | sColors[role]);
+                            float rad = Float.parseFloat(sp[2]);
+                            if (rad <= 0) gd.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+                            else gd.setCornerRadius(rad * dens);
+                            float sw = Float.parseFloat(sp[3]);
+                            if (sw > 0) gd.setStroke(Math.max(1, Math.round(sw * dens)), 0xFF000000 | ("1".equals(sp[4]) ? sColors[ACCENT] : sColors[PAGE]));
+                            v.setBackground(gd);
+                        } catch (Throwable ignored) {}
+                    }
+                });
+                ok++;
+            } catch (Throwable t) { log("View.draw (shapes)", t); }
         }
         final String barName = BAR_CLASS.get(lp.packageName);
         if (barName != null) {
