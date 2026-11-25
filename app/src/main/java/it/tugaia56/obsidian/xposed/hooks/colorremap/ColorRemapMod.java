@@ -33,12 +33,12 @@ import it.tugaia56.obsidian.xposed.utils.AccentUtil;
  * i colori fissi vengono sostituiti nel momento in cui l'app li passa alle view (Paint, testo, sfondi, filtri, liste di
  * colori, risorse). Ogni app ha una tabella "colore originale (rgb) -> ruolo": ACCENT = accento del Theme, PAGE = sfondo
  * (background_dark), TILE = tessere e barre (button_material_dark), CARD = card (holo_light_primary_dark), PILL = pillola
- * della barra di navigazione (system_secondary_container_dark), WHITE = bianco, RED = rosso del Theme (holo_red_dark), A30 = accento con trasparenza al 30% (solo per i colori che l'app usa gia' trasparenti; opachi diventano accento pieno). La trasparenza originale resta. Solo con il tema scuro.
+ * della barra di navigazione (system_secondary_container_dark), WHITE = bianco, RED = rosso del Theme (holo_red_dark), RIPPLE = ripple_material_dark, A30 = accento con trasparenza al 30% (solo per i colori che l'app usa gia' trasparenti; opachi diventano accento pieno). La trasparenza originale resta. Solo con il tema scuro.
  * Serve la spunta sull'app nell'ambito di Oxydian in LSPosed. Prima di aggiungere un'app controllare che non abbia PairIP.
  */
 public class ColorRemapMod extends XposedMods {
 
-    private static final int ACCENT = 0, PAGE = 1, TILE = 2, CARD = 3, PILL = 4, WHITE = 5, RED = 6, A30 = 7;
+    private static final int ACCENT = 0, PAGE = 1, TILE = 2, CARD = 3, PILL = 4, WHITE = 5, RED = 6, A30 = 7, RIPPLE = 8;
 
     private static final Map<String, Map<Integer, Integer>> RULES = new HashMap<>();
 
@@ -187,7 +187,9 @@ public class ColorRemapMod extends XposedMods {
         github.put(0x17181C, PAGE);    // sfondo di barre e pagine scritto nel codice
         github.put(0x050505, PAGE);
         RULES.put("com.github.android", github);
-        RULES.put("com.google.android.googlequicksearchbox", new HashMap<>());  // solo per attivare gli hook: le pillole usano BORDER_FILL
+        Map<Integer, Integer> google = new HashMap<>();
+        google.put(0x22242A, RIPPLE);  // pulsante rotondo del menu in alto a sinistra
+        RULES.put("com.google.android.googlequicksearchbox", google);  // le pillole sotto la barra Cerca usano BORDER_FILL
     }
 
     /** Colori che cambiano solo quando l'app li disegna come rettangolo arrotondato (pulsanti, chip): il testo e le icone con lo stesso colore restano come sono. */
@@ -224,7 +226,8 @@ public class ColorRemapMod extends XposedMods {
     }
 
     private static volatile boolean sReady;
-    private static final int[] sColors = new int[8];
+    private static final int[] sColors = new int[9];
+    private static int sRippleAlpha = 0xFF;
     /** load() legge colori con getColor, che e' agganciato: senza guardia si richiamerebbe all'infinito. */
     private static final ThreadLocal<Boolean> sBusy = new ThreadLocal<>();
 
@@ -262,6 +265,9 @@ public class ColorRemapMod extends XposedMods {
             sColors[WHITE] = 0xFFFFFF;
             sColors[RED] = resColor(res, "holo_red_dark");
             sColors[A30] = sColors[ACCENT];
+            sColors[RIPPLE] = resColor(res, "ripple_material_dark");
+            int rid = Resources.getSystem().getIdentifier("ripple_material_dark", "color", "android");
+            sRippleAlpha = rid == 0 ? 0xFF : (res.getColor(rid, null) >>> 24);
             sReady = true;
         } catch (Throwable ignored) {
         } finally {
@@ -279,6 +285,7 @@ public class ColorRemapMod extends XposedMods {
         if (!sReady) load();
         if (!sReady || sColors[role] < 0) return c;
         if (role == A30 && (c >>> 24) < 0xFF) return 0x4D000000 | sColors[role];
+        if (role == RIPPLE) return (sRippleAlpha << 24) | sColors[role];
         return (c & 0xFF000000) | sColors[role];
     }
 
