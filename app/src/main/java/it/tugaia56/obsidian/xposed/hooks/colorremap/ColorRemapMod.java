@@ -64,6 +64,9 @@ public class ColorRemapMod extends XposedMods {
     private static final Map<String, String[]> PILL_VIEWS = new HashMap<>();
     private static final Map<String, String[]> PILL_PARENTS = new HashMap<>();
 
+    /** Viste (per id) che prendono come sfondo pieno il colore dello sfondo del Theme (barre nere scritte nel codice). */
+    private static final Map<String, String[]> VIEW_BG = new HashMap<>();
+
     /** Sfondo a pillola creato dal modulo (serve a riconoscerlo e non rifarlo). */
     private static final class PillBg extends android.graphics.drawable.GradientDrawable {}
 
@@ -76,6 +79,9 @@ public class ColorRemapMod extends XposedMods {
         box.put(0x383838, TILE);
         box.put(0x314358, PILL);
         RULES.put("com.box.android", box);
+        // Fotocamera OnePlus (com.oplus.camera): la barra in basso (scatto, miniatura, modalita') e' nera nel codice (vista a colori invertiti)
+        RULES.put("com.oplus.camera", new HashMap<Integer, Integer>());
+        VIEW_BG.put("com.oplus.camera", new String[]{"control_panel_layout"});
         // Firefox (org.mozilla.firefox 160, design "Nova"): menu, barra e altre parti Compose usano la tavolozza scritta nel codice
         // (grigi caldi/viola): pagina, card e viola -> colori del Theme (il resto dei colori segue l'overlay)
         Map<Integer, Integer> firefox = new HashMap<>();
@@ -749,6 +755,28 @@ public class ColorRemapMod extends XposedMods {
                 });
                 ok++;
             } catch (Throwable t) { log("View.onAttachedToWindow (pills)", t); }
+        }
+        final String[] bgIds = VIEW_BG.get(lp.packageName);
+        if (bgIds != null) {
+            try {
+                XposedHelpers.findAndHookMethod(android.view.View.class, "onAttachedToWindow", new XC_MethodHook() {
+                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                        try {
+                            if (sBusy.get() != null || !night()) return;
+                            android.view.View v = (android.view.View) p.thisObject;
+                            int id = v.getId();
+                            if (id == android.view.View.NO_ID) return;
+                            boolean ok = false;
+                            for (String n : bgIds) if (id == v.getResources().getIdentifier(n, "id", lp.packageName)) ok = true;
+                            if (!ok) return;
+                            if (!sReady) load();
+                            if (!sReady || sColors[PAGE] < 0) return;
+                            v.setBackgroundColor(0xFF000000 | sColors[PAGE]);
+                        } catch (Throwable ignored) {}
+                    }
+                });
+                ok++;
+            } catch (Throwable t) { log("View.onAttachedToWindow (bg)", t); }
         }
         final String barName = BAR_CLASS.get(lp.packageName);
         if (barName != null) {
