@@ -184,6 +184,8 @@ public class ColorRemapMod extends XposedMods {
         Map<Integer, Integer> github = new HashMap<>();
         github.put(0x85BEFF, ACCENT);
         github.put(0x2E8FFF, A50);     // pillola del tab attivo della barra in basso: blu al 16% -> accento al 50%
+        github.put(0x17181C, PAGE);    // sfondo di barre e pagine scritto nel codice
+        github.put(0x050505, PAGE);
         RULES.put("com.github.android", github);
     }
 
