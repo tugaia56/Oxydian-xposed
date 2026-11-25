@@ -60,6 +60,13 @@ public class ColorRemapMod extends XposedMods {
     /** App con pillola del tab attivo disegnata in accento pieno (rettangolo arrotondato largo e basso): si schiarisce verso lo sfondo, cosi' l'icona si vede. */
     private static final java.util.Set<String> PILL_FIX = new java.util.HashSet<>();
 
+    /** Viste (per id) che diventano una pillola con sfondo del Theme e bordo accento; i figli diretti dei contenitori indicati (id "contenitore") ricevono lo stesso. */
+    private static final Map<String, String[]> PILL_VIEWS = new HashMap<>();
+    private static final Map<String, String[]> PILL_PARENTS = new HashMap<>();
+
+    /** Sfondo a pillola creato dal modulo (serve a riconoscerlo e non rifarlo). */
+    private static final class PillBg extends android.graphics.drawable.GradientDrawable {}
+
     static {
         // Box (com.box.android)
         Map<Integer, Integer> box = new HashMap<>();
@@ -69,6 +76,11 @@ public class ColorRemapMod extends XposedMods {
         box.put(0x383838, TILE);
         box.put(0x314358, PILL);
         RULES.put("com.box.android", box);
+        // Chrome (com.android.chrome): le pillole della pagina nuova scheda (Cerca con Google, AI Mode, Incognito) sono viste con un
+        // colore calcolato da Chrome (#333654) e disegni cifrati: si ritrovano per id e si rifanno con sfondo del Theme e bordo accento
+        RULES.put("com.android.chrome", new HashMap<Integer, Integer>());
+        PILL_VIEWS.put("com.android.chrome", new String[]{"search_box_shadow_container", "composeplate_button", "incognito_button"});
+        PILL_PARENTS.put("com.android.chrome", new String[]{"buttons_container"});
         // Call Recorder (org.skvalex.cr): riga verde "holo" (#99cc00) sotto le date, colorata nel codice
         Map<Integer, Integer> cr = new HashMap<>();
         cr.put(0x99CC00, ACCENT);
@@ -684,6 +696,50 @@ public class ColorRemapMod extends XposedMods {
                     ok += 2;
                 }
             } catch (Throwable t) { log("BaseRecordingCanvas.drawRoundRect (pill)", t); }
+        }
+        final String[] pillIds = PILL_VIEWS.get(lp.packageName);
+        if (pillIds != null) {
+            try {
+                final String[] parentIds = PILL_PARENTS.get(lp.packageName);
+                XposedHelpers.findAndHookMethod(android.view.View.class, "onAttachedToWindow", new XC_MethodHook() {
+                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                        try {
+                            if (sBusy.get() != null || !night()) return;
+                            android.view.View v = (android.view.View) p.thisObject;
+                            int id = v.getId();
+                            if (id == android.view.View.NO_ID) {
+                                // senza id: e' un figlio diretto di uno dei contenitori
+                                android.view.ViewParent vp = v.getParent();
+                                if (!(vp instanceof android.view.View) || parentIds == null) return;
+                                int pid = ((android.view.View) vp).getId();
+                                boolean ok = false;
+                                for (String pn : parentIds) if (pid != android.view.View.NO_ID && pid == v.getResources().getIdentifier(pn, "id", lp.packageName)) ok = true;
+                                if (!ok || !v.isClickable()) return;
+                            } else {
+                                boolean ok = false;
+                                for (String n : pillIds) if (id == v.getResources().getIdentifier(n, "id", lp.packageName)) ok = true;
+                                if (!ok) {
+                                    android.view.ViewParent vp = v.getParent();
+                                    if (parentIds == null || !(vp instanceof android.view.View)) return;
+                                    int pid = ((android.view.View) vp).getId();
+                                    for (String pn : parentIds) if (pid != android.view.View.NO_ID && pid == v.getResources().getIdentifier(pn, "id", lp.packageName)) ok = true;
+                                    if (!ok || !v.isClickable()) return;
+                                }
+                            }
+                            if (!sReady) load();
+                            if (!sReady || sColors[PAGE] < 0) return;
+                            if (v.getBackground() instanceof PillBg) return;   // gia' fatta
+                            float dens = v.getResources().getDisplayMetrics().density;
+                            PillBg gd = new PillBg();
+                            gd.setColor(0xFF000000 | sColors[PAGE]);
+                            gd.setStroke(Math.max(1, Math.round(1.5f * dens)), 0xFF000000 | sColors[ACCENT]);
+                            gd.setCornerRadius(200f * dens);
+                            v.setBackground(gd);
+                        } catch (Throwable ignored) {}
+                    }
+                });
+                ok++;
+            } catch (Throwable t) { log("View.onAttachedToWindow (pills)", t); }
         }
         final String barName = BAR_CLASS.get(lp.packageName);
         if (barName != null) {
