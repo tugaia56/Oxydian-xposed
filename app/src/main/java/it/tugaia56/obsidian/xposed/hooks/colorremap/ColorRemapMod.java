@@ -76,6 +76,15 @@ public class ColorRemapMod extends XposedMods {
         box.put(0x383838, TILE);
         box.put(0x314358, PILL);
         RULES.put("com.box.android", box);
+        // Firefox (org.mozilla.firefox 160, design "Nova"): menu, barra e altre parti Compose usano la tavolozza scritta nel codice
+        // (grigi caldi/viola): pagina, card e viola -> colori del Theme (il resto dei colori segue l'overlay)
+        Map<Integer, Integer> firefox = new HashMap<>();
+        for (int c : new int[]{0x1D1B1F, 0x171519, 0x131215}) firefox.put(c, PAGE);
+        firefox.put(0x252428, TILE);
+        for (int c : new int[]{0x312F33, 0x3F3E42, 0x515054}) firefox.put(c, CARD);
+        for (int c : new int[]{0xCDB7FF, 0xB393FF}) firefox.put(c, ACCENT);
+        for (int c : new int[]{0x5939A8, 0x3E2976}) firefox.put(c, PILL);
+        RULES.put("org.mozilla.firefox", firefox);
         // Chrome (com.android.chrome): le pillole della pagina nuova scheda (Cerca con Google, AI Mode, Incognito) sono viste con un
         // colore calcolato da Chrome (#333654) e disegni cifrati: si ritrovano per id e si rifanno con sfondo del Theme e bordo accento
         RULES.put("com.android.chrome", new HashMap<Integer, Integer>());
