@@ -87,7 +87,7 @@ public class ColorRemapMod extends XposedMods {
         VIEW_BG.put("com.oplus.camera", new String[]{"control_panel_layout", "camera_root"});
         // finestra delle modalita' (si apre toccando due volte il tab attivo): pannello nel colore dello sfondo con bordo accento, icone nel colore delle tessere
         VIEW_SHAPES.put("com.oplus.camera", new String[][]{
-                {"oplus_menu_bottom", String.valueOf(PAGE), "24", "1.5", "1"},
+                {"oplus_menu_bottom", String.valueOf(PAGE), "24", "0", "0"},
                 {"bottom_menu_item", String.valueOf(TILE), "0", "0", "0"}});
         // Firefox (org.mozilla.firefox 160, design "Nova"): menu, barra e altre parti Compose usano la tavolozza scritta nel codice
         // (grigi caldi/viola): pagina, card e viola -> colori del Theme (il resto dei colori segue l'overlay)
