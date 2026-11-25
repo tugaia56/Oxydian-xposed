@@ -33,12 +33,12 @@ import it.tugaia56.obsidian.xposed.utils.AccentUtil;
  * i colori fissi vengono sostituiti nel momento in cui l'app li passa alle view (Paint, testo, sfondi, filtri, liste di
  * colori, risorse). Ogni app ha una tabella "colore originale (rgb) -> ruolo": ACCENT = accento del Theme, PAGE = sfondo
  * (background_dark), TILE = tessere e barre (button_material_dark), CARD = card (holo_light_primary_dark), PILL = pillola
- * della barra di navigazione (system_secondary_container_dark), WHITE = bianco, RED = rosso del Theme (holo_red_dark). La trasparenza originale resta. Solo con il tema scuro.
+ * della barra di navigazione (system_secondary_container_dark), WHITE = bianco, RED = rosso del Theme (holo_red_dark), A50 = accento con trasparenza al 50% (solo per i colori che l'app usa gia' trasparenti; opachi diventano accento pieno). La trasparenza originale resta. Solo con il tema scuro.
  * Serve la spunta sull'app nell'ambito di Oxydian in LSPosed. Prima di aggiungere un'app controllare che non abbia PairIP.
  */
 public class ColorRemapMod extends XposedMods {
 
-    private static final int ACCENT = 0, PAGE = 1, TILE = 2, CARD = 3, PILL = 4, WHITE = 5, RED = 6;
+    private static final int ACCENT = 0, PAGE = 1, TILE = 2, CARD = 3, PILL = 4, WHITE = 5, RED = 6, A50 = 7;
 
     private static final Map<String, Map<Integer, Integer>> RULES = new HashMap<>();
 
@@ -183,6 +183,7 @@ public class ColorRemapMod extends XposedMods {
         // GitHub (com.github.android): la barra in alto e' Compose; icone (cerca, aggiorna, nuovo) azzurre #85beff -> accento
         Map<Integer, Integer> github = new HashMap<>();
         github.put(0x85BEFF, ACCENT);
+        github.put(0x2E8FFF, A50);     // pillola del tab attivo della barra in basso: blu al 16% -> accento al 50%
         RULES.put("com.github.android", github);
     }
 
@@ -216,7 +217,7 @@ public class ColorRemapMod extends XposedMods {
     }
 
     private static volatile boolean sReady;
-    private static final int[] sColors = new int[7];
+    private static final int[] sColors = new int[8];
     /** load() legge colori con getColor, che e' agganciato: senza guardia si richiamerebbe all'infinito. */
     private static final ThreadLocal<Boolean> sBusy = new ThreadLocal<>();
 
@@ -253,6 +254,7 @@ public class ColorRemapMod extends XposedMods {
             sColors[PILL] = resColor(res, "system_secondary_container_dark");
             sColors[WHITE] = 0xFFFFFF;
             sColors[RED] = resColor(res, "holo_red_dark");
+            sColors[A50] = sColors[ACCENT];
             sReady = true;
         } catch (Throwable ignored) {
         } finally {
@@ -269,6 +271,7 @@ public class ColorRemapMod extends XposedMods {
         if (role == null) return c;
         if (!sReady) load();
         if (!sReady || sColors[role] < 0) return c;
+        if (role == A50 && (c >>> 24) < 0xFF) return 0x80000000 | sColors[role];
         return (c & 0xFF000000) | sColors[role];
     }
 
