@@ -40,11 +40,15 @@ public final class AccentUtil {
     /** Accento scelto in Oxydian Theme (persist.oxytheme.accent), opaco; senza Theme il valore dato. Vale nell'app e nei ganci. */
     public static int themeAccent(int def) {
         try {
-            Class<?> sp = Class.forName("android.os.SystemProperties");
-            String v = (String) sp.getMethod("get", String.class, String.class).invoke(null, "persist.oxytheme.accent", "");
-            if (v != null && v.length() >= 6) return 0xFF000000 | (int) Long.parseLong(v.substring(v.length() - 6), 16);
+            Integer o = it.tugaia56.obsidian.utils.ThemeOverride.accent();
+            if (o != null) return 0xFF000000 | o;
         } catch (Throwable ignored) {}
         return def;
+    }
+
+    /** Il vecchio viola predefinito salvato nelle impostazioni segue l'accento del Theme (niente doppioni). */
+    public static int followTheme(int c) {
+        return c == DEFAULT ? themeAccent(c) : c;
     }
 
     public static int systemAccent() {

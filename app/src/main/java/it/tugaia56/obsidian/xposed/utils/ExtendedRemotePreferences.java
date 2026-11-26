@@ -72,11 +72,11 @@ public class ExtendedRemotePreferences extends RemotePreferences {
             if (o != null) return o;
         }
         Object c = cached("i", key, defValue);
-        if (c != null && c != NULL) return (Integer) c;
+        if (c != null && c != NULL) return AccentUtil.followTheme((Integer) c);
         try {
             int v = super.getInt(key, defValue);
             remember("i", key, defValue, v);
-            return v;
+            return AccentUtil.followTheme(v);
         } catch (RemotePreferenceAccessException e) {
             return defValue;
         }
