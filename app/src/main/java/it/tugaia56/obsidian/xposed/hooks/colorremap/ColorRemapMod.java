@@ -100,6 +100,7 @@ public class ColorRemapMod extends XposedMods {
         box.put(0x212121, PAGE);
         box.put(0x383838, TILE);
         box.put(0x314358, PILL);
+        box.put(0x166ED8, ACCENT);  // pillola del tab attivo: blu di Box al 20% -> accento al 20% (la trasparenza resta)
         RULES.put("com.box.android", box);
         // Fotocamera OnePlus (com.oplus.camera): la barra in basso (scatto, miniatura, modalita') e' nera nel codice (vista a colori invertiti)
         RULES.put("com.oplus.camera", new HashMap<Integer, Integer>());
