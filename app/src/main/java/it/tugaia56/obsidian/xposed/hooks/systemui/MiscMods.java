@@ -616,7 +616,10 @@ public class MiscMods extends XposedMods {
      *  pixels let the stock white circle show through underneath it, since drawHandlerImage()
      *  only draws OVER the already-drawn stock circle, never erases it. */
     private void applyHandlerColor(Object shutdownView) {
-        if ("image".equals(mPowerMenuHandlerMode) && mPowerMenuHandlerBitmap != null) {
+        Integer chosen = handlerColor();
+        // anche il colore "trasparente" (#00000000) deve togliere del tutto il cerchio, come l'immagine
+        if (("image".equals(mPowerMenuHandlerMode) && mPowerMenuHandlerBitmap != null)
+                || (chosen != null && (chosen >>> 24) == 0)) {
             try {
                 setIntField(shutdownView, "mHandlerColor", 0x00000000);
                 Object paintObj = getObjectField(shutdownView, "mHandlerPaint");
@@ -654,6 +657,8 @@ public class MiscMods extends XposedMods {
             setIntField(shutdownView, "mHandlerColor", c);
             Object paintObj = getObjectField(shutdownView, "mHandlerPaint");
             if (paintObj instanceof Paint) ((Paint) paintObj).setColor(c);
+            // colore con trasparenza: OOS riscrive l'opacita' da mHandlerAlpha, va impostata anche li'
+            if ((c >>> 24) < 0xFF) setFloatField(shutdownView, "mHandlerAlpha", (c >>> 24) / 255f);
         } catch (Throwable ignored) {}
     }
 
