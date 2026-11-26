@@ -106,6 +106,8 @@ public class ColorRemapMod extends XposedMods {
         VIEW_FRAME.put("com.heytap.mydevices", new String[]{"com.oplus.mydevices.deviceui.devicecard.view.homecard.HomeCardView"});
         FRAME_RADIUS.put("com.heytap.mydevices", 20);
         VIEW_NO_DARK.put("com.heytap.mydevices", new String[]{"connect_state_button"});  // pulsante Connetti nel pannello
+        VIEW_SHAPES.put("com.heytap.mydevices", new String[][]{
+                {"connect_state_button", String.valueOf(PAGE), "22", "1.5", "1"}});  // Connetti: scuro con bordo accento
         // finestra delle modalita' (si apre toccando due volte il tab attivo): pannello nel colore dello sfondo con bordo accento, icone nel colore delle tessere
         VIEW_SHAPES.put("com.oplus.camera", new String[][]{
                 {"oplus_menu_bottom", String.valueOf(PAGE), "24", "0", "0"},
@@ -213,6 +215,7 @@ public class ColorRemapMod extends XposedMods {
         oneplusFiles.put(0x1A1A1A, PAGE);  // card "Tutti i file" e categorie; il bordo accento e' in VIEW_FRAME
         RULES.put("com.oneplus.filemanager", oneplusFiles);
         Map<Integer, Integer> myDevices = new HashMap<>();
+        myDevices.put(0xFF6C61, ACCENT);  // testo "Elimina dispositivo" (rosso errore dell app)
         myDevices.put(0x1E1E1E, PAGE);  // pannello che si apre toccando una scheda
         myDevices.put(0x363636, CARD);  // riga "Impostazioni dispositivo audio" nel pannello
         RULES.put("com.heytap.mydevices", myDevices);
