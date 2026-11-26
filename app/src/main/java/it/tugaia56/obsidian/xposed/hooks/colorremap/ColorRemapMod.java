@@ -70,6 +70,9 @@ public class ColorRemapMod extends XposedMods {
     /** Colore diverso dallo sfondo per una vista di VIEW_BG: "pacchetto/id" -> ruolo. */
     private static final Map<String, Integer> VIEW_BG_ROLE = new HashMap<>();
 
+    /** Viste (per id) su cui si spegne la scurezza forzata di ColorOS, che scurisce l'accento. */
+    private static final Map<String, String[]> VIEW_NO_DARK = new HashMap<>();
+
     /** Raggio (dp) del bordo di VIEW_FRAME quando non e' 12. */
     private static final Map<String, Integer> FRAME_RADIUS = new HashMap<>();
 
@@ -102,6 +105,7 @@ public class ColorRemapMod extends XposedMods {
         VIEW_BG_ROLE.put("com.heytap.mydevices/bottomContainer", CARD);  // fascia con il nome, piu' chiara: holo_light_primary_dark
         VIEW_FRAME.put("com.heytap.mydevices", new String[]{"com.oplus.mydevices.deviceui.devicecard.view.homecard.HomeCardView"});
         FRAME_RADIUS.put("com.heytap.mydevices", 20);
+        VIEW_NO_DARK.put("com.heytap.mydevices", new String[]{"connect_state_button"});  // pulsante Connetti nel pannello
         // finestra delle modalita' (si apre toccando due volte il tab attivo): pannello nel colore dello sfondo con bordo accento, icone nel colore delle tessere
         VIEW_SHAPES.put("com.oplus.camera", new String[][]{
                 {"oplus_menu_bottom", String.valueOf(PAGE), "24", "0", "0"},
@@ -808,6 +812,23 @@ public class ColorRemapMod extends XposedMods {
                 });
                 ok++;
             } catch (Throwable t) { log("View.onAttachedToWindow (pills)", t); }
+        }
+        final String[] noDarkIds = VIEW_NO_DARK.get(lp.packageName);
+        if (noDarkIds != null) {
+            try {
+                XposedHelpers.findAndHookMethod(android.view.View.class, "onAttachedToWindow", new XC_MethodHook() {
+                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                        try {
+                            if (sBusy.get() != null || !night()) return;
+                            android.view.View v = (android.view.View) p.thisObject;
+                            int id = v.getId();
+                            if (id == android.view.View.NO_ID) return;
+                            for (String n : noDarkIds) if (id == v.getResources().getIdentifier(n, "id", lp.packageName)) v.setForceDarkAllowed(false);
+                        } catch (Throwable ignored) {}
+                    }
+                });
+                ok++;
+            } catch (Throwable t) { log("View.onAttachedToWindow (no dark)", t); }
         }
         final String[] frameIds = VIEW_FRAME.get(lp.packageName);
         if (frameIds != null) {
