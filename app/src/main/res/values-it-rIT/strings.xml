@@ -387,6 +387,8 @@
     <string name="advanced_reboot_auth_summary">Autenticarsi per mostrare le opzioni di riavvio avanzato</string>
     <string name="advanced_reboot_auth_failed">Autenticazione fallita</string>
     <string name="power_menu_pill_section">Pillolone</string>
+    <string name="power_menu_icons_color_title">Colore icone Riavvia/Spegni</string>
+    <string name="power_menu_icons_color_summary">Colora le due icone</string>
     <string name="power_menu_gradient_color_title">Colore Riavvia/Spegni</string>
     <string name="power_menu_gradient_split_title">Colori separati</string>
     <string name="power_menu_handler_color_title">Sfondo Pallino</string>

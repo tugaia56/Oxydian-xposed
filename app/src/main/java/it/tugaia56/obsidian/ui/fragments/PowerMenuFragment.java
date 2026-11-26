@@ -101,6 +101,10 @@ public class PowerMenuFragment extends Fragment {
     private static final String PREF_HANDLER_BORDER_USE_ACCENT   = "power_menu_handler_border_use_accent";
     private static final String PREF_HANDLER_BORDER_CUSTOM_COLOR = "power_menu_handler_border_custom_color";
     private static final int DIALOG_HANDLER_BORDER_CUSTOM_COLOR = PREF_HANDLER_BORDER_CUSTOM_COLOR.hashCode();
+    private static final String PREF_ICONS = "power_menu_icons_color";
+    private static final String PREF_ICONS_USE_ACCENT = "power_menu_icons_use_accent";
+    private static final String PREF_ICONS_CUSTOM_COLOR = "power_menu_icons_custom_color";
+    private static final int DIALOG_ICONS_CUSTOM_COLOR = PREF_ICONS_CUSTOM_COLOR.hashCode();
 
     // Sfondo Menù Power — background of the WHOLE popup window, independent from the
     // pillolone's own background above. Same 3-way shape, own pref keys/file.
@@ -274,6 +278,8 @@ public class PowerMenuFragment extends Fragment {
             ObsidianPrefs.putString(PREF_HANDLER_MODE, "custom");
         } else if (event.dialogId() == DIALOG_HANDLER_BORDER_CUSTOM_COLOR) {
             ObsidianPrefs.putInt(PREF_HANDLER_BORDER_CUSTOM_COLOR, event.color());
+        } else if (event.dialogId() == DIALOG_ICONS_CUSTOM_COLOR) {
+            ObsidianPrefs.putInt(PREF_ICONS_CUSTOM_COLOR, event.color());
         } else if (event.dialogId() == DIALOG_ADV_REBOOT_BORDER_CUSTOM_COLOR) {
             ObsidianPrefs.putInt(PREF_ADV_REBOOT_BORDER_CUSTOM_COLOR, event.color());
         } else {
@@ -533,6 +539,28 @@ public class PowerMenuFragment extends Fragment {
                 });
         menuBgZoomItem.onLivePreview = value -> { if (mMenuBgCropOverlay != null) mMenuBgCropOverlay.setZoomPercent(value); };
 
+        // Colore delle icone Riavvia/Spegni (sotto "Colore Riavvia/Spegni")
+        SwitchWidgetAdapter.SwitchItem iconsItem = new SwitchWidgetAdapter.SwitchItem(
+                getString(R.string.power_menu_icons_color_title),
+                ObsidianPrefs.getBoolean(PREF_ICONS, false)
+                        ? accentCustomColorLabel(PREF_ICONS_USE_ACCENT, PREF_ICONS_CUSTOM_COLOR)
+                        : getString(R.string.power_menu_icons_color_summary),
+                ObsidianPrefs.getBoolean(PREF_ICONS, false),
+                null);
+        iconsItem.onChanged = () -> {
+            ObsidianPrefs.putBoolean(PREF_ICONS, iconsItem.checked);
+            AppUtils.showRestartReminder(requireContext());
+            rebuild();
+            if (iconsItem.checked) showAccentCustomDialog(PREF_ICONS_USE_ACCENT, PREF_ICONS_CUSTOM_COLOR,
+                    DIALOG_ICONS_CUSTOM_COLOR, R.string.power_menu_icons_color_title);
+        };
+        iconsItem.onRowClick = () -> {
+            if (ObsidianPrefs.getBoolean(PREF_ICONS, false)) {
+                showAccentCustomDialog(PREF_ICONS_USE_ACCENT, PREF_ICONS_CUSTOM_COLOR,
+                        DIALOG_ICONS_CUSTOM_COLOR, R.string.power_menu_icons_color_title);
+            }
+        };
+
         List<RecyclerView.Adapter<?>> sections = new java.util.ArrayList<>();
 
         // ── Menù Power: autenticazione, SOS — tutto quello che NON riguarda il pillolone
@@ -583,14 +611,14 @@ public class PowerMenuFragment extends Fragment {
         // Pillolone, un'unica card continua, una riga sola ciascuno. ─────────────────────────
         sections.add(new SectionTitleAdapter(List.of(getString(R.string.power_menu_pill_section))));
         if (bgIsPhoto) {
-            GroupUtils.addGroup(sections, List.of(gradientSwitch, handlerSwitch, handlerBorderItem, bgItem));
+            GroupUtils.addGroup(sections, List.of(gradientSwitch, iconsItem, handlerSwitch, handlerBorderItem, bgItem));
             if (mBgExpanded) {
                 GroupUtils.addGroup(sections, List.of(bgZoomItem));
                 sections.add(new PillBgPreviewAdapter());
             }
             GroupUtils.addGroup(sections, List.of(borderItem));
         } else {
-            GroupUtils.addGroup(sections, List.of(gradientSwitch, handlerSwitch, handlerBorderItem, bgItem, borderItem));
+            GroupUtils.addGroup(sections, List.of(gradientSwitch, iconsItem, handlerSwitch, handlerBorderItem, bgItem, borderItem));
         }
 
         // Preserva la posizione di scroll — senza questo, tornare dal picker foto/preset (che ora

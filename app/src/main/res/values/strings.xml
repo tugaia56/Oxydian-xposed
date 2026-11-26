@@ -389,6 +389,8 @@
     <string name="advanced_reboot_auth">Advanced Reboot Authentication</string>
     <string name="advanced_reboot_auth_summary">Authenticate to show advanced reboot options</string>
     <string name="power_menu_pill_section">Slider</string>
+    <string name="power_menu_icons_color_title">Reboot/Shutdown icon colour</string>
+    <string name="power_menu_icons_color_summary">Colour of the two icons</string>
     <string name="power_menu_gradient_color_title">Reboot/Shutdown Color</string>
     <string name="power_menu_gradient_split_title">Separate colors</string>
     <string name="power_menu_handler_color_title">Handle Background</string>

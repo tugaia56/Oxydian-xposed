@@ -86,6 +86,8 @@ public class MiscMods extends XposedMods {
     private int     mPowerMenuGradientRestartColor = 0xFF00BD13;  // default = verde stock
     private int     mPowerMenuGradientShutdownColor = 0xFFEB3B2F; // default = rosso stock
     private String  mPowerMenuBgMode = "stock";
+    private boolean mPowerMenuIconsOn = false, mPowerMenuIconsUseAccent = true;
+    private int     mPowerMenuIconsColor = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     private int     mPowerMenuBgCustomColor = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     private boolean mPowerMenuBorderEnabled = false;
     private boolean mPowerMenuBorderUseAccent = true;
@@ -166,6 +168,9 @@ public class MiscMods extends XposedMods {
         mPowerMenuGradientRestartColor = Xprefs.getInt("power_menu_gradient_restart_color", 0xFF00BD13);
         mPowerMenuGradientShutdownColor = Xprefs.getInt("power_menu_gradient_shutdown_color", 0xFFEB3B2F);
         mPowerMenuBgMode = Xprefs.getString("power_menu_bg_mode", "stock");
+        mPowerMenuIconsOn = Xprefs.getBoolean("power_menu_icons_color", false);
+        mPowerMenuIconsUseAccent = Xprefs.getBoolean("power_menu_icons_use_accent", true);
+        mPowerMenuIconsColor = Xprefs.getInt("power_menu_icons_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
         mPowerMenuBgCustomColor = Xprefs.getInt("power_menu_bg_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
         mPowerMenuBgCropCx = Xprefs.getInt("power_menu_bg_crop_cx", 50);
         mPowerMenuBgCropCy = Xprefs.getInt("power_menu_bg_crop_cy", 50);
@@ -209,6 +214,9 @@ public class MiscMods extends XposedMods {
             mPowerMenuGradientCustomColor = parseIntProp(
                     readSysProp("persist.obsidian.dst.pm_gradient_color", ""), it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
             mPowerMenuBgMode = readSysProp("persist.obsidian.dst.pm_bg_mode", "stock");
+            mPowerMenuIconsOn = "1".equals(readSysProp("persist.obsidian.dst.pm_icons_on", "0"));
+            mPowerMenuIconsUseAccent = "1".equals(readSysProp("persist.obsidian.dst.pm_icons_accent", "1"));
+            mPowerMenuIconsColor = parseIntProp(readSysProp("persist.obsidian.dst.pm_icons_color", ""), mPowerMenuIconsColor);
             mPowerMenuBgCustomColor = parseIntProp(
                     readSysProp("persist.obsidian.dst.pm_bg_color", ""), it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
             mPowerMenuBorderEnabled = "1".equals(readSysProp("persist.obsidian.dst.pm_border_on", "0"));
@@ -363,6 +371,7 @@ public class MiscMods extends XposedMods {
                         if (!(p.thisObject instanceof android.app.Dialog)) return;
                         String cls = p.thisObject.getClass().getName();
                         if (!cls.contains("GlobalAction")) return;
+                        tintPowerIcons((android.app.Dialog) p.thisObject);
                         // 2026-09-13: il controllo "stock" era QUI, prima del log dentro
                         // applyMenuBackground() — se mPowerMenuMenuBgMode leggeva "stock" per una
                         // corsa al boot (updatePrefs/preloadFallback non ancora passati), il log
@@ -595,6 +604,26 @@ public class MiscMods extends XposedMods {
 
     private int advRebootBorderColor() {
         return mAdvRebootBorderUseAccent ? sharedAccentColor() : mAdvRebootBorderCustomColor;
+    }
+
+    /** Colore delle icone Riavvia/Spegni: sono animazioni Lottie, si colorano con un filtro sull'intera vista. */
+    private void tintPowerIcons(android.app.Dialog dialog) {
+        try {
+            if (dialog.getWindow() == null) return;
+            android.view.View root = dialog.getWindow().getDecorView();
+            for (String n : new String[]{"reboot_animation_view", "shutdown_animation_view"}) {
+                int id = mContext.getResources().getIdentifier(n, "id", SYSTEM_UI);
+                android.view.View v = id == 0 ? null : root.findViewById(id);
+                if (v == null) { XposedBridge.log("[ Obsidian ] MiscMods power icons: " + n + " not found"); continue; }
+                if (!mPowerMenuIconsOn) { v.setLayerType(android.view.View.LAYER_TYPE_NONE, null); continue; }
+                int color = mPowerMenuIconsUseAccent ? sharedAccentColor() : mPowerMenuIconsColor;
+                Paint paint = new Paint();
+                paint.setColorFilter(new android.graphics.PorterDuffColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN));
+                v.setLayerType(android.view.View.LAYER_TYPE_HARDWARE, paint);
+            }
+        } catch (Throwable t) {
+            XposedBridge.log("[ Obsidian ] MiscMods power icons: " + t);
+        }
     }
 
     /** Colore Pallino — null means "stock" (leave OOS's default white handler alone). */

@@ -269,6 +269,9 @@ public class DstFabricatedUtil {
             String  pmGradientMode  = ObsidianPrefs.getString("power_menu_gradient_mode", "accent");
             int     pmGradientColor = ObsidianPrefs.getInt(   "power_menu_gradient_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
             String  pmBgMode        = ObsidianPrefs.getString("power_menu_bg_mode", "stock");
+            boolean pmIconsOn       = ObsidianPrefs.getBoolean("power_menu_icons_color", false);
+            boolean pmIconsAccent   = ObsidianPrefs.getBoolean("power_menu_icons_use_accent", true);
+            int     pmIconsColor    = ObsidianPrefs.getInt("power_menu_icons_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
             int     pmBgColor       = ObsidianPrefs.getInt(   "power_menu_bg_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
             boolean pmBorderOn      = ObsidianPrefs.getBoolean("power_menu_border_enabled", false);
             boolean pmBorderAccent  = ObsidianPrefs.getBoolean("power_menu_border_use_accent", true);
@@ -324,6 +327,9 @@ public class DstFabricatedUtil {
                 "setprop persist.obsidian.dst.lk_longshot    " + (lkLongshot ? "1" : "0"),
                 "setprop persist.obsidian.dst.pm_gradient_mode  \"" + pmGradientMode + "\"",
                 "setprop persist.obsidian.dst.pm_gradient_color " + pmGradientColor,
+                "setprop persist.obsidian.dst.pm_icons_on       " + (pmIconsOn ? "1" : "0"),
+                "setprop persist.obsidian.dst.pm_icons_accent   " + (pmIconsAccent ? "1" : "0"),
+                "setprop persist.obsidian.dst.pm_icons_color    " + pmIconsColor,
                 "setprop persist.obsidian.dst.pm_bg_mode        \"" + pmBgMode + "\"",
                 "setprop persist.obsidian.dst.pm_bg_color       " + pmBgColor,
                 "setprop persist.obsidian.dst.pm_border_on      " + (pmBorderOn ? "1" : "0"),
