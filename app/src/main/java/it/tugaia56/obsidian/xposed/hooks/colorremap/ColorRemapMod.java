@@ -77,6 +77,11 @@ public class ColorRemapMod extends XposedMods {
     private static final Map<String, Map<Integer, Integer>> EXACT = new HashMap<>();
     private Map<Integer, Integer> mExact;
 
+    /** Barra Material in basso: la pillola dietro l'icona accento del tab attivo va nell'accento al 20% (id standard navigation_bar_item_active_indicator_view). */
+    private static final java.util.Set<String> INDICATOR20 = new java.util.HashSet<>(java.util.Arrays.asList("com.safeincloud.free"));
+    /** Barra Compose: le forme a pillola nel colore dello sfondo (tab attivo) diventano accento al 20%. */
+    private static final java.util.Set<String> PILL_BG20 = new java.util.HashSet<>(java.util.Arrays.asList("com.google.android.googlequicksearchbox"));
+
     /** App dove il bianco pieno che copre una superficie grande (almeno un terzo dello schermo) diventa lo sfondo del Theme; bianchi piccoli (testi, icone) invariati. */
     private static final java.util.Set<String> BIG_WHITE = new java.util.HashSet<>(java.util.Arrays.asList("ginlemon.iconpackstudio"));
 
@@ -235,6 +240,7 @@ public class ColorRemapMod extends XposedMods {
         Map<Integer, Integer> oneplusFiles = new HashMap<>();
         oneplusFiles.put(0x1A1A1A, PAGE);  // card "Tutti i file" e categorie; il bordo accento e' in VIEW_FRAME
         RULES.put("com.oneplus.filemanager", oneplusFiles);
+        RULES.put("com.safeincloud.free", new HashMap<>());  // solo per attivare gli hook (INDICATOR20)
         Map<Integer, Integer> myDevices = new HashMap<>();
         myDevices.put(0xFF6C61, ACCENT);  // testo "Elimina dispositivo" (rosso errore dell app)
         myDevices.put(0x1E1E1E, PAGE);  // pannello che si apre toccando una scheda
@@ -885,6 +891,62 @@ public class ColorRemapMod extends XposedMods {
                     ok += 5;
                 }
             } catch (Throwable t) { log("BaseRecordingCanvas (big white)", t); }
+        }
+        if (INDICATOR20.contains(lp.packageName)) {
+            try {
+                XposedHelpers.findAndHookMethod(android.view.View.class, "draw", Canvas.class, new XC_MethodHook() {
+                    int mId;
+                    @Override protected void beforeHookedMethod(MethodHookParam p) {
+                        try {
+                            android.view.View v = (android.view.View) p.thisObject;
+                            int id = v.getId();
+                            if (id == android.view.View.NO_ID || sBusy.get() != null || !night()) return;
+                            if (mId == 0) mId = v.getResources().getIdentifier("navigation_bar_item_active_indicator_view", "id", lp.packageName);
+                            if (id != mId) return;
+                            if (!sReady) load();
+                            if (!sReady || sColors[ACCENT] < 0) return;
+                            int want = 0x33000000 | sColors[ACCENT];
+                            android.content.res.ColorStateList t = v.getBackgroundTintList();
+                            if (t == null || t.getDefaultColor() != want) v.setBackgroundTintList(android.content.res.ColorStateList.valueOf(want));
+                        } catch (Throwable ignored) {}
+                    }
+                });
+                ok++;
+            } catch (Throwable t) { log("View.draw (indicator20)", t); }
+        }
+        if (PILL_BG20.contains(lp.packageName)) {
+            try {
+                Class<?> rc = XposedHelpers.findClassIfExists("android.graphics.BaseRecordingCanvas", lp.classLoader);
+                final float dens = Resources.getSystem().getDisplayMetrics().density;
+                XC_MethodHook pill = new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) {
+                        try {
+                            if (sBusy.get() != null || !night()) return;
+                            Paint paint = (Paint) p.args[p.args.length - 1];
+                            if (!sReady) load();
+                            if (!sReady || sColors[PAGE] < 0 || paint.getColor() != (0xFF000000 | sColors[PAGE]) || paint.getShader() != null) return;
+                            Object a0 = p.args[0];
+                            float w, h;
+                            if (a0 instanceof Float) { w = (Float) p.args[2] - (Float) a0; h = (Float) p.args[3] - (Float) p.args[1]; }
+                            else if (a0 instanceof android.graphics.Path) { android.graphics.RectF r = new android.graphics.RectF(); ((android.graphics.Path) a0).computeBounds(r, true); w = r.width(); h = r.height(); }
+                            else return;
+                            if (Math.abs(h - 32f * dens) > 3f * dens || w < 40f * dens || w > 68f * dens) return;  // pillola del tab: 56 x 32 dp (si allarga mentre si anima)
+                            p.setObjectExtra("pill", paint.getColor());
+                            paint.setColor(0x33000000 | sColors[ACCENT]);
+                        } catch (Throwable ignored) {}
+                    }
+
+                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                        try {
+                            Object old = p.getObjectExtra("pill");
+                            if (old != null) ((Paint) p.args[p.args.length - 1]).setColor((Integer) old);
+                        } catch (Throwable ignored) {}
+                    }
+                };
+                XposedHelpers.findAndHookMethod(rc, "drawRoundRect", float.class, float.class, float.class, float.class, float.class, float.class, Paint.class, pill);
+                XposedHelpers.findAndHookMethod(rc, "drawPath", android.graphics.Path.class, Paint.class, pill);
+                ok += 2;
+            } catch (Throwable t) { log("BaseRecordingCanvas (pill20)", t); }
         }
         final String[] noDarkIds = VIEW_NO_DARK.get(lp.packageName);
         if (noDarkIds != null) {
