@@ -67,6 +67,9 @@ public class ColorRemapMod extends XposedMods {
     /** Viste (per id) che prendono come sfondo pieno il colore dello sfondo del Theme (barre nere scritte nel codice). */
     private static final Map<String, String[]> VIEW_BG = new HashMap<>();
 
+    /** Viste (per id) a cui aggiungere un bordo accento arrotondato in primo piano (un disegno, non sul canvas: in alcune app OnePlus il canvas scurisce l'accento). */
+    private static final Map<String, String[]> VIEW_FRAME = new HashMap<>();
+
     /** Pannelli e pulsanti (per id) con sfondo arrotondato: {id, ruolo del riempimento, raggio dp (0 = cerchio), spessore bordo dp (0 = senza), bordo accento 1/0}. */
     private static final Map<String, String[][]> VIEW_SHAPES = new HashMap<>();
 
@@ -86,6 +89,7 @@ public class ColorRemapMod extends XposedMods {
         RULES.put("com.oplus.camera", new HashMap<Integer, Integer>());
         VIEW_BG.put("com.oplus.camera", new String[]{"control_panel_layout", "camera_root"});
         VIEW_BG.put("com.oneplus.filemanager", new String[]{"navigation_tab"});  // barra in basso di I miei file
+        VIEW_FRAME.put("com.oneplus.filemanager", new String[]{"main_category_item", "phone_storage"});  // le 7 schede in alto
         // finestra delle modalita' (si apre toccando due volte il tab attivo): pannello nel colore dello sfondo con bordo accento, icone nel colore delle tessere
         VIEW_SHAPES.put("com.oplus.camera", new String[][]{
                 {"oplus_menu_bottom", String.valueOf(PAGE), "24", "0", "0"},
@@ -190,6 +194,7 @@ public class ColorRemapMod extends XposedMods {
         RULES.put("com.github.android", github);
         // I miei file (com.oneplus.filemanager): card in alto colorate dal codice (BORDER_FILL; la barra in basso: VIEW_BG) (l'overlay del Theme fa il resto)
         Map<Integer, Integer> oneplusFiles = new HashMap<>();
+        oneplusFiles.put(0x1A1A1A, PAGE);  // card "Tutti i file" e categorie; il bordo accento e' in VIEW_FRAME
         RULES.put("com.oneplus.filemanager", oneplusFiles);
         Map<Integer, Integer> google = new HashMap<>();
         google.put(0x22242A, RIPPLE);  // pulsante rotondo del menu in alto a sinistra
@@ -212,10 +217,6 @@ public class ColorRemapMod extends XposedMods {
         Map<Integer, Integer> dreoCards = new HashMap<>();
         dreoCards.put(0x303236, TILE);
         BORDER_FILL.put("com.hesung.dreo", dreoCards);
-        // I miei file: card "Tutti i file" e categorie #1a1a1a -> sfondo del Theme con bordo accento
-        Map<Integer, Integer> filesCards = new HashMap<>();
-        filesCards.put(0x1A1A1A, PAGE);
-        BORDER_FILL.put("com.oneplus.filemanager", filesCards);
         // Google (app): pillole sotto la barra Cerca (Cerca, AI Mode, comando vocale, Lens) #2c2e35 -> sfondo del Theme con bordo accento
         Map<Integer, Integer> googlePills = new HashMap<>();
         googlePills.put(0x2C2E35, PAGE);
@@ -791,6 +792,34 @@ public class ColorRemapMod extends XposedMods {
                 });
                 ok++;
             } catch (Throwable t) { log("View.onAttachedToWindow (pills)", t); }
+        }
+        final String[] frameIds = VIEW_FRAME.get(lp.packageName);
+        if (frameIds != null) {
+            try {
+                XposedHelpers.findAndHookMethod(android.view.View.class, "onAttachedToWindow", new XC_MethodHook() {
+                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                        try {
+                            if (sBusy.get() != null || !night()) return;
+                            android.view.View v = (android.view.View) p.thisObject;
+                            int id = v.getId();
+                            if (id == android.view.View.NO_ID) return;
+                            boolean ok = false;
+                            for (String n : frameIds) if (id == v.getResources().getIdentifier(n, "id", lp.packageName)) ok = true;
+                            if (!ok) return;
+                            if (!sReady) load();
+                            if (!sReady || sColors[ACCENT] < 0) return;
+                            float dens = v.getResources().getDisplayMetrics().density;
+                            android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
+                            g.setColor(0);
+                            g.setStroke(Math.round(1.5f * dens), 0xFF000000 | sColors[ACCENT]);
+                            g.setCornerRadius(12f * dens);
+                            v.setForceDarkAllowed(false);  // ColorOS scurisce i colori chiari di queste viste
+                            v.setForeground(g);
+                        } catch (Throwable ignored) {}
+                    }
+                });
+                ok++;
+            } catch (Throwable t) { log("View.onAttachedToWindow (frame)", t); }
         }
         final String[] bgIds = VIEW_BG.get(lp.packageName);
         if (bgIds != null) {
