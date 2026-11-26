@@ -67,7 +67,13 @@ public class ColorRemapMod extends XposedMods {
     /** Viste (per id) che prendono come sfondo pieno il colore dello sfondo del Theme (barre nere scritte nel codice). */
     private static final Map<String, String[]> VIEW_BG = new HashMap<>();
 
-    /** Viste (per id) a cui aggiungere un bordo accento arrotondato in primo piano (un disegno, non sul canvas: in alcune app OnePlus il canvas scurisce l'accento). */
+    /** Colore diverso dallo sfondo per una vista di VIEW_BG: "pacchetto/id" -> ruolo. */
+    private static final Map<String, Integer> VIEW_BG_ROLE = new HashMap<>();
+
+    /** Raggio (dp) del bordo di VIEW_FRAME quando non e' 12. */
+    private static final Map<String, Integer> FRAME_RADIUS = new HashMap<>();
+
+    /** Viste (per id, o per nome di classe se contiene un punto) a cui aggiungere un bordo accento arrotondato in primo piano (un disegno, non sul canvas: in alcune app OnePlus il canvas scurisce l'accento). */
     private static final Map<String, String[]> VIEW_FRAME = new HashMap<>();
 
     /** Pannelli e pulsanti (per id) con sfondo arrotondato: {id, ruolo del riempimento, raggio dp (0 = cerchio), spessore bordo dp (0 = senza), bordo accento 1/0}. */
@@ -90,6 +96,12 @@ public class ColorRemapMod extends XposedMods {
         VIEW_BG.put("com.oplus.camera", new String[]{"control_panel_layout", "camera_root"});
         VIEW_BG.put("com.oneplus.filemanager", new String[]{"navigation_tab"});  // barra in basso di I miei file
         VIEW_FRAME.put("com.oneplus.filemanager", new String[]{"main_category_item", "phone_storage"});  // le 7 schede in alto
+        // I miei dispositivi: schede dei dispositivi (due fasce grigie) -> sfondo del Theme con bordo accento
+        VIEW_BG.put("com.heytap.mydevices", new String[]{"topContainer", "bottomContainer"});
+        VIEW_BG_ROLE.put("com.heytap.mydevices/topContainer", TILE);     // fascia con l'immagine: button_material_dark
+        VIEW_BG_ROLE.put("com.heytap.mydevices/bottomContainer", CARD);  // fascia con il nome, piu' chiara: holo_light_primary_dark
+        VIEW_FRAME.put("com.heytap.mydevices", new String[]{"com.oplus.mydevices.deviceui.devicecard.view.homecard.HomeCardView"});
+        FRAME_RADIUS.put("com.heytap.mydevices", 20);
         // finestra delle modalita' (si apre toccando due volte il tab attivo): pannello nel colore dello sfondo con bordo accento, icone nel colore delle tessere
         VIEW_SHAPES.put("com.oplus.camera", new String[][]{
                 {"oplus_menu_bottom", String.valueOf(PAGE), "24", "0", "0"},
@@ -196,6 +208,7 @@ public class ColorRemapMod extends XposedMods {
         Map<Integer, Integer> oneplusFiles = new HashMap<>();
         oneplusFiles.put(0x1A1A1A, PAGE);  // card "Tutti i file" e categorie; il bordo accento e' in VIEW_FRAME
         RULES.put("com.oneplus.filemanager", oneplusFiles);
+        RULES.put("com.heytap.mydevices", new HashMap<>());  // solo per attivare gli hook (VIEW_BG, VIEW_FRAME)
         Map<Integer, Integer> google = new HashMap<>();
         google.put(0x22242A, RIPPLE);  // pulsante rotondo del menu in alto a sinistra
         RULES.put("com.google.android.googlequicksearchbox", google);  // le pillole sotto la barra Cerca usano BORDER_FILL
@@ -802,9 +815,11 @@ public class ColorRemapMod extends XposedMods {
                             if (sBusy.get() != null || !night()) return;
                             android.view.View v = (android.view.View) p.thisObject;
                             int id = v.getId();
-                            if (id == android.view.View.NO_ID) return;
                             boolean ok = false;
-                            for (String n : frameIds) if (id == v.getResources().getIdentifier(n, "id", lp.packageName)) ok = true;
+                            for (String n : frameIds) {
+                                if (n.indexOf('.') >= 0) ok |= n.equals(v.getClass().getName());
+                                else ok |= id != android.view.View.NO_ID && id == v.getResources().getIdentifier(n, "id", lp.packageName);
+                            }
                             if (!ok) return;
                             if (!sReady) load();
                             if (!sReady || sColors[ACCENT] < 0) return;
@@ -812,7 +827,7 @@ public class ColorRemapMod extends XposedMods {
                             android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
                             g.setColor(0);
                             g.setStroke(Math.round(1.5f * dens), 0xFF000000 | sColors[ACCENT]);
-                            g.setCornerRadius(12f * dens);
+                            g.setCornerRadius((FRAME_RADIUS.containsKey(lp.packageName) ? FRAME_RADIUS.get(lp.packageName) : 12) * dens);
                             v.setForceDarkAllowed(false);  // ColorOS scurisce i colori chiari di queste viste
                             v.setForeground(g);
                         } catch (Throwable ignored) {}
@@ -831,12 +846,14 @@ public class ColorRemapMod extends XposedMods {
                             android.view.View v = (android.view.View) p.thisObject;
                             int id = v.getId();
                             if (id == android.view.View.NO_ID) return;
-                            boolean ok = false;
-                            for (String n : bgIds) if (id == v.getResources().getIdentifier(n, "id", lp.packageName)) ok = true;
-                            if (!ok) return;
+                            String hit = null;
+                            for (String n : bgIds) if (id == v.getResources().getIdentifier(n, "id", lp.packageName)) hit = n;
+                            if (hit == null) return;
                             if (!sReady) load();
-                            if (!sReady || sColors[PAGE] < 0) return;
-                            v.setBackgroundColor(0xFF000000 | sColors[PAGE]);
+                            Integer role = VIEW_BG_ROLE.get(lp.packageName + "/" + hit);
+                            int r = role == null ? PAGE : role;
+                            if (!sReady || sColors[r] < 0) return;
+                            v.setBackgroundColor(0xFF000000 | sColors[r]);
                         } catch (Throwable ignored) {}
                     }
                 });
