@@ -85,6 +85,7 @@ public class ColorRemapMod extends XposedMods {
         // Fotocamera OnePlus (com.oplus.camera): la barra in basso (scatto, miniatura, modalita') e' nera nel codice (vista a colori invertiti)
         RULES.put("com.oplus.camera", new HashMap<Integer, Integer>());
         VIEW_BG.put("com.oplus.camera", new String[]{"control_panel_layout", "camera_root"});
+        VIEW_BG.put("com.oneplus.filemanager", new String[]{"navigation_tab"});  // barra in basso di I miei file
         // finestra delle modalita' (si apre toccando due volte il tab attivo): pannello nel colore dello sfondo con bordo accento, icone nel colore delle tessere
         VIEW_SHAPES.put("com.oplus.camera", new String[][]{
                 {"oplus_menu_bottom", String.valueOf(PAGE), "24", "0", "0"},
@@ -187,6 +188,9 @@ public class ColorRemapMod extends XposedMods {
         github.put(0x17181C, PAGE);    // sfondo di barre e pagine scritto nel codice
         github.put(0x050505, PAGE);
         RULES.put("com.github.android", github);
+        // I miei file (com.oneplus.filemanager): card in alto colorate dal codice (BORDER_FILL; la barra in basso: VIEW_BG) (l'overlay del Theme fa il resto)
+        Map<Integer, Integer> oneplusFiles = new HashMap<>();
+        RULES.put("com.oneplus.filemanager", oneplusFiles);
         Map<Integer, Integer> google = new HashMap<>();
         google.put(0x22242A, RIPPLE);  // pulsante rotondo del menu in alto a sinistra
         RULES.put("com.google.android.googlequicksearchbox", google);  // le pillole sotto la barra Cerca usano BORDER_FILL
@@ -208,6 +212,10 @@ public class ColorRemapMod extends XposedMods {
         Map<Integer, Integer> dreoCards = new HashMap<>();
         dreoCards.put(0x303236, TILE);
         BORDER_FILL.put("com.hesung.dreo", dreoCards);
+        // I miei file: card "Tutti i file" e categorie #1a1a1a -> sfondo del Theme con bordo accento
+        Map<Integer, Integer> filesCards = new HashMap<>();
+        filesCards.put(0x1A1A1A, PAGE);
+        BORDER_FILL.put("com.oneplus.filemanager", filesCards);
         // Google (app): pillole sotto la barra Cerca (Cerca, AI Mode, comando vocale, Lens) #2c2e35 -> sfondo del Theme con bordo accento
         Map<Integer, Integer> googlePills = new HashMap<>();
         googlePills.put(0x2C2E35, PAGE);
