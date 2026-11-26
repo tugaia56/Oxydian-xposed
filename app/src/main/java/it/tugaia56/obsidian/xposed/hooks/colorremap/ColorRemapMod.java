@@ -210,6 +210,14 @@ public class ColorRemapMod extends XposedMods {
         github.put(0x17181C, PAGE);    // sfondo di barre e pagine scritto nel codice
         github.put(0x050505, PAGE);
         RULES.put("com.github.android", github);
+        // Icon Pack Studio (ginlemon.iconpackstudio): tutta Compose
+        Map<Integer, Integer> ips = new HashMap<>();
+        ips.put(0x000000, PAGE);    // sfondo e barra in basso
+        ips.put(0x0A0A0A, TILE);    // card scure delle anteprime
+        ips.put(0x13161B, TILE);    // card delle anteprime
+        ips.put(0x1D1F24, CARD);    // campo di ricerca
+        ips.put(0x317AFF, ACCENT);  // azzurro: tab attivo e filtro selezionato
+        RULES.put("ginlemon.iconpackstudio", ips);
         // I miei file (com.oneplus.filemanager): card in alto colorate dal codice (BORDER_FILL; la barra in basso: VIEW_BG) (l'overlay del Theme fa il resto)
         Map<Integer, Integer> oneplusFiles = new HashMap<>();
         oneplusFiles.put(0x1A1A1A, PAGE);  // card "Tutti i file" e categorie; il bordo accento e' in VIEW_FRAME
