@@ -210,6 +210,7 @@ public class ColorRemapMod extends XposedMods {
         RULES.put("com.oneplus.filemanager", oneplusFiles);
         Map<Integer, Integer> myDevices = new HashMap<>();
         myDevices.put(0x1E1E1E, PAGE);  // pannello che si apre toccando una scheda
+        myDevices.put(0x363636, CARD);  // riga "Impostazioni dispositivo audio" nel pannello
         RULES.put("com.heytap.mydevices", myDevices);
         Map<Integer, Integer> google = new HashMap<>();
         google.put(0x22242A, RIPPLE);  // pulsante rotondo del menu in alto a sinistra
