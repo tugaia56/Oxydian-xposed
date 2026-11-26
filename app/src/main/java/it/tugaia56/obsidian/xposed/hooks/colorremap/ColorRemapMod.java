@@ -73,6 +73,9 @@ public class ColorRemapMod extends XposedMods {
     /** Viste (per id) su cui si spegne la scurezza forzata di ColorOS, che scurisce l'accento. */
     private static final Map<String, String[]> VIEW_NO_DARK = new HashMap<>();
 
+    /** App dove il bianco pieno che copre una superficie grande (almeno un terzo dello schermo) diventa lo sfondo del Theme; bianchi piccoli (testi, icone) invariati. */
+    private static final java.util.Set<String> BIG_WHITE = new java.util.HashSet<>(java.util.Arrays.asList("ginlemon.iconpackstudio"));
+
     /** Raggio (dp) del bordo di VIEW_FRAME quando non e' 12. */
     private static final Map<String, Integer> FRAME_RADIUS = new HashMap<>();
 
@@ -217,6 +220,7 @@ public class ColorRemapMod extends XposedMods {
         ips.put(0x13161B, TILE);    // card delle anteprime
         ips.put(0x1D1F24, CARD);    // campo di ricerca
         ips.put(0x317AFF, ACCENT);  // azzurro: tab attivo e filtro selezionato
+        ips.put(0x006ED5, ACCENT);  // pulsante "Anteprima" nella modifica
         RULES.put("ginlemon.iconpackstudio", ips);
         // I miei file (com.oneplus.filemanager): card in alto colorate dal codice (BORDER_FILL; la barra in basso: VIEW_BG) (l'overlay del Theme fa il resto)
         Map<Integer, Integer> oneplusFiles = new HashMap<>();
@@ -823,6 +827,49 @@ public class ColorRemapMod extends XposedMods {
                 });
                 ok++;
             } catch (Throwable t) { log("View.onAttachedToWindow (pills)", t); }
+        }
+        if (BIG_WHITE.contains(lp.packageName)) {
+            try {
+                Class<?> rc = XposedHelpers.findClassIfExists("android.graphics.BaseRecordingCanvas", lp.classLoader);
+                final android.util.DisplayMetrics dm = Resources.getSystem().getDisplayMetrics();
+                final float min = dm.widthPixels * (float) dm.heightPixels / 3f;
+                XC_MethodHook white = new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) {
+                        try {
+                            if (sBusy.get() != null || !night()) return;
+                            Paint paint = (Paint) p.args[p.args.length - 1];
+                            if (paint.getColor() != 0xFFFFFFFF || paint.getShader() != null) return;
+                            Object a0 = p.args[0];
+                            float w, h;
+                            if (a0 instanceof Float) { w = (Float) p.args[2] - (Float) a0; h = (Float) p.args[3] - (Float) p.args[1]; }
+                            else if (a0 instanceof android.graphics.RectF) { android.graphics.RectF r = (android.graphics.RectF) a0; w = r.width(); h = r.height(); }
+                            else if (a0 instanceof android.graphics.Rect) { android.graphics.Rect r = (android.graphics.Rect) a0; w = r.width(); h = r.height(); }
+                            else if (a0 instanceof android.graphics.Path) { android.graphics.RectF r = new android.graphics.RectF(); ((android.graphics.Path) a0).computeBounds(r, true); w = r.width(); h = r.height(); }
+                            else return;
+                            if (w * h < min) return;
+                            if (!sReady) load();
+                            if (!sReady || sColors[PAGE] < 0) return;
+                            p.setObjectExtra("white", 0xFFFFFFFF);
+                            paint.setColor(0xFF000000 | sColors[PAGE]);
+                        } catch (Throwable ignored) {}
+                    }
+
+                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                        try {
+                            Object old = p.getObjectExtra("white");
+                            if (old != null) ((Paint) p.args[p.args.length - 1]).setColor((Integer) old);
+                        } catch (Throwable ignored) {}
+                    }
+                };
+                if (rc != null) {
+                    XposedHelpers.findAndHookMethod(rc, "drawRect", float.class, float.class, float.class, float.class, Paint.class, white);
+                    XposedHelpers.findAndHookMethod(rc, "drawRect", android.graphics.RectF.class, Paint.class, white);
+                    XposedHelpers.findAndHookMethod(rc, "drawRect", android.graphics.Rect.class, Paint.class, white);
+                    XposedHelpers.findAndHookMethod(rc, "drawRoundRect", float.class, float.class, float.class, float.class, float.class, float.class, Paint.class, white);
+                    XposedHelpers.findAndHookMethod(rc, "drawPath", android.graphics.Path.class, Paint.class, white);
+                    ok += 5;
+                }
+            } catch (Throwable t) { log("BaseRecordingCanvas (big white)", t); }
         }
         final String[] noDarkIds = VIEW_NO_DARK.get(lp.packageName);
         if (noDarkIds != null) {
