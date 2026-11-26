@@ -73,6 +73,10 @@ public class ColorRemapMod extends XposedMods {
     /** Viste (per id) su cui si spegne la scurezza forzata di ColorOS, che scurisce l'accento. */
     private static final Map<String, String[]> VIEW_NO_DARK = new HashMap<>();
 
+    /** Colori con la trasparenza esatta (argb) che valgono prima delle regole per rgb; diventano opachi nel colore del ruolo. */
+    private static final Map<String, Map<Integer, Integer>> EXACT = new HashMap<>();
+    private Map<Integer, Integer> mExact;
+
     /** App dove il bianco pieno che copre una superficie grande (almeno un terzo dello schermo) diventa lo sfondo del Theme; bianchi piccoli (testi, icone) invariati. */
     private static final java.util.Set<String> BIG_WHITE = new java.util.HashSet<>(java.util.Arrays.asList("ginlemon.iconpackstudio"));
 
@@ -222,6 +226,9 @@ public class ColorRemapMod extends XposedMods {
         ips.put(0x317AFF, ACCENT);  // azzurro: tab attivo e filtro selezionato
         ips.put(0x006ED5, ACCENT);  // pulsante "Anteprima" nella modifica
         RULES.put("ginlemon.iconpackstudio", ips);
+        Map<Integer, Integer> ipsExact = new HashMap<>();
+        ipsExact.put(0x8A000000, CARD);  // riquadri dietro zoom e pulsantini nella modifica (nero 54%, sul bianco era grigio)
+        EXACT.put("ginlemon.iconpackstudio", ipsExact);
         // I miei file (com.oneplus.filemanager): card in alto colorate dal codice (BORDER_FILL; la barra in basso: VIEW_BG) (l'overlay del Theme fa il resto)
         Map<Integer, Integer> oneplusFiles = new HashMap<>();
         oneplusFiles.put(0x1A1A1A, PAGE);  // card "Tutti i file" e categorie; il bordo accento e' in VIEW_FRAME
@@ -324,6 +331,11 @@ public class ColorRemapMod extends XposedMods {
     }
 
     private int map(int c) {
+        Integer ex = mExact == null ? null : mExact.get(c);
+        if (ex != null) {
+            if (!sReady) load();
+            return sReady && sColors[ex] >= 0 ? 0xFF000000 | sColors[ex] : c;
+        }
         Integer role = mRules.get(c & 0xFFFFFF);
         if (role == null) return c;
         if (!sReady) load();
@@ -367,6 +379,7 @@ public class ColorRemapMod extends XposedMods {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lp) throws Throwable {
         mRules = RULES.get(lp.packageName);
+        mExact = EXACT.get(lp.packageName);
         if (mRules == null) return;
         int ok = 0;
         try { XposedHelpers.findAndHookMethod(Paint.class, "setColor", int.class, new First("Paint.setColor")); ok++; } catch (Throwable t) { log("Paint.setColor", t); }
