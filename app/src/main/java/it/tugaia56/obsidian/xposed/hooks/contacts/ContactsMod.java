@@ -42,7 +42,7 @@ public class ContactsMod extends XposedMods {
     private static final int BLUE_GRAY_DARK = 0xFF1B2029;
 
     private volatile boolean mBorder = false;
-    private volatile int mAccent = 0xFF908DFF;
+    private volatile int mAccent = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     private volatile int mFillNoBorder = 0xFF2B2F3A;
     private long mPropsAt = 0;
     private volatile int mBg = BLUE_GRAY_DARK;          // sfondo del Theme (system_background_dark)
@@ -85,7 +85,7 @@ public class ContactsMod extends XposedMods {
             int id = r.getIdentifier("accent_material_dark", "color", "android");
             if (id != 0) return r.getColor(id, null);
         } catch (Throwable ignored) {}
-        return 0xFF908DFF;
+        return it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     }
 
     /** Risorse dell'app (con gli overlay di Oxydian Theme applicati): Resources.getSystem() ha i colori originali di

@@ -20,7 +20,7 @@ public class ObsidianTheme {
 
     // ── Defaults (match colors.xml / obs_primary / obs_background) ────────────
     /** Default accent — soft lavender, matches obs_primary (#908DFF). */
-    public static final int DEFAULT_ACCENT = 0xFF908DFF;
+    public static final int DEFAULT_ACCENT = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     /** Default background — dark navy, matches obs_background (#1B2029). */
     public static final int DEFAULT_BG     = 0xFF1B2029;
     /** Default light-mode background — soft off-white. */

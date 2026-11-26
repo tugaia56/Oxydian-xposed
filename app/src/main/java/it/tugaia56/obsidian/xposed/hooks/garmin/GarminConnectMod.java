@@ -29,7 +29,7 @@ public class GarminConnectMod extends XposedMods {
     public static final String PKG_IQ = "com.garmin.connectiq";
     private static final int BLUE_GRAY_DARK = 0xFF1B2029;
 
-    private volatile int mAccent = 0xFF908DFF;
+    private volatile int mAccent = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     private volatile int mBg = BLUE_GRAY_DARK;
     private volatile long mAt = -10000;
 

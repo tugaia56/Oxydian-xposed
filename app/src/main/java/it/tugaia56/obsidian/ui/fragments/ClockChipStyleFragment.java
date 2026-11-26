@@ -302,7 +302,7 @@ public class ClockChipStyleFragment extends Fragment {
 
     private int systemAccentColorSafe() {
         try { return requireContext().getColor(android.R.color.system_accent1_600); }
-        catch (Throwable t) { return 0xFF908DFF; }
+        catch (Throwable t) { return it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF); }
     }
 
     // ── Righe generiche ──────────────────────────────────────────────────────

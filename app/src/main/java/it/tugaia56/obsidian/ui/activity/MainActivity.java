@@ -879,9 +879,8 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
             if (mNavDivider != null) mNavDivider.setBackgroundColor(0x33FFFFFF);
             return;
         }
-        boolean bgOn = ObsidianPrefs.getBoolean("DST_BACKGROUND_on", false);
-        if (!bgOn) return;
-        int bgColor = ObsidianPrefs.getInt("DST_BACKGROUND", 0xFF1A1A2E) | 0xFF000000;
+        // stesso sfondo della pagina: quello di Oxydian Theme (o il preset interno)
+        int bgColor = ObsidianTheme.windowBg() | 0xFF000000;
         mBottomNav.setBackgroundColor(bgColor);
         navHost().setBackgroundColor(bgColor);
         if (mNavDivider != null) {

@@ -36,7 +36,7 @@ public class DeviceStatGaugeView extends View {
     private final Context mContext;
     private StatType mType = StatType.BATTERY;
     private Style mStyle = Style.CIRCULAR;
-    private int mProgressColor = 0xFF908DFF;
+    private int mProgressColor = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     private int mTextColor = Color.WHITE;
     private Drawable mIcon;
 

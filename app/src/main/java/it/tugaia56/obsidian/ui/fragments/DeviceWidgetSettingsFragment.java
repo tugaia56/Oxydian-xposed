@@ -161,8 +161,8 @@ public class DeviceWidgetSettingsFragment extends Fragment {
         DeviceStatGaugeView.Style style = circular ? DeviceStatGaugeView.Style.CIRCULAR : DeviceStatGaugeView.Style.LINEAR;
         boolean customColor = ObsidianPrefs.getBoolean(KEY_COLOR_SWITCH, false);
         int progressColor = customColor
-                ? ObsidianPrefs.getInt(circular ? KEY_COLOR_CIRCULAR : KEY_COLOR_LINEAR, 0xFF908DFF)
-                : 0xFF908DFF;
+                ? ObsidianPrefs.getInt(circular ? KEY_COLOR_CIRCULAR : KEY_COLOR_LINEAR, it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF))
+                : it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
         int textColor = customColor ? ObsidianPrefs.getInt(KEY_TEXT_COLOR, 0xFFFFFFFF) : 0xFFFFFFFF;
 
         int shown = 0;

@@ -53,9 +53,9 @@ public class MessagesBubbleMod extends XposedMods {
     private long mPropsAt = 0;
     private Paint mStroke;
     private Paint mStrokeIn;
-    private int mStrokeColor = 0xFF908DFF;      // accento dell'utente
+    private int mStrokeColor = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);      // accento dell'utente
     private volatile int mBorderInColor = 0xFFFFFFFF;
-    private volatile int mBorderOutColor = 0xFF908DFF;
+    private volatile int mBorderOutColor = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     private float mDensity = 3f;
     private final ThreadLocal<Boolean> mBusy = new ThreadLocal<>();
     // Testo delle bolle inviate: quando la bolla cambia colore, il testo (scuro) va reso chiaro.
@@ -124,7 +124,7 @@ public class MessagesBubbleMod extends XposedMods {
             if (c == 0) {
                 Resources r = Resources.getSystem();
                 int id = r.getIdentifier("accent_material_dark", "color", "android");
-                c = id != 0 ? r.getColor(id, null) : 0xFF908DFF;
+                c = id != 0 ? r.getColor(id, null) : it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
             }
             if (c != mStrokeColor) {
                 mStrokeColor = c;

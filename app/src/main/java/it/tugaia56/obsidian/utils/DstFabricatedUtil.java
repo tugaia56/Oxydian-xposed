@@ -267,19 +267,19 @@ public class DstFabricatedUtil {
             // accensione abbastanza presto, vedeva sempre lo stock finché updatePrefs() non
             // arrivava. Stesso canale/stesso motivo delle altre.
             String  pmGradientMode  = ObsidianPrefs.getString("power_menu_gradient_mode", "accent");
-            int     pmGradientColor = ObsidianPrefs.getInt(   "power_menu_gradient_custom_color", 0xFF908DFF);
+            int     pmGradientColor = ObsidianPrefs.getInt(   "power_menu_gradient_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
             String  pmBgMode        = ObsidianPrefs.getString("power_menu_bg_mode", "stock");
-            int     pmBgColor       = ObsidianPrefs.getInt(   "power_menu_bg_custom_color", 0xFF908DFF);
+            int     pmBgColor       = ObsidianPrefs.getInt(   "power_menu_bg_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
             boolean pmBorderOn      = ObsidianPrefs.getBoolean("power_menu_border_enabled", false);
             boolean pmBorderAccent  = ObsidianPrefs.getBoolean("power_menu_border_use_accent", true);
-            int     pmBorderColor   = ObsidianPrefs.getInt(   "power_menu_border_custom_color", 0xFF908DFF);
+            int     pmBorderColor   = ObsidianPrefs.getInt(   "power_menu_border_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
             String  pmHandlerMode   = ObsidianPrefs.getString("power_menu_handler_mode", "stock");
-            int     pmHandlerColor  = ObsidianPrefs.getInt(   "power_menu_handler_custom_color", 0xFF908DFF);
+            int     pmHandlerColor  = ObsidianPrefs.getInt(   "power_menu_handler_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
             boolean pmHandlerBorderOn     = ObsidianPrefs.getBoolean("power_menu_handler_border_enabled", false);
             boolean pmHandlerBorderAccent = ObsidianPrefs.getBoolean("power_menu_handler_border_use_accent", true);
-            int     pmHandlerBorderColor  = ObsidianPrefs.getInt(   "power_menu_handler_border_custom_color", 0xFF908DFF);
+            int     pmHandlerBorderColor  = ObsidianPrefs.getInt(   "power_menu_handler_border_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
             String  pmMenuBgMode    = ObsidianPrefs.getString("power_menu_menu_bg_mode", "stock");
-            int     pmMenuBgColor   = ObsidianPrefs.getInt(   "power_menu_menu_bg_custom_color", 0xFF908DFF);
+            int     pmMenuBgColor   = ObsidianPrefs.getInt(   "power_menu_menu_bg_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
 
             Shell.Result propsResult = Shell.cmd(
                 "setprop persist.obsidian.dst.a1_on       " + (a1On ? "1" : "0"),

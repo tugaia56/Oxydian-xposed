@@ -235,7 +235,7 @@ public class FingerprintIconMods extends XposedMods {
     }
 
     private int accentColor() {
-        if (Xprefs.getBoolean("DST_ACCENT1_on", false)) return Xprefs.getInt("DST_ACCENT1", 0xFF908DFF) | 0xFF000000;
+        if (Xprefs.getBoolean("DST_ACCENT1_on", false)) return Xprefs.getInt("DST_ACCENT1", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF)) | 0xFF000000;
         return it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
     }
 

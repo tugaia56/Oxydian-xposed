@@ -65,7 +65,7 @@ public class MiscMods extends XposedMods {
     private int     mAdvancedRebootYOffset = 0;
     private boolean mBlockClipboardOverlay = false;
     private boolean mAdvRebootUseAccent  = true; // legacy 2-way switch, read once for migration into mAdvRebootMode below
-    private int     mAdvRebootCustomColor = 0xFF908DFF; // matches ObsidianTheme.DEFAULT_ACCENT
+    private int     mAdvRebootCustomColor = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF); // matches ObsidianTheme.DEFAULT_ACCENT
     // "Colore Pulsante" — 3-way Accento/Personalizzato/Immagine (AdvancedRebootButtonPresetFragment
     // for the image side, same fingerprint-preset+gallery flow as "Sfondo Pallino"). "accent"|
     // "custom"|"image" — migrated from mAdvRebootUseAccent above if never explicitly set.
@@ -76,26 +76,26 @@ public class MiscMods extends XposedMods {
     private int     mAdvRebootCropZoom = 100;
     private boolean mAdvRebootBorderEnabled = false;
     private boolean mAdvRebootBorderUseAccent = true;
-    private int     mAdvRebootBorderCustomColor = 0xFF908DFF;
+    private int     mAdvRebootBorderCustomColor = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
 
     // Riavvia/Spegni pill — independent from the Riavvio Avanzato button's own colour above.
     // mode is one of "stock" (leave OOS green/red/white alone) / "accent" / "custom" / "split"
     // (due colori distinti, uno per Riavvia uno per Spegni — richiesta esplicita dell'utente).
     private String  mPowerMenuGradientMode = "accent";
-    private int     mPowerMenuGradientCustomColor = 0xFF908DFF;
+    private int     mPowerMenuGradientCustomColor = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     private int     mPowerMenuGradientRestartColor = 0xFF00BD13;  // default = verde stock
     private int     mPowerMenuGradientShutdownColor = 0xFFEB3B2F; // default = rosso stock
     private String  mPowerMenuBgMode = "stock";
-    private int     mPowerMenuBgCustomColor = 0xFF908DFF;
+    private int     mPowerMenuBgCustomColor = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     private boolean mPowerMenuBorderEnabled = false;
     private boolean mPowerMenuBorderUseAccent = true;
-    private int     mPowerMenuBorderCustomColor = 0xFF908DFF;
+    private int     mPowerMenuBorderCustomColor = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
 
     // Bordo Pallino — 2026-09-13, stessa idea di Bordo Pillolone ma sull'anello del pallino
     // (mHandlerRectF), per poter avere pallino navy (Colore Pallino → Colore) + bordo accento.
     private boolean mPowerMenuHandlerBorderEnabled = false;
     private boolean mPowerMenuHandlerBorderUseAccent = true;
-    private int     mPowerMenuHandlerBorderCustomColor = 0xFF908DFF;
+    private int     mPowerMenuHandlerBorderCustomColor = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     // Pallino (draggable thumb) colour/image — real field names confirmed via a live reflection
     // field dump of OplusShutdownView: "mHandlerColor" (int, default -1/white) + "mHandlerPaint"
     // (already-built Paint, not resource-driven so no getColor hook applies here) +
@@ -103,7 +103,7 @@ public class MiscMods extends XposedMods {
     // mBarRectF — empty in a field dump taken before layout, fine once read from onDraw itself).
     private static final String POWER_MENU_HANDLER_IMAGE_SUBPATH = ".obsidian/power_menu_handler_image";
     private String  mPowerMenuHandlerMode = "stock";
-    private int     mPowerMenuHandlerCustomColor = 0xFF908DFF;
+    private int     mPowerMenuHandlerCustomColor = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     private Bitmap  mPowerMenuHandlerBitmap;
     private long    mPowerMenuHandlerBitmapMtime = -1;
     // Ritaglio (cx/cy/zoom) — stessa convenzione di QsHeaderImage/ImageCropOverlayView: cx/cy
@@ -130,7 +130,7 @@ public class MiscMods extends XposedMods {
     // above. Same "stock"/"accent"/"custom"/"image" shape, own pref keys/file.
     private static final String POWER_MENU_MENU_BG_IMAGE_SUBPATH = ".obsidian/power_menu_menu_bg_image";
     private String  mPowerMenuMenuBgMode = "stock";
-    private int     mPowerMenuMenuBgCustomColor = 0xFF908DFF;
+    private int     mPowerMenuMenuBgCustomColor = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     private int mPowerMenuMenuBgCropCx = 50;
     private int mPowerMenuMenuBgCropCy = 50;
     private int mPowerMenuMenuBgCropZoom = 100;
@@ -153,36 +153,36 @@ public class MiscMods extends XposedMods {
         mAdvancedRebootYOffset = Xprefs.getInt("advanced_reboot_y_offset", 0);
         mBlockClipboardOverlay = Xprefs.getBoolean("block_clipboard_overlay", false);
         mAdvRebootUseAccent   = Xprefs.getBoolean("advanced_reboot_use_accent", true);
-        mAdvRebootCustomColor = Xprefs.getInt("advanced_reboot_custom_color", 0xFF908DFF);
+        mAdvRebootCustomColor = Xprefs.getInt("advanced_reboot_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
         String advRebootModeStored = Xprefs.getString("advanced_reboot_mode", null);
         mAdvRebootMode = advRebootModeStored != null ? advRebootModeStored : (mAdvRebootUseAccent ? "accent" : "custom");
         mAdvRebootCropZoom = Xprefs.getInt("advanced_reboot_button_crop_zoom", 100);
         mAdvRebootBorderEnabled = Xprefs.getBoolean("advanced_reboot_border_enabled", false);
         mAdvRebootBorderUseAccent = Xprefs.getBoolean("advanced_reboot_border_use_accent", true);
-        mAdvRebootBorderCustomColor = Xprefs.getInt("advanced_reboot_border_custom_color", 0xFF908DFF);
+        mAdvRebootBorderCustomColor = Xprefs.getInt("advanced_reboot_border_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
         refreshAdvRebootBitmap();
         mPowerMenuGradientMode = Xprefs.getString("power_menu_gradient_mode", "accent");
-        mPowerMenuGradientCustomColor = Xprefs.getInt("power_menu_gradient_custom_color", 0xFF908DFF);
+        mPowerMenuGradientCustomColor = Xprefs.getInt("power_menu_gradient_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
         mPowerMenuGradientRestartColor = Xprefs.getInt("power_menu_gradient_restart_color", 0xFF00BD13);
         mPowerMenuGradientShutdownColor = Xprefs.getInt("power_menu_gradient_shutdown_color", 0xFFEB3B2F);
         mPowerMenuBgMode = Xprefs.getString("power_menu_bg_mode", "stock");
-        mPowerMenuBgCustomColor = Xprefs.getInt("power_menu_bg_custom_color", 0xFF908DFF);
+        mPowerMenuBgCustomColor = Xprefs.getInt("power_menu_bg_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
         mPowerMenuBgCropCx = Xprefs.getInt("power_menu_bg_crop_cx", 50);
         mPowerMenuBgCropCy = Xprefs.getInt("power_menu_bg_crop_cy", 50);
         mPowerMenuBgCropZoom = Xprefs.getInt("power_menu_bg_crop_zoom", 100);
         mPowerMenuBorderEnabled = Xprefs.getBoolean("power_menu_border_enabled", false);
         mPowerMenuBorderUseAccent = Xprefs.getBoolean("power_menu_border_use_accent", true);
-        mPowerMenuBorderCustomColor = Xprefs.getInt("power_menu_border_custom_color", 0xFF908DFF);
+        mPowerMenuBorderCustomColor = Xprefs.getInt("power_menu_border_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
         mPowerMenuHandlerMode = Xprefs.getString("power_menu_handler_mode", "stock");
-        mPowerMenuHandlerCustomColor = Xprefs.getInt("power_menu_handler_custom_color", 0xFF908DFF);
+        mPowerMenuHandlerCustomColor = Xprefs.getInt("power_menu_handler_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
         mPowerMenuHandlerCropCx = Xprefs.getInt("power_menu_handler_crop_cx", 50);
         mPowerMenuHandlerCropCy = Xprefs.getInt("power_menu_handler_crop_cy", 50);
         mPowerMenuHandlerCropZoom = Xprefs.getInt("power_menu_handler_crop_zoom", 100);
         mPowerMenuHandlerBorderEnabled = Xprefs.getBoolean("power_menu_handler_border_enabled", false);
         mPowerMenuHandlerBorderUseAccent = Xprefs.getBoolean("power_menu_handler_border_use_accent", true);
-        mPowerMenuHandlerBorderCustomColor = Xprefs.getInt("power_menu_handler_border_custom_color", 0xFF908DFF);
+        mPowerMenuHandlerBorderCustomColor = Xprefs.getInt("power_menu_handler_border_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
         mPowerMenuMenuBgMode = Xprefs.getString("power_menu_menu_bg_mode", "stock");
-        mPowerMenuMenuBgCustomColor = Xprefs.getInt("power_menu_menu_bg_custom_color", 0xFF908DFF);
+        mPowerMenuMenuBgCustomColor = Xprefs.getInt("power_menu_menu_bg_custom_color", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
         mPowerMenuMenuBgCropCx = Xprefs.getInt("power_menu_menu_bg_crop_cx", 50);
         mPowerMenuMenuBgCropCy = Xprefs.getInt("power_menu_menu_bg_crop_cy", 50);
         mPowerMenuMenuBgCropZoom = Xprefs.getInt("power_menu_menu_bg_crop_zoom", 100);
@@ -207,24 +207,24 @@ public class MiscMods extends XposedMods {
         try {
             mPowerMenuGradientMode = readSysProp("persist.obsidian.dst.pm_gradient_mode", "accent");
             mPowerMenuGradientCustomColor = parseIntProp(
-                    readSysProp("persist.obsidian.dst.pm_gradient_color", ""), 0xFF908DFF);
+                    readSysProp("persist.obsidian.dst.pm_gradient_color", ""), it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
             mPowerMenuBgMode = readSysProp("persist.obsidian.dst.pm_bg_mode", "stock");
             mPowerMenuBgCustomColor = parseIntProp(
-                    readSysProp("persist.obsidian.dst.pm_bg_color", ""), 0xFF908DFF);
+                    readSysProp("persist.obsidian.dst.pm_bg_color", ""), it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
             mPowerMenuBorderEnabled = "1".equals(readSysProp("persist.obsidian.dst.pm_border_on", "0"));
             mPowerMenuBorderUseAccent = "1".equals(readSysProp("persist.obsidian.dst.pm_border_accent", "1"));
             mPowerMenuBorderCustomColor = parseIntProp(
-                    readSysProp("persist.obsidian.dst.pm_border_color", ""), 0xFF908DFF);
+                    readSysProp("persist.obsidian.dst.pm_border_color", ""), it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
             mPowerMenuHandlerMode = readSysProp("persist.obsidian.dst.pm_handler_mode", "stock");
             mPowerMenuHandlerCustomColor = parseIntProp(
-                    readSysProp("persist.obsidian.dst.pm_handler_color", ""), 0xFF908DFF);
+                    readSysProp("persist.obsidian.dst.pm_handler_color", ""), it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
             mPowerMenuHandlerBorderEnabled = "1".equals(readSysProp("persist.obsidian.dst.pm_handler_border_on", "0"));
             mPowerMenuHandlerBorderUseAccent = "1".equals(readSysProp("persist.obsidian.dst.pm_handler_border_accent", "1"));
             mPowerMenuHandlerBorderCustomColor = parseIntProp(
-                    readSysProp("persist.obsidian.dst.pm_handler_border_color", ""), 0xFF908DFF);
+                    readSysProp("persist.obsidian.dst.pm_handler_border_color", ""), it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
             mPowerMenuMenuBgMode = readSysProp("persist.obsidian.dst.pm_menu_bg_mode", "stock");
             mPowerMenuMenuBgCustomColor = parseIntProp(
-                    readSysProp("persist.obsidian.dst.pm_menu_bg_color", ""), 0xFF908DFF);
+                    readSysProp("persist.obsidian.dst.pm_menu_bg_color", ""), it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
             refreshPowerMenuBgBitmap();
             refreshPowerMenuMenuBgBitmap();
             refreshPowerMenuHandlerBitmap();
@@ -576,7 +576,7 @@ public class MiscMods extends XposedMods {
 
     private int sharedAccentColor() {
         boolean accentOn = Xprefs != null && Xprefs.getBoolean("DST_ACCENT1_on", false);
-        return accentOn ? Xprefs.getInt("DST_ACCENT1", 0xFF908DFF) : it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
+        return accentOn ? Xprefs.getInt("DST_ACCENT1", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF)) : it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
     }
 
     /** Own independent Accento/Personalizzato choice — NOT tied to the gradient colour, so the

@@ -64,7 +64,7 @@ public class AlbumArtLockscreenMod extends XposedMods {
     private boolean mShowAlbumArt   = false;
     private int     mFilter         = FILTER_NONE;
     private float   mBlurRadius     = 7.5f;
-    private int     mAccentColor    = 0xFF908DFF;
+    private int     mAccentColor    = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
 
     private boolean mKeyguardShowing = false;
 

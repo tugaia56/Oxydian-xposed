@@ -62,7 +62,7 @@ public class ACalendarPlusMod extends XposedMods {
 
     private final HashMap<Long, Integer> mMap = new HashMap<>();
     private volatile boolean mReady = false;
-    private volatile int mAccent = 0xFF908DFF;
+    private volatile int mAccent = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     private volatile int mRipple = 0x80908DFF;
     private volatile int mButton = 0xFF242832;
     private volatile int mFloating = 0xFF22262F;

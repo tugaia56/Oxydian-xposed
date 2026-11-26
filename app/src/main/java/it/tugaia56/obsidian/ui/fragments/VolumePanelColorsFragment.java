@@ -688,7 +688,7 @@ public class VolumePanelColorsFragment extends Fragment {
     private String accentCustomLabel(String useAccentKey, String customColorKey) {
         boolean useAccent = ObsidianPrefs.getBoolean(useAccentKey, true);
         if (useAccent) return getString(R.string.color_mode_accent);
-        return String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(customColorKey, 0xFF908DFF));
+        return String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(customColorKey, it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF)));
     }
 
     private void showBorderColorDialog() {
@@ -703,7 +703,7 @@ public class VolumePanelColorsFragment extends Fragment {
                     ObsidianPrefs.putBoolean(PREF_BORDER_USE_ACCENT, useAccent);
                     rebuild();
                     if (!useAccent && getActivity() instanceof MainActivity) {
-                        int current = ObsidianPrefs.getInt(PREF_BORDER_CUSTOM, 0xFF908DFF);
+                        int current = ObsidianPrefs.getInt(PREF_BORDER_CUSTOM, it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
                         ((MainActivity) getActivity()).showColorPickerDialog(
                                 DIALOG_BORDER_CUSTOM_COLOR, current, true, true, true);
                     }

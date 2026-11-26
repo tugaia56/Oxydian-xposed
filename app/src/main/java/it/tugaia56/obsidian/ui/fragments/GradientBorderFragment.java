@@ -184,7 +184,7 @@ public class GradientBorderFragment extends Fragment {
         mRv.setAdapter(new ConcatAdapter(chain.toArray(new RecyclerView.Adapter<?>[0])));
     }
 
-    private static int c1() { return ObsidianPrefs.getInt(KEY_C1, 0xFF908DFF) | 0xFF000000; }
+    private static int c1() { return ObsidianPrefs.getInt(KEY_C1, it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF)) | 0xFF000000; }
     private static int c2() { return ObsidianPrefs.getInt(KEY_C2, DEF_C2) | 0xFF000000; }
     private static int c3() { return ObsidianPrefs.getInt(KEY_C3, DEF_C3) | 0xFF000000; }
     private static String hex(int c) { return String.format("#%06X", 0xFFFFFF & c); }

@@ -110,7 +110,7 @@ public class LockscreenClockMod extends XposedMods {
     private boolean mEnabled;
     private int mStyle;
     private boolean mCustomColor;
-    private int mAccent1 = 0xFF908DFF, mText1 = 0xFFFFFFFF;
+    private int mAccent1 = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF), mText1 = 0xFFFFFFFF;
     // 0 = selettore spento: si usa il colore dell'accento 1 (accenti 2/3) o il disegno originale (testo 2)
     private int mAccent2, mAccent3, mText2;
     private float mScale = 1f;
@@ -124,7 +124,7 @@ public class LockscreenClockMod extends XposedMods {
     private boolean mAodEnabled;
     private int mAodStyle;
     private boolean mAodCustomColor;
-    private int mAodAccent1 = 0xFF908DFF, mAodText1 = 0xFFFFFFFF;
+    private int mAodAccent1 = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF), mAodText1 = 0xFFFFFFFF;
     private int mAodAccent2, mAodAccent3, mAodText2;
     private float mAodScale = 1f;
     private int mAodLineHeightDp;
@@ -563,7 +563,7 @@ public class LockscreenClockMod extends XposedMods {
 
     private int appAccentColor() {
         if (Xprefs.getBoolean("DST_ACCENT1_on", false)) {
-            return Xprefs.getInt("DST_ACCENT1", 0xFF908DFF) | 0xFF000000;
+            return Xprefs.getInt("DST_ACCENT1", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF)) | 0xFF000000;
         }
         return it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
     }

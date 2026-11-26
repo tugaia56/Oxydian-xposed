@@ -215,11 +215,11 @@ public class LockscreenWidgetsMod extends XposedMods {
         mCustomColor = Xprefs.getBoolean(KEY_COLOR_SWITCH, false);
         mCustomBg = Xprefs.getBoolean(KEY_BG_SWITCH, false);
         mBgSelection = parseInt(Xprefs.getString(KEY_BG_SELECTION, "0"), 0);
-        mBigActive          = colorIfOn(KEY_BIG_ACTIVE, 0xFF908DFF);
+        mBigActive          = colorIfOn(KEY_BIG_ACTIVE, it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
         mBigInactive        = colorIfOn(KEY_BIG_INACTIVE, 0x40FFFFFF);
         mBigIconActive      = colorIfOn(KEY_BIG_ICON_ACTIVE, 0xFFFFFFFF);
         mBigIconInactive    = colorIfOn(KEY_BIG_ICON_INACTIVE, 0xFFFFFFFF);
-        mSmallActive        = colorIfOn(KEY_SMALL_ACTIVE, 0xFF908DFF);
+        mSmallActive        = colorIfOn(KEY_SMALL_ACTIVE, it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
         mSmallInactive      = colorIfOn(KEY_SMALL_INACTIVE, 0x40FFFFFF);
         mSmallIconActive    = colorIfOn(KEY_SMALL_ICON_ACTIVE, 0xFFFFFFFF);
         mSmallIconInactive  = colorIfOn(KEY_SMALL_ICON_INACTIVE, 0xFFFFFFFF);
@@ -228,8 +228,8 @@ public class LockscreenWidgetsMod extends XposedMods {
         mDeviceEnabled = Xprefs.getBoolean(KEY_DEVICE_ENABLED, false);
         mDeviceStyle = parseInt(Xprefs.getString(KEY_DEVICE_STYLE, "0"), 0);
         mDeviceCustomColor = Xprefs.getBoolean(KEY_DEVICE_CUSTOM_COLOR, false);
-        mDeviceColorCircular = colorIfOn(KEY_DEVICE_COLOR_CIRCULAR, 0xFF908DFF);
-        mDeviceColorLinear   = colorIfOn(KEY_DEVICE_COLOR_LINEAR, 0xFF908DFF);
+        mDeviceColorCircular = colorIfOn(KEY_DEVICE_COLOR_CIRCULAR, it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
+        mDeviceColorLinear   = colorIfOn(KEY_DEVICE_COLOR_LINEAR, it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
         mDeviceTextColor     = colorIfOn(KEY_DEVICE_TEXT_COLOR, 0xFFFFFFFF);
         mDeviceName = Xprefs.getString(KEY_DEVICE_NAME, "");
         for (int i = 0; i < KEY_DEVICE_TYPES.length; i++) {
@@ -753,7 +753,7 @@ public class LockscreenWidgetsMod extends XposedMods {
 
     private int appAccentColor() {
         if (Xprefs.getBoolean("DST_ACCENT1_on", false)) {
-            return Xprefs.getInt("DST_ACCENT1", 0xFF908DFF) | 0xFF000000;
+            return Xprefs.getInt("DST_ACCENT1", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF)) | 0xFF000000;
         }
         return it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
     }

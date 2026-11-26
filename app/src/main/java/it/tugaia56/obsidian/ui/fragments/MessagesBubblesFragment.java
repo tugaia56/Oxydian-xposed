@@ -132,8 +132,8 @@ public class MessagesBubblesFragment extends Fragment {
                     borderLabel(PREF_BORDER_IN_MODE, PREF_BORDER_IN_COLOR, 1, 0xFFFFFFFF),
                     () -> showBorderDialog(PREF_BORDER_IN_MODE, PREF_BORDER_IN_COLOR, DIALOG_IN, 1, 0xFFFFFFFF, R.string.msg_border_in_title)));
             shapeRows.add(new ListWidgetAdapter.ListItem(getString(R.string.msg_border_out_title),
-                    borderLabel(PREF_BORDER_OUT_MODE, PREF_BORDER_OUT_COLOR, 0, 0xFF908DFF),
-                    () -> showBorderDialog(PREF_BORDER_OUT_MODE, PREF_BORDER_OUT_COLOR, DIALOG_OUT, 0, 0xFF908DFF, R.string.msg_border_out_title)));
+                    borderLabel(PREF_BORDER_OUT_MODE, PREF_BORDER_OUT_COLOR, 0, it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF)),
+                    () -> showBorderDialog(PREF_BORDER_OUT_MODE, PREF_BORDER_OUT_COLOR, DIALOG_OUT, 0, it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF), R.string.msg_border_out_title)));
             shapeRows.add(new SliderWidgetAdapter.SliderItem(
                     getString(R.string.msg_border_width), ObsidianPrefs.getInt(PREF_BORDER_W, 2), 1, 8, "", 2,
                     value -> { ObsidianPrefs.putInt(PREF_BORDER_W, value); applyProps(); }));
@@ -250,7 +250,7 @@ public class MessagesBubblesFragment extends Fragment {
         final String bIn = ObsidianPrefs.getInt(PREF_BORDER_IN_MODE, 1) == 0 ? "accent"
                 : String.valueOf(ObsidianPrefs.getInt(PREF_BORDER_IN_COLOR, 0xFFFFFFFF) | 0xFF000000);
         final String bOut = ObsidianPrefs.getInt(PREF_BORDER_OUT_MODE, 0) == 0 ? "accent"
-                : String.valueOf(ObsidianPrefs.getInt(PREF_BORDER_OUT_COLOR, 0xFF908DFF) | 0xFF000000);
+                : String.valueOf(ObsidianPrefs.getInt(PREF_BORDER_OUT_COLOR, it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF)) | 0xFF000000);
         final int outColor = ObsidianPrefs.getInt(PREF_OUT_COLOR, 0xFF2B2F3A);
         final String inColor = ObsidianPrefs.getInt(PREF_IN_MODE, 0) == 0 ? "0"
                 : String.valueOf(ObsidianPrefs.getInt(PREF_IN_COLOR, 0xFF1C2029) | 0xFF000000);

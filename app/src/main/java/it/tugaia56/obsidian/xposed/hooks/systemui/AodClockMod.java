@@ -70,7 +70,7 @@ public class AodClockMod extends XposedMods {
     private boolean mEnabled;
     private int mStyle;
     private boolean mCustomColor;
-    private int mAccent1 = 0xFF908DFF, mText1 = 0xFFFFFFFF;
+    private int mAccent1 = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF), mText1 = 0xFFFFFFFF;
     private int mAccent2, mAccent3, mText2;   // 0 = selettore spento
     private float mScale = 1f;
     private int mLineHeightDp;
@@ -107,7 +107,7 @@ public class AodClockMod extends XposedMods {
 
     private int resolveColor(String key, int def) {
         if (Xprefs.getBoolean(key + "_use_accent", false)) {
-            if (Xprefs.getBoolean("DST_ACCENT1_on", false)) return Xprefs.getInt("DST_ACCENT1", 0xFF908DFF) | 0xFF000000;
+            if (Xprefs.getBoolean("DST_ACCENT1_on", false)) return Xprefs.getInt("DST_ACCENT1", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF)) | 0xFF000000;
             return it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
         }
         return Xprefs.getInt(key, def);

@@ -142,7 +142,7 @@ public class VolumePanelMod extends XposedMods {
     private int     mIconColor       = 0xFFFFFFFF;
     private boolean mBorderOn        = false;
     private boolean mBorderUseAccent = true;
-    private int     mBorderCustomColor = 0xFF908DFF;
+    private int     mBorderCustomColor = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     private boolean mProgressLineOn  = false;
     private boolean mProgressLineUseAccent = true;
     private int     mProgressLineCustomColor = 0xFFFFFFFF;
@@ -186,7 +186,7 @@ public class VolumePanelMod extends XposedMods {
         mIconColor      = Xprefs.getInt(PREF_ICON_COLOR, 0xFFFFFFFF);
         mBorderOn         = Xprefs.getBoolean(PREF_BORDER_ON, false);
         mBorderUseAccent  = Xprefs.getBoolean(PREF_BORDER_USE_ACCENT, true);
-        mBorderCustomColor = Xprefs.getInt(PREF_BORDER_CUSTOM, 0xFF908DFF);
+        mBorderCustomColor = Xprefs.getInt(PREF_BORDER_CUSTOM, it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
         mProgressLineOn = Xprefs.getBoolean(PREF_PROGRESS_LINE, false);
         mProgressLineUseAccent = Xprefs.getBoolean(PREF_PROGRESS_LINE_USE_ACCENT, true);
         mProgressLineCustomColor = Xprefs.getInt(PREF_PROGRESS_LINE_CUSTOM, 0xFFFFFFFF);
@@ -852,7 +852,7 @@ public class VolumePanelMod extends XposedMods {
 
     private int appAccentColor() {
         if (Xprefs.getBoolean("DST_ACCENT1_on", false)) {
-            return Xprefs.getInt("DST_ACCENT1", 0xFF908DFF) | 0xFF000000;
+            return Xprefs.getInt("DST_ACCENT1", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF)) | 0xFF000000;
         }
         return it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
     }

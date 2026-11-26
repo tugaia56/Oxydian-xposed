@@ -121,7 +121,7 @@ public final class GradientBorder {
             int id = r.getIdentifier("accent_material_dark", "color", "android");
             if (id != 0) return r.getColor(id, null);
         } catch (Throwable ignored) {}
-        return 0xFF908DFF;
+        return it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     }
 
     /** Come {@link #setStroke}, ma con il bordo sfumato acceso il bordo c'e' sempre: se lo stile scelto non ne ha

@@ -344,7 +344,7 @@ public class LockscreenWeather extends XposedMods {
      *  wallpaper e può risultare molto più scuro/diverso da quello visto nel resto dell'app. */
     private int appAccentColor() {
         if (Xprefs.getBoolean("DST_ACCENT1_on", false)) {
-            return Xprefs.getInt("DST_ACCENT1", 0xFF908DFF) | 0xFF000000;
+            return Xprefs.getInt("DST_ACCENT1", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF)) | 0xFF000000;
         }
         return it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
     }

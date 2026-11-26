@@ -584,15 +584,15 @@ public class QsTilesCustomizeMod extends XposedMods {
 
     private boolean mTileBgBaseOn, mTileBgHighlightOn, mTileBgMediaOn;
     private boolean mTileBgBaseAccent, mTileBgHlAccent;
-    private int mTileBgBaseActive = 0xFF908DFF, mTileBgBaseInactive = 0x19FFFFFF;
-    private int mTileBgHlActive = 0xFF908DFF, mTileBgHlInactive = 0x19FFFFFF;
+    private int mTileBgBaseActive = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF), mTileBgBaseInactive = 0x19FFFFFF;
+    private int mTileBgHlActive = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF), mTileBgHlInactive = 0x19FFFFFF;
     private int mTileBgMediaColor = 0x19FFFFFF;
     private Integer mTileViewFlagActiveAttr;
 
     private boolean mTileBorderOn;
-    private int mTileBorderColor = 0xFF908DFF;
+    private int mTileBorderColor = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     private boolean mIconBorderOn;
-    private int mIconBorderColor = 0xFF908DFF;
+    private int mIconBorderColor = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
 
 
     private boolean mMediaCoverFilterOn;
@@ -699,11 +699,11 @@ public class QsTilesCustomizeMod extends XposedMods {
         mTransitionStyle = parseInt(Xprefs.getString(KEY_TRANSITIONS, "0"), 0);
 
         mTileBgBaseOn = Xprefs.getBoolean(KEY_TILE_BG_BASE_ON, false);
-        mTileBgBaseActive = Xprefs.getInt(KEY_TILE_BG_BASE_ACTIVE, 0xFF908DFF);
+        mTileBgBaseActive = Xprefs.getInt(KEY_TILE_BG_BASE_ACTIVE, it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
         mTileBgBaseInactive = Xprefs.getInt(KEY_TILE_BG_BASE_INACTIVE, 0x19FFFFFF);
         mTileBgBaseAccent = Xprefs.getBoolean(KEY_TILE_BG_BASE_ACCENT, false);
         mTileBgHighlightOn = Xprefs.getBoolean(KEY_TILE_BG_HL_ON, false);
-        mTileBgHlActive = Xprefs.getInt(KEY_TILE_BG_HL_ACTIVE, 0xFF908DFF);
+        mTileBgHlActive = Xprefs.getInt(KEY_TILE_BG_HL_ACTIVE, it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
         mTileBgHlInactive = Xprefs.getInt(KEY_TILE_BG_HL_INACTIVE, 0x19FFFFFF);
         mTileBgHlAccent = Xprefs.getBoolean(KEY_TILE_BG_HL_ACCENT, false);
         mTileBgMediaOn = Xprefs.getBoolean(KEY_TILE_BG_MEDIA_ON, false);
@@ -712,11 +712,11 @@ public class QsTilesCustomizeMod extends XposedMods {
 
         mTileBorderOn = Xprefs.getBoolean(KEY_TILE_BORDER_ON, false);
         mTileBorderColor = Xprefs.getBoolean(KEY_TILE_BORDER_COLOR + "_use_accent", false)
-                ? appAccentColor() : Xprefs.getInt(KEY_TILE_BORDER_COLOR, 0xFF908DFF);
+                ? appAccentColor() : Xprefs.getInt(KEY_TILE_BORDER_COLOR, it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
 
         mIconBorderOn = Xprefs.getBoolean(KEY_ICON_BORDER_ON, false);
         mIconBorderColor = Xprefs.getBoolean(KEY_ICON_BORDER_COLOR + "_use_accent", false)
-                ? appAccentColor() : Xprefs.getInt(KEY_ICON_BORDER_COLOR, 0xFF908DFF);
+                ? appAccentColor() : Xprefs.getInt(KEY_ICON_BORDER_COLOR, it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF));
 
         mMediaCoverFilterOn = Xprefs.getBoolean(KEY_MEDIA_COVER_FILTER_ON, false);
         mMediaCoverFilter = parseInt(Xprefs.getString(KEY_MEDIA_COVER_FILTER, "0"), COVER_FILTER_NONE);
@@ -743,7 +743,7 @@ public class QsTilesCustomizeMod extends XposedMods {
 
     private int appAccentColor() {
         if (Xprefs.getBoolean("DST_ACCENT1_on", false)) {
-            return Xprefs.getInt("DST_ACCENT1", 0xFF908DFF) | 0xFF000000;
+            return Xprefs.getInt("DST_ACCENT1", it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF)) | 0xFF000000;
         }
         return it.tugaia56.obsidian.xposed.utils.AccentUtil.systemAccent();
     }

@@ -148,7 +148,7 @@ public class SettingsCardBackgroundMod extends XposedMods {
     // Bordo accento sul menu overflow (COUIPopupListWindow) — richiesto dall'utente 2026-09-05
     // per "I miei dispositivi", stesso stile accento+sfondo OBS già usato per i dialoghi in-app
     // (vedi ObsidianTheme.dialogBackground/themeDialog). Stesse chiavi/logica di MonetFreeze.
-    private static final int DEFAULT_ACCENT_COLOR = 0xFF908DFF;
+    private static final int DEFAULT_ACCENT_COLOR = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeAccent(0xFF908DFF);
     private static final String PREF_ACCENT_ON = "DST_ACCENT1_on";
     private static final String PREF_ACCENT = "DST_ACCENT1";
     private int mAccentColor = DEFAULT_ACCENT_COLOR;
