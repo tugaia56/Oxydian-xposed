@@ -208,7 +208,9 @@ public class ColorRemapMod extends XposedMods {
         Map<Integer, Integer> oneplusFiles = new HashMap<>();
         oneplusFiles.put(0x1A1A1A, PAGE);  // card "Tutti i file" e categorie; il bordo accento e' in VIEW_FRAME
         RULES.put("com.oneplus.filemanager", oneplusFiles);
-        RULES.put("com.heytap.mydevices", new HashMap<>());  // solo per attivare gli hook (VIEW_BG, VIEW_FRAME)
+        Map<Integer, Integer> myDevices = new HashMap<>();
+        myDevices.put(0x1E1E1E, PAGE);  // pannello che si apre toccando una scheda
+        RULES.put("com.heytap.mydevices", myDevices);
         Map<Integer, Integer> google = new HashMap<>();
         google.put(0x22242A, RIPPLE);  // pulsante rotondo del menu in alto a sinistra
         RULES.put("com.google.android.googlequicksearchbox", google);  // le pillole sotto la barra Cerca usano BORDER_FILL
