@@ -561,7 +561,9 @@ public class MiscMods extends XposedMods {
     private void applyBarAlpha(Object shutdownView) {
         if (!"accent".equals(mPowerMenuBgMode) && !"custom".equals(mPowerMenuBgMode)) return;
         try {
-            setFloatField(shutdownView, "mBarAlpha", 1f);
+            // l'opacita' e' quella del colore scelto: pieno = 1, trasparente (#00000000) = invisibile
+            Integer c = powerMenuBgColor();
+            setFloatField(shutdownView, "mBarAlpha", c == null ? 1f : (c >>> 24) / 255f);
         } catch (Throwable ignored) {}
     }
 
