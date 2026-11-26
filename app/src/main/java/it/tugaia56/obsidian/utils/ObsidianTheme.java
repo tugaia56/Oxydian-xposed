@@ -302,11 +302,27 @@ public class ObsidianTheme {
     public static void themeDialog(android.app.Dialog d) {
         if (d.getWindow() == null) return;
         d.getWindow().setBackgroundDrawable(dialogBackground(d.getContext()));
-        recolorDialogText(d.getWindow().getDecorView());
+        android.view.View decor = d.getWindow().getDecorView();
+        recolorDialogText(decor);
+        // le righe delle liste nascono (e si riciclano) dopo: si ricolora a ogni passata di layout
+        decor.getViewTreeObserver().addOnGlobalLayoutListener(() -> recolorDialogText(decor));
     }
 
     private static void recolorDialogText(android.view.View v) {
-        if (v instanceof android.widget.Button) return;
+        // pallini e spunte nell'accento del Theme (XML userebbe il viola fisso di colorPrimary)
+        android.content.res.ColorStateList marks = new android.content.res.ColorStateList(
+                new int[][]{{android.R.attr.state_checked}, {}}, new int[]{accentColor(), (textColor() & 0x00FFFFFF) | 0x99000000});
+        if (v instanceof android.widget.CompoundButton cb) { cb.setButtonTintList(marks); cb.setTextColor(textColor()); return; }
+        if (v instanceof android.widget.Button b) {
+            // solo i pulsanti di testo (Annulla, Applica): quelli pieni tengono il loro testo
+            int c = b.getCurrentTextColor();
+            if ((c & 0xFFFFFF) == 0x908DFF) b.setTextColor(accentColor());
+            return;
+        }
+        if (v instanceof android.widget.CheckedTextView ct) {
+            ct.setCheckMarkTintList(marks);
+            ct.setCompoundDrawableTintList(marks); // il pallino dei dialoghi Material sta a lato del testo
+        }
         if (v instanceof android.widget.TextView tv) tv.setTextColor(textColor());
         if (v instanceof ViewGroup vg) {
             for (int i = 0; i < vg.getChildCount(); i++) recolorDialogText(vg.getChildAt(i));

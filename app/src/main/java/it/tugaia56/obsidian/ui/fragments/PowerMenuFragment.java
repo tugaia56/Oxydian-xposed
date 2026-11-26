@@ -628,7 +628,7 @@ public class PowerMenuFragment extends Fragment {
         String mode = advRebootModeCurrent();
         if ("image".equals(mode)) return getString(R.string.color_mode_image);
         if ("custom".equals(mode)) {
-            return String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(PREF_CUSTOM_COLOR, ObsidianTheme.DEFAULT_ACCENT));
+            return hex(ObsidianPrefs.getInt(PREF_CUSTOM_COLOR, ObsidianTheme.DEFAULT_ACCENT));
         }
         return getString(R.string.color_mode_accent);
     }
@@ -680,7 +680,7 @@ public class PowerMenuFragment extends Fragment {
     private String accentCustomColorLabel(String useAccentKey, String customColorKey) {
         boolean useAccent = ObsidianPrefs.getBoolean(useAccentKey, true);
         if (useAccent) return getString(R.string.color_mode_accent);
-        return String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(customColorKey, ObsidianTheme.DEFAULT_ACCENT));
+        return hex(ObsidianPrefs.getInt(customColorKey, ObsidianTheme.DEFAULT_ACCENT));
     }
 
     private void showAccentCustomDialog(String useAccentKey, String customColorKey, int dialogId, int titleResId) {
@@ -710,7 +710,7 @@ public class PowerMenuFragment extends Fragment {
         if ("split".equals(mode)) return getString(R.string.power_menu_gradient_split_title);
         boolean useAccent = !"custom".equals(mode);
         if (useAccent) return getString(R.string.color_mode_accent);
-        return String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(PREF_GRADIENT_CUSTOM, ObsidianTheme.DEFAULT_ACCENT));
+        return hex(ObsidianPrefs.getInt(PREF_GRADIENT_CUSTOM, ObsidianTheme.DEFAULT_ACCENT));
     }
 
     /** "Colore Riavvia/Spegni" row tap — 3-way Accento/Personalizzato/Due colori chooser
@@ -811,7 +811,7 @@ public class PowerMenuFragment extends Fragment {
         String mode = ObsidianPrefs.getString(modePrefKey, defaultMode);
         if (BG_MODE_IMAGE.equals(mode)) return getString(R.string.color_mode_image);
         if ("custom".equals(mode)) {
-            return String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(customPrefKey, ObsidianTheme.DEFAULT_ACCENT));
+            return hex(ObsidianPrefs.getInt(customPrefKey, ObsidianTheme.DEFAULT_ACCENT));
         }
         return "accent".equals(mode) ? getString(R.string.color_mode_accent) : getString(R.string.color_mode_stock);
     }
@@ -1026,5 +1026,10 @@ public class PowerMenuFragment extends Fragment {
             final ImageCropOverlayView overlay;
             VH(FrameLayout card, ImageCropOverlayView overlay) { super(card); this.overlay = overlay; }
         }
+    }
+
+    /** Codice del colore; con trasparenza mostra anche le due cifre iniziali (#00000000 non deve sembrare nero). */
+    private static String hex(int c) {
+        return (c >>> 24) == 0xFF ? String.format("#%06X", 0xFFFFFF & c) : String.format("#%08X", c);
     }
 }
