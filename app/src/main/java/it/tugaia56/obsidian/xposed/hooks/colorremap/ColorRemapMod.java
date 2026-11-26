@@ -73,7 +73,7 @@ public class ColorRemapMod extends XposedMods {
     /** Viste (per id) su cui si spegne la scurezza forzata di ColorOS, che scurisce l'accento. */
     private static final Map<String, String[]> VIEW_NO_DARK = new HashMap<>();
 
-    /** Colori con la trasparenza esatta (argb) che valgono prima delle regole per rgb; diventano opachi nel colore del ruolo. */
+    /** Colori con la trasparenza esatta (argb) che valgono prima delle regole per rgb; diventano opachi nel colore del ruolo (RIPPLE tiene la sua trasparenza). */
     private static final Map<String, Map<Integer, Integer>> EXACT = new HashMap<>();
     private Map<Integer, Integer> mExact;
 
@@ -228,6 +228,7 @@ public class ColorRemapMod extends XposedMods {
         RULES.put("ginlemon.iconpackstudio", ips);
         Map<Integer, Integer> ipsExact = new HashMap<>();
         ipsExact.put(0x8A000000, CARD);  // riquadri dietro zoom e pulsantini nella modifica (nero 54%, sul bianco era grigio)
+        ipsExact.put(0x80C4D2EF, RIPPLE);  // testi spenti (tab Sfondo ed Effetti non attivi)
         EXACT.put("ginlemon.iconpackstudio", ipsExact);
         // I miei file (com.oneplus.filemanager): card in alto colorate dal codice (BORDER_FILL; la barra in basso: VIEW_BG) (l'overlay del Theme fa il resto)
         Map<Integer, Integer> oneplusFiles = new HashMap<>();
@@ -334,7 +335,7 @@ public class ColorRemapMod extends XposedMods {
         Integer ex = mExact == null ? null : mExact.get(c);
         if (ex != null) {
             if (!sReady) load();
-            return sReady && sColors[ex] >= 0 ? 0xFF000000 | sColors[ex] : c;
+            return sReady && sColors[ex] >= 0 ? (ex == RIPPLE ? sRippleAlpha << 24 : 0xFF000000) | sColors[ex] : c;
         }
         Integer role = mRules.get(c & 0xFFFFFF);
         if (role == null) return c;
