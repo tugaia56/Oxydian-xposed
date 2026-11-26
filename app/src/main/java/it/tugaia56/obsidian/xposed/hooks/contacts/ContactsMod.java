@@ -165,7 +165,7 @@ public class ContactsMod extends XposedMods {
     }
 
     private int fill() {
-        return mBorder ? BLUE_GRAY_DARK : mFillNoBorder;
+        return mBorder ? it.tugaia56.obsidian.xposed.utils.AccentUtil.themeBackground(BLUE_GRAY_DARK) : mFillNoBorder;
     }
 
     private Paint stroke() {
@@ -447,7 +447,7 @@ public class ContactsMod extends XposedMods {
     /** Sostituzioni delle risorse colore dell'app (sfondo, pulsante +, scheda selezionata). */
     public static void applyResources(XC_InitPackageResources.InitPackageResourcesParam resparam) {
         if (!PKG.equals(resparam.packageName)) return;
-        final int bg = BLUE_GRAY_DARK, acc = accent(), white = 0xFFFFFFFF;
+        final int bg = it.tugaia56.obsidian.xposed.utils.AccentUtil.themeBackground(BLUE_GRAY_DARK), acc = accent(), white = 0xFFFFFFFF;
         String[][] map = {
                 {"background", "b"}, {"surface", "b"}, {"surface_bright", "b"}, {"surface_dim", "b"},
                 {"surface_container", "b"}, {"surface_container_low", "b"}, {"surface_container_lowest", "b"},

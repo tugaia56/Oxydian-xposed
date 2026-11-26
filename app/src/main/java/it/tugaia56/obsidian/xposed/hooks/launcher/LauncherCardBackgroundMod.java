@@ -81,7 +81,7 @@ public class LauncherCardBackgroundMod extends XposedMods {
         mThemeApplied = Xprefs.getBoolean("launcher_theme_applied", false);
         mCardColor = Xprefs.getBoolean(PREF_BG_ON, false)
                 ? (Xprefs.getInt(PREF_BG, DEFAULT_CARD_COLOR) | 0xFF000000)
-                : DEFAULT_CARD_COLOR;
+                : it.tugaia56.obsidian.xposed.utils.AccentUtil.themeBackground(DEFAULT_CARD_COLOR);
         mPageColor = mCardColor;
         new Handler(Looper.getMainLooper()).post(() -> {
             reapplyCardColors();

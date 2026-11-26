@@ -27,6 +27,16 @@ public final class AccentUtil {
         }
     }
 
+    /** Sfondo scelto in Oxydian Theme (persist.oxytheme.bg), opaco; se non c'e' il valore dato. */
+    public static int themeBackground(int def) {
+        try {
+            Class<?> sp = Class.forName("android.os.SystemProperties");
+            String v = (String) sp.getMethod("get", String.class, String.class).invoke(null, "persist.oxytheme.bg", "");
+            if (v != null && v.length() >= 6) return 0xFF000000 | (int) Long.parseLong(v.substring(v.length() - 6), 16);
+        } catch (Throwable ignored) {}
+        return def;
+    }
+
     public static int systemAccent() {
         try {
             int id = Resources.getSystem().getIdentifier("accent_material_dark", "color", "android");
