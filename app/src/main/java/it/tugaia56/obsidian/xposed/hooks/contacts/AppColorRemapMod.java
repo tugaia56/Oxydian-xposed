@@ -40,6 +40,9 @@ public class AppColorRemapMod extends XposedMods {
         MAP.put("pl.solidexplorer2", new int[][]{{0xFF583B68, ACC}, {0xFFDBCAFB, ACC}, {0xFF303030, BG}, {0xFF000000, BG}, {0xFF171717, BG}, {0xFF222222, BG}});
         // Sicurezza personale: le pagine Impostazioni e il testo di "Configura" non seguono le risorse (restano i colori originali)
         MAP.put("com.google.android.apps.safetyhub", new int[][]{{0xFF292D36, BG}, {0xFF131314, BG}, {0xFF101319, BTN}, {0xFF303030, 0xFFFFFFFF}});
+        // Pixolor: il pulsante X per chiudere il cerchio diventa rosso trasparente (e0d32f2f) -> accento. Solo con quella
+        // trasparenza esatta (terzo valore): i rossi veri che l'app misura e mostra non si toccano
+        MAP.put("com.embermitre.pixolor.app", new int[][]{{0xE0D32F2F, ACC, 1}});
         CARD.put("com.google.android.apps.weather", new int[]{0xFF871F21, 0xFF101319, 0xFF0E0E0E});
     }
 
@@ -84,7 +87,7 @@ public class AppColorRemapMod extends XposedMods {
 
     private int remap(int c) {
         for (int[] rule : mRules) {
-            if ((c & 0xFFFFFF) == (rule[0] & 0xFFFFFF)) {
+            if (rule.length > 2 ? c == rule[0] : (c & 0xFFFFFF) == (rule[0] & 0xFFFFFF)) {   // 3 valori = anche la trasparenza deve coincidere
                 refreshAccent();
                 int to = rule[1] == ACC ? mAccent : rule[1] == BG ? mBg : rule[1] == BTN ? mBtn : rule[1];
                 return (c & 0xFF000000) | (to & 0xFFFFFF);
