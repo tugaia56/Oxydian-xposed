@@ -611,7 +611,8 @@ public class MiscMods extends XposedMods {
         try {
             if (dialog.getWindow() == null) return;
             android.view.View root = dialog.getWindow().getDecorView();
-            for (String n : new String[]{"reboot_animation_view", "shutdown_animation_view"}) {
+            for (String n : new String[]{"reboot_animation_view", "shutdown_animation_view",
+                    "global_actions_arrow_up_view", "global_actions_arrow_down_view"}) {   // anche le frecce verticali
                 int id = mContext.getResources().getIdentifier(n, "id", SYSTEM_UI);
                 android.view.View v = id == 0 ? null : root.findViewById(id);
                 if (v == null) { XposedBridge.log("[ Obsidian ] MiscMods power icons: " + n + " not found"); continue; }
