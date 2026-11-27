@@ -108,6 +108,14 @@ public class GestioneModsTabFragment extends Fragment {
 
                 new NavAdapter.NavItem(
                         R.drawable.ic_notifications,
+                        getString(R.string.nav_dialer),
+                        getString(R.string.nav_dialer_summary),
+                        () -> navigate(new DialerFragment(), getString(R.string.nav_dialer)),
+                        0xFF009688, // teal
+                        "telefono", "phone", "dialer", "tastierino", "keypad", "tasti", "bordo", "border", "google"),
+
+                new NavAdapter.NavItem(
+                        R.drawable.ic_notifications,
                         getString(R.string.nav_contacts),
                         getString(R.string.nav_contacts_summary),
                         () -> navigate(new ContactsFragment(), getString(R.string.nav_contacts)),

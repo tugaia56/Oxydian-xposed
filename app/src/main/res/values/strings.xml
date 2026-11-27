@@ -1438,4 +1438,13 @@
     <string name="nav_screenshot_enabler_summary_pure">Allow screenshots and screen recording in apps that block them. Needs System (framework) ticked in the Vector/LSPosed scope, then a reboot</string>
     <string name="nav_corepatch_summary_pure">Allow downgrading apps. Needs System (framework) ticked in the Vector/LSPosed scope, then a reboot</string>
     <string name="mod_health_intro_pure">Shows which mods installed correctly the last time each process (SystemUI, Settings, Framework) started. Not a live check: it reflects the state as of the last reboot — after a ROM update, just reboot and reopen this screen.</string>
+    <string name="nav_dialer">Google Phone</string>
+    <string name="nav_dialer_summary">Keypad keys: background, border and number colour</string>
+    <string name="dial_note">Works only in the Google Phone app and needs Phone ticked in Oxydian\'s scope in LSPosed. Close and reopen Phone to see changes.</string>
+    <string name="dial_section_keys">Keypad keys</string>
+    <string name="dial_fill_title">Key background</string>
+    <string name="dial_border_title">Key border</string>
+    <string name="dial_border_summary">Border around each key</string>
+    <string name="dial_border_color_title">Border colour</string>
+    <string name="dial_number_title">Number colour</string>
 </resources>

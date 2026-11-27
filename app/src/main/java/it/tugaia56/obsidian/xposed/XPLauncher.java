@@ -76,6 +76,7 @@ public class XPLauncher {
                     // Contatti e Messaggi di Google: i loro mod lavorano sul disegno dell'app (Compose), non sono di OxygenOS
                     || lpparam.packageName.equals(it.tugaia56.obsidian.xposed.hooks.contacts.ContactsMod.PKG)
                     || lpparam.packageName.equals(it.tugaia56.obsidian.xposed.hooks.messages.MessagesBubbleMod.PKG)
+                    || lpparam.packageName.equals(it.tugaia56.obsidian.xposed.hooks.dialer.DialerKeypadMod.PKG)
                     || it.tugaia56.obsidian.xposed.hooks.contacts.RisingTabBarMod.handles(lpparam.packageName)
                     || it.tugaia56.obsidian.xposed.hooks.contacts.AppColorRemapMod.handles(lpparam.packageName)) hookOtherPackage(lpparam);
             return;

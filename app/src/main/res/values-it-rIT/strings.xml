@@ -1410,4 +1410,13 @@
     <string name="nav_screenshot_enabler_summary_pure">Consente screenshot e registrazione schermo nelle app che li bloccano. Serve la spunta su Sistema (framework) tra gli ambiti di Vector/LSPosed, poi un riavvio</string>
     <string name="nav_corepatch_summary_pure">Consente il downgrade delle app. Serve la spunta su Sistema (framework) tra gli ambiti di Vector/LSPosed, poi un riavvio</string>
     <string name="mod_health_intro_pure">Mostra quali mod si sono installati correttamente all’ultimo avvio di ogni processo (SystemUI, Impostazioni, Framework). Non è un controllo in tempo reale: riflette lo stato dell’ultimo riavvio — dopo un aggiornamento ROM basta riavviare e riaprire questa schermata.</string>
+    <string name="nav_dialer">Google Telefono</string>
+    <string name="nav_dialer_summary">Tasti del tastierino: sfondo, bordo e colore dei numeri</string>
+    <string name="dial_note">Funziona solo nell\'app Google Telefono e serve la spunta su Telefono nell\'ambito di Oxydian in LSPosed. Chiudi e riapri il Telefono per vedere le modifiche.</string>
+    <string name="dial_section_keys">Tasti del tastierino</string>
+    <string name="dial_fill_title">Sfondo dei tasti</string>
+    <string name="dial_border_title">Bordo dei tasti</string>
+    <string name="dial_border_summary">Bordo attorno a ogni tasto</string>
+    <string name="dial_border_color_title">Colore del bordo</string>
+    <string name="dial_number_title">Colore dei numeri</string>
 </resources>

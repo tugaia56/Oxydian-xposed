@@ -176,6 +176,9 @@ public class ModPacks {
                 || Constants.Packages.SYSTEM_UI.equals(packageName)) {
             mods.add(it.tugaia56.obsidian.xposed.hooks.settings.CouiSwitchMod.class);
         }
+        if (it.tugaia56.obsidian.xposed.hooks.dialer.DialerKeypadMod.PKG.equals(packageName)) {
+            mods.add(it.tugaia56.obsidian.xposed.hooks.dialer.DialerKeypadMod.class);   // Telefono Google: tasti del tastierino
+        }
         if (MessagesBubbleMod.PKG.equals(packageName)) {
             mods.add(MessagesBubbleMod.class);
         }
