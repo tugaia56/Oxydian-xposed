@@ -880,11 +880,45 @@ public class MiscMods extends XposedMods {
             }
             w.setBackgroundDrawable(new CenterCropBitmapDrawable(mPowerMenuMenuBgBitmap,
                     mPowerMenuMenuBgCropCx / 100f, mPowerMenuMenuBgCropCy / 100f, mPowerMenuMenuBgCropZoom));
+            removeScrim(w.getDecorView());
         } else {
             int color = "accent".equals(mPowerMenuMenuBgMode) ? sharedAccentColor() : mPowerMenuMenuBgCustomColor;
             android.graphics.drawable.GradientDrawable gd = new android.graphics.drawable.GradientDrawable();
             gd.setColor(color);
             w.setBackgroundDrawable(gd);
+            removeScrim(w.getDecorView());
+        }
+    }
+
+    /** Il menu di spegnimento stende dopo l'apertura un velo (ScrimDrawable) o cambia lo sfondo della finestra, coprendo
+     *  quello scelto: prima di ogni disegno si controlla e si rimette (con un tetto, per non entrare mai in un ciclo). */
+    private static void removeScrim(android.view.View decor) {
+        final Drawable mine = decor.getBackground();
+        clearScrim(decor, 0);
+        final int[] fixes = {0};
+        decor.getViewTreeObserver().addOnPreDrawListener(() -> {
+            try {
+                if (fixes[0] > 60) return true;
+                Drawable now = decor.getBackground();
+                if (now != mine && mine != null) {
+                    fixes[0]++;
+                    XposedBridge.log("[ Obsidian ] MiscMods menu-bg: sfondo finestra cambiato in "
+                            + (now == null ? "null" : now.getClass().getName()) + ", rimesso");
+                    decor.setBackground(mine);
+                }
+                if (mine != null && mine.getAlpha() != 255) { fixes[0]++; mine.setAlpha(255); }
+                clearScrim(decor, 0);
+            } catch (Throwable ignored) {}
+            return true;
+        });
+    }
+
+    private static void clearScrim(android.view.View v, int depth) {
+        Drawable bg = v.getBackground();
+        if (bg != null && "ScrimDrawable".equals(bg.getClass().getSimpleName())) v.setBackground(null);
+        if (v instanceof android.view.ViewGroup && depth < 8) {
+            android.view.ViewGroup g = (android.view.ViewGroup) v;
+            for (int i = 0; i < g.getChildCount(); i++) clearScrim(g.getChildAt(i), depth + 1);
         }
     }
 
