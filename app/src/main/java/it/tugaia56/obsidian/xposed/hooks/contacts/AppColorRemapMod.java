@@ -36,7 +36,8 @@ public class AppColorRemapMod extends XposedMods {
     static {
         MAP.put("com.google.android.apps.weather", new int[][]{{0xFFDBCAFB, ACC}, {0xFF4D4169, 0xFFFFFFFF}, {0xFFFF9993, 0xFFFFFFFF}});
         // Solid Explorer: il suo overlay non si puo' piu' fare (le risorse hanno due pacchetti e il primo non e' il suo). tema Material: 583b68/dbcafb -> accento; temi Scuro (sfondo 303030) e Onice (sfondo nero 000000, intestazione 171717): -> sfondo del Theme; primario/secondario si scelgono nell'app; l'accento del Theme e' anche tra i colori primario/secondario
-        MAP.put("pl.solidexplorer2", new int[][]{{0xFF583B68, ACC}, {0xFFDBCAFB, ACC}, {0xFF303030, BG}, {0xFF000000, BG}, {0xFF171717, BG}});
+        // 222222 = fondo dei dialoghi del tema scuro
+        MAP.put("pl.solidexplorer2", new int[][]{{0xFF583B68, ACC}, {0xFFDBCAFB, ACC}, {0xFF303030, BG}, {0xFF000000, BG}, {0xFF171717, BG}, {0xFF222222, BG}});
         // Sicurezza personale: le pagine Impostazioni e il testo di "Configura" non seguono le risorse (restano i colori originali)
         MAP.put("com.google.android.apps.safetyhub", new int[][]{{0xFF292D36, BG}, {0xFF131314, BG}, {0xFF101319, BTN}, {0xFF303030, 0xFFFFFFFF}});
         CARD.put("com.google.android.apps.weather", new int[]{0xFF871F21, 0xFF101319, 0xFF0E0E0E});
@@ -224,6 +225,32 @@ public class AppColorRemapMod extends XposedMods {
      * Solid Explorer: l'accento del Theme al posto del viola #673ab7 nel selettore di colore primario/secondario.
      */
     private void installSolidExplorer(final XC_LoadPackage.LoadPackageParam lpparam0) {
+        // menu a comparsa: sfondo del Theme con bordo accento (stesso colore della pagina, senza bordo si confondevano)
+        try {
+            XposedBridge.hookAllMethods(android.view.View.class, "onAttachedToWindow", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam param) {
+                    try {
+                        if (!param.thisObject.getClass().getName().endsWith("PopupWindow$PopupDecorView")) return;
+                        final android.view.ViewGroup decor = (android.view.ViewGroup) param.thisObject;
+                        decor.post(() -> {
+                            try {
+                                android.view.View c = decor.getChildAt(0);
+                                if (c == null || c.getBackground() == null) return;
+                                refreshAccent();
+                                float d = c.getResources().getDisplayMetrics().density;
+                                int l = c.getPaddingLeft(), t = c.getPaddingTop(), r = c.getPaddingRight(), b = c.getPaddingBottom();
+                                android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
+                                g.setColor(mBg);
+                                g.setStroke(Math.round(1.5f * d), mAccent);
+                                g.setCornerRadius(12f * d);
+                                c.setBackground(g);
+                                c.setPadding(l, t, r, b);
+                            } catch (Throwable ignored) {}
+                        });
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) { XposedBridge.log("[ Obsidian ] AppColorRemapMod Solid popup: " + t); }
         // colori di sfondo sostituiti alla creazione del drawable (su OxygenOS 16 gli sfondi non passano dalle chiamate di disegno che si intercettano)
         try {
             XposedBridge.hookAllConstructors(android.graphics.drawable.ColorDrawable.class, new XC_MethodHook() {
