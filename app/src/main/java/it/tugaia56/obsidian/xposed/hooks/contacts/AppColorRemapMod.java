@@ -225,6 +225,27 @@ public class AppColorRemapMod extends XposedMods {
      * Solid Explorer: l'accento del Theme al posto del viola #673ab7 nel selettore di colore primario/secondario.
      */
     private void installSolidExplorer(final XC_LoadPackage.LoadPackageParam lpparam0) {
+        // colore primario/accento salvato dall'app: se e' un accento del Theme (di adesso o di prima) si da' quello attuale
+        try {
+            final java.io.File seenFile = new java.io.File(lpparam0.appInfo.dataDir, "oxy_theme_accents.txt");
+            XposedBridge.hookAllMethods(Class.forName("android.app.SharedPreferencesImpl"), "getInt", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam param) {
+                    try {
+                        Object k = param.args[0];
+                        if (!"color_accent".equals(k) && !"color_primary".equals(k)) return;
+                        int v = (Integer) param.getResult() & 0xFFFFFF;
+                        refreshAccent();
+                        String now = Integer.toHexString(mAccent & 0xFFFFFF);
+                        String seen = ",908dff,";
+                        if (seenFile.exists()) seen += new String(java.nio.file.Files.readAllBytes(seenFile.toPath()));
+                        if (!seen.contains("," + now + ",")) {
+                            try (java.io.FileWriter w = new java.io.FileWriter(seenFile, true)) { w.write(now + ","); }
+                        }
+                        if (seen.contains("," + Integer.toHexString(v) + ",")) param.setResult(0xFF000000 | mAccent);
+                    } catch (Throwable ignored) {}
+                }
+            });
+        } catch (Throwable t) { XposedBridge.log("[ Obsidian ] AppColorRemapMod Solid accent prefs: " + t); }
         // menu a comparsa: sfondo del Theme con bordo accento (stesso colore della pagina, senza bordo si confondevano)
         try {
             XposedBridge.hookAllMethods(android.view.View.class, "onAttachedToWindow", new XC_MethodHook() {
