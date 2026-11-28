@@ -1419,4 +1419,12 @@
     <string name="dial_border_summary">Bordo attorno a ogni tasto</string>
     <string name="dial_border_color_title">Colore del bordo</string>
     <string name="dial_number_title">Colore dei numeri</string>
+    <string name="nav_pmbar">Gestione telefono</string>
+    <string name="nav_pmbar_summary">Bordo della barretta in basso (Home, Utilità)</string>
+    <string name="pmbar_note">Funziona solo in Gestione telefono e serve la spunta su Gestione telefono nell\'ambito di Oxydian in LSPosed. Chiudila e riaprila per vedere le modifiche.</string>
+    <string name="pmbar_border_title">Bordo della barretta</string>
+    <string name="pmbar_border_summary">Bordo attorno alla barretta Home / Utilità</string>
+    <string name="nav_apps">App</string>
+    <string name="nav_apps_summary">Launcher, Contatti, Messaggi, Telefono, Gestione telefono</string>
+    <string name="pmbar_fill_title">Sfondo della barretta</string>
 </resources>

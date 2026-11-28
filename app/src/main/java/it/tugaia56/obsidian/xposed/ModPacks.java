@@ -179,6 +179,9 @@ public class ModPacks {
         if (it.tugaia56.obsidian.xposed.hooks.dialer.DialerKeypadMod.PKG.equals(packageName)) {
             mods.add(it.tugaia56.obsidian.xposed.hooks.dialer.DialerKeypadMod.class);   // Telefono Google: tasti del tastierino
         }
+        if (it.tugaia56.obsidian.xposed.hooks.settings.PhoneManagerBarMod.PKG.equals(packageName)) {
+            mods.add(it.tugaia56.obsidian.xposed.hooks.settings.PhoneManagerBarMod.class);   // Gestione telefono: bordo della barretta in basso
+        }
         if (MessagesBubbleMod.PKG.equals(packageName)) {
             mods.add(MessagesBubbleMod.class);
         }

@@ -98,31 +98,6 @@ public class GestioneModsTabFragment extends Fragment {
                         "meteo", "weather", "bordi", "edge lighting"),
 
                 new NavAdapter.NavItem(
-                        R.drawable.ic_notifications,
-                        getString(R.string.nav_messages),
-                        getString(R.string.nav_messages_summary),
-                        () -> navigate(new MessagesBubblesFragment(), getString(R.string.nav_messages)),
-                        0xFF4CAF50, // green
-                        "messaggi", "messages", "bolle", "bubble", "chat", "bordo", "border",
-                        "angolo", "corner", "google"),
-
-                new NavAdapter.NavItem(
-                        R.drawable.ic_notifications,
-                        getString(R.string.nav_dialer),
-                        getString(R.string.nav_dialer_summary),
-                        () -> navigate(new DialerFragment(), getString(R.string.nav_dialer)),
-                        0xFF009688, // teal
-                        "telefono", "phone", "dialer", "tastierino", "keypad", "tasti", "bordo", "border", "google"),
-
-                new NavAdapter.NavItem(
-                        R.drawable.ic_notifications,
-                        getString(R.string.nav_contacts),
-                        getString(R.string.nav_contacts_summary),
-                        () -> navigate(new ContactsFragment(), getString(R.string.nav_contacts)),
-                        0xFF2196F3, // blue
-                        "contatti", "contacts", "rubrica", "card", "bordo", "border", "google"),
-
-                new NavAdapter.NavItem(
                         R.drawable.ic_sysui_volume,
                         getString(R.string.dark_shadow_preset_rvd),
                         getString(R.string.nav_volume_icon_summary),
@@ -137,6 +112,11 @@ public class GestioneModsTabFragment extends Fragment {
                 it.tugaia56.obsidian.ui.PureAndroidFilter.filter(requireContext(), items));
         if (it.tugaia56.obsidian.ui.PureAndroidFilter.active()) {
             // Android puro: il tab Oxydian non c'e' (era vuoto), le sue card stanno qui
+            shown.add(new NavAdapter.NavItem(
+                    R.drawable.ic_mods_tools,
+                    getString(R.string.nav_apps), getString(R.string.nav_apps_summary),
+                    () -> navigate(new AppsFragment(), getString(R.string.nav_apps)),
+                    0xFF009688, "app", "google", "contatti", "messaggi", "telefono"));
             shown.add(new NavAdapter.NavItem(
                     R.drawable.ic_settings,
                     getString(R.string.nav_boot_log), getString(R.string.nav_boot_log_summary),

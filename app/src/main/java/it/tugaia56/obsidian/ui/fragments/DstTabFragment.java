@@ -60,13 +60,12 @@ public class DstTabFragment extends Fragment {
         List<NavAdapter.NavItem> items = List.of(
 
                 new NavAdapter.NavItem(
-                        R.drawable.ic_recents,
-                        getString(R.string.nav_launcher),
-                        getString(R.string.nav_launcher_summary),
-                        () -> navigate(new LauncherFragment(),
-                                getString(R.string.nav_launcher)),
-                        0xFF009688, // teal
-                        "launcher", "recenti", "recents", "task switcher", "multitasking"),
+                        R.drawable.ic_mods_tools,
+                        getString(R.string.nav_apps),
+                        getString(R.string.nav_apps_summary),
+                        () -> navigate(new AppsFragment(), getString(R.string.nav_apps)),
+                        0xFF2196F3, // blue
+                        "app", "google", "oneplus", "contatti", "messaggi", "telefono", "gestione telefono"),
 
                 new NavAdapter.NavItem(
                         R.drawable.ic_settings,

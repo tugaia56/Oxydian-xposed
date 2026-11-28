@@ -1447,4 +1447,12 @@
     <string name="dial_border_summary">Border around each key</string>
     <string name="dial_border_color_title">Border colour</string>
     <string name="dial_number_title">Number colour</string>
+    <string name="nav_pmbar">Phone Manager</string>
+    <string name="nav_pmbar_summary">Border around the bottom bar (Home, Tools)</string>
+    <string name="pmbar_note">Works only in OnePlus Phone Manager and needs it ticked in Oxydian\'s scope in LSPosed. Close and reopen it to see changes.</string>
+    <string name="pmbar_border_title">Bottom bar border</string>
+    <string name="pmbar_border_summary">Border around the Home / Tools bar</string>
+    <string name="nav_apps">Apps</string>
+    <string name="nav_apps_summary">Launcher, Contacts, Messages, Phone, Phone Manager</string>
+    <string name="pmbar_fill_title">Bottom bar background</string>
 </resources>

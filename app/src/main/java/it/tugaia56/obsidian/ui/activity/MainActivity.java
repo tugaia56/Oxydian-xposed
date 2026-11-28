@@ -824,6 +824,27 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
                 PowerMenuFragment::new, getString(R.string.nav_misc_power_menu),
                 "power menu", "accensione", "spegnimento", "menù accensione"));
 
+        all.add(new SearchEntry(
+                getString(R.string.nav_pmbar), getString(R.string.nav_apps),
+                R.drawable.ic_mods_tools, 0xFF2196F3, R.id.tab_dst,
+                it.tugaia56.obsidian.ui.fragments.PhoneManagerFragment::new, getString(R.string.nav_pmbar),
+                "gestione telefono", "phone manager", "barra", "bordo"));
+        all.add(new SearchEntry(
+                getString(R.string.nav_contacts), getString(R.string.nav_apps),
+                R.drawable.ic_mods_tools, 0xFF2196F3, R.id.tab_dst,
+                it.tugaia56.obsidian.ui.fragments.ContactsFragment::new, getString(R.string.nav_contacts),
+                "contatti", "contacts", "rubrica"));
+        all.add(new SearchEntry(
+                getString(R.string.nav_messages), getString(R.string.nav_apps),
+                R.drawable.ic_mods_tools, 0xFF2196F3, R.id.tab_dst,
+                it.tugaia56.obsidian.ui.fragments.MessagesBubblesFragment::new, getString(R.string.nav_messages),
+                "messaggi", "messages", "bolle", "chat"));
+        all.add(new SearchEntry(
+                getString(R.string.nav_dialer), getString(R.string.nav_apps),
+                R.drawable.ic_mods_tools, 0xFF2196F3, R.id.tab_dst,
+                it.tugaia56.obsidian.ui.fragments.DialerFragment::new, getString(R.string.nav_dialer),
+                "telefono", "dialer", "tastierino", "numeri"));
+
         if (it.tugaia56.obsidian.ui.PureAndroidFilter.active()) {
             all.removeIf(e -> it.tugaia56.obsidian.ui.PureAndroidFilter.hiddenPage(e.pageSupplier));
             // il tab Oxydian non c'e': le voci che ci portavano vanno al tab Mods
