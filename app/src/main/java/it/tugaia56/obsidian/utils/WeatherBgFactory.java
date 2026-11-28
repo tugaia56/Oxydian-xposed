@@ -73,7 +73,7 @@ public class WeatherBgFactory {
         GradientDrawable inner = new GradientDrawable();
         inner.setShape(GradientDrawable.RECTANGLE);
         inner.setCornerRadius(30 * density);
-        inner.setColor(0xFF1B2029); // ObsidianTheme.DEFAULT_BG
+        inner.setColor(it.tugaia56.obsidian.xposed.utils.AccentUtil.themeBackground(0xFF1B2029));   // sfondo del Theme
 
         LayerDrawable layered = new LayerDrawable(new Drawable[]{accentDrawable, inner});
         int inset = Math.round(1.5f * density);

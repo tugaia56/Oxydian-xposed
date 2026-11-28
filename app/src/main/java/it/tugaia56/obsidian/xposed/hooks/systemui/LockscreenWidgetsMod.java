@@ -684,11 +684,17 @@ public class LockscreenWidgetsMod extends XposedMods {
 
         // Senza Colori Personalizzati l'accento va usato solo per lo stato attivo — altrimenti
         // (es. Torcia spenta) il pulsante resta comunque colorato e sembra sempre "attivo".
-        int bgColor   = mCustomColor ? (res.active ? mBigActive : mBigInactive)
-                                      : (res.active ? appAccentColor() : 0x40FFFFFF);
+        boolean userColor = userColor(res.active ? KEY_BIG_ACTIVE : KEY_BIG_INACTIVE);
+        boolean outlined = !userColor && !(res.toggle && res.active);
+        int bgColor   = userColor ? (res.active ? mBigActive : mBigInactive) : defaultFill(res);
         int iconColor = mCustomColor ? (res.active ? mBigIconActive : mBigIconInactive) : 0xFFFFFFFF;
 
         applyFabBackground(fab, bgColor);
+        if (outlined && !mCustomBg) {
+            // un Drawable vero (non le proprieta' del pulsante, che schiariscono il colore: vedi applyFabBackground)
+            fab.setBackgroundTintList(null);
+            fab.setBackground(outlinedBg(GradientDrawable.RECTANGLE, bgColor));
+        }
         if (res.icon != null) {
             fab.setIcon(res.tintable ? tint(res.icon, iconColor) : res.icon);
         }
@@ -721,8 +727,9 @@ public class LockscreenWidgetsMod extends XposedMods {
         int size = dp(sizeDp);
         int padding = dp(sizeDp / 4);
 
-        int bgColor   = mCustomColor ? (res.active ? mSmallActive : mSmallInactive)
-                                      : (res.active ? appAccentColor() : 0x40FFFFFF);
+        boolean userColor = userColor(res.active ? KEY_SMALL_ACTIVE : KEY_SMALL_INACTIVE);
+        boolean outlined = !userColor && !(res.toggle && res.active);
+        int bgColor   = userColor ? (res.active ? mSmallActive : mSmallInactive) : defaultFill(res);
         int iconColor = mCustomColor ? (res.active ? mSmallIconActive : mSmallIconInactive) : 0xFFFFFFFF;
 
         ImageView iv = new ImageView(appContext != null ? appContext : mContext);
@@ -735,7 +742,7 @@ public class LockscreenWidgetsMod extends XposedMods {
             GradientDrawable bg = new GradientDrawable();
             bg.setShape(GradientDrawable.OVAL);
             bg.setColor(bgColor);
-            iv.setBackground(bg);
+            iv.setBackground(outlined ? outlinedBg(GradientDrawable.OVAL, bgColor) : bg);
         }
         iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
         if (res.icon != null) iv.setImageDrawable(res.icon);
@@ -749,6 +756,27 @@ public class LockscreenWidgetsMod extends XposedMods {
         Drawable wrapped = d.mutate();
         wrapped.setTint(color);
         return wrapped;
+    }
+
+    /** Colore scelto a mano per questo stato ("Colori Personalizzati" acceso e quel colore attivo). */
+    private boolean userColor(String key) {
+        return mCustomColor && Xprefs.getBoolean(key + "_on", false);
+    }
+
+    /** Senza colore scelto: sfondo del Theme; pieno in accento solo l'interruttore acceso (Torcia, Wi-Fi...). */
+    private int defaultFill(SlotResources res) {
+        return res.toggle && res.active ? appAccentColor()
+                : it.tugaia56.obsidian.xposed.utils.AccentUtil.themeBackground(0xFF1B2029);
+    }
+
+    private GradientDrawable outlinedBg(int shape, int fill) {
+        float density = mContext.getResources().getDisplayMetrics().density;
+        GradientDrawable d = new GradientDrawable();
+        d.setShape(shape);
+        if (shape == GradientDrawable.RECTANGLE) d.setCornerRadius(1000f);
+        d.setColor(fill);
+        d.setStroke(Math.round(1.5f * density), appAccentColor());
+        return d;
     }
 
     private int appAccentColor() {
@@ -816,6 +844,7 @@ public class LockscreenWidgetsMod extends XposedMods {
         String label = "";
         boolean tintable = true;
         boolean active = true;
+        boolean toggle = false;   // ha uno stato acceso/spento (Torcia, Wi-Fi...)
         View.OnClickListener onClick = v -> {};
         View.OnLongClickListener onLongClick = null;
     }
@@ -871,6 +900,7 @@ public class LockscreenWidgetsMod extends XposedMods {
             }
             case 5 -> { // Torcia
                 r.icon = resolveDrawable("ic_widget_torch");
+                r.toggle = true;
                 r.active = mTorchOn;
                 r.label = mTorchOn ? "Torcia attivata" : "Torcia disattivata";
                 r.onClick = v -> toggleTorch();
@@ -898,6 +928,7 @@ public class LockscreenWidgetsMod extends XposedMods {
                 if (mWifiManager == null) { return null; }
                 boolean wifiOn = mWifiManager.isWifiEnabled();
                 r.icon = resolveDrawable("ic_widget_wifi");
+                r.toggle = true;
                 r.active = wifiOn;
                 r.label = wifiOn ? "Wi-Fi attivo" : "Wi-Fi disattivo";
                 r.onClick = v -> toggleWifi();
@@ -906,6 +937,7 @@ public class LockscreenWidgetsMod extends XposedMods {
                 if (mTelephonyManager == null) { return null; }
                 boolean dataOn = isMobileDataOn();
                 r.icon = resolveDrawable("ic_widget_mobile_data");
+                r.toggle = true;
                 r.active = dataOn;
                 r.label = dataOn ? "Dati mobili attivati" : "Dati mobili disattivati";
                 r.onClick = v -> toggleMobileData();
@@ -914,6 +946,7 @@ public class LockscreenWidgetsMod extends XposedMods {
                 if (mWifiManager == null) { return null; }
                 boolean apOn = isHotspotOn();
                 r.icon = resolveDrawable("ic_widget_hotspot");
+                r.toggle = true;
                 r.active = apOn;
                 r.label = apOn ? "Hotspot attivato" : "Hotspot disattivato";
                 r.onClick = v -> toggleHotspot(apOn);
@@ -922,6 +955,7 @@ public class LockscreenWidgetsMod extends XposedMods {
                 if (mBluetoothAdapter == null) { return null; }
                 boolean btOn = mBluetoothAdapter.isEnabled();
                 r.icon = resolveDrawable("ic_widget_bluetooth");
+                r.toggle = true;
                 r.active = btOn;
                 r.label = btOn ? "Bluetooth attivo" : "Bluetooth disattivo";
                 r.onClick = v -> toggleBluetooth();
