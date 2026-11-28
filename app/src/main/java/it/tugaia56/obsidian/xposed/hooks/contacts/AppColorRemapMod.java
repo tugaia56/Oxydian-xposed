@@ -50,7 +50,7 @@ public class AppColorRemapMod extends XposedMods {
         // riquadri -> card, rosso di MEGA e pulsante bianco -> accento
         MAP.put("mega.privacy.android.app", new int[][]{{0xFF151616, BG}, {0xFF303233, BTN}, {0xFF494A4D, BTN},
                 {0xFFF23433, ACC}, {0xFFFB6361, ACC}, {0xFFF4F4F5, ACC}, {0xFF222324, BTN},
-                {0xFFFAFAFB, ACC50}});   // i cerchi di "Fai di piu' con MEGA": accento trasparente
+                {0xFFFAFAFB, ACC50}, {0xFF09BF5B, ACC}});   // i cerchi di "Fai di piu' con MEGA": accento trasparente
         ICONS.put("mega.privacy.android.app", new int[][]{{0xFF04101E, 0xFFFFFFFF}, {0xFF303233, 0xFFFFFFFF}});   // icone scure su + e cerchi: bianche
         CARD.put("com.google.android.apps.weather", new int[]{0xFF871F21, 0xFF101319, 0xFF0E0E0E});
     }
