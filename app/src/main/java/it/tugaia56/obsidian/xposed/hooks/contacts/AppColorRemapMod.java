@@ -29,8 +29,11 @@ public class AppColorRemapMod extends XposedMods {
     private static final int ACC = 0;   // segnaposto: accento
     private static final int BG = 1;    // segnaposto: sfondo del Theme (system_background_dark)
     private static final int BTN = 2;   // segnaposto: button_material_dark
+    private static final int ACC50 = 5;   // segnaposto: accento al 50%
     private static final int SOLID_ACCENT_SLOT = 3;   // Solid Explorer: 4o colore del selettore (viola #673ab7) = accento del Theme
     private static final Map<String, int[][]> MAP = new HashMap<>();
+    // solo per i filtri colore (le icone colorate): non tocca sfondi e testi dello stesso colore
+    private static final Map<String, int[][]> ICONS = new HashMap<>();
     // card riempite con un filtro colore di questo colore: sfondo del Theme + bordo accento
     private static final Map<String, int[]> CARD = new HashMap<>();
     static {
@@ -43,6 +46,12 @@ public class AppColorRemapMod extends XposedMods {
         // Pixolor: il pulsante X per chiudere il cerchio diventa rosso trasparente (e0d32f2f) -> accento. Solo con quella
         // trasparenza esatta (terzo valore): i rossi veri che l'app misura e mostra non si toccano
         MAP.put("com.embermitre.pixolor.app", new int[][]{{0xE0D32F2F, ACC, 1}});
+        // MEGA: le schermate hanno i colori scritti nell'app (l'overlay del Theme colora solo lo splash): sfondo -> Theme,
+        // riquadri -> card, rosso di MEGA e pulsante bianco -> accento
+        MAP.put("mega.privacy.android.app", new int[][]{{0xFF151616, BG}, {0xFF303233, BTN}, {0xFF494A4D, BTN},
+                {0xFFF23433, ACC}, {0xFFFB6361, ACC}, {0xFFF4F4F5, ACC}, {0xFF222324, BTN},
+                {0xFFFAFAFB, ACC50}});   // i cerchi di "Fai di piu' con MEGA": accento trasparente
+        ICONS.put("mega.privacy.android.app", new int[][]{{0xFF04101E, 0xFFFFFFFF}, {0xFF303233, 0xFFFFFFFF}});   // icone scure su + e cerchi: bianche
         CARD.put("com.google.android.apps.weather", new int[]{0xFF871F21, 0xFF101319, 0xFF0E0E0E});
     }
 
@@ -89,6 +98,7 @@ public class AppColorRemapMod extends XposedMods {
         for (int[] rule : mRules) {
             if (rule.length > 2 ? c == rule[0] : (c & 0xFFFFFF) == (rule[0] & 0xFFFFFF)) {   // 3 valori = anche la trasparenza deve coincidere
                 refreshAccent();
+                if (rule[1] == ACC50) return (mAccent & 0xFFFFFF) | 0x80000000;
                 int to = rule[1] == ACC ? mAccent : rule[1] == BG ? mBg : rule[1] == BTN ? mBtn : rule[1];
                 return (c & 0xFF000000) | (to & 0xFFFFFF);
             }
@@ -108,8 +118,19 @@ public class AppColorRemapMod extends XposedMods {
             }
         };
         try { XposedHelpers.findAndHookMethod(Paint.class, "setColor", int.class, first); } catch (Throwable t) { XposedBridge.log("[ Obsidian ] AppColorRemapMod setColor: " + t); }
-        try { XposedBridge.hookAllConstructors(android.graphics.PorterDuffColorFilter.class, first); } catch (Throwable ignored) {}
-        try { XposedBridge.hookAllConstructors(android.graphics.BlendModeColorFilter.class, first); } catch (Throwable ignored) {}
+        final int[][] icons = ICONS.get(lpparam.packageName);
+        XC_MethodHook filter = icons == null ? first : new XC_MethodHook() {
+            @Override protected void beforeHookedMethod(MethodHookParam param) {
+                try {
+                    if (param.args.length == 0 || !(param.args[0] instanceof Integer)) return;
+                    int c = (Integer) param.args[0];
+                    for (int[] r : icons) if ((c & 0xFFFFFF) == (r[0] & 0xFFFFFF)) { param.args[0] = (c & 0xFF000000) | (r[1] & 0xFFFFFF); return; }
+                    param.args[0] = remap(c);
+                } catch (Throwable ignored) {}
+            }
+        };
+        try { XposedBridge.hookAllConstructors(android.graphics.PorterDuffColorFilter.class, filter); } catch (Throwable ignored) {}
+        try { XposedBridge.hookAllConstructors(android.graphics.BlendModeColorFilter.class, filter); } catch (Throwable ignored) {}
         // Paint.setColor(long): Compose assegna i colori come "color long" (API 26+); si converte in ARGB, si sostituisce e si riconverte
         try {
             XposedBridge.hookAllMethods(Paint.class, "setColor", new XC_MethodHook() {
