@@ -1427,4 +1427,9 @@
     <string name="nav_apps">App</string>
     <string name="nav_apps_summary">Launcher, Contatti, Messaggi, Telefono, Gestione telefono</string>
     <string name="pmbar_fill_title">Sfondo della barretta</string>
+    <string name="launcher_recents_style_title">Stile del pulsante</string>
+    <string-array name="launcher_recents_style_entries">
+        <item>Pieno</item>
+        <item>Scuro con bordo</item>
+    </string-array>
 </resources>

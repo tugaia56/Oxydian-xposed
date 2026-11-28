@@ -221,6 +221,7 @@ public class ModPacks {
         if (Constants.Packages.LAUNCHER.equals(packageName)) {
             mods.add(LauncherMod.class);
             mods.add(LauncherCardBackgroundMod.class);
+            mods.add(it.tugaia56.obsidian.xposed.hooks.launcher.LauncherRecentsButtonMod.class);   // pulsante Chiudi delle recenti
         }
         // interruttori AndroidX/Material (SwitchCompat, MaterialSwitch) nello stile scelto, in ogni app dove il modulo e' attivo
         mods.add(it.tugaia56.obsidian.xposed.hooks.settings.SwitchCompatMod.class);

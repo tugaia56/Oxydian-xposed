@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.tugaia56.obsidian.R;
+import it.tugaia56.obsidian.receivers.BootReceiver;
 import it.tugaia56.obsidian.ui.activity.MainActivity;
 import it.tugaia56.obsidian.ui.adapters.GroupUtils;
 import it.tugaia56.obsidian.ui.adapters.ListWidgetAdapter;
@@ -30,10 +31,8 @@ import it.tugaia56.obsidian.ui.adapters.SliderWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.SwitchWidgetAdapter;
 import it.tugaia56.obsidian.ui.adapters.WarningBannerAdapter;
 import it.tugaia56.obsidian.ui.events.ColorSelectedEvent;
-import it.tugaia56.obsidian.utils.Constants;
 import it.tugaia56.obsidian.utils.ObsidianPrefs;
 import it.tugaia56.obsidian.utils.ObsidianTheme;
-import it.tugaia56.obsidian.utils.overlay.FabricatedUtil;
 
 /**
  * Launcher hub — full mirror of OC's launcher_mods.xml (Home Layout, Folder Layout, Drawer,
@@ -86,11 +85,7 @@ public class LauncherFragment extends Fragment {
 
     // Fabricated overlay names — color resource (OOS16) + the two OOS15 drawable
     // resources named by the user, so the feature works across OOS versions.
-    private static final String OVERLAY_RECENTS_COLOR     = "LAUNCHER_RECENTS_0";
-    private static final String OVERLAY_RECENTS_DRAWABLE1 = "LAUNCHER_RECENTS_1";
-    private static final String OVERLAY_RECENTS_DRAWABLE2 = "LAUNCHER_RECENTS_2";
-    private static final String[] OVERLAY_RECENTS_NAMES = {
-            OVERLAY_RECENTS_COLOR, OVERLAY_RECENTS_DRAWABLE1, OVERLAY_RECENTS_DRAWABLE2};
+    private static final String KEY_RECENTS_BTN_STYLE = "LAUNCHER_RECENTS_BTN_STYLE";   // 0 pieno, 1 scuro con bordo
 
 
     private static final int RECENTS_COLOR_DIALOG_ID = KEY_RECENTS_BTN_COLOR.hashCode();
@@ -138,6 +133,11 @@ public class LauncherFragment extends Fragment {
                 recentsButtonColorSwitch(),
                 sliderItem(getString(R.string.launcher_recents_icon_round), "launcher_recents_icon_round", 0, 50, 30),
                 sliderItem(getString(R.string.launcher_recents_icon_size), "launcher_recents_icon_size", 100, 200, 100)));
+        if (ObsidianPrefs.getBoolean(KEY_RECENTS_BTN_COLOR + "_on", false)) {
+            recentsRows.add(4, new ListWidgetAdapter.ListItem(getString(R.string.launcher_recents_style_title),
+                    getResources().getStringArray(R.array.launcher_recents_style_entries)[ObsidianPrefs.getInt(KEY_RECENTS_BTN_STYLE, 0) == 1 ? 1 : 0],
+                    this::showRecentsStyleDialog));
+        }
         GroupUtils.addGroup(chain, recentsRows);
 
         // ── Home Layout ──────────────────────────────────────────────────────
@@ -203,12 +203,9 @@ public class LauncherFragment extends Fragment {
                 getString(R.string.launcher_recents_color_no_reboot), on, null);
         item.onChanged = () -> {
             ObsidianPrefs.putBoolean(KEY_RECENTS_BTN_COLOR + "_on", item.checked);
-            if (item.checked) {
-                new Thread(() -> applyRecentsBtnColor(currentRecentsColor())).start();
-                showRecentsColorModeDialog();
-            } else {
-                new Thread(this::disableRecentsBtnColor).start();
-            }
+            new Thread(BootReceiver::removeOldRecentsOverlays).start();
+            rebuild();
+            if (item.checked) showRecentsColorModeDialog();
         };
         item.onRowClick = this::showRecentsColorModeDialog;
         return item;
@@ -296,10 +293,18 @@ public class LauncherFragment extends Fragment {
         ObsidianTheme.themeDialog(dlgRef[0]);
     }
 
-    private static int currentRecentsColor() {
-        return ObsidianPrefs.getBoolean(KEY_RECENTS_BTN_COLOR + "_use_accent", false)
-                ? ObsidianTheme.overlayAccent()
-                : ObsidianPrefs.getInt(KEY_RECENTS_BTN_COLOR, 0xFF6200EE);
+    private void showRecentsStyleDialog() {
+        String[] entries = getResources().getStringArray(R.array.launcher_recents_style_entries);
+        final int[] selected = {ObsidianPrefs.getInt(KEY_RECENTS_BTN_STYLE, 0) == 1 ? 1 : 0};
+        ObsidianTheme.themeDialog(new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.launcher_recents_style_title)
+                .setSingleChoiceItems(entries, selected[0], (d, which) -> selected[0] = which)
+                .setPositiveButton(R.string.apply, (d, w) -> {
+                    ObsidianPrefs.putInt(KEY_RECENTS_BTN_STYLE, selected[0]);
+                    rebuild();
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show());
     }
 
     private String recentsColorLabel() {
@@ -309,9 +314,7 @@ public class LauncherFragment extends Fragment {
         return String.format("#%06X", 0xFFFFFF & ObsidianPrefs.getInt(KEY_RECENTS_BTN_COLOR, 0xFF6200EE));
     }
 
-    /** RRO overlay applied once at selection time (no live Xposed hook to re-resolve at draw
-     *  time), so "Accento" bakes the CURRENT accent colour in — same as "Personalizzato", if the
-     *  global accent changes later this needs re-selecting to pick up the new value. */
+    /** Il colore lo applica LauncherRecentsButtonMod mentre disegna il pulsante: "Accento" segue l'accento da solo. */
     private void showRecentsColorModeDialog() {
         String[] entries = { getString(R.string.color_mode_accent), getString(R.string.color_mode_custom) };
         int current = ObsidianPrefs.getBoolean(KEY_RECENTS_BTN_COLOR + "_use_accent", false) ? 0 : 1;
@@ -323,10 +326,8 @@ public class LauncherFragment extends Fragment {
                     boolean useAccent = selected[0] == 0;
                     ObsidianPrefs.putBoolean(KEY_RECENTS_BTN_COLOR + "_use_accent", useAccent);
                     ObsidianPrefs.putBoolean(KEY_RECENTS_BTN_COLOR + "_on", true);
+                    new Thread(BootReceiver::removeOldRecentsOverlays).start();
                     if (useAccent) {
-                        int color = ObsidianTheme.overlayAccent();
-                        ObsidianPrefs.putInt(KEY_RECENTS_BTN_COLOR, color);
-                        new Thread(() -> applyRecentsBtnColor(color)).start();
                         rebuild();
                     } else if (getActivity() instanceof MainActivity) {
                         int currentColor = ObsidianPrefs.getInt(KEY_RECENTS_BTN_COLOR, 0xFF6200EE);
@@ -341,27 +342,9 @@ public class LauncherFragment extends Fragment {
     public void onColorSelected(ColorSelectedEvent event) {
         if (event.dialogId() != RECENTS_COLOR_DIALOG_ID) return;
         ObsidianPrefs.putInt(KEY_RECENTS_BTN_COLOR, event.color());
-        new Thread(() -> applyRecentsBtnColor(event.color())).start();
         rebuild();
     }
 
-    private void applyRecentsBtnColor(int color) {
-        ObsidianPrefs.putInt(KEY_RECENTS_BTN_COLOR + "_baked", color);
-        String hex = fmt(color);
-        String pkg = Constants.LAUNCHER;
-        FabricatedUtil.buildAndEnableOverlays(
-                new Object[]{pkg, OVERLAY_RECENTS_COLOR,     "color",    "toggle_bar_apply_btn_enabled_color", hex},
-                new Object[]{pkg, OVERLAY_RECENTS_DRAWABLE1, "drawable", "toggle_bar_apply_btn_enabled_color", hex},
-                new Object[]{pkg, OVERLAY_RECENTS_DRAWABLE2, "drawable", "recent_clear_circle",                hex});
-    }
-
-    private void disableRecentsBtnColor() {
-        FabricatedUtil.disableOverlays(OVERLAY_RECENTS_NAMES);
-    }
-
-    private static String fmt(int color) {
-        return String.format("0x%08X", 0xFFFFFFFFL & color);
-    }
 
     @Override
     public void onDestroy() {

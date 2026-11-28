@@ -1455,4 +1455,9 @@
     <string name="nav_apps">Apps</string>
     <string name="nav_apps_summary">Launcher, Contacts, Messages, Phone, Phone Manager</string>
     <string name="pmbar_fill_title">Bottom bar background</string>
+    <string name="launcher_recents_style_title">Button style</string>
+    <string-array name="launcher_recents_style_entries">
+        <item>Filled</item>
+        <item>Dark with border</item>
+    </string-array>
 </resources>

@@ -10,7 +10,6 @@ import it.tugaia56.obsidian.utils.Constants;
 import it.tugaia56.obsidian.utils.DstFabricatedUtil;
 import it.tugaia56.obsidian.utils.ModuleConstants;
 import it.tugaia56.obsidian.utils.ObsidianPrefs;
-import it.tugaia56.obsidian.utils.ObsidianTheme;
 import it.tugaia56.obsidian.utils.overlay.FabricatedUtil;
 
 import static it.tugaia56.obsidian.utils.DarkShadowUtils.PREF_PREFIX;
@@ -37,12 +36,8 @@ public class BootReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if (!Intent.ACTION_BOOT_COMPLETED.equals(action) && !Intent.ACTION_USER_UNLOCKED.equals(action)) return;
 
-        // Launcher Recents button color — re-applied from prefs (live accent) after the
-        // launcher/OMS settle, so a boot-time same-target overlay race can't leave it off.
-        new Thread(() -> {
-            try { Thread.sleep(20000); } catch (InterruptedException ignored) {}
-            reapplyRecentsBtn();
-        }).start();
+        // Pulsante "Chiudi" delle recenti: ora lo colora una mod nel launcher, si tolgono i vecchi overlay
+        new Thread(BootReceiver::removeOldRecentsOverlays).start();
 
         // DST ACCENT/BACKGROUND overlays (target: android) — OOS ThemeManager resets
         // them after boot, so we wait 15s to re-apply after ThemeManager finishes.
@@ -52,31 +47,11 @@ public class BootReceiver extends BroadcastReceiver {
         }).start();
     }
 
-    /** Se il pulsante "Chiudi" delle recenti segue l'accento ma l'overlay e' stato cotto con un accento diverso
-     *  (l'accento e' cambiato dopo l'ultimo avvio), lo rifa col colore attuale. Chiamato all'apertura dell'app. */
-    public static void syncRecentsBtnIfStale() {
-        String key = "LAUNCHER_RECENTS_BTN_COLOR";
-        if (!ObsidianPrefs.getBoolean(key + "_on", false) || !ObsidianPrefs.getBoolean(key + "_use_accent", false)) return;
-        if (ObsidianPrefs.getInt(key + "_baked", 0) == ObsidianTheme.overlayAccent()) return;
-        reapplyRecentsBtn();
-    }
-
-    private static void reapplyRecentsBtn() {
-        String key = "LAUNCHER_RECENTS_BTN_COLOR";
-        if (!ObsidianPrefs.getBoolean(key + "_on", false)) return;
-        int color = ObsidianPrefs.getBoolean(key + "_use_accent", false)
-                ? ObsidianTheme.overlayAccent()
-                : ObsidianPrefs.getInt(key, 0xFF6200EE);
-        ObsidianPrefs.putInt(key + "_baked", color);
-        String hex = fmt(color);
-        FabricatedUtil.buildAndEnableOverlays(
-            new Object[]{Constants.LAUNCHER, "LAUNCHER_RECENTS_0", "color",
-                    "toggle_bar_apply_btn_enabled_color", hex},
-            new Object[]{Constants.LAUNCHER, "LAUNCHER_RECENTS_2", "drawable",
-                    "recent_clear_circle", hex});
-    }
-
-    private static String fmt(int color) {
-        return String.format("0x%08X", 0xFFFFFFFFL & color);
+    /** Il vecchio metodo scriveva il colore in tre overlay (che coprirebbero la mod): si tolgono, una volta sola. */
+    public static void removeOldRecentsOverlays() {
+        String baked = "LAUNCHER_RECENTS_BTN_COLOR_baked";
+        if (ObsidianPrefs.getInt(baked, 0) == 0) return;
+        FabricatedUtil.disableOverlays("LAUNCHER_RECENTS_0", "LAUNCHER_RECENTS_1", "LAUNCHER_RECENTS_2");
+        ObsidianPrefs.putInt(baked, 0);
     }
 }
